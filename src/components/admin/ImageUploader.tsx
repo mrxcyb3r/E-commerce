@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Image as ImageIcon, Plus, X, Upload, Check, Star, ArrowLeft, ArrowRight } from 'lucide-react';
+import { supabase } from '../lib/supabase/client';
 
 interface ImageUploaderProps {
   images: string[];
@@ -7,6 +8,18 @@ interface ImageUploaderProps {
   maxImages?: number;
   label?: string;
   helperText?: string;
+}
+
+interface UploadProgress {
+  progress: number;
+  status: 'idle' | 'uploading' | 'success' | 'error';
+  error?: string;
+}
+
+interface ImageUploadState {
+  url: string;
+  progress: UploadProgress;
+  isPrimary: boolean;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -18,19 +31,30 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const [urlInput, setUrlInput] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadErrors, setUploadErrors] = useState<{ [key: number]: string }>({});
+  const [uploadProgress, setUploadProgress] = useState<Map<number, UploadProgress>>(new Map());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [primaryIndex, setPrimaryIndex] = useState(0);
+
+  // Initialize progress states for existing images
+  useEffect(() => {
+    const progressMap = new Map<number, UploadProgress>();
+    images.forEach((_, index) => {
+      progressMap.set(index, { progress: 0, status: 'success' });
+    });
+    setUploadProgress(progressMap);
+  }, [images]);
 
   const handleAddUrl = () => {
     if (!urlInput.trim()) return;
     try {
       new URL(urlInput); // validate
+      // For URL-based images, just add them directly
       onChange([...images, urlInput.trim()]);
       setUrlInput('');
       setShowUrlInput(false);
-      setUploadError(null);
     } catch {
-      setUploadError("Iltimos, to'g'ri rasm URL manzilini kiriting.");
+      setUploadErrors(prev => ({ ...prev, 0: "Iltimos, to'g'ri rasm URL manzilini kiriting." }));
     }
   };
 
@@ -38,43 +62,74 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     const files = e.target.files as FileList;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
+    Array.from(files).forEach((file, fileIndex) => {
+      const progressId = images.length + fileIndex;
+      
+      // Validation
       if (!file.type.startsWith('image/')) {
-        setUploadError('Faqat rasm fayllari (JPG, PNG, WEBP) qabul qilinadi.');
+        setUploadErrors(prev => ({ ...prev, [progressId]: 'Faqat rasm fayllari (JPG, PNG, WEBP) qabul qilinadi.' }));
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        setUploadError("Rasm hajmi 5MB dan oshmasligi kerak.");
+        setUploadErrors(prev => ({ ...prev, [progressId]: "Rasm hajmi 5MB dan oshmasligi kerak." }));
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result;
-        if (result) {
-          onChange([...images, result as string]);
-          setUploadError(null);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+      setUploadErrors(prev => ({ ...prev, [progressId]: '' }));
+      setUploadProgress(prev => {
+        const map = new Map(progressMap);
+        map.set(progressId, { progress: 0, status: 'uploading', error: undefined });
+        return map;
+      });
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+      // Upload to Supabase Storage
+      const filePath = `product-images/${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        setUploadErrors(prev => ({ ...prev, [progressId]: uploadError.message }));
+        setUploadProgress(prev => {
+          const map = new Map(progressMap);
+          map.set(progressId, { progress: 100, status: 'error', error: uploadError.message });
+          return map;
+        });
+        return;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      // Add to state
+      onChange([...images, publicUrl]);
+      
+      setUploadProgress(prev => {
+        const map = new Map(progressMap);
+        map.set(progressId, { progress: 100, status: 'success' });
+        return map;
+      });
+    });
   };
 
   const handleRemove = (index: number) => {
+    // Optionally delete from Supabase Storage
+    const primary = images[index];
+    if (primary && primary.includes('product-images')) {
+      const path = primary.split('/').pop();
+      supabase.storage.from('product-images').remove([path]);
+    }
     const next = images.filter((_, i) => i !== index);
     onChange(next);
   };
 
   const handleSetPrimary = (index: number) => {
-    if (index === 0) return;
-    const target = images[index];
-    const rest = images.filter((_, i) => i !== index);
-    onChange([target, ...rest]);
+    if (index === primaryIndex) return;
+    setPrimaryIndex(index);
   };
 
   const handleMove = (index: number, direction: 'left' | 'right') => {
@@ -121,153 +176,88 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             />
           </div>
         )}
-      </div>
 
-      <p className="text-xs text-neutral-500 dark:text-neutral-400">
-        {helperText}
-      </p>
-
-      {/* URL Input Form */}
-      {showUrlInput && (
-        <div className="p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-2">
-          <div className="flex items-center gap-2">
+        {showUrlInput && (
+          <div className="mt-2">
             <input
-              type="url"
+              type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
-              placeholder="https://images.unsplash.com/... yoki rasm havolasi"
-              className="flex-1 text-xs px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddUrl();
-                }
-              }}
+              placeholder="https://..."
+              className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 text-xs"
+              placeholder="Rasm URL manzili"
             />
             <button
               type="button"
               onClick={handleAddUrl}
-              className="px-3 py-2 text-xs font-bold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 rounded-lg hover:bg-neutral-800 transition-colors"
+              className="mt-2 px-3 py-1 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-400 text-neutral-950"
             >
               Qo'shish
             </button>
           </div>
-          {uploadError && (
-            <p className="text-xs text-red-600 dark:text-red-400 font-medium">
-              {uploadError}
-            </p>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Images Grid */}
-      {images.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {images.map((img, idx) => (
-            <div
-              key={idx}
-              className={`group relative aspect-square rounded-xl overflow-hidden border-2 bg-neutral-100 dark:bg-neutral-800 ${
-                idx === 0
-                  ? 'border-amber-500 ring-2 ring-amber-500/20'
-                  : 'border-neutral-200 dark:border-neutral-700'
-              }`}
-            >
-              <img
-                src={img}
-                alt=""
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-
-              {/* Primary Badge */}
-              {idx === 0 && (
-                <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                  <Star className="w-3 h-3 fill-current" />
-                  <span>Asosiy</span>
-                </div>
-              )}
-
-              {/* Action Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                <div className="flex items-center justify-between">
-                  {idx !== 0 ? (
+        {images.length > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            {images.map((src, index) => {
+              const isPrimary = index === primaryIndex;
+              const progress = uploadProgress.get(index);
+              return (
+                <div
+                  key={index}
+                  className={`relative rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs overflow-hidden ${isPrimary ? 'border-amber-500' : ''}`}>
+                  {progress && progress.status === 'uploading' && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs">
+                      <span>{y progress}%</span>
+                    </div>
+                  )}
+                  <img
+                    src={src}
+                    alt=""
+                    className="w-full h-40 object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {progress && progress.status === 'error' && (
+                      <div className="bg-red-500/20 text-red-400 text-xs p-1 rounded">
+                        {progress.error?.substring(0, 30)}
+                      </div>
+                    )}
                     <button
                       type="button"
-                      onClick={() => handleSetPrimary(idx)}
-                      title="Asosiy rasm qilish"
-                      className="p-1 rounded-md bg-white/80 hover:bg-white text-neutral-900 text-[10px] font-bold flex items-center gap-1"
-                    >
-                      <Star className="w-3 h-3" />
-                      <span>Asosiy</span>
+                      onClick={() => handleRemove(index)}
+                      className="absolute top-1 right-1 rounded-full bg-black/60 text-white text-xs p-1 hover:bg-black/80">
+                      <X className="w-3 h-3" />
                     </button>
-                  ) : <div />}
-
-                  <button
-                    type="button"
-                    onClick={() => handleRemove(idx)}
-                    title="O'chirish"
-                    className="p-1 rounded-md bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+                    {isPrimary && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetPrimary(index)}
+                        className="absolute top-1 left-1 rounded-full bg-black/60 text-white text-xs p-1 hover:bg-black/80">
+                          <Star className="w-2 h-2" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleMove(index, 'left')}"
+                      className="absolute bottom-1 left-1 rounded-full bg-black/20 text-white text-xs p-1 hover:bg-black/40">
+                        <ArrowLeft className="w-2 h-2" />
+                      </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMove(index, 'right')}"
+                      className="absolute bottom-1 right-1 rounded-full bg-black/20 text-white text-xs p-1 hover:bg-black/40">
+                        <ArrowRight className="w-2 h-2" />
+                      </button>
+                  </div>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <button
-                    type="button"
-                    disabled={idx === 0}
-                    onClick={() => handleMove(idx, 'left')}
-                    className="p-1 rounded-md bg-black/60 hover:bg-black text-white disabled:opacity-30"
-                    title="Oldinga surish"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={idx === images.length - 1}
-                    onClick={() => handleMove(idx, 'right')}
-                    className="p-1 rounded-md bg-black/60 hover:bg-black text-white disabled:opacity-30"
-                    title="Keyinga surish"
-                  >
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Add Image Tile */}
-          {images.length < maxImages && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="aspect-square rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-900 dark:hover:border-white transition-colors flex flex-col items-center justify-center p-4 text-center group bg-neutral-50/50 dark:bg-neutral-800/30"
-            >
-              <div className="w-9 h-9 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-300 group-hover:scale-110 transition-transform">
-                <Plus className="w-5 h-5" />
-              </div>
-              <span className="mt-2 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                Rasm qo'shish
-              </span>
-            </button>
-          )}
-        </div>
-      ) : (
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-neutral-300 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-neutral-900 dark:hover:border-white transition-colors cursor-pointer bg-neutral-50/50 dark:bg-neutral-900/50"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 mx-auto flex items-center justify-center mb-3">
-            <ImageIcon className="w-6 h-6" />
+              );
+            })}
           </div>
-          <p className="text-sm font-bold text-neutral-900 dark:text-white">
-            Hali rasmlar yuklanmagan
-          </p>
-          <p className="text-xs text-neutral-500 mt-1">
-            Faylni bu yerga bosing yoki yuqoridagi "+ URL qo'shish" tugmasidan foydalaning.
-          </p>
-        </div>
-      )}
+        )}
+      </div>
+
+      <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-300 mt-1">{helperText}</p>
     </div>
   );
 };
