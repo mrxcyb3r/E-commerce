@@ -315,9 +315,9 @@ export const ProductsListPage: React.FC = () => {
                             </Link>
                             <div className="flex items-center gap-2 mt-0.5 text-[10px] text-neutral-400">
                               <span className="font-mono">{p.sku}</span>
-                              {p.images.length > 1 && (
+                              {p.images?.length > 1 && (
                                 <span className="bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.2 rounded font-medium">
-                                  {p.images.length} rasm
+                                  {p.images?.length} rasm
                                 </span>
                               )}
                             </div>
