@@ -1,0 +1,6 @@
+{
+  "name": "Ecommerce",
+  "description": "Zamonaviy va sifatli mahsulotlar raqamli vitrinasi — Mahsulotlarni onlayn ko'ring, do'kondan xarid qiling",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
