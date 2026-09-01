@@ -1,0 +1,1173 @@
+{
+  "version": "1.0",
+  "contentType": "video",
+  "libraryName": "Raqamli Vitrina Video Prompt Library",
+  "prompts": [
+    {
+      "id": "sneaker-360-turntable-spin",
+      "title": "Krossovka — 360° Silliq studiya aylanishi",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Mahsulotning geometriyasi va logotipini deformatsiya qilmasdan bir tekis 360 gradus aylantirishda eng barqaror ishlaydi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Krossovkani toza studiya poydevori ustida silliq 360 gradusga aylantirib, har tomonlama to'liq ko'rsatadi.",
+      "whatYouNeed": [
+        "Krossovkaning yondan 45 gradus burchakda olingan 1 ta tiniq rasmi"
+      ],
+      "prompt": "A continuous smooth 360-degree turntable product video of the sneaker from the uploaded reference image. The sneaker rests on a minimal matte circular white pedestal. The camera stays at a static eye-level 45-degree angle while the pedestal rotates slowly and steadily for a complete 360 rotation over 5 seconds. Constant high-key commercial softbox lighting with soft contact shadows underneath. STRICT PRODUCT PRESERVATION: The sneaker must remain 100% rigid and consistent with the reference photo throughout the entire rotation. Absolutely zero morphing, zero color changes, no shifting logos, no altering sole thickness or lacing pattern. The video ends in a clean, stable frame matching the starting angle.",
+      "negativeInstructions": [
+        "Do not morph or bend the sneaker during rotation.",
+        "Do not alter brand logos or lacing structure.",
+        "Do not change shoe colors or upper materials.",
+        "Do not add fast spinning or camera shakes."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "360-spin",
+        "turntable",
+        "catalog",
+        "reel",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sneaker-on-foot-street-walk",
+      "title": "Krossovka — Oyoqda qadam bosish (Street Walk Reel)",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Oyoq qadamlarini va poyabzal amortizatsiyasini realistik sekinlashtirilgan kadrda tabiiy yetkazadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Krossovkani odam oyog'ida shahar yo'lkasida qadam bosayotgan holda, pastki rakursdan Reels formatida namoyish etadi.",
+      "whatYouNeed": [
+        "Krossovkaning yon profili aniq ko'ringan 1 ta rasm"
+      ],
+      "prompt": "Low-angle cinematic tracking shot at ground level of a person taking 2 to 3 slow, confident forward steps wearing the exact sneakers from the reference image. The model is wearing modern dark cuffed denim. The scene takes place on a clean paved city sidewalk in soft afternoon golden daylight. The camera smoothly tracks backward at shoe level keeping the moving sneakers in razor-sharp focus with subtle realistic sole compression on each step. Shallow depth of field with softly blurred street background. STRICT PRODUCT PRESERVATION: The sneaker's sole profile, upper paneling, laces, and exact colorway must remain identical to the reference image across all frames without distortion or melting.",
+      "negativeInstructions": [
+        "Do not morph the sneaker sole or distort foot anatomy.",
+        "Do not alter brand stripes or logos during movement.",
+        "Do not generate blurry feet or extra toes.",
+        "Do not change sneaker colors."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "on-foot",
+        "walk",
+        "lifestyle",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sneaker-cinematic-light-sweep-reveal",
+      "title": "Krossovka — Kinematik nur oqimi (Cinematic Reveal)",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Yorug'lik nurlarini material ustida mayin surish va premium kontrast hosil qilish uchun qulay."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Krossovka ustidan sekin o'tuvchi nur oqimi bilan mahsulot teksturasi va shaklini jozibador ochib beradi.",
+      "whatYouNeed": [
+        "Toza fonda olingan krossovka rasmi"
+      ],
+      "prompt": "Cinematic vertical product reveal video of the sneaker from the reference photo. The camera performs a slow, subtle forward push-in toward the side profile of the shoe resting on a sleek dark granite slab. A warm directional beam of soft studio light glides smoothly from left to right across the sneaker's leather/mesh upper, highlighting the craftsmanship, brand logo, and sole contours. Ambient moody studio atmosphere. STRICT PRODUCT PRESERVATION: Keep the shoe completely static and identical to the reference photo. No geometric distortion, no changing colors, no disappearing details.",
+      "negativeInstructions": [
+        "Do not morph the product geometry.",
+        "Do not flicker or randomly change lighting colors.",
+        "Do not change brand badges or texture.",
+        "No smoke or fire effects."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "reveal",
+        "cinematic",
+        "lighting",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sneaker-macro-stitching-zoom",
+      "title": "Krossovka — Sifat va choklar makro yaqinlashuvi",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Pika",
+        "reason": "Qisqa 3 soniyali makro yaqinlashuvlar va detal ko'rsatishda tez va samarali ishlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "9:16",
+      "duration": "3 seconds",
+      "description": "Krossovkaning haqiqiy charm donadorligi, to'qimasi va tikuv iplarini juda yaqindan ko'rsatuvchi 3 soniyali makro video.",
+      "whatYouNeed": [
+        "Krossovkaning old yoki yon qismi yaqindan tushirilgan rasm"
+      ],
+      "prompt": "Macro commercial product video. The camera begins on a medium close-up of the sneaker and performs a slow, butter-smooth glide directly into the side quarter panel, focusing intimately on the genuine material texture, tight thread stitching, and embossed logo badge. Soft commercial studio rim lighting creating gentle specular highlights. STRICT PRODUCT PRESERVATION: 100% fidelity to the uploaded reference. Thread colors, leather grain, and badge typography must remain crystal clear without AI smoothing or artifacts.",
+      "negativeInstructions": [
+        "Do not hallucinate random text or blurry stitching.",
+        "Do not distort the logo or shoe profile.",
+        "Do not add rapid shake or zoom blur.",
+        "No color changes."
+      ],
+      "tags": [
+        "footwear",
+        "macro",
+        "detail",
+        "craftsmanship",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "running-shoes-lightweight-treadmill",
+      "title": "Yugurish krossovkasi — Dinamik yugurish harakati",
+      "category": "Footwear",
+      "subcategory": "Running shoes",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Sport harakatlarini tabiiy tezlik va yengil qadam ritmida realistik tasvirlaydi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Yugurish krossovkasini sportchi oyog'ida yugurish paytida, tagcharm amortizatsiyasini ko'rsatuvchi formatda taqdim etadi.",
+      "whatYouNeed": [
+        "Yugurish poyabzalining yon tomoni rasmi"
+      ],
+      "prompt": "Close-up side-profile tracking video of an athlete's feet running at a smooth steady pace on a modern red running track. The athlete is wearing the exact running shoes from the reference photo. Slow-motion 60fps aesthetic showcasing the shoe's flexible sole cushioning, lightweight mesh breathability, and ground contact. Bright natural morning sunlight. STRICT PRODUCT PRESERVATION: Preserve the exact midsole shape, color gradient, heel counter structure, and upper knit patterns from the source image. The shoe must not warp or distort mid-stride.",
+      "negativeInstructions": [
+        "Do not alter the midsole foam structure or thickness.",
+        "Do not generate unnatural foot bends or ghosting artifacts.",
+        "Do not change the shoe colorway.",
+        "No cartoonish motion trails."
+      ],
+      "tags": [
+        "footwear",
+        "running",
+        "sports",
+        "action",
+        "reels"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "football-boots-ball-tap-action",
+      "title": "Futbol butsasi — To'p bilan maydonda harakat",
+      "category": "Footwear",
+      "subcategory": "Football boots",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Sport maydoni chimlari va poyabzalning o'tkir tikanlarini barqaror harakatlantiradi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Futbol butsasini yashil maydonda to'pni qabul qilish va mayin nazorat qilish holatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Futbol butsasining yon yoki pastki shiplari ko'ringan rasm"
+      ],
+      "prompt": "Low-angle dynamic sports video on a lush green football pitch. A player wearing the exact football boots from the uploaded photo performs a slow-motion foot roll and gentle tap on a soccer ball resting on the grass. Camera slowly orbits from front-quarter to side-profile at turf level. Evening stadium floodlights creating crisp rim lighting and subtle atmospheric dew mist. STRICT PRODUCT PRESERVATION: The football boots must replicate the uploaded image with 100% accuracy: exact stud configuration, upper synthetic strike zone texture, dynamic graphic accents, and original vibrant colors.",
+      "negativeInstructions": [
+        "Do not alter the stud layout or cleat shape.",
+        "Do not distort or change brand graphic patterns.",
+        "Do not create distorted football geometry.",
+        "No unnatural leg movements."
+      ],
+      "tags": [
+        "footwear",
+        "football",
+        "sports",
+        "action",
+        "reels",
+        "featured"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "formal-shoes-luxury-slow-orbit",
+      "title": "Klassik tufli — Nafis 180° kamera aylanmasi",
+      "category": "Footwear",
+      "subcategory": "Formal shoes",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Yaltiroq charm sirtidagi nozik yorug'lik akslarini silliq aylanma harakatda premium ko'rsatadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Klassik charm tuflini quyuq yog'och pol ustida, kamera uning atrofida sekin yarim aylana qilgan holda tasvirlaydi.",
+      "whatYouNeed": [
+        "Klassik tufli juftining old yoki yon rasmi"
+      ],
+      "prompt": "Luxury commercial video featuring the pair of classic leather formal shoes from the uploaded reference. The shoes remain stationary on a rich, polished dark walnut hardwood floor. The camera executes a slow, buttery-smooth 180-degree semi-orbit from side to front at shoe height. Warm directional boutique lighting highlights the deep leather patina, burnished toe caps, and precision welt stitching. STRICT PRODUCT PRESERVATION: Preserve the exact shoe silhouette, lace eyelets, leather finish, brogue punching, and sole edge color from the reference image.",
+      "negativeInstructions": [
+        "Do not change the shoe leather finish or color shade.",
+        "Do not alter the shoe shape or add unrequested buckles.",
+        "Do not introduce shaky camera motion.",
+        "No plastic CGI reflections."
+      ],
+      "tags": [
+        "footwear",
+        "formal",
+        "leather",
+        "luxury",
+        "orbit",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "boots-winter-snow-step",
+      "title": "Qishki botinka — Qorda birinchi qadam",
+      "category": "Footwear",
+      "subcategory": "Winter boots",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Qor bosilgandagi haqiqiy qor qisirlashi va qishki havo mayinligini ajoyib yetkazadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Qishki issiq botinkani toza qor ustiga birinchi qadam bosayotgan paytda, suv o'tmasligini ko'rsatuvchi uslubda namoyish etadi.",
+      "whatYouNeed": [
+        "Qishki botinkaning to'liq yon rasmi"
+      ],
+      "prompt": "Ground-level slow-motion video of a foot taking a firm, steady step into fresh, powdery white snow wearing the exact winter boot from the uploaded reference photo. The heavy-duty tread firmly grips the snow, with delicate snow particles settling around the thick rubber sole. Crisp, clear winter daylight illuminating the waterproof leather/nubuck upper and cozy collar lining. STRICT PRODUCT PRESERVATION: The boot must strictly retain its original silhouette, lace hooks, eyelets, sole thickness, and exact colorway across all frames.",
+      "negativeInstructions": [
+        "Do not alter the boot sole tread or height.",
+        "Do not change the boot color tone.",
+        "Do not create muddy or dirty textures on the boot.",
+        "No unnatural foot deformation."
+      ],
+      "tags": [
+        "footwear",
+        "boots",
+        "winter",
+        "snow",
+        "seasonal",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "mens-tshirt-fashion-walk-urban",
+      "title": "Erkaklar futbolkasi — Shahar bo'ylab erkin qadam (Model Walk)",
+      "category": "Men",
+      "subcategory": "T-shirts",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Kiyimning tana harakatiga mos tabiiy tebranishini va model qadamlarini eng realistik aks ettiradi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Futbolkani kiygan yosh yigitning zamonaviy ko'chada oldinga qarab ishonchli yurib kelishini ko'rsatadi.",
+      "whatYouNeed": [
+        "Futbolkaning old tomoni to'liq ko'ringan 1 ta rasmi"
+      ],
+      "prompt": "Vertical medium tracking shot of a modern young male model walking forward naturally down a minimalist urban pedestrian boulevard wearing the exact t-shirt from the reference photo. The camera tracks backward smoothly at chest height keeping the model centered. Soft natural daylight, subtle natural fabric movement with every stride. The model pauses slightly at the end, looking confident. STRICT PRODUCT PRESERVATION: The t-shirt must remain completely identical to the uploaded reference: preserve exact neckline, sleeve fit, fabric color hue, chest print, and brand graphics without any distortion or blurring.",
+      "negativeInstructions": [
+        "Do not change or distort the graphic print on the shirt.",
+        "Do not alter the t-shirt color or fit.",
+        "Do not create unnatural model walk or distorted arms.",
+        "No jittery camera movements."
+      ],
+      "tags": [
+        "men",
+        "t-shirt",
+        "model",
+        "streetwear",
+        "walk",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "mens-hoodie-urban-turn-lifestyle",
+      "title": "Erkaklar xudisi — Shahar fonida 180° burilish",
+      "category": "Men",
+      "subcategory": "Hoodies",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Kapyushon va orqa/oldi qismlarini bitta silliq harakatda ko'rsatish uchun ideal."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Xudi kiygan modelning sekin yarim burilib, xudining oldi, yengi va kapyushonini ko'rsatishi.",
+      "whatYouNeed": [
+        "Xudining to'liq oldi ko'ringan rasmi"
+      ],
+      "prompt": "Medium lifestyle video of a male model wearing the exact hoodie from the reference photo standing outdoors near clean modern architectural concrete walls. The model starts at a 3/4 back-angle, then turns slowly and smoothly toward the camera, hands resting naturally near the front kangaroo pocket. Soft natural daylight illuminating the thick fleece fabric texture and hood shape. STRICT PRODUCT PRESERVATION: Ensure the hoodie remains 100% faithful to the reference image in drawstring design, pocket cut, cuff ribbing, color shade, and any chest/sleeve artwork.",
+      "negativeInstructions": [
+        "Do not alter the hoodie fit or colorway.",
+        "Do not erase or morph drawstrings or pockets.",
+        "Do not generate distorted hands or facial features.",
+        "No rapid spinning."
+      ],
+      "tags": [
+        "men",
+        "hoodie",
+        "streetwear",
+        "model",
+        "lifestyle",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "mens-suit-executive-slow-walk",
+      "title": "Klassik kostyum — Ishbilarmonlik qadami (Luxury Lounge)",
+      "category": "Men",
+      "subcategory": "Suits",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Klassik kostyumning elka tuzilishi va qat'iy matosini buzmasdan premium harakatlantiradi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Erkaklar kostyumini hashamatli biznes binosida, kostyum tugmasini to'g'irlab yurib kelayotgan model ustida ko'rsatadi.",
+      "whatYouNeed": [
+        "Kostyum yoki pidjakning old qismi aniq ko'ringan rasm"
+      ],
+      "prompt": "Slow-motion cinematic vertical video of a distinguished man wearing the exact tailored suit from the reference photo walking through a sunlit, high-ceiling luxury architectural hotel lounge. The model smoothly adjusts his jacket button with a natural gesture and pauses. Elegant commercial lighting highlighting the wool fabric weave, sharp lapels, and clean trouser crease. STRICT PRODUCT PRESERVATION: The suit must duplicate the reference image in lapel style, button arrangement, pinstripe/solid pattern, tailoring silhouette, and exact fabric color.",
+      "negativeInstructions": [
+        "Do not modify the suit cut or lapel design.",
+        "Do not alter button count or fabric pattern.",
+        "Do not change the suit color.",
+        "No unnatural hand movements."
+      ],
+      "tags": [
+        "men",
+        "suit",
+        "classic",
+        "luxury",
+        "formal",
+        "model",
+        "reel",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "mens-jacket-zipper-pull-detail",
+      "title": "Kurtka / Bomber — Zamok tortilishi va mato jilosi",
+      "category": "Men",
+      "subcategory": "Jackets",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Pika",
+        "reason": "Qisqa detallar va zamok harakatini ixcham 3 soniyada toza yaratadi."
+      },
+      "difficulty": "easy",
+      "duration": "3 seconds",
+      "aspectRatio": "9:16",
+      "description": "Kurtka zamogini yuqoriga sekin tortish va mato sifatini yaqindan ko'rsatuvchi dinamik rolik.",
+      "whatYouNeed": [
+        "Kurtkaning old tomoni va zamogi ko'ringan rasm"
+      ],
+      "prompt": "Close-up chest-level video of a model wearing the exact jacket from the uploaded reference photo. A realistic hand gently pulls the metal zipper slider upward by a few inches, demonstrating the smooth hardware action and heavy-duty jacket fabric texture. Soft directional daylight highlighting the zipper teeth and collar construction. STRICT PRODUCT PRESERVATION: The jacket's fabric sheen, zipper pull design, collar snaps, and exact color must duplicate the reference image without alteration.",
+      "negativeInstructions": [
+        "Do not distort the hand or create extra fingers.",
+        "Do not alter the zipper hardware color.",
+        "Do not change the jacket fabric or color.",
+        "No blurry motion."
+      ],
+      "tags": [
+        "men",
+        "jacket",
+        "bomber",
+        "zipper",
+        "detail",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "mens-tracksuit-athletic-stretch",
+      "title": "Erkaklar sport kastyumi — Yengil sport mashqi",
+      "category": "Men",
+      "subcategory": "Sportswear",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Sport zalidagi yorug'lik va kiyimning elastik harakatini tabiiy ko'rsatadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Sport kastyumini zamonaviy zalda, yengil mashq harakatlarini bajarayotgan sportchi ustida namoyish etadi.",
+      "whatYouNeed": [
+        "Sport kiyimining to'liq rasmi"
+      ],
+      "prompt": "Vertical commercial fitness video of an athletic male model wearing the exact tracksuit from the reference image inside a clean, modern fitness gym. The model takes a slight side step and performs a gentle upper body stretch, showcasing the suit's comfort, fit, and flexibility. Bright natural ambient lighting with modern gym aesthetic in blurred background. STRICT PRODUCT PRESERVATION: Match the exact side stripes, zipper style, brand emblems, and colorway from the reference photo without changes.",
+      "negativeInstructions": [
+        "Do not alter side stripe colors or positions.",
+        "Do not remove brand logos.",
+        "Do not change tracksuit fit.",
+        "No distorted limbs."
+      ],
+      "tags": [
+        "men",
+        "sportswear",
+        "tracksuit",
+        "gym",
+        "fitness",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "womens-dress-flowing-fabric-turn",
+      "title": "Ayollar ko'ylagi — Nafis mato tebranishi va mayin burilish",
+      "category": "Women",
+      "subcategory": "Dresses",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Ko'ylak etagining mayin hilpirashi va modelning nafis harakatini moda jurnallari darajasida hosil qiladi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ayollar ko'ylagini kiygan modelning mayin yarim burilishi va mato etagining tabiiy to'kilishi.",
+      "whatYouNeed": [
+        "Ko'ylakning to'liq bo'yi ko'ringan rasmi"
+      ],
+      "prompt": "Graceful fashion commercial video of a female model wearing the exact dress from the reference photo. The model is standing in a sun-drenched minimalist stone courtyard and performs a slow, elegant half-turn. The dress fabric catches a gentle breeze, showcasing the natural drape, silhouette flow, and movement of the skirt hem. Warm natural sunlight. STRICT PRODUCT PRESERVATION: The dress must duplicate the source image in pattern design, floral/geometric prints, neckline modesty, sleeve cuffs, and exact color tones throughout the full movement.",
+      "negativeInstructions": [
+        "Do not create violent wind or exaggerated spinning.",
+        "Do not alter the dress pattern or neckline.",
+        "Do not shorten the dress length.",
+        "Do not change dress colors."
+      ],
+      "tags": [
+        "women",
+        "dress",
+        "fabric-motion",
+        "elegant",
+        "fashion",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "womens-modest-fashion-walk",
+      "title": "Modest / Muslimalar libosi — Bejirim xiyobon qadami",
+      "category": "Women",
+      "subcategory": "Modest fashion",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Yopiq fasonlar va ro'molning saranjom turishini hurmat va nafislik bilan yetkazadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Modest libos yoki abayani zamonaviy toza binolar orasida, odobli va erkin qadam bosayotgan model ustida ko'rsatadi.",
+      "whatYouNeed": [
+        "Modest ko'ylak yoki abayaning to'liq rasmi"
+      ],
+      "prompt": "Full-body vertical video of a graceful model wearing the exact modest dress / abaya from the reference photo, paired with a matching neutral solid hijab. The model walks slowly forward in a calm, modern minimalist architectural promenade with gentle ambient daylight. The flowing silhouette and sleeve tailoring move naturally with modest grace. STRICT PRODUCT PRESERVATION: Maintain exact sleeve cuffs, neckline modesty, fabric opacity, embroidery trim, and true fabric color matching the uploaded reference photo.",
+      "negativeInstructions": [
+        "Do not make the dress tight-fitting or sheer.",
+        "Do not alter modesty or shorten hem/sleeves.",
+        "Do not change fabric texture or color.",
+        "No unnatural facial artifacts."
+      ],
+      "tags": [
+        "women",
+        "modest",
+        "abaya",
+        "dress",
+        "hijab",
+        "uzbek-market",
+        "reel",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "womens-blouse-silk-drape-dolly",
+      "title": "Ayollar ipak bluzkasi — Mayin dolly yaqinlashuvi",
+      "category": "Women",
+      "subcategory": "Blouses",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Ipak matoning nozik jilosi va yoqa bantlarini barqaror yoritishda ustun."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Bluzkaning nozik matosi, yoqa bog'ichi va yeng detallarini sekin yaqinlashuvchi kamera orqali ko'rsatadi.",
+      "whatYouNeed": [
+        "Bluzkaning old tomoni rasmi"
+      ],
+      "prompt": "Medium vertical dolly shot moving slowly toward a female model wearing the exact blouse from the reference image, standing in a bright modern design showroom. Soft diffuse natural window light highlights the silk/chiffon sheen and gentle fabric folds. The model rests one hand naturally near the collar bow, making a subtle refined gesture. STRICT PRODUCT PRESERVATION: Duplicate the exact collar bow style, button placket, sleeve cuff pleats, and color hue from the uploaded photo.",
+      "negativeInstructions": [
+        "Do not remove the collar bow or pleats.",
+        "Do not alter the blouse color tone.",
+        "Do not create distorted fingers.",
+        "No shaky camera movement."
+      ],
+      "tags": [
+        "women",
+        "blouse",
+        "silk",
+        "office",
+        "formal",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "womens-trench-coat-autumn-walk",
+      "title": "Ayollar trenchi / platshi — Kuzgi barglar va shahar qadami",
+      "category": "Women",
+      "subcategory": "Coats",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Kuzgi shahar muhitida trench matosining qulay harakatini tabiiy beradi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ayollar trench paltosini oltin kuz xiyobonida, kamar bog'langan holda yurib kelayotgan kadrda tasvirlaydi.",
+      "whatYouNeed": [
+        "Trenchning oldi va kamari ko'ringan rasmi"
+      ],
+      "prompt": "Vertical street fashion video of a woman wearing the exact trench coat from the reference photo, walking at an easy pace through a clean tree-lined boulevard in soft golden autumn daylight. The belt is tied neatly at the waist, and the coat hem sways gently with each step. Camera tracks backward at waist level. STRICT PRODUCT PRESERVATION: The trench coat must maintain its exact double-breasted buttons, shoulder epaulets, storm flap, cuff buckles, and original camel/beige color.",
+      "negativeInstructions": [
+        "Do not alter the trench coat length or cut.",
+        "Do not change buckle hardware or button styles.",
+        "Do not change the coat color.",
+        "No rainy or gloomy lighting."
+      ],
+      "tags": [
+        "women",
+        "coat",
+        "trench",
+        "autumn",
+        "seasonal",
+        "lifestyle",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "womens-handbag-shoulder-carry-walk",
+      "title": "Ayollar sumkasi — Yelka va qo'lda ushlash (Lifestyle Reel)",
+      "category": "Accessories",
+      "subcategory": "Handbags",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Sumka tutqichlari, charm tuzilishi va qizlarning tabiiy yurishini xatosiz birlashtiradi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Sumkani qo'lda yoki yelkada tutib, zamonaviy shahar markazida yurib ketayotgan estetik kadr.",
+      "whatYouNeed": [
+        "Sumkaning oldi va tutqichi to'liq ko'ringan rasm"
+      ],
+      "prompt": "Medium close-up lifestyle video focused on a stylish woman's arm and side as she walks gracefully along a modern boutique street carrying the exact handbag from the uploaded photo. The camera tracks smoothly alongside her, capturing the subtle swing of the bag, the gleaming metal clasps, and the rich leather texture in morning sunlight. STRICT PRODUCT PRESERVATION: The handbag must exactly match the reference photo in leather finish, metal hardware color (gold/silver), handle shape, and lock clasp.",
+      "negativeInstructions": [
+        "Do not morph the handbag shape during the walk.",
+        "Do not alter hardware metal finishes.",
+        "Do not distort the hand holding the strap.",
+        "Do not change the bag color."
+      ],
+      "tags": [
+        "accessories",
+        "handbag",
+        "luxury",
+        "lifestyle",
+        "women",
+        "reel",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "backpack-360-rotation-pedestal",
+      "title": "Ryukzak — 360° Har tomonlama ko'rsatish",
+      "category": "Accessories",
+      "subcategory": "Backpacks",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Ryukzakning yon cho'ntaklari, kamarlari va orqa qismini barqaror aylantirib beradi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ryukzakni poydevor ustida to'liq 360 gradusga aylantirib, oldi, yon cho'ntaklari va orqa tasmalarini ko'rsatadi.",
+      "whatYouNeed": [
+        "Ryukzakning tik turgan toza rasmi"
+      ],
+      "prompt": "A seamless 360-degree product turntable video of the uploaded backpack standing upright and fully packed on a smooth circular pedestal in a clean light-gray studio. The pedestal rotates smoothly for one complete 360 rotation over 5 seconds while a steady static camera captures the front zippers, side bottle mesh pockets, top carry handle, and padded shoulder straps in crisp focus. Balanced studio illumination. STRICT PRODUCT PRESERVATION: Retain the exact zipper pulls, logo embroidery, strap webbing, fabric weave, and colorway from the reference image without changes.",
+      "negativeInstructions": [
+        "Do not collapse the backpack structure.",
+        "Do not change pocket positions or logo badges.",
+        "Do not alter fabric colors.",
+        "No wobbling motion."
+      ],
+      "tags": [
+        "accessories",
+        "backpack",
+        "school",
+        "360-spin",
+        "turntable",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "watch-macro-light-reflection-sweep",
+      "title": "Qo'l soati — Siferblatdagi yorug'lik aksi (Macro Luxury)",
+      "category": "Accessories",
+      "subcategory": "Watches",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Soat siferblati, metall qirralari va oynadagi jilolarni buzmasdan yorug'lik oqimini hosil qiladi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Soat siferblati va metall korpusi ustidan sekin o'tuvchi nur aksi bilan hashamatli reklama tayyorlaydi.",
+      "whatYouNeed": [
+        "Soat siferblati va kamari aniq ko'ringan rasm"
+      ],
+      "prompt": "Extreme macro luxury video of the timepiece from the reference photo resting on textured dark stone. The camera performs a steady micro-glide across the bezel and crystal. A precise bar of soft studio light sweeps slowly across the dial, illuminating the hour markers, polished hands, sub-dials, and metallic case edges. High-end luxury watch commercial aesthetic. STRICT PRODUCT PRESERVATION: The watch dial layout, typography, hands, markings, and strap materials must remain 100% stable and identical to the reference photo.",
+      "negativeInstructions": [
+        "Do not invent fake dial text or morph markers.",
+        "Do not change the hands or crown design.",
+        "Do not alter the metal finish or strap material.",
+        "No blurry artifacts."
+      ],
+      "tags": [
+        "accessories",
+        "watch",
+        "luxury",
+        "macro",
+        "reveal",
+        "reel",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sunglasses-pedestal-slow-tilt",
+      "title": "Quyosh ko'zoynagi — Sekin tilt va yozgi nur",
+      "category": "Accessories",
+      "subcategory": "Sunglasses",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Pika",
+        "reason": "Ko'zoynak gardishi va linzalardagi yozgi yorug'likni ixcham formatda ko'rsatish uchun qulay."
+      },
+      "difficulty": "easy",
+      "duration": "3 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ko'zoynakni poydevorda yuqoridan pastga sekin kamera harakati bilan linza va gardish sifatini namoyish qiladi.",
+      "whatYouNeed": [
+        "Ko'zoynakning oldi yoki 45 gradus burchakdagi rasmi"
+      ],
+      "prompt": "Smooth vertical camera tilt moving down slowly from a 45-degree high angle to eye-level, focusing on the sunglasses from the reference image resting on a warm-sandstone pedestal. Warm sunlit studio lighting casting subtle organic leaf shadows across the backdrop. Transparent lens tint and polished frame edges clearly in focus. STRICT PRODUCT PRESERVATION: The sunglasses must exactly match the source image in frame shape, bridge thickness, hinge details, and lens tint color.",
+      "negativeInstructions": [
+        "Do not distort frame symmetry or shape.",
+        "Do not change lens color or gradient.",
+        "Do not add unrequested brand marks.",
+        "No glare washing out the frame."
+      ],
+      "tags": [
+        "accessories",
+        "sunglasses",
+        "tilt",
+        "minimal",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "wallet-leather-open-reveal",
+      "title": "Charm hamyon — Sekin ochilish va bo'limlar ko'rinishi",
+      "category": "Accessories",
+      "subcategory": "Wallets",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Charmning egiluvchanligi va hamyon bo'limlarining tabiiy ochilishini xatosiz yaratadi."
+      },
+      "difficulty": "easy",
+      "duration": "3 seconds",
+      "aspectRatio": "9:16",
+      "description": "Hamyonning silliq ochilib, ichki karta va kupyura bo'limlarini ko'rsatuvchi 3 soniyali video.",
+      "whatYouNeed": [
+        "Hamyonning rasmi"
+      ],
+      "prompt": "Close-up commercial video of the leather wallet from the reference photo resting on a polished wooden workbench. A pair of well-groomed hands gently and smoothly opens the wallet from closed to half-open, revealing the interior card slots and lining. Warm directional lighting highlighting the genuine leather grain and edge stitching. STRICT PRODUCT PRESERVATION: The wallet's leather texture, stitching color, card slot layout, and embossed branding must duplicate the reference image perfectly.",
+      "negativeInstructions": [
+        "Do not distort hands or generate extra fingers.",
+        "Do not alter wallet design or fold style.",
+        "Do not change leather color.",
+        "No jerky movements."
+      ],
+      "tags": [
+        "accessories",
+        "wallet",
+        "leather",
+        "craftsmanship",
+        "detail",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "school-uniform-back-to-school-reel",
+      "title": "Maktab formasi — Maktab hovlisiga kirish (Back to School)",
+      "category": "School",
+      "subcategory": "School uniforms",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Bolalar va maktab muhitining samimiy, yorug' va madaniyatli kayfiyatini yaratish uchun eng yaxshi vosita."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Maktab formasini kiygan o'quvchining maktab eshigi tomon odobli va quvnoq qadam tashlab borishi.",
+      "whatYouNeed": [
+        "Maktab formasining to'liq rasmi"
+      ],
+      "prompt": "Positive and neat commercial back-to-school video of an 11-year-old student wearing the exact school uniform outfit from the reference image, walking naturally toward a bright, modern school building holding a backpack. Morning sun rays, clean academic environment. The student turns slightly to smile. STRICT PRODUCT PRESERVATION: The school uniform jacket, vest, trousers/skirt, buttons, and collar must strictly replicate the reference photo in cut, fabric texture, and dark navy/solid color without changes.",
+      "negativeInstructions": [
+        "Do not alter the school uniform design or color.",
+        "Do not change jacket lapels or button details.",
+        "Do not create unnatural child facial artifacts.",
+        "No messy backgrounds."
+      ],
+      "tags": [
+        "school",
+        "uniform",
+        "back-to-school",
+        "kids",
+        "uzbek-market",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "school-backpack-zipper-pack-reel",
+      "title": "Maktab ryukzaki — Kitob solish va qulaylik ko'rsatish",
+      "category": "School",
+      "subcategory": "Backpacks",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Ryukzak ichiga daftar/kitob solish harakatini tabiiy va sodda yetkazadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ryukzakning asosiy bo'limiga daftar solinishi va mustahkam zamogi yopilishini ko'rsatuvchi amaliy rolik.",
+      "whatYouNeed": [
+        "Ryukzakning old tomoni rasmi"
+      ],
+      "prompt": "Commercial product video of the uploaded backpack standing on a light wooden school desk. A neat hand places a colorful school notebook into the open main compartment and smoothly pulls the zipper closed. Camera zooms out slightly to reveal the complete upright backpack. Bright morning classroom daylight. STRICT PRODUCT PRESERVATION: Keep the exact zipper pull tags, logo badge, fabric pattern, and color tone of the backpack identical to the reference image.",
+      "negativeInstructions": [
+        "Do not distort hands or book geometry.",
+        "Do not alter backpack compartments or logos.",
+        "Do not change fabric colors.",
+        "No cluttered desks."
+      ],
+      "tags": [
+        "school",
+        "backpack",
+        "back-to-school",
+        "lifestyle",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "school-shoes-walking-corridor",
+      "title": "Maktab poyabzali — Sinf koridorida qadamlar",
+      "category": "School",
+      "subcategory": "School shoes",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Klassik maktab tuflisining oyoqda qulay turishini pastki planda toza ifodalaydi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Maktab tuflisini kiygan bolaning yorug' maktab koridorida qadam bosishi.",
+      "whatYouNeed": [
+        "Maktab tuflisining yon yoki ustki rasmi"
+      ],
+      "prompt": "Low-angle tracking shot focused on the feet of a schoolboy walking down a bright, sunlit modern school hallway wearing the exact school shoes from the reference photo. Paired with neat dark school uniform trousers. The camera smoothly tracks along at ankle level, highlighting the clean black leather finish, durable sole, and comfortable step. STRICT PRODUCT PRESERVATION: Maintain exact shoe strap closure (velcro/laces), toe box shape, sole thickness, and black/navy color from the source image.",
+      "negativeInstructions": [
+        "Do not alter the shoe closure style or sole thickness.",
+        "Do not change leather color or finish.",
+        "Do not generate distorted footsteps.",
+        "No scuffs or artificial wear."
+      ],
+      "tags": [
+        "school",
+        "shoes",
+        "leather",
+        "on-foot",
+        "back-to-school",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sports-gym-training-explosive-motion",
+      "title": "Fitnes kiyimi — Zal mashg'ulotida baquvvat harakat",
+      "category": "Sports",
+      "subcategory": "Gym",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Sportchi mushaklari va kiyimining cho'zilishini dinamik zal yoritilishida kuchli aks ettiradi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Fitnes kiyimini zamonaviy trenajyor zalida, baquvvat sportchi mashq qilayotgan paytda ko'rsatadi.",
+      "whatYouNeed": [
+        "Fitnes kiyimining oldi ko'ringan rasmi"
+      ],
+      "prompt": "High-energy commercial sports video of an athletic male model wearing the exact compression gym wear from the reference photo inside a modern dark-themed training gym. The athlete performs a slow, powerful dumbbell bicep curl. Controlled studio rim lighting accentuating the fabric's compression panels, breathable mesh inserts, and sharp brand logo. STRICT PRODUCT PRESERVATION: The gym apparel must replicate the reference photo in panel stitching, logo placement, fabric sheen, and exact colorway without changes.",
+      "negativeInstructions": [
+        "Do not alter compression panel layout.",
+        "Do not change the apparel color.",
+        "Do not create distorted equipment or extra limbs.",
+        "No extreme motion blur."
+      ],
+      "tags": [
+        "sports",
+        "gym",
+        "fitness",
+        "action",
+        "training",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sports-boxing-gloves-punch-bag",
+      "title": "Boks qo'lqopi — Grushaga zarba berish dinamikasi",
+      "category": "Sports",
+      "subcategory": "Boxing",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Boks qo'lqopining qopga urilishidagi to'qnashuv va charm mustahkamligini ishonchli beradi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Boks qo'lqopini kiygan sportchining og'ir charm qopga (grusha) zarba berishi va qo'lqopning baquvvatligini ko'rsatish.",
+      "whatYouNeed": [
+        "Boks qo'lqoplarining juft rasmi"
+      ],
+      "prompt": "Slow-motion sports commercial video of a boxer wearing the exact boxing gloves from the reference photo landing a clean, controlled punch against a heavy leather punching bag. Low-angle dynamic camera with dramatic gym spotlighting highlighting the glove's genuine leather sheen, thumb curve, and wrist strap logo. Subtle chalk dust in the air. STRICT PRODUCT PRESERVATION: Maintain exact glove shape, wrist strap closure, brand typography, and original colorway from the reference image.",
+      "negativeInstructions": [
+        "Do not alter brand logos or typography on gloves.",
+        "Do not change glove padding proportions or color.",
+        "Do not create distorted boxing bag physics.",
+        "No unnatural blood or sweat."
+      ],
+      "tags": [
+        "sports",
+        "boxing",
+        "gloves",
+        "action",
+        "martial-arts",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sports-running-tshirt-breeze-motion",
+      "title": "Sport futbolkasi — Ochiq havoda yugurish va nafas oluvchi mato",
+      "category": "Sports",
+      "subcategory": "Running",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Sport futbolkasining yengilligi va ochiq havodagi yugurish harakatini uyg'unlashtiradi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Yugurish futbolkasini ochiq havo yo'lkasida yugurib kelayotgan sportchi ustida namoyish qiladi.",
+      "whatYouNeed": [
+        "Sport futbolkasining old rasmi"
+      ],
+      "prompt": "Medium vertical action video of a runner jogging steadily along a scenic park path in the morning light, wearing the exact athletic running t-shirt from the reference photo. The camera tracks backward smoothly in front of the runner. The lightweight technical fabric moves with natural breathability and comfort. STRICT PRODUCT PRESERVATION: Duplicate the exact reflective accents, neckline cut, raglan seams, brand logo, and fabric color tone from the source image.",
+      "negativeInstructions": [
+        "Do not alter the shirt's technical paneling or stripes.",
+        "Do not remove reflective elements.",
+        "Do not change the fabric color.",
+        "No unnatural running posture."
+      ],
+      "tags": [
+        "sports",
+        "running",
+        "t-shirt",
+        "activewear",
+        "lifestyle",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-new-arrival-spotlight-reel",
+      "title": "Yangi kelgan mahsulot — Spotlight va sekin aylanma (New Arrival)",
+      "category": "General Ecommerce",
+      "subcategory": "New Arrivals",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Istalgan mahsulotni toza sahnada spotlight ostida aylanma bilan tantanali taqdim etishda universal."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Istalgan mahsulotni markazda qoldirib, yuqoridan tushgan yorug'lik va silliq kamera harakati bilan yangi mahsulot sifatida tanishtiradi.",
+      "whatYouNeed": [
+        "Istalgan mahsulotning toza fonga olingan 1 ta rasmi"
+      ],
+      "prompt": "High-impact vertical product announcement video. The uploaded product rests on a sleek minimalist pedestal. The video begins in soft moody lighting, then a clean overhead circular spotlight turns on smoothly, bathing the product in crisp commercial illumination. The camera performs a slow, steady 45-degree arc around the product, showcasing all sides with premium clarity. STRICT PRODUCT PRESERVATION: The product must remain 100% untouched and identical to the uploaded reference photo in shape, materials, textures, colors, and branding across the entire video.",
+      "negativeInstructions": [
+        "Do not morph or alter the product in any way.",
+        "Do not change product colors or logos.",
+        "Do not introduce distracting flying 3D elements.",
+        "No flickering lights."
+      ],
+      "tags": [
+        "general",
+        "new-arrival",
+        "announcement",
+        "spotlight",
+        "ecommerce",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "general-promotional-discount-zoom-reel",
+      "title": "Aksiya va Chegirma — Dinamik yaqinlashuv (Sale Reel)",
+      "category": "General Ecommerce",
+      "subcategory": "Sale Campaigns",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Pika",
+        "reason": "Aksiya uchun qisqa, diqqatni tortuvchi va tezkor vizual effekt yaratishda qulay."
+      },
+      "difficulty": "easy",
+      "duration": "3 seconds",
+      "aspectRatio": "9:16",
+      "description": "Mahsulotga qarab tezkor lekin silliq yaqinlashuvchi, Instagram Stories va Reels uchun aksiya videosi.",
+      "whatYouNeed": [
+        "Aksiyaga qo'yilgan mahsulotning tiniq rasmi"
+      ],
+      "prompt": "Fast-paced, attention-grabbing vertical commercial reel. The uploaded product is centered in a modern studio with bold deep-blue and warm-gold ambient lighting. The camera performs a smooth, confident zoom-in toward the product, settling into a crystal-clear hero shot with subtle ambient lighting shimmer. Crisp, sharp product focus. STRICT PRODUCT PRESERVATION: The product must stay completely identical to the uploaded image: preserve exact textures, colors, logos, and construction. Zero morphing.",
+      "negativeInstructions": [
+        "Do not distort or change the product.",
+        "Do not add unreadable messy text overlays.",
+        "Do not change product colors.",
+        "No chaotic motion blur."
+      ],
+      "tags": [
+        "general",
+        "sale",
+        "promotional",
+        "zoom",
+        "instagram",
+        "reels",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "general-unboxing-box-open-reveal",
+      "title": "Unboxing / Quti ochilishi — Mahsulotni ko'rsatish",
+      "category": "General Ecommerce",
+      "subcategory": "Unboxing",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Quti qopqog'i ochilishi va qadoq qog'ozi yozilishini eng tabiiy qo'l harakatlari bilan tasvirlaydi."
+      },
+      "difficulty": "medium",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Elegent qora/oq quti ochilib, ichidan yangi mahsulot ochilishi va ko'rsatilishini ifodalaydi.",
+      "whatYouNeed": [
+        "Mahsulotning toza rasmi"
+      ],
+      "prompt": "Top-down to 45-degree angle unboxing video. A pair of well-groomed hands gently lifts the lid off a minimalist matte black product gift box on a clean wooden tabletop, revealing the exact product from the reference photo resting nestled inside crisp white tissue paper. The camera slowly glides closer to the product as soft morning daylight illuminates its premium details. STRICT PRODUCT PRESERVATION: The revealed product must be an exact 1:1 match to the reference image in shape, colors, logo placement, and materials.",
+      "negativeInstructions": [
+        "Do not distort hands or generate extra fingers.",
+        "Do not replace the product with a generic item.",
+        "Do not alter product colors or logos.",
+        "No messy tearing of packaging."
+      ],
+      "tags": [
+        "general",
+        "unboxing",
+        "gift",
+        "luxury",
+        "reveal",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-seamless-loop-catalog-pedestal",
+      "title": "Cheksiz Loop (Seamless Loop) — Katalog va Feed uchun",
+      "category": "General Ecommerce",
+      "subcategory": "Minimal Catalog",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Kling",
+        "reason": "Boshalnishi va tugashi bir-biriga mukammal ulanuvchi cheksiz aylanma (loop) hosil qilishda eng ishonchli."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Ijtimoiy tarmoqlar va ilova feedida to'xtovsiz aylanib turuvchi cheksiz silliq video.",
+      "whatYouNeed": [
+        "Istalgan mahsulotning studiya foni rasmi"
+      ],
+      "prompt": "A perfectly seamless looping product video of the uploaded item resting on an immaculate off-white pedestal. The camera maintains a gentle, constant circular orbit around the product over exactly 5 seconds, ending on the identical start frame to create an invisible infinite loop. Soft, even commercial studio lighting throughout. STRICT PRODUCT PRESERVATION: Retain 100% of the original product's color, form, materials, logo, and physical details without any shifting or AI morphing.",
+      "negativeInstructions": [
+        "Do not create jump cuts between the start and end frames.",
+        "Do not morph or alter the product.",
+        "Do not change product colors.",
+        "No flickering shadows."
+      ],
+      "tags": [
+        "general",
+        "loop",
+        "seamless-loop",
+        "catalog",
+        "pedestal",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "children-shoes-twinkle-step-reel",
+      "title": "Bolalar poyabzali — Quvnoq qadamlar va o'yin",
+      "category": "Children",
+      "subcategory": "Shoes",
+      "contentType": "video",
+      "recommendedTool": {
+        "name": "Hailuo",
+        "reason": "Bolalar poyabzalining qulayligi va quvnoq bolalar qadamini iliq va estetik yetkazadi."
+      },
+      "difficulty": "easy",
+      "duration": "5 seconds",
+      "aspectRatio": "9:16",
+      "description": "Bolalar krossovka yoki tuflisini rang-barang bog' yo'lkasida quvnoq qadam bosib o'ynayotgan kadrda ko'rsatadi.",
+      "whatYouNeed": [
+        "Bolalar poyabzalining 1 ta tiniq rasmi"
+      ],
+      "prompt": "Ground-level cheerful commercial video of a young child's feet taking happy, bouncing steps along a colorful rubber playground pathway wearing the exact children's shoes from the reference photo. Bright sunny daylight, joyful and energizing atmosphere. The camera tracks alongside the moving shoes at ankle height. STRICT PRODUCT PRESERVATION: The shoes must replicate the uploaded image with 100% fidelity: exact velcro straps, sole tread, colorful accents, and cartoon/brand badges without deformation.",
+      "negativeInstructions": [
+        "Do not alter shoe strap closure or colors.",
+        "Do not generate distorted feet or ankles.",
+        "Do not change shoe proportions.",
+        "No dark or scary lighting."
+      ],
+      "tags": [
+        "children",
+        "shoes",
+        "kids",
+        "on-foot",
+        "playground",
+        "reel"
+      ],
+      "featured": false,
+      "published": true
+    }
+  ]
+}

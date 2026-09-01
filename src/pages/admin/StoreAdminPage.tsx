@@ -22,8 +22,8 @@ export const StoreAdminPage: React.FC = () => {
   const [landmark, setLandmark] = useState(storeInfo.landmark);
   const [city, setCity] = useState(storeInfo.city);
   const [workingHours, setWorkingHours] = useState(storeInfo.workingHours);
-  const [phone1, setPhone1] = useState(storeInfo.phoneNumbers[0] || '');
-  const [phone2, setPhone2] = useState(storeInfo.phoneNumbers[1] || '');
+  const [phone1, setPhone1] = useState(storeInfo.phoneNumbers?.[0] || '');
+  const [phone2, setPhone2] = useState(storeInfo.phoneNumbers?.[1] || '');
   const [telegramUsername, setTelegramUsername] = useState(storeInfo.telegramUsername);
   const [telegramChannel, setTelegramChannel] = useState(storeInfo.telegramChannel || '');
   const [instagramUsername, setInstagramUsername] = useState(storeInfo.instagramUsername);

@@ -1,0 +1,799 @@
+{
+  "version": "1.0",
+  "contentType": "text",
+  "libraryName": "Raqamli Vitrina Text Prompt Library",
+  "prompts": [
+    {
+      "id": "product-description-standard",
+      "title": "Standart mahsulot tavsifi (Katalog va Sayt uchun)",
+      "category": "Product",
+      "subcategory": "Product Descriptions",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "O'zbek tilidagi tabiiy va ravon marketing matnlarini tuzishda hamda mahsulot parametrlarini chiroyli tizimlashtirishda juda aniq ishlaydi."
+      },
+      "difficulty": "easy",
+      "description": "Mahsulot kartochkasi uchun to'liq, o'qishga oson va xaridorni qiziqtiruvchi standart mahsulot tavsifini yaratadi.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Materiali / Tarkibi (agar ma'lum bo'lsa)",
+        "Mavjud o'lchamlar va ranglar",
+        "Asosiy xususiyatlari",
+        "Narxi"
+      ],
+      "prompt": "Siz tajribali elektron tijorat marketologisiz. Quyida berilgan mahsulot ma'lumotlaridan foydalanib, O'zbekiston bozori uchun tabiiy, tushunarli va ishonchli mahsulot tavsifini yozing.\n\nMAHSULOT MA'LUMOTLARI:\n- Mahsulot nomi: [MAHSULOT NOMI]\n- Materiali/Tarkibi: [MATERIAL]\n- O'lchamlari: [O'LCHAMLAR]\n- Rangi: [RANGI]\n- Asosiy xususiyatlari: [XUSUSIYATLAR]\n- Narxi: [NARXI]\n\nQOIDALAR:\n1. Faqat berilgan faktlarga tayaning. Hech qanday soxta xususiyat, kafolat yoki chegirma to'qimang.\n2. Til: O'zbek tili (Lotin alifbosi), ravon va zamonaviy uslubda.\n3. Matnni ko'z bilan tez o'qishga moslashtiring (qisqa xatboshilar, qulay bullet-pointlar).\n\nFORMAT:\n1. 1 ta qiziqtiruvchi kirish jumlasi\n2. Mahsulotning 3-4 ta asosiy afzalligi (ro'yxat ko'rinishida)\n3. Parametrlari (Material, O'lcham, Rang)\n4. Qisqa va tabiiy xaridga chorlov (CTA)",
+      "tags": [
+        "product",
+        "description",
+        "catalog",
+        "ecommerce",
+        "uzbek",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "product-description-short-card",
+      "title": "Qisqa mahsulot tavsifi (Mini Card / Feed)",
+      "category": "Product",
+      "subcategory": "Product Descriptions",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ixcham, lo'nda va eng muhim ma'lumotni 2-3 jumlada ifodalash uchun juda qulay."
+      },
+      "difficulty": "easy",
+      "description": "Mahsulotning mini kartochkasi yoki ilova feedi uchun 2-3 jumlali ixcham tavsif tayyorlaydi.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Eng asosiy 1-2 ta afzalligi"
+      ],
+      "prompt": "Quyidagi mahsulot uchun elektron do'kon kartochkasi va mobil ilova ro'yxatida ko'rinadigan juda ixcham (2-3 jumladan iborat) qisqa tavsif yozing.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Xususiyati: [ASOSIY AFZALLIGI]\n- Kimga mos: [FOYDALANUVCHI GURUHI]\n\nTALABLAR:\n- O'zbek tili (Lotin), ixcham va aniq.\n- Ortiqcha maqtovlarsiz, xaridorga beradigan real foydasiga urg'u bering.\n- Hech qanday to'qima ma'lumot kiritmang.",
+      "tags": [
+        "product",
+        "short-description",
+        "mini-card",
+        "feed"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "product-description-premium-fashion",
+      "title": "Premium kiyim va moda tavsifi (Editorial / Luxury)",
+      "category": "Product",
+      "subcategory": "Product Descriptions",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "DeepSeek",
+        "reason": "Moda va uslubga oid nozik tushunchalarni boy so'z boyligi bilan nafis ifodalaydi."
+      },
+      "difficulty": "easy",
+      "description": "Klassik kiyimlar, premium poyabzal va aksessuarlar uchun estetik va didli tavsif yaratadi.",
+      "whatYouNeed": [
+        "Kiyim turi va fasoni",
+        "Mato turi (masalan: jun, paxta, ipak, charm)",
+        "Tikilish sifati yoki uslubi"
+      ],
+      "prompt": "Siz premium kiyim do'konining yetakchi stillist-kopirayterisiz. Quyidagi mahsulot uchun nafis, didli va moda jurnallari uslubidagi jozibali tavsif yozing.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Mato / Material: [MATO TURI]\n- Fasoni va bichimi: [FASONI]\n- Mos keladigan vaziyatlar: [MASALAN: OFIS, OQSHOM, KUNDALIK]\n\nTALABLAR:\n- Nafis va jiddiy ohang (ortiqcha shov-shuvsiz, sifat va qulaylikka urg'u).\n- Matoning tanaga yoqimliligi va bichimning qomatga mos tushishini tasvirlang.\n- Til: O'zbek tili (Lotin). Faqat berilgan ma'lumotlarga asoslaning.",
+      "tags": [
+        "product",
+        "fashion",
+        "premium",
+        "clothing",
+        "editorial"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "product-feature-to-benefit-converter",
+      "title": "Xususiyatni mijoz foydasiga aylantirish (Feature to Benefit)",
+      "category": "Product",
+      "subcategory": "Product Benefits",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Quruq texnik parametrlarni mijoz tushunadigan aniq hayotiy foydaga aylantirishda kuchli mantiqqa ega."
+      },
+      "difficulty": "easy",
+      "description": "Mahsulotning quruq xususiyatlarini (masalan: '100% paxta') mijoz his qiladigan foydaga ('kun bo'yi terlatmaydi') aylantiradi.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Mahsulotning 3-5 ta texnik yoki jismoniy xususiyati"
+      ],
+      "prompt": "Quyida berilgan mahsulot xususiyatlarini xaridor uchun tushunarli, jozibali 'Mijozga beradigan foydasi' (Feature -> Benefit) ko'rinishiga aylantirib bering.\n\nMAHSULOT NOMI: [MAHSULOT NOMI]\nBERILGAN XUSUSIYATLAR:\n[XUSUSIYATLAR RO'YXATINI YOZING, MASALAN: 100% paxta, EVA tagcharm, YKK zamok]\n\nQOIDALAR:\n- Har bir xususiyat uchun 'Bu sizga nima beradi?' degan savolga aniq javob bering.\n- Ortiqcha ilmiy atamalarsiz, oddiy xaridor tilida yozing.\n- Mavjud bo'lmagan xususiyatlarni qo'shmang.\n- Natijani ixcham ro'yxat tarzida taqdim eting.",
+      "tags": [
+        "product",
+        "benefits",
+        "conversion",
+        "marketing",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "product-raw-notes-formatter",
+      "title": "Xom qaydlarni chiroyli tavsifga aylantirish",
+      "category": "Product",
+      "subcategory": "Product Information",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Tartibsiz yozilgan qisqa so'zlarni tuzilmali va toza matnga xatosiz aylantiradi."
+      },
+      "difficulty": "easy",
+      "description": "Telefoningizda tezda yozilgan tartibsiz qaydlarni (narx, o'lcham, rang) tayyor chiroyli tavsifga keltiradi.",
+      "whatYouNeed": [
+        "Ixtiyoriy tartibsiz qisqa ma'lumotlar"
+      ],
+      "prompt": "Men sizga mahsulot haqida qisqa va tartibsiz qaydlarni beraman. Siz ularni xaridor o'qishi uchun qulay, chiroyli va tartibli mahsulot kartasiga aylantiring.\n\nQAYDLAR:\n[BU YERGA QAYDLARINGIZNI TASHLANG, MASALAN: qora xudi, 3 ipli paxta, M L XL bor, 280 ming, qalin qishki]\n\nTALABLAR:\n- Barcha ma'lumotlarni mantiqiy guruhlang (Nomi, Material, O'lchamlar, Narx).\n- Grammatik xatolarni to'g'irlang.\n- Berilmagan yangi faktlarni aslo to'qimang.\n- O'zbek tili (Lotin).",
+      "tags": [
+        "product",
+        "cleanup",
+        "formatting",
+        "notes"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "product-title-generator-variations",
+      "title": "Sotuvchi mahsulot nomlari (5 xil variant)",
+      "category": "Product",
+      "subcategory": "Product Titles",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Qwen",
+        "reason": "Qisqa sarlavhalar va turli xil marketing uslublarida variantlar tanlash uchun qulay."
+      },
+      "difficulty": "easy",
+      "description": "Do'koningizdagi mahsulot uchun qidiruvga qulay va aniq 5 xil professional sarlavha yaratadi.",
+      "whatYouNeed": [
+        "Mahsulot turi",
+        "Brend yoki model (agar bo'lsa)",
+        "Rangi yoki o'ziga xosligi"
+      ],
+      "prompt": "Quyidagi mahsulot uchun elektron tijorat standartlariga mos, qisqa va aniq 5 xil sarlavha (Product Title) variantini yozib bering.\n\nMAHSULOT:\n- Turi: [MASALAN: Erkaklar krossovkasi / Ayollar ko'ylagi]\n- Modeli/Brendi: [MODEL / BREND]\n- Asosiy belgisi: [MASALAN: Teri, Yozgi, Oversize]\n- Rangi: [RANGI]\n\nVARIANTLAR USLUBI:\n1. Klassik va aniq (Katalog uchun)\n2. Qisqa va lo'nda\n3. Qidiruvga (SEO) moslashtirilgan\n4. Premium uslubda\n5. Zamonaviy yoshlarbop\n\nHech qanday soxta so'zlar qo'shmang.",
+      "tags": [
+        "product",
+        "title",
+        "naming",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "product-size-guide-explainer",
+      "title": "O'lcham tanlash bo'yicha tushuntirish (Size Guide Text)",
+      "category": "Product",
+      "subcategory": "Product Information",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Xaridorlarga o'lcham tanlashda adashmaslik bo'yicha samimiy va tushunarli ko'rsatma yozishda samarali."
+      },
+      "difficulty": "easy",
+      "description": "Xaridor o'ziga mos o'lchamni to'g'ri tanlashi uchun qisqa va aniq tavsiya matnini tuzadi.",
+      "whatYouNeed": [
+        "Mahsulot turi (poyabzal yoki kiyim)",
+        "O'lcham standarti (masalan: o'z o'lchamiga mos / 1 o'lcham kichik / oversize)"
+      ],
+      "prompt": "Do'konimiz mijozlari o'zlariga to'g'ri o'lcham tanlashlari uchun samimiy va tushunarli o'lcham bo'yicha qo'llanma matnini tayyorlang.\n\nMAHSULOT VA O'LCHAM MA'LUMOTI:\n- Mahsulot turi: [KIYIM / POYABZAL]\n- O'lcham xususiyati: [MASALAN: O'z o'lchamingizga to'liq mos keladi / Qolip biroz kichik / Erkin tushadigan oversize]\n- Mavjud o'lchamlar: [O'LCHAMLAR RO'YXATI]\n\nTALABLAR:\n- Mijoz o'zini qanday o'lchashi yoki qaysi o'lchamni tanlashi kerakligini 3 bandda sodda tushuntiring.\n- Agar ikkilanib qolsa, sotuvchiga murojaat qilish chaqirig'ini qo'shing.\n- O'zbek tili (Lotin).",
+      "tags": [
+        "product",
+        "size-guide",
+        "sizes",
+        "customer-care"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "social-instagram-caption-engaging",
+      "title": "Instagram posti (Jozibali Hook + Tavsif + CTA)",
+      "category": "Social Media",
+      "subcategory": "Instagram",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Instagram algoritmlari va auditoriyasi uchun qiziqarli 'Hook' (tutqich jumla) va tabiiy CTA yaratishda eng yaxshi tanlov."
+      },
+      "difficulty": "easy",
+      "description": "Instagram tasmangiz uchun diqqatni tortuvchi sarlavha, mahsulot afzalligi va xarid chaqiruvidan iborat tayyor post.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Narxi",
+        "Asosiy afzalligi",
+        "Buyurtma berish usuli (Direct / Telegram)"
+      ],
+      "prompt": "Instagram sahifamiz uchun quyidagi mahsulotga professional va yuqori konversiyali post matni (caption) yozing.\n\nMAHSULOT MA'LUMOTLARI:\n- Nomi: [MAHSULOT NOMI]\n- Asosiy afzalligi: [AFZALLIGI]\n- O'lchamlari/Ranglari: [MAVJUD VARIANTLAR]\n- Narxi: [NARXI]\n- Buyurtma yo'li: [DIRECT / TELEGRAM / SAYT]\n\nTUZILISHI:\n1. 🎯 KUCHLI HOOK: Birinchi qatorda o'quvchini to'xtatuvchi qiziqarli savol yoki jozibali fikr.\n2. 💡 ASOSIY QISM: Mahsulot kundalik hayotda qanday qulaylik berishi haqida 2-3 ta qisqa jumla.\n3. 📌 ANIQ MA'LUMOT: Narxi va o'lchamlari ko'rsatilgan qulay blok.\n4. 📲 CALL TO ACTION: Xarid qilish uchun aniq yo'l-yo'riq.\n5. 🏷 XESHTEGLAR: 5-6 ta O'zbekiston auditoriyasiga mos tematik xeshteg.\n\nOrtiqcha yolg'on so'zlarsiz, zamonaviy va samimiy o'zbek tilida yozing.",
+      "tags": [
+        "social-media",
+        "instagram",
+        "caption",
+        "post",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "social-instagram-reels-caption",
+      "title": "Instagram Reels / TikTok uchun qisqa matn",
+      "category": "Social Media",
+      "subcategory": "Instagram",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Reels videolari tagida uzoq o'qilmaydigan, lekin videoni oxirigacha ko'rishga undovchi ixcham matnlar tuzadi."
+      },
+      "difficulty": "easy",
+      "description": "Reels va qisqa videolar tagiga qo'yiladigan, video mavzusiga mos ixcham va jonli matn.",
+      "whatYouNeed": [
+        "Videoda nima ko'rsatilgani",
+        "Mahsulot nomi va narxi"
+      ],
+      "prompt": "Instagram Reels va TikTok videomiz tagiga qo'yish uchun juda qisqa, qiziqarli va dinamik matn tayyorlang.\n\nVIDEO HAQIDA:\n- Mahsulot: [MAHSULOT NOMI]\n- Videoda nima bo'lyapti: [MASALAN: Mahsulotning 360 aylanishi / Oyoqda kiyilishi / Unboxing]\n- Narxi: [NARXI]\n\nTALABLAR:\n- 2-3 qatordan oshmasin.\n- Videoni saqlab qo'yishga yoki do'stiga yuborishga undovchi tabiiy chaqiriq bo'lsin.\n- 3-4 ta eng asosiy xeshteg qo'shing.\n- O'zbek tili (Lotin).",
+      "tags": [
+        "social-media",
+        "instagram",
+        "reels",
+        "tiktok",
+        "video-caption"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "social-instagram-stories-series",
+      "title": "Instagram Stories ketma-ketligi (3 ta story ssenariysi)",
+      "category": "Social Media",
+      "subcategory": "Instagram",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "DeepSeek",
+        "reason": "Stories uchun ketma-ket qiziqish uyg'otuvchi ssenariy va savol-javobli interaktiv matnlarni yaxshi tuzadi."
+      },
+      "difficulty": "medium",
+      "description": "Mahsulotni bitta emas, 3 ta ketma-ket Stories orqali bosqichma-bosqich sotish ssenariysi.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Mijoz hal qiladigan muammo yoki orzu",
+        "Narxi va harakatga chaqiruv"
+      ],
+      "prompt": "Instagram Stories uchun 3 qismdan iborat sotuvchi mini-ssenariy matnini yozib bering.\n\nMAHSULOT: [MAHSULOT NOMI]\nMUAMMO/VAZIYAT: [MASALAN: Qishda qalin lekin noqulay kiyinishdan charchadingizmi?]\nNARXI VA TAKLIF: [NARXI]\n\nTUZILISH:\n- Story 1 (Muammo/Savol): O'quvchiga tanish vaziyat va so'rovnoma (Sticker/Opros) g'oyasi.\n- Story 2 (Yechim): Mahsulotimiz ushbu vaziyatni qanday yengil hal qilishi.\n- Story 3 (Natija va Harakat): Narx, rasm/video va 'Directga yozing' havolasi.\n\nHar bir story uchun ekranda chiqadigan qisqa matnlarni aniq ko'rsating.",
+      "tags": [
+        "social-media",
+        "instagram",
+        "stories",
+        "storytelling",
+        "sales"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "social-telegram-product-post",
+      "title": "Telegram kanal uchun to'liq formatlangan post",
+      "category": "Social Media",
+      "subcategory": "Telegram",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Telegram foydalanuvchilari uchun qalin shriftlar, qulay emojilar va buyurtma havolalarini xatosiz formatlaydi."
+      },
+      "difficulty": "easy",
+      "description": "Telegram kanalida chiroyli chiqadigan, barcha parametrlar va admin havolasi ko'rsatilgan tayyor post.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Materiali, o'lchamlari va rangi",
+        "Narxi",
+        "Admin foydalanuvchi nomi (@admin) yoki telefon"
+      ],
+      "prompt": "Telegram kanalimiz uchun quyidagi mahsulotga sotuvchi va ko'zga juda yoqimli formatlangan post matnini yozing.\n\nMAHSULOT MA'LUMOTLARI:\n- Mahsulot: [MAHSULOT NOMI]\n- Tarkibi/Materiali: [MATERIAL]\n- O'lchamlari: [O'LCHAMLAR]\n- Rangi: [RANGI]\n- Narxi: [NARXI]\n- Admin kontakti: [ADMIN TELEGRAM YOKI TEL]\n- Yetkazib berish: [SHARTLARI]\n\nTELEGRAM FORMATI QOIDALARI:\n- Sarlavha qalin shriftda va 1 ta mos emoji bilan.\n- Parametrlar ro'yxati tartibli bo'lsin (▫️ yoki • belgilari bilan).\n- Narx aniq ajratib ko'rsatilsin.\n- Pastda buyurtma berish uchun to'g'ridan-to'g'ri havola yozilsin.\n- Hech qanday yolg'on ma'lumot qo'shmang.",
+      "tags": [
+        "social-media",
+        "telegram",
+        "channel",
+        "promo",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "social-telegram-weekly-digest",
+      "title": "Telegram haftalik top mahsulotlar to'plami (Digest)",
+      "category": "Social Media",
+      "subcategory": "Telegram",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "DeepSeek",
+        "reason": "Bir nechta mahsulotlarni bitta xabarda qisqa va qulay sarhisob qilish uchun qulay."
+      },
+      "difficulty": "medium",
+      "description": "Hafta davomida eng ko'p sotilgan yoki yangi kelgan 3-5 ta mahsulotni bitta postda jamlaydi.",
+      "whatYouNeed": [
+        "3-4 ta mahsulot nomi va narxlari",
+        "Kanal admini havolasi"
+      ],
+      "prompt": "Telegram kanalimiz obunachilari uchun haftaning eng sara mahsulotlari to'plami (Haftalik Top) postini tayyorlang.\n\nMAHSULOTLAR RO'YXATI:\n1. [1-MAHSULOT NOMI] — [NARXI]\n2. [2-MAHSULOT NOMI] — [NARXI]\n3. [3-MAHSULOT NOMI] — [NARXI]\n\nTALABLAR:\n- Kirish qismida haftalik tanlov haqida qisqa samimiy xabar.\n- Har bir mahsulot yonida uning bitta asosiy ustunligi 1 qatorda ko'rsatilsin.\n- Yakuniy umumiy buyurtma berish havolasi (@admin).\n- O'zbek tili (Lotin).",
+      "tags": [
+        "social-media",
+        "telegram",
+        "digest",
+        "collection",
+        "weekly"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "advertising-targeted-feed-ad",
+      "title": "Target reklama matni (Instagram / Facebook Feed Ad)",
+      "category": "Advertising",
+      "subcategory": "Target Ads",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Reklama qoidalariga mos, manipulyatsiyasiz, to'g'ridan-to'g'ri maqsadli auditoriyaga xitob qiluvchi matn yozadi."
+      },
+      "difficulty": "easy",
+      "description": "Instagram va Facebook target reklamasi uchun xaridor e'tiborini tortuvchi 3 xil variantdagi matn.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Maqsadli auditoriya (kimlar uchun)",
+        "Asosiy taklif / Narx"
+      ],
+      "prompt": "Instagram va Facebook homiylik reklamasi (Target Ad) uchun 3 xil variantda reklama matnini yozib bering.\n\nREKLAMA OB'EKTI:\n- Mahsulot: [MAHSULOT NOMI]\n- Kimlar uchun: [MAQASADLI AUDITORIYA]\n- Asosiy ustunligi: [USTUNLIGI]\n- Narxi/Taklif: [NARXI YOKI TAKLIF]\n\nVARIANTLAR:\n1. 🎯 To'g'ridan-to'g'ri foydaga asoslangan (Muammoni tez yechuvchi)\n2. 💎 Sifat va qulaylikka urg'u beruvchi (Premium)\n3. ⚡ Qisqa va tezkor harakatga undovchi (Aksiya/Chegirma bo'lsa)\n\nHar bir variantda sarlavha (Headline), asosiy matn (Body) va tugma matni (CTA) bo'lsin.",
+      "tags": [
+        "advertising",
+        "target",
+        "instagram-ads",
+        "facebook-ads",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "advertising-retargeting-reminder",
+      "title": "Qiziqqan mijozlarni qaytarish matni (Retargeting)",
+      "category": "Advertising",
+      "subcategory": "Retargeting",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Mahsulotni ko'rgan lekin xarid qilmagan mijozga nozik va samimiy eslatma yozishda samarali."
+      },
+      "difficulty": "medium",
+      "description": "Mahsulotni savatga solib qo'ygan yoki sahifani ko'rib ketgan mijozlarga samimiy eslatma reklama matni.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Do'kon nomi",
+        "Qulaylik yoki yetkazib berish sharti"
+      ],
+      "prompt": "Bizning sahifamizga tashrif buyurgan, mahsulotga qiziqqan lekin hali buyurtma bermagan mijozlar uchun muloyim va qiziqtiruvchi eslatma (Retargeting) reklama matnini yozing.\n\nMA'LUMOTLAR:\n- Do'kon nomi: [DO'KON NOMI]\n- Mahsulot: [MAHSULOT NOMI]\n- Qulaylik: [MASALAN: Shahar bo'ylab tez yetkazish / O'lcham almashtirish imkoniyati]\n\nTALABLAR:\n- Ohang: samimiy, do'stona, bezovta qilmaydigan.\n- Mijozning ikkilanishini bartaraf etuvchi 2-3 ta jumla.\n- 'Savollaringiz bormi? Yordam beramiz' qabilidagi yengil CTA.",
+      "tags": [
+        "advertising",
+        "retargeting",
+        "reminder",
+        "conversion"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sales-mega-discount-announcement",
+      "title": "Katta chegirma e'loni (Haqiqiy aksiya shartlari bilan)",
+      "category": "Sales",
+      "subcategory": "Discounts",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Chegirma shartlarini aniq, tushunarli va ishonchli taqdim etish uchun qulay."
+      },
+      "difficulty": "easy",
+      "description": "Mavsumiy chegirmalar va aksiyalar uchun shoshilinchlik hissini beruvchi, ammo soxta bo'lmagan e'lon.",
+      "whatYouNeed": [
+        "Aksiya nomi",
+        "Chegirma miqdori yoki eski/yangi narx",
+        "Aksiya muddati (agar ma'lum bo'lsa)"
+      ],
+      "prompt": "Do'konimizdagi haqiqiy chegirma aksiyasi haqida ijtimoiy tarmoqlar uchun kuchli e'lon matnini yozing.\n\nAKSIYA MA'LUMOTLARI:\n- Aksiya sababi: [MASALAN: Mavsumiy yangilanish / Qishki chegirmalar]\n- Qamrab olingan mahsulotlar: [MAHSULOTLAR TURI]\n- Chegirma: [MASALAN: -30% YOKI Eski narx: X, Yangi narx: Y]\n- Amal qilish muddati: [SANASI YOKI MAHSULOT TUGAGUNCHA]\n\nTALABLAR:\n- Narxdagi real tejashni xaridorga aniq ko'rsating.\n- Eskirgan va asabga teguvchi arzon so'zlarsiz, zamonaviy va ishonchli yozing.\n- Xarid qilish bosqichlarini 1-2-3 qilib ko'rsating.\n- O'zbek tili (Lotin).",
+      "tags": [
+        "sales",
+        "discount",
+        "chegirma",
+        "promo",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sales-bundle-offer-cross-sell",
+      "title": "To'plam taklifi (Kiyim + Poyabzal / 1+1 aksiyasi)",
+      "category": "Sales",
+      "subcategory": "Bundles",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Bir nechta mahsulotni bitta to'plam qilib sotish mantiqini mijozga foydali qilib tushuntiradi."
+      },
+      "difficulty": "easy",
+      "description": "Ikkita yoki undan ortiq mahsulot birga olinganda beriladigan maxsus to'plam narxi haqida e'lon.",
+      "whatYouNeed": [
+        "To'plamga kiruvchi 2 ta mahsulot",
+        "Alohida va to'plamdagi narxlari"
+      ],
+      "prompt": "Quyidagi 2 ta mahsulotni birgalikda 'Tayyor obraz' (Look / Bundle) sifatida xarid qilish taklifini yozib bering.\n\nTO'PLAM TARKIBI:\n- 1-mahsulot: [1-MAHSULOT NOMI]\n- 2-mahsulot: [2-MAHSULOT NOMI]\n- Birgalikdagi maxsus narx: [TO'PLAM NARXI]\n\nTALABLAR:\n- Ushbu ikki mahsulot bir-biriga qanchalik mos tushishini ta'kidlang.\n- Alohida qidirmasdan, vaqt va mablag'ni tejash foydasini ko'rsating.\n- Aniq harakatga chaqiruv.",
+      "tags": [
+        "sales",
+        "bundle",
+        "cross-sell",
+        "lookbook"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "seo-product-meta-title-description",
+      "title": "SEO Mahsulot sarlavhasi va Meta Description",
+      "category": "SEO",
+      "subcategory": "Meta Tags",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Qwen",
+        "reason": "Qidiruv tizimlari (Google, Yandex) belgilagan 60 va 160 belgilik cheklovlarga qat'iy rioya qiladi."
+      },
+      "difficulty": "easy",
+      "description": "Sayt qidiruv natijalarida yuqorida chiqishi va bosilish foizini (CTR) oshirish uchun meta teglar.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Asosiy kalit so'z (masalan: erkaklar krossovkasi toshkent)",
+        "Asosiy ustunlik va narx"
+      ],
+      "prompt": "Quyidagi mahsulot uchun Google va Yandex qidiruv tizimlariga to'liq moslashtirilgan SEO Meta teglarini tayyorlang.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Shahar/Hudud: [MASALAN: Toshkent / O'zbekiston]\n- Narxi/Xususiyati: [NARX YOKI ASOSIY XUSUSIYAT]\n\nTALABLAR:\n1. 🏷 SEO TITLE: 50-60 belgi oralig'ida. Mahsulot nomi, asosiy kalit so'z va do'kon nomini o'z ichiga olsin.\n2. 📝 META DESCRIPTION: 140-160 belgi oralig'ida. Foydalanuvchini havola ustiga bosishga undovchi jozibador va aniq tavsif.\n3. 🔍 5 ta asosiy qidiruv kalit so'zlari ro'yxati.\n\nHech qanday kalit so'zlar bilan to'ldirib tashlangan sun'iy jumlalar bo'lmasin, o'qilishi tabiiy bo'lsin.",
+      "tags": [
+        "seo",
+        "meta-tags",
+        "google",
+        "search",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "seo-category-page-text",
+      "title": "Kategoriya sahifasi uchun SEO matni (Category Description)",
+      "category": "SEO",
+      "subcategory": "Category Text",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Sayt kategoriyalari ostiga qo'yiladigan foydali va qidiruv tizimiga mos matnlarni mukammal tuzadi."
+      },
+      "difficulty": "medium",
+      "description": "Onlayn do'konning bo'lim sahifalari (masalan: 'Ayollar sumkalari') ostiga qo'yiladigan SEO matni.",
+      "whatYouNeed": [
+        "Kategoriya nomi",
+        "Mavjud assortiment turlari",
+        "Do'kondan xarid qilish afzalliklari"
+      ],
+      "prompt": "Elektron do'konimizning quyidagi kategoriya sahifasi uchun 150-200 so'zdan iborat professional SEO matni yozing.\n\nKATEGORIYA: [KATEGORIYA NOMI, MASALAN: Erkaklar sport poyabzallari]\nASSORTIMENT: [QANDAY MODELLAR BORLIGI]\nDO'KON USTUNLIGI: [MASALAN: Sifat kafolati, O'zbekiston bo'ylab yetkazish]\n\nTUZILISH:\n- 1 ta H1 sarlavha va kirish xatboshisi.\n- To'g'ri tanlov qilish bo'yicha 2 ta qisqa maslahat.\n- Nima uchun bizdan xarid qilish qulayligi haqida xulosa.\n- Kalit so'zlar tabiiy matn ichiga singdirilsin.",
+      "tags": [
+        "seo",
+        "category",
+        "ecommerce",
+        "website"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "feed-raqamli-vitrina-hook-caption",
+      "title": "Raqamli Vitrina Feedi uchun qisqa mahsulot posti",
+      "category": "Feed",
+      "subcategory": "Feed Captions",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ilova ichki feedida xaridor tasmani aylantirayotganda bir zumda ko'zga tashlanadigan lo'nda matn tuzadi."
+      },
+      "difficulty": "easy",
+      "description": "Raqamli Vitrina ilovasi tasmada (Feed) ko'rinadigan, to'g'ridan-to'g'ri mahsulot sahifasiga o'tishga undovchi matn.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Narxi",
+        "1 ta asosiy afzalligi"
+      ],
+      "prompt": "Raqamli Vitrina mobil ilovasi Feedi (tasma) uchun juda ixcham, zamonaviy va sotuvchi post matnini yozing.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Narxi: [NARXI]\n- Asosiy plyusi: [1 TA ENG ASOSIY AFZALLIGI]\n\nFORMAT:\n- 1-qator: E'tibor tortuvchi 1 ta gap.\n- 2-qator: Narx va mavjud o'lchamlar.\n- 3-qator: 'Batafsil ko'rish va buyurtma berish uchun mahsulot ustiga bosing' chaqirig'i.\n\nJuda qisqa va qulay bo'lsin.",
+      "tags": [
+        "feed",
+        "raqamli-vitrina",
+        "mobile-app",
+        "caption",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "feed-interactive-question-poll",
+      "title": "Feed va Ijtimoiy tarmoq uchun interaktiv savol (Auditoriya jalb qilish)",
+      "category": "Feed",
+      "subcategory": "Engagement",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "DeepSeek",
+        "reason": "Auditoriyani izoh qoldirishga va fikr bildirishga undaydigan tabiiy qiziqarli savollarni topishda kuchli."
+      },
+      "difficulty": "easy",
+      "description": "Mijozlardan qaysi rang yoki uslub ko'proq yoqishini so'rab, tasmada faollikni oshiruvchi post.",
+      "whatYouNeed": [
+        "Taqqoslash uchun 2 xil rang yoki mahsulot varianti"
+      ],
+      "prompt": "Ilovamiz tasmada va Instagramda foydalanuvchilar faolligini (izohlar va fikrlarni) oshirish uchun qiziqarli interaktiv post yozing.\n\nMAHSULOT VARIANTLARI:\n- Variant A: [1-RANG YOKI MODEL NOMI]\n- Variant B: [2-RANG YOKI MODEL NOMI]\n\nTALABLAR:\n- Samimiy savol: 'Sizga qaysi biri ko'proq yoqdi? A yoki B?'\n- Nima uchun bu ranglar tanlangani haqida qisqa 1 jumla.\n- Izohlarda o'z fikrini qoldirishga samimiy chorlov.",
+      "tags": [
+        "feed",
+        "engagement",
+        "poll",
+        "interactive",
+        "social"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "comm-customer-price-availability-reply",
+      "title": "Mijozga narx va mavjudlik bo'yicha tezkor javob (Direct / Telegram)",
+      "category": "Customer Communication",
+      "subcategory": "Quick Replies",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Mijoz bilan muloyim, tezkor va professional xushmuomalalikda muloqot qilish andozalarini beradi."
+      },
+      "difficulty": "easy",
+      "description": "'Narxi qancha?' yoki 'Bormi?' deb yozgan mijozga samimiy va xaridga olib boruvchi tayyor javob.",
+      "whatYouNeed": [
+        "Mahsulot nomi",
+        "Narxi",
+        "Mavjud o'lchamlar / ranglar",
+        "Yetkazib berish haqida qisqa ma'lumot"
+      ],
+      "prompt": "Instagram Direct yoki Telegram orqali 'Assalomu alaykum, narxi qancha?' deb so'ragan mijoz uchun juda muloyim, professional va xaridni davom ettirishga undovchi javob matnini yozing.\n\nMA'LUMOTLAR:\n- Mahsulot: [MAHSULOT NOMI]\n- Narxi: [NARXI]\n- Mavjud o'lchamlar: [O'LCHAMLAR]\n- Yetkazib berish: [YETKAZISH SHARTI]\n\nTUZILISH:\n1. Samimiy salomlashish va qiziqish uchun minnatdorlik.\n2. Aniq narx va o'lchamlar haqida ma'lumot.\n3. 'Sizga qaysi o'lcham/rang ma'qul edi? Tanlashda yordam beraylikmi?' degan ochiq savol bilan yakunlash.",
+      "tags": [
+        "customer-communication",
+        "direct-reply",
+        "pricing",
+        "telegram-reply",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "comm-order-confirmation-message",
+      "title": "Buyurtmani tasdiqlash xabari (Chek / SMS / Telegram)",
+      "category": "Customer Communication",
+      "subcategory": "Order Status",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Buyurtma rekvizitlari va manzilni mijoz uchun aniq tizimlashtirib beradi."
+      },
+      "difficulty": "easy",
+      "description": "Mijoz xarid qilgandan so'ng unga yuboriladigan ishonchli va tartibli buyurtma tasdiq xabari.",
+      "whatYouNeed": [
+        "Mijoz ismi uchun joy",
+        "Mahsulot nomi va o'lchami",
+        "Summasi",
+        "Manzil va yetkazish vaqti"
+      ],
+      "prompt": "Xaridni rasmiylashtirgan mijozga Telegram yoki SMS orqali yuboriladigan buyurtma tasdig'i xabarini tayyorlang.\n\nSHABLON UCHUN PARAMETRLAR:\n- Mijoz ismi: [MIJOZ ISMI]\n- Mahsulot: [MAHSULOT NOMI VA O'LCHAMI]\n- Umumiy summa: [SUMMA]\n- Yetkazish manzili: [MANZIL]\n- Yetkazish muddati: [VAQTI]\n\nTALABLAR:\n- Minnatdorlik bildirish.\n- Barcha ma'lumotlarni qulay ro'yxat tarzida ko'rsatish.\n- Kuryer yetib borishidan oldin bog'lanishini eslatish.\n- Xushmuomala yakun.",
+      "tags": [
+        "customer-communication",
+        "order-confirmation",
+        "receipt",
+        "sms"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "comm-complaint-resolution-polite",
+      "title": "E'tiroz yoki o'lcham to'g'ri kelmaganda muloyim javob",
+      "category": "Customer Communication",
+      "subcategory": "Customer Care",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Vaziyatni yumshatuvchi, mijozni tushunadigan va nizosiz yechim taklif qiluvchi professional javob tuzadi."
+      },
+      "difficulty": "medium",
+      "description": "Mahsulot o'lchami tushmagan yoki norozi bo'lgan mijozga do'kon obro'sini saqlagan holda yechim berish matni.",
+      "whatYouNeed": [
+        "Muammo turi (masalan: o'lcham kichik keldi)",
+        "Do'kon yechimi (masalan: boshqa o'lchamga bepul almashtirib berish)"
+      ],
+      "prompt": "Mahsulot o'lchami to'g'ri kelmagani yoki noroziligi haqida yozgan mijozga professional, xushmuomala va yechimga yo'naltirilgan javob yozing.\n\nVAZIYAT:\n- Muammo: [MUAMMO TURI]\n- Taklif qilinadigan yechim: [MASALAN: Boshqa o'lchamga almashtirish yoki mutaxassis tekshiruvi]\n\nTALABLAR:\n- Mijoz holatini tushunish va yuzaga kelgan noqulaylik uchun uzr so'rash.\n- Bahslashmasdan, darhol aniq yordam qadamlarini taklif qilish.\n- Mijoz o'zini qadrli his qilishi uchun samimiy ohang.",
+      "tags": [
+        "customer-communication",
+        "complaint",
+        "support",
+        "customer-care"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "brand-store-instagram-bio",
+      "title": "Instagram profil tavsifi (Bio Generator)",
+      "category": "Brand",
+      "subcategory": "Store Bio",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "150 belgilik cheklov ichida do'konning eng asosiy yo'nalishi va manzilini ixcham joylaydi."
+      },
+      "difficulty": "easy",
+      "description": "Instagram profilingiz bosh sahifasi uchun 150 belgidan oshmaydigan, ishonchli va chiroyli Bio.",
+      "whatYouNeed": [
+        "Do'kon nomi va yo'nalishi",
+        "Yetkazib berish sharti",
+        "Do'kon manzili yoki aloqa havolasi"
+      ],
+      "prompt": "Do'konimizning Instagram profili uchun 150 belgigacha bo'lgan 3 xil ixcham va estetik Bio (profil tavsifi) variantini yozib bering.\n\nDO'KON HAQIDA:\n- Nomi: [DO'KON NOMI]\n- Asosiy yo'nalishi: [MASALAN: Erkaklar zamonaviy kiyimlari / Ayollar sifatli poyabzallari]\n- Yetkazib berish: [MASALAN: O'zbekiston bo'ylab tezkor yetkazish]\n- Manzil/Ish vaqti: [MANZIL YOKI ISH VAQTI]\n\nTALABLAR:\n- Emojilardan o'rinli foydalanilgan 3-4 qatorli tuzilish.\n- So'nggi qatorda 'Buyurtma berish uchun havola 👇' chaqirig'i bo'lsin.\n- 3 xil uslub: Zamonaviy, Minimalist, Rasmiy.",
+      "tags": [
+        "brand",
+        "bio",
+        "instagram-bio",
+        "profile",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "brand-telegram-channel-description",
+      "title": "Telegram kanal tavsifi (Channel Description)",
+      "category": "Brand",
+      "subcategory": "Store Bio",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Telegram kanal sarlavhasi ostida turadigan ixcham va barcha kontaktlarni o'z ichiga olgan matn tuzadi."
+      },
+      "difficulty": "easy",
+      "description": "Telegram kanal tavsifi bo'limiga qo'yiladigan, do'kon haqida lo'nda ma'lumot va admin kontakti.",
+      "whatYouNeed": [
+        "Do'kon nomi",
+        "Sotiladigan mahsulotlar",
+        "Admin foydalanuvchi nomi va telefon raqami"
+      ],
+      "prompt": "Telegram kanalimiz tavsifi (Описание канала) bo'limi uchun ixcham va tushunarli matn tayyorlang.\n\nMA'LUMOTLAR:\n- Do'kon nomi: [DO'KON NOMI]\n- Mahsulotlar: [QISQACHA ASSORTIMENT]\n- Admin: @[ADMIN_USERNAME]\n- Telefon: [TELEFON RAQAM]\n- Manzil: [SHAHAR/MANZIL]\n\nJuda ixcham, barcha kontaktlar bir qarashda ko'rinadigan bo'lsin.",
+      "tags": [
+        "brand",
+        "telegram-bio",
+        "channel-desc",
+        "contact"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "seasonal-back-to-school-promo",
+      "title": "Maktab mavsumi e'loni (Back to School Campaign)",
+      "category": "Seasonal",
+      "subcategory": "Back to School",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ota-onalar va o'quvchilar uchun sifat, qulaylik va narx muvozanatini ishonchli yetkazadi."
+      },
+      "difficulty": "easy",
+      "description": "Yangi o'quv yili oldidan maktab formalari, ryukzaklar va poyabzallar uchun mo'ljallangan sotuvchi post.",
+      "whatYouNeed": [
+        "Mahsulotlar (forma, poyabzal, sumka)",
+        "Yosh toifasi",
+        "Narxlar yoki to'plam taklifi"
+      ],
+      "prompt": "Yangi o'quv yili (Back to School) mavsumi munosabati bilan ota-onalarga qaratilgan samimiy va ishonchli reklama postini yozing.\n\nMAHSULOTLAR:\n- Assortiment: [MASALAN: Maktab formalari, klassik tuflilar, ortopedik ryukzaklar]\n- Sifat belgisi: [MASALAN: Yuvganda rangi o'chmaydigan mato, bolaga qulay qolip]\n- Narxlar/Taklif: [NARXLAR]\n- Do'kon manzili: [MANZIL]\n\nTALABLAR:\n- Ota-onalarning xavotirlarini (sifat, chidamlilik, maktab talablariga moslik) bartaraf eting.\n- Bolalar kun bo'yi kiyganda qulayligi va harakatni cheklamasligiga urg'u bering.\n- Do'konga kelib kiyib ko'rish yoki buyurtma berishga chorlov.",
+      "tags": [
+        "seasonal",
+        "back-to-school",
+        "maktab",
+        "uniforma",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "seasonal-eid-holiday-greeting-sale",
+      "title": "Bayram tabrigi va bayramona taklif (Hayit / Navro'z / Yangi Yil)",
+      "category": "Seasonal",
+      "subcategory": "Holidays",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "DeepSeek",
+        "reason": "Milliy va umumxalq bayramlari uchun samimiy tabrik so'zlarini savdo taklifi bilan odob doirasida birlashtiradi."
+      },
+      "difficulty": "easy",
+      "description": "Bayram munosabati bilan samimiy tabrik va bayram dasturxoni / sovg'alari uchun maxsus taklif posti.",
+      "whatYouNeed": [
+        "Bayram nomi (Hayit, Navro'z, Yangi Yil)",
+        "Bayramona maxsus taklif yoki sovg'abop mahsulotlar"
+      ],
+      "prompt": "Do'konimiz mijozlari va obunachilari uchun bayram tabrigi hamda bayramona maxsus taklif matnini tayyorlang.\n\nBAYRAM MA'LUMOTI:\n- Qaysi bayram: [MASALAN: Qurbon Hayiti / Ramazon Hayiti / Navro'z / Yangi Yil]\n- Bayram taklifi: [MASALAN: Sovg'alar to'plami / Maxsus bayramona narxlar]\n\nTALABLAR:\n- Avvalo chin dildan samimiy va iliq bayram tilaklari bildiring.\n- So'ngra bayram kunlarida yaqinlarga xursandchilik ulashish uchun qulay taklifni nozik tarzda bildiring.\n- Tijoriy jihatdan ortiqcha bosim o'tkazmaydigan, odobli va hurmatli ohang.",
+      "tags": [
+        "seasonal",
+        "holiday",
+        "hayit",
+        "tabrik",
+        "celebration"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-uzbek-ecommerce-hashtags",
+      "title": "Mahsulot bo'yicha to'g'ri xeshteglar to'plami (Hashtags)",
+      "category": "General",
+      "subcategory": "Hashtags",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Qwen",
+        "reason": "O'zbekiston hududiy va tematik qidiruvlariga mos eng ommabop xeshteglarni saralaydi."
+      },
+      "difficulty": "easy",
+      "description": "Instagram va Telegram qidiruvlarida mahsulotingiz chiqishi uchun 15 ta to'g'ri va aniq xeshteg.",
+      "whatYouNeed": [
+        "Mahsulot toifasi",
+        "Shahar yoki viloyat (agar mahalliy do'kon bo'lsa)"
+      ],
+      "prompt": "Quyidagi mahsulot uchun Instagram va ijtimoiy tarmoqlarda post ostiga qo'yish uchun 15 ta eng to'g'ri va toza xeshteglar ro'yxatini tuzib bering.\n\nMAHSULOT TOIFASI: [MASALAN: Erkaklar poyabzallari / Ayollar kiyimlari / Bolalar sport formasi]\nHUDUD: [MASALAN: Toshkent / Samarqand / Butun O'zbekiston]\n\nXESHTEGLAR GURUHLARI:\n1. Mahsulotga oid to'g'ridan-to'g'ri xeshteglar (5 ta)\n2. Hududiy va bozor xeshteglari (5 ta)\n3. Umumiy xarid va uslub xeshteglari (5 ta)\n\nKeraksiz, spam yoki ma'nosiz xeshteglar kiritmang.",
+      "tags": [
+        "general",
+        "hashtags",
+        "seo",
+        "social-media"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-cta-variations-generator",
+      "title": "Harakatga chaqiruvchi jumlalar (10 xil Call to Action)",
+      "category": "General",
+      "subcategory": "Call to Action",
+      "contentType": "text",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Turli vaziyatlar (sayt, bot, do'konga kelish, direct) uchun xaridorga bosim o'tkazmaydigan jozibali chaqiruvlar tuzadi."
+      },
+      "difficulty": "easy",
+      "description": "Postlaringiz va reklamalaringiz oxiriga qo'yish uchun 10 xil uslubdagi harakatga chaqiruvchi jumla.",
+      "whatYouNeed": [
+        "Asosiy aloqa kanali (Direct, Telegram, Manzil yoki Telefon)"
+      ],
+      "prompt": "Elektron do'konimiz postlari va reklamalari oxirida xaridorni harakatga undash uchun 10 xil uslubdagi 'Call to Action' (CTA) jumlalarini yozib bering.\n\nALOQA USULI: [MASALAN: Direct orqali yozish / Telegram bot / Do'konga tashrif]\n\nUSLUBLAR:\n- 2 ta Muloyim va do'stona\n- 2 ta To'g'ridan-to'g'ri va aniq\n- 2 ta Qiziqish uyg'otuvchi\n- 2 ta Yordam taklif qiluvchi (Maslahat beramiz)\n- 2 ta Qisqa va lo'nda",
+      "tags": [
+        "general",
+        "cta",
+        "conversion",
+        "closing"
+      ],
+      "featured": false,
+      "published": true
+    }
+  ]
+}

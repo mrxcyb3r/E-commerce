@@ -1,0 +1,1802 @@
+{
+  "version": "1.0",
+  "contentType": "image",
+  "libraryName": "Raqamli Vitrina Image Prompt Library",
+  "prompts": [
+    {
+      "id": "men-tshirt-premium-studio",
+      "title": "Erkaklar futbolkasi — Premium studiya katalogi",
+      "category": "Men",
+      "subcategory": "T-shirts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yuklangan mahsulot rasmining original ranglari, logotipi va mato teksturasini buzmasdan toza studiya foniga o'tkazishda eng aniq ishlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Erkaklar futbolkasini neytral oq/och kulrang professional studiya fonida, tekis va chiroyli yoritilgan holatda katalog uchun tayyorlaydi.",
+      "whatYouNeed": [
+        "Futbolkaning tekis joyga qo'yilgan yoki ilingan 1 ta tiniq rasmi",
+        "Logotip yoki print aniq ko'ringan old tomon rasmi"
+      ],
+      "prompt": "Commercial ecommerce studio photography of the men's t-shirt shown in the reference photo. The t-shirt is centered symmetrically on a clean, solid light-gray studio background (#F5F5F7) with soft natural drop shadows underneath. Balanced commercial softbox lighting illuminating the fabric texture, clean collar structure, and hem lines. Razor-sharp focus throughout. STRICT PRODUCT PRESERVATION: The t-shirt must be an exact 1:1 match to the source reference image. Perfectly preserve the exact fabric color tone, neckline cut, sleeve proportions, chest print, embroidery, brand logos, and cotton weave. Do not redesign, recolor, distort, remove, or invent any logos or graphics.",
+      "negativeInstructions": [
+        "Do not alter the t-shirt color or fabric shade.",
+        "Do not redesign or hallucinate chest prints or brand logos.",
+        "Do not change the collar shape or sleeve length.",
+        "Do not add human body parts or mannequins.",
+        "No dirty or complex backgrounds."
+      ],
+      "tags": [
+        "men",
+        "t-shirt",
+        "studio",
+        "catalog",
+        "clothing",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "men-tshirt-oversized-streetwear",
+      "title": "Oversize futbolka — Zamonaviy shahar stili",
+      "category": "Men",
+      "subcategory": "Oversized T-shirts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Kiyimning tushishi (draping) va modelning tabiiy gavdasini realistik saqlagan holda shahar uslubini yaratadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Oversize futbolkani zamonaviy shahar fonida, model ustida erkin tushib turgan streetwear formatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Futbolkaning oldi to'liq ko'ringan 1 ta rasmi"
+      ],
+      "prompt": "Medium lifestyle portrait of a stylish young male model wearing the exact oversized t-shirt from the reference photo. The model is standing outdoors near a minimalist modern architectural concrete wall in soft natural daylight. Relaxed drop-shoulder fit, realistic fabric folds and natural drape. Shot on 50mm lens with soft background blur. STRICT PRODUCT PRESERVATION: The garment worn by the model must be identical to the uploaded reference: preserve exact silhouette, oversized drop-shoulder cut, fabric drape, neckline, color tone, and any graphic print or embroidery. Do not redraw or modify any artwork on the shirt.",
+      "negativeInstructions": [
+        "Do not change the oversized fit to a tight or regular fit.",
+        "Do not alter the graphic print or text on the shirt.",
+        "Do not modify the color hue or fabric weight.",
+        "Do not generate distorted hands or facial features."
+      ],
+      "tags": [
+        "men",
+        "oversized",
+        "streetwear",
+        "model",
+        "urban",
+        "instagram"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-polo-minimal-pedestal",
+      "title": "Polo ko'ylak — Minimalist poydevor kompozitsiyasi",
+      "category": "Men",
+      "subcategory": "Polo",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Minimalist geometrik shakllar va nozik soyalarni premium vizual darajasida hosil qilish uchun qulay."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "1:1",
+      "description": "Klassik polo ko'ylakni minimalist gipsli poydevor ustida, nafis yorug'lik va qat'iy yoqa shakli bilan tasvirlaydi.",
+      "whatYouNeed": [
+        "Poloning yoqasi va tugmalari to'g'rilangan 1 ta tiniq rasmi"
+      ],
+      "prompt": "High-end product photography of the men's polo shirt from the uploaded photo, neatly folded and positioned on a smooth matte beige geometric stone pedestal. Minimalist architectural background with warm morning window light casting sharp aesthetic architectural shadows. Crisp collar structure and button placket detail in sharp focus. STRICT PRODUCT PRESERVATION: Retain the exact pique cotton texture, collar ribbing, button color and spacing, pocket or chest embroidery, and original colorway exactly as seen in the uploaded reference.",
+      "negativeInstructions": [
+        "Do not replace the polo collar with a standard t-shirt collar.",
+        "Do not alter button count or placement.",
+        "Do not change fabric texture from pique to smooth silk.",
+        "Do not distort brand markings."
+      ],
+      "tags": [
+        "men",
+        "polo",
+        "minimal",
+        "luxury",
+        "pedestal",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-hoodie-ghost-mannequin",
+      "title": "Erkaklar xudisi — Ko'rinmas maneken (Ghost Mannequin)",
+      "category": "Men",
+      "subcategory": "Hoodies",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ghost mannequin effektida ichki kapyushon va yoqa qismini real 3D hajmda xatosiz yig'ishga yordam beradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Kapyushonli xudini ko'rinmas 3D hajmda, kapyushon ichi ko'ringan holda toza katalog ko'rinishiga keltiradi.",
+      "whatYouNeed": [
+        "Xudining to'liq oldi ko'ringan rasmi",
+        "Kapyushon va cho'ntak qismi yopilmagan bo'lishi kerak"
+      ],
+      "prompt": "Professional 3D ghost mannequin product photography of the hoodie from the reference image. The hoodie appears naturally filled with realistic human torso volume, with the interior neck opening and hood interior neatly visible. Centered on a seamless pure light gray background (#EFEFEF). Even commercial studio illumination highlighting the fleece/french terry texture, kangaroo pocket, drawstring aglets, and ribbed cuffs. STRICT PRODUCT PRESERVATION: The garment must remain identical to the reference image in exact color, drawstring thickness, eyelet hardware, pocket shape, hood depth, and all printed or embroidered details.",
+      "negativeInstructions": [
+        "Do not show any visible mannequin neck or plastic parts.",
+        "Do not flatten the 3D volume of the hoodie.",
+        "Do not remove the kangaroo pocket or drawstrings.",
+        "Do not change the fabric color or tone."
+      ],
+      "tags": [
+        "men",
+        "hoodie",
+        "ghost-mannequin",
+        "catalog",
+        "ecommerce",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "men-jeans-denim-flatlay",
+      "title": "Erkaklar jinsi shimi — Flat Lay va aksessuarlar",
+      "category": "Men",
+      "subcategory": "Jeans",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Jinsi matosining tabiiy rangi, yuvilish chiziqlari (wash) va mayda iplarini aynan saqlab beradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Jinsi shimni tepadan tekis tushirilgan zamonaviy flat lay kompozitsiyasida, sifatli kamar bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Jinsi shimning to'liq yoyilgan 1 ta rasmi"
+      ],
+      "prompt": "Top-down flat lay product photograph of the men's denim jeans in the reference image, neatly arranged on a clean light concrete surface. Positioned alongside a rolled black leather belt and sunglasses to complete a balanced outfit aesthetic. Soft natural daylight from the upper-left creating gentle shadows in the denim folds. STRICT PRODUCT PRESERVATION: The jeans must strictly match the source image in denim wash, whiskering patterns, distressing, pocket rivet hardware, copper/gold contrast stitching, and belt loops.",
+      "negativeInstructions": [
+        "Do not invent artificial distressing or holes if none exist.",
+        "Do not change the wash shade from dark to light or vice versa.",
+        "Do not alter pocket stitch designs.",
+        "Do not distort the straight/slim cut of the leg."
+      ],
+      "tags": [
+        "men",
+        "jeans",
+        "denim",
+        "flatlay",
+        "casualwear"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-suit-luxury-executive",
+      "title": "Klassik erkaklar kostyumi — Premium interyer",
+      "category": "Men",
+      "subcategory": "Suits",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Klassik kostyumning elka tuzilishi, lapel qirralari va mato yaltirashini oliy darajada yetkazadi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "4:5",
+      "description": "Erkaklar kostyumini zamonaviy hashamatli biznes lounge yoki mehmonxona interyerida, model ustida ko'rsatadi.",
+      "whatYouNeed": [
+        "Kostyum yoki pidjakning old qismi aniq ko'ringan rasm"
+      ],
+      "prompt": "Editorial fashion photography of a sophisticated male model wearing the exact tailored two-piece suit from the reference image. The model is standing in a luxurious, sunlit executive lounge with dark wood paneling and large glass windows. Impeccable tailoring fit, jacket buttoned, sharp shoulder line, natural fabric drape. High-end commercial lighting. STRICT PRODUCT PRESERVATION: The suit must duplicate the source image in exact lapel cut (notch/peak), button count, chest pocket angle, fabric pinstripe/texture, and exact wool fabric color hue.",
+      "negativeInstructions": [
+        "Do not alter the lapel width or cut.",
+        "Do not change button materials or colors.",
+        "Do not change a double-breasted suit to single-breasted or vice-versa.",
+        "Do not alter the fabric pattern or color."
+      ],
+      "tags": [
+        "men",
+        "suit",
+        "classic",
+        "formal",
+        "luxury",
+        "model",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "men-jacket-leather-urban-night",
+      "title": "Erkaklar charm kurtkasi — Kechki shahar chiroqlari",
+      "category": "Men",
+      "subcategory": "Jackets",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Charm yuzasidagi akslanishlar va kechki shahar chiroqlari (bokeh) bilan dramatik kontrast hosil qiladi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Charm kurtkani kechki zamonaviy ko'chada, orqa fondagi shahar chiroqlari bilan uslubli ko'rsatadi.",
+      "whatYouNeed": [
+        "Kurtkaning old tomoni va zamoklari ko'ringan rasm"
+      ],
+      "prompt": "Cinematic portrait of a male model wearing the exact leather jacket from the reference image, standing on a modern urban street at twilight. Soft city neon and street lamp reflections gently illuminating the jacket's leather grain and metallic zippers. Shallow depth of field with beautiful evening bokeh in the background. STRICT PRODUCT PRESERVATION: Keep the exact leather finish (matte/glossy), zipper pulls, collar snaps, pocket angles, shoulder epaulets, and stitching identical to the reference image.",
+      "negativeInstructions": [
+        "Do not alter the leather grain or color.",
+        "Do not add extra zippers, studs, or patches not present in the original.",
+        "Do not change the collar style.",
+        "No distorted hands or face."
+      ],
+      "tags": [
+        "men",
+        "jacket",
+        "leather",
+        "urban",
+        "night",
+        "lifestyle"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-tracksuit-gym-fitness",
+      "title": "Erkaklar sport kiyimi — Zamonaviy trenajyor zali",
+      "category": "Men",
+      "subcategory": "Sportswear",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Sport kiyimining elastik matosi, chiziqlari va anatomik qulayligini realistik ko'rsatadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Sport kastyumini zamonaviy fitnes klubda, harakatga tayyor sportchi model ustida tasvirlaydi.",
+      "whatYouNeed": [
+        "Sport kiyimining (kurtka va shim) to'liq rasmi"
+      ],
+      "prompt": "Commercial fitness product photography of an athletic male model wearing the exact tracksuit from the reference image, standing in a contemporary high-end gym with clean ambient lighting and modern workout equipment in the blurred background. Natural athletic stance showcasing the suit's comfort and cut. STRICT PRODUCT PRESERVATION: Exactly match the tracksuit's fabric sheen, panel colors, side stripes, zipper style, brand emblems, and cuff ribbing from the source photo.",
+      "negativeInstructions": [
+        "Do not alter side stripe colors or widths.",
+        "Do not remove brand logos or add fictional brand stripes.",
+        "Do not change the track jacket fit or neckline.",
+        "Do not make the fabric look wet or overly glossy."
+      ],
+      "tags": [
+        "men",
+        "sportswear",
+        "tracksuit",
+        "gym",
+        "fitness",
+        "model"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-shirt-formal-office",
+      "title": "Klassik erkaklar ko'ylagi — Ofis biznes muhiti",
+      "category": "Men",
+      "subcategory": "Shirts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ko'ylak yoqasi, mato qatlamlari va tugmalarining toza qadab turilishini aniq tasvirlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Erkaklar klassik ko'ylagini yorug' zamonaviy ofis interyerida, dazmollangan mukammal holatda ko'rsatadi.",
+      "whatYouNeed": [
+        "Ko'ylakning yoqa va ko'krak qismi tekislangan rasmi"
+      ],
+      "prompt": "Professional lifestyle commercial photograph of a well-groomed businessman wearing the exact dress shirt from the uploaded photo, standing inside a bright modern glass-walled architectural office. Clean posture, natural daylight, crisp fabric ironing. STRICT PRODUCT PRESERVATION: The shirt must duplicate the reference image in collar style (spread/button-down/mandarin), button color, cuff design, fabric pattern (solid/stripes/checks), and exact shade of fabric.",
+      "negativeInstructions": [
+        "Do not change the collar type.",
+        "Do not add a tie unless present in the reference.",
+        "Do not alter the pattern spacing or striping scale.",
+        "Do not introduce wrinkles or fabric defects."
+      ],
+      "tags": [
+        "men",
+        "shirt",
+        "formal",
+        "office",
+        "business",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-shorts-summer-casual",
+      "title": "Erkaklar shortigi — Yozgi shahar va dam olish",
+      "category": "Men",
+      "subcategory": "Shorts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yozgi tabiiy quyosh nurlari va qulay kundalik muhitni sifatli aks ettiradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Erkaklar shortigini quyoshli yozgi ko'chada yoki basseyn bo'yida qulay dam olish formatida taqdim etadi.",
+      "whatYouNeed": [
+        "Shortikning old tomoni to'liq ko'ringan rasm"
+      ],
+      "prompt": "Lifestyle summer photograph focused from waist to knee of a male model wearing the exact casual shorts from the reference image. Walking casually on a sunlit paved resort pathway near green palm foliage. Warm afternoon sunlight creating soft natural shadows. STRICT PRODUCT PRESERVATION: Maintain exact waistband style (drawstring/button), pocket structure, inseam length, fabric weave (linen/cotton/nylon), and color hue from the original image.",
+      "negativeInstructions": [
+        "Do not alter the length of the shorts.",
+        "Do not change waist closure details.",
+        "Do not modify the color or pattern.",
+        "No unnatural leg skin textures."
+      ],
+      "tags": [
+        "men",
+        "shorts",
+        "summer",
+        "casual",
+        "lifestyle"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-coat-winter-editorial",
+      "title": "Erkaklar klassik paltosi — Qishki editorial fasad",
+      "category": "Men",
+      "subcategory": "Coats",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Qalin jun mato (wool/cashmere) teksturasini va qishki sokin atmosferani yaratishda kuchli."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "4:5",
+      "description": "Klassik erkaklar paltosini zamonaviy qishki shahar binosi fonida, qat'iy va qimmatbaho qiyofada namoyish etadi.",
+      "whatYouNeed": [
+        "Paltoning butun bo'yi ko'ringan old rasmi"
+      ],
+      "prompt": "High-fashion winter editorial photograph of a male model wearing the exact wool overcoat from the reference image, standing in front of modern stone architecture on a crisp winter day. Confident walking pose, hands casually near pockets. Soft overcast winter lighting emphasizing the heavy fabric drape and texture. STRICT PRODUCT PRESERVATION: Preserve the exact coat length, lapel proportions, button configuration, pocket flaps, and wool/cashmere fabric shade from the source reference.",
+      "negativeInstructions": [
+        "Do not change coat length from long to short.",
+        "Do not alter the button spacing or lapel style.",
+        "Do not add fake fur collars or hoods if not present in reference.",
+        "Do not change the fabric color tone."
+      ],
+      "tags": [
+        "men",
+        "coat",
+        "winter",
+        "editorial",
+        "luxury",
+        "fashion"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-bomber-jacket-neon-urban",
+      "title": "Bomber kurtka — Zamonaviy shahar aksenti",
+      "category": "Men",
+      "subcategory": "Bombers",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Bomberning rezinka qirralari, mato jilosi va yeng cho'ntaklarini buzmasdan saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Bomber kurtkani zamonaviy yoshlar uslubida, shahar markazidagi toza fon bilan tasvirlaydi.",
+      "whatYouNeed": [
+        "Bomber kurtkaning old tomoni rasmi"
+      ],
+      "prompt": "Commercial streetwear fashion photography of a young man wearing the exact bomber jacket from the uploaded reference image. Model stands against an architectural glass and steel building facade. Daylight with crisp contrast. The jacket's rib-knit collar, cuffs, hem, and sleeve utility zipper are clearly in focus. STRICT PRODUCT PRESERVATION: The bomber jacket must be identical to the uploaded reference in nylon/satin sheen, ribbed trims, zipper pulls, and colorway.",
+      "negativeInstructions": [
+        "Do not add imaginary patches or arm badges.",
+        "Do not alter the rib-knit cuff colors or striping.",
+        "Do not change the zipper hardware metal tone.",
+        "Do not modify jacket proportions."
+      ],
+      "tags": [
+        "men",
+        "bomber",
+        "streetwear",
+        "jacket",
+        "urban"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "men-sweatshirt-lifestyle-cafe",
+      "title": "Svitshot — Shinam qahvaxona muhiti",
+      "category": "Men",
+      "subcategory": "Sweatshirts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Kundalik iliq muhitda kiyimning tabiiy yarashishini aks ettirish uchun qulay."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Oddiy svitshotni zamonaviy qahvaxona ichida, qulay kundalik turmush tarzi formatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Svitshotning oldi tekis tushirilgan rasm"
+      ],
+      "prompt": "Warm lifestyle portrait of a young man wearing the exact crewneck sweatshirt from the reference image, sitting at a wooden table in a sunlit modern aesthetic coffee shop. Holding a warm ceramic mug, relaxed posture. Soft window light illuminating the sweatshirt cotton texture. STRICT PRODUCT PRESERVATION: Retain the exact collar ribbing, raglan or set-in sleeve seams, chest typography/embroidery, and exact fabric color from the uploaded photo.",
+      "negativeInstructions": [
+        "Do not add a hood or front pocket to a crewneck sweatshirt.",
+        "Do not alter the graphic text or logo on the chest.",
+        "Do not change fabric hue or texture.",
+        "No distorted hands or mug geometry."
+      ],
+      "tags": [
+        "men",
+        "sweatshirt",
+        "lifestyle",
+        "cafe",
+        "casual"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-dress-elegant-courtyard",
+      "title": "Ayollar ko'ylagi — Nafis shahar saroyi / hovli",
+      "category": "Women",
+      "subcategory": "Dresses",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ko'ylakning uzunligi, yubka kengligi, bel qismi va mato burmalarini xatosiz ifodalaydi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "4:5",
+      "description": "Ayollar ko'ylagini quyoshli nafis hovli yoki zamonaviy arxitektura fonida, to'liq bo'y-basti bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Ko'ylakning to'liq bo'yi ko'ringan old rasmi"
+      ],
+      "prompt": "Full-length fashion photography of a graceful female model wearing the exact dress from the reference image. The model is standing in a sunlit modern interior courtyard with warm neutral stone arches and soft ambient daylight. Graceful natural pose showing the full silhouette, sleeve length, and fabric flow. STRICT PRODUCT PRESERVATION: Preserve the uploaded dress's exact pattern, floral or geometric print, fabric drape, neckline, cuffs, belt/waist tie, and hem length. Do not alter colors or add nonexistent embroidery.",
+      "negativeInstructions": [
+        "Do not shorten or lengthen the dress hemline.",
+        "Do not change the neckline cut or sleeve style.",
+        "Do not redesign floral or patterned prints.",
+        "Do not modify the color palette."
+      ],
+      "tags": [
+        "women",
+        "dress",
+        "elegant",
+        "fashion",
+        "model",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "women-dress-modest-fashion",
+      "title": "Modest / Muslimalar ko'ylagi — Kamtarona zamonaviy stil",
+      "category": "Women",
+      "subcategory": "Modest fashion",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yopiq fasonlar, ro'mol uyg'unligi va kiyimning erkin to'kilishini milliy va zamonaviy talablarga mos yetkazadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Modest libosni zamonaviy me'moriy fonda, to'liq yopiq va bejirim ko'rinishda tasvirlaydi.",
+      "whatYouNeed": [
+        "Modest ko'ylak yoki abayaning 1 ta to'liq rasmi"
+      ],
+      "prompt": "Elegant modest fashion photoshoot of a model wearing the exact long modest dress / abaya from the reference image. The model is styled with a matching solid neutral hijab, standing in a serene minimalist modern gallery hallway with soft diffuse daylight. Flowing graceful posture. STRICT PRODUCT PRESERVATION: The dress must exactly match the source image in sleeve cuff details, neckline modesty, fabric opacity and drape, waistline cut, and original color tone.",
+      "negativeInstructions": [
+        "Do not make the dress tight-fitting or sheer.",
+        "Do not shorten the sleeves or skirt hem.",
+        "Do not alter the original fabric texture or color.",
+        "No revealing cuts or uncharacteristic alterations."
+      ],
+      "tags": [
+        "women",
+        "modest",
+        "dress",
+        "abaya",
+        "hijab",
+        "uzbek-market",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "women-blouse-office-minimal",
+      "title": "Ayollar bluzkasi — Elegant ishbilarmonlik uslubi",
+      "category": "Women",
+      "subcategory": "Blouses",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ipak yoki shifon kabi nozik matolarning shaffofligi va yoqa bog'ichlarini aniq saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ayollar bluzkasini zamonaviy ofis muhitida, nafis va jiddiy ayol obrazida taqdim etadi.",
+      "whatYouNeed": [
+        "Bluzkaning yoqa va yeng qismlari tekislangan rasmi"
+      ],
+      "prompt": "Medium portrait of an elegant woman wearing the exact blouse from the reference photo, standing in a brightly lit contemporary design studio. Soft natural window light highlighting the blouse's silk/chiffon texture and drape. Refined and professional aesthetic. STRICT PRODUCT PRESERVATION: Duplicate the exact collar/bow tie style, sleeve puff or cuff pleats, button details, and color shade from the uploaded image.",
+      "negativeInstructions": [
+        "Do not remove collar bows or pleats if present.",
+        "Do not change the fabric from matte to glossy or vice versa.",
+        "Do not alter the sleeve volume.",
+        "Do not change the pattern or color tone."
+      ],
+      "tags": [
+        "women",
+        "blouse",
+        "formal",
+        "office",
+        "elegant"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-suit-power-suit-studio",
+      "title": "Ayollar klassik kostyumi — Premium studiya tahriri",
+      "category": "Women",
+      "subcategory": "Suits",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Ayollar kostyumining qat'iy qolipini va studiya yoritilishini moda jurnallari darajasida aks ettiradi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "4:5",
+      "description": "Klassik ayollar kostyum-shimi (pantsuit) professional studiyada, qat'iy va zamonaviy lider qiyofasida.",
+      "whatYouNeed": [
+        "Kostyum va shimning to'liq old rasmi"
+      ],
+      "prompt": "High-fashion studio editorial photo of a confident woman wearing the exact tailored pantsuit from the uploaded reference. Standing centered on a smooth warm-beige cyclorama studio background with directional key lighting and soft fill. Sharp tailoring lines, straight trousers drape. STRICT PRODUCT PRESERVATION: Exactly preserve the blazer lapels, single/double button closure, flap pockets, trouser crease, and solid fabric color tone from the reference photo.",
+      "negativeInstructions": [
+        "Do not alter the suit tailoring or fit.",
+        "Do not change button styles or pocket shapes.",
+        "Do not alter the trouser length or cut.",
+        "Do not introduce unrelated graphics or patterns."
+      ],
+      "tags": [
+        "women",
+        "suit",
+        "pantsuit",
+        "formal",
+        "studio",
+        "editorial"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-skirt-pleated-motion",
+      "title": "Ayollar yubkasi — Harakatdagi yengil mayinlik",
+      "category": "Women",
+      "subcategory": "Skirts",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yubkaning plisse buklamalari va uzunligini buzmasdan tabiiy harakat bag'ishlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Plisse yoki klassik ayollar yubkasini yengil harakatda, ochiq osmon va zamonaviy ko'chada ko'rsatadi.",
+      "whatYouNeed": [
+        "Yubkaning to'liq uzunligi ko'ringan 1 ta rasmi"
+      ],
+      "prompt": "Lifestyle fashion photo focused on the lower body of a model walking lightly outdoors, wearing the exact skirt from the uploaded image. Golden hour sunlight catching the edge of the fabric, showing natural movement. Paved clean pedestrian street with blurred greenery in background. STRICT PRODUCT PRESERVATION: Preserve the exact skirt waistline, pleating width, fabric sheen, hemline finish, and color tone from the source image.",
+      "negativeInstructions": [
+        "Do not flatten pleats or change pleat size.",
+        "Do not alter skirt length (midi/maxi/mini).",
+        "Do not change fabric material or color.",
+        "No distorted legs or feet."
+      ],
+      "tags": [
+        "women",
+        "skirt",
+        "pleated",
+        "movement",
+        "lifestyle"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-hoodie-cozy-lifestyle",
+      "title": "Ayollar xudisi — Shinam uy/dam olish muhiti",
+      "category": "Women",
+      "subcategory": "Hoodies",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yumshoq pastel ranglar va qulay kundalik ayollar kayfiyatini yaratish uchun qulay."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ayollar xudisini yorug' va shinam xonada, qulay dam olish formatida tasvirlaydi.",
+      "whatYouNeed": [
+        "Xudining oldi ko'ringan rasmi"
+      ],
+      "prompt": "Cozy lifestyle photography of a young woman wearing the exact hoodie from the reference image, relaxing on a comfortable light-colored sofa near a sunny window with indoor plants nearby. Soft morning natural light, friendly relaxed mood. STRICT PRODUCT PRESERVATION: Retain the uploaded hoodie's exact pastel/solid color, drawstring style, front pocket shape, hood size, and any print or logo without alterations.",
+      "negativeInstructions": [
+        "Do not change the hoodie shape or color shade.",
+        "Do not alter or blur the chest print or logo.",
+        "Do not change fabric texture.",
+        "No unnatural facial expressions or distorted limbs."
+      ],
+      "tags": [
+        "women",
+        "hoodie",
+        "casual",
+        "cozy",
+        "lifestyle"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-coat-trench-autumn",
+      "title": "Ayollar trenchi / platshi — Kuzgi shahar xiyoboni",
+      "category": "Women",
+      "subcategory": "Coats",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Trench kiyimining kamar bog'lanishi, yoqa qatlamlari va tugmalarini to'liq saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Klassik trench yoki kuzgi paltoni sarg'ish bargli xiyobonda, zamonaviy shahar qizi qiyofasida ko'rsatadi.",
+      "whatYouNeed": [
+        "Trenchning oldi va kamari ko'ringan rasmi"
+      ],
+      "prompt": "Full-body autumn fashion photograph of a stylish woman walking through a clean city avenue lined with golden autumn trees, wearing the exact trench coat from the reference photo. Coat is styled naturally with belt tied. Soft diffused daylight. STRICT PRODUCT PRESERVATION: Maintain exact trench coat storm flaps, cuff buckles, double-breasted buttons, epaulets, fabric water-resistant texture, and beige/khaki/camel color tone from the reference.",
+      "negativeInstructions": [
+        "Do not remove shoulder epaulets or cuff buckles if present.",
+        "Do not change the classic trench color.",
+        "Do not shorten the coat length.",
+        "No artificial rain or heavy weather effects."
+      ],
+      "tags": [
+        "women",
+        "coat",
+        "trench",
+        "autumn",
+        "seasonal",
+        "lifestyle"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-jeans-mom-fit-minimal",
+      "title": "Ayollar jinsi shimi — Zamonaviy Mom / Wide Fit",
+      "category": "Women",
+      "subcategory": "Jeans",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Shimning baland beli va oyoq fasonini realistik shaklda aks ettiradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Ayollar jinsi shimini minimal oq fonda, model ustida qomatga yarashgan holatda ko'rsatadi.",
+      "whatYouNeed": [
+        "Jinsi shimning to'liq bo'yi ko'ringan rasmi"
+      ],
+      "prompt": "Fashion catalog photo from the waist down of a model standing straight, wearing the exact women's jeans from the uploaded image. Paired simply with clean white minimalist sneakers against a solid warm-white studio wall. Direct soft daylight. STRICT PRODUCT PRESERVATION: Exact high-waist cut, denim wash tone, waistband button, pocket shape, seam contrast, and ankle hem length must duplicate the reference image perfectly.",
+      "negativeInstructions": [
+        "Do not alter the waist rise or leg flare/taper.",
+        "Do not change denim wash from light to dark or vice versa.",
+        "Do not add rips or distress marks if none exist.",
+        "No shoe distortions."
+      ],
+      "tags": [
+        "women",
+        "jeans",
+        "denim",
+        "catalog",
+        "minimal"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "women-tracksuit-yoga-wellness",
+      "title": "Ayollar sport kiyimi — Yoga va sog'lom turmush",
+      "category": "Women",
+      "subcategory": "Sportswear",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Sport leggings va top kiyimlarining elastikligi va chiroyli bichimini buzmaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ayollar fitnes to'plamini yorug' yoga studiyasida, toza va estetik holatda taqdim etadi.",
+      "whatYouNeed": [
+        "Sport to'plamining (top + leggings) rasmi"
+      ],
+      "prompt": "Commercial fitness photography of a sporty woman wearing the exact athletic activewear set from the uploaded photo, standing in a bright sun-drenched minimalist yoga studio with light wood flooring. Natural posture, clean and energizing aesthetic. STRICT PRODUCT PRESERVATION: Maintain exact seamless ribbing, waistband height, sports bra cut, contour shading lines, and solid fabric color exactly as shown in the reference.",
+      "negativeInstructions": [
+        "Do not change the neckline or back straps of the top.",
+        "Do not alter the leggings waistband height.",
+        "Do not change fabric compression texture or color.",
+        "No unnatural body proportions."
+      ],
+      "tags": [
+        "women",
+        "sportswear",
+        "yoga",
+        "fitness",
+        "activewear"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-sneaker-premium-studio",
+      "title": "Krossovka — Premium studiya katalogi (Flagship)",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Krossovkaning tagcharmi, to'ri, logotiplari va ranglarini 100% buzilmasdan saqlashda eng yaxshi natija beradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Krossovkani 45 gradus burchak ostida, toza oq studiya fonida va tabiiy soyalar bilan katalog darajasiga olib chiqadi.",
+      "whatYouNeed": [
+        "Krossovkaning yondan 45 gradus burchakda olingan 1 ta tiniq rasmi",
+        "Tiniq yoritilgan oddiy stol yoki pol ustidagi rasm kifoya"
+      ],
+      "prompt": "Commercial ecommerce product photography of the sneaker in the reference image. Place the shoe at a 45-degree angle profile on an immaculate, matte off-white seamless studio backdrop with subtle, soft contact shadows underneath. Balanced high-key softbox lighting from the front-left and fill light on the right. STRICT PRODUCT PRESERVATION: Retain the exact shoe shape, sole silhouette, color palette, upper mesh/leather texture, logo placement, stitching, and lacing structure visible in the reference image. Do not modify, rebrand, simplify, recolor, or redesign any part of the shoe. Razor-sharp focus throughout, natural textures.",
+      "negativeInstructions": [
+        "Do not alter the sneaker colorway or accent colors.",
+        "Do not invent new logos or redraw existing brand marks.",
+        "Do not change the sole thickness or tread profile.",
+        "Do not add levitation or extreme CGI floating effects.",
+        "No dirty floor reflections."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "studio",
+        "catalog",
+        "ecommerce",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "footwear-sneaker-on-foot-street",
+      "title": "Krossovka — Oyoqda kiyilgan shahar stili",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Krossovkaning oyoqqa kiyilgandagi hajmini va tagcharm egilishini realistik ko'rsatadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Krossovkani toza shahar yo'lkasida odam oyog'ida, qadam bosayotgan estetik yaqin planda tasvirlaydi.",
+      "whatYouNeed": [
+        "Krossovkaning yon profili aniq ko'ringan rasm"
+      ],
+      "prompt": "Eye-level close-up street-style lifestyle photo focused from the calf down. The person is wearing the exact sneakers shown in the reference image, paired with clean, modern dark cuffed denim trousers. The subject is taking a forward step on a clean asphalt and concrete sidewalk in a modern city during soft golden afternoon daylight. Shallow depth of field with a subtly blurred urban background. STRICT PRODUCT PRESERVATION: Maintain 100% fidelity to the original sneaker in the reference image: preserve exact sole profile, materials, colors, logos, laces, and panel cuts. No morphing, no added logos.",
+      "negativeInstructions": [
+        "Do not warp the sole or change sneaker proportions on foot.",
+        "Do not alter lacing pattern or tongue logo.",
+        "Do not generate deformed ankles or unnatural foot angles.",
+        "Do not change color tones."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "on-foot",
+        "streetwear",
+        "lifestyle",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "footwear-sneaker-macro-detail",
+      "title": "Krossovka — Material va choklar makro detali",
+      "category": "Footwear",
+      "subcategory": "Sneakers",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Mato tolalari, charm teshikchalari (perforatsiya) va tikuv iplarini yuqori aniqlikda chiqaradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Krossovka materiali, tikuv sifati va logotipini juda yaqindan, sifatini isbotlovchi makro rakursda ko'rsatadi.",
+      "whatYouNeed": [
+        "Krossovkaning yon qismi yoki burni yaqindan olingan rasm"
+      ],
+      "prompt": "Macro commercial product photography focusing on the side quarter, stitching, and brand badge of the uploaded shoe. Dramatic directional soft studio light grazing across the surface to emphasize the genuine leather grain, breathable mesh weave, and precision stitching threads. Clean dark gray neutral background with shallow depth of field. STRICT PRODUCT PRESERVATION: The exact material texture, color tone, thread color, perforations, and hardware must duplicate the reference image without alteration.",
+      "negativeInstructions": [
+        "Do not smooth out genuine leather grain or mesh texture.",
+        "Do not alter thread stitching color.",
+        "Do not blur or hallucinate brand lettering.",
+        "Do not change shoe colors."
+      ],
+      "tags": [
+        "footwear",
+        "sneakers",
+        "macro",
+        "detail",
+        "quality",
+        "craftsmanship"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-running-shoes-action",
+      "title": "Yugurish krossovkasi — Yengil atletika harakati",
+      "category": "Footwear",
+      "subcategory": "Running shoes",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yugurish poyabzalining amortizatsiya xususiyati va yengilligini dinamik ravishda taqdim etadi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "1:1",
+      "description": "Yugurish krossovkasini professional yugurish yo'lakchasi (tartan) ustida, quyoshli ertalabki dinamikada ko'rsatadi.",
+      "whatYouNeed": [
+        "Sport krossovkasining yon tomoni rasmi"
+      ],
+      "prompt": "Dynamic sports product photography of the exact running shoes in the reference photo, positioned mid-stride on a red athletic running track at sunrise. Low angle perspective, crisp morning sun flare behind, sharp focus on the shoe's cushioned midsole and breathable upper mesh. STRICT PRODUCT PRESERVATION: The running shoe's foam midsole geometry, upper knit patterns, color gradient, and brand stripes must remain identical to the reference image.",
+      "negativeInstructions": [
+        "Do not alter the midsole foam thickness or cutouts.",
+        "Do not change the shoe's color gradient.",
+        "Do not alter the outsole rubber grip pattern.",
+        "No cartoonish motion blur."
+      ],
+      "tags": [
+        "footwear",
+        "running",
+        "sports",
+        "action",
+        "shoes"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-formal-oxford-dark-wood",
+      "title": "Klassik tufli (Oksford/Derbi) — Qimmatbaho yog'och interyer",
+      "category": "Footwear",
+      "subcategory": "Formal shoes",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Yaltiroq charm va qoramtir eman yog'ochi ustidagi jilolarni juda boy va hashamatli tasvirlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Klassik erkaklar tuflisini silliqlangan eman daraxti ustida, aristokratik nafislik bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Klassik tufli juftining old yoki yon rasmi"
+      ],
+      "prompt": "Luxury commercial product photography of the pair of classic formal leather shoes shown in the image. Placed neatly at a 30-degree angle on a polished dark oak wooden parquet floor inside an upscale bespoke shoe boutique. Warm ambient side lighting highlighting the rich leather patina, sole welt stitching, and burnished toe cap. STRICT PRODUCT PRESERVATION: Preserve the exact shoe silhouette, leather finish, brogue perforations, sole edge color, and lace eyelets from the uploaded photo.",
+      "negativeInstructions": [
+        "Do not convert formal shoes into casual loafers or boots.",
+        "Do not alter the leather patina or color tone.",
+        "Do not invent decorative buckles if none exist.",
+        "No artificial CGI plastic sheen."
+      ],
+      "tags": [
+        "footwear",
+        "formal",
+        "classic",
+        "leather",
+        "oxford",
+        "luxury",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "footwear-loafers-casual-summer",
+      "title": "Lofer / Mokasina — Yozgi shahar va dam olish",
+      "category": "Footwear",
+      "subcategory": "Loafers",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Zamsh yoki yumshoq charm materialning tabiiy yumshoqligini aniq ifodalaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Zamsh loferlarni ochiq yozgi terrasa fonida, nozik va qulay uslubda ko'rsatadi.",
+      "whatYouNeed": [
+        "Loferning ustki qismi va tokkasi ko'ringan rasm"
+      ],
+      "prompt": "Commercial lifestyle product photo of the suede/leather loafers from the reference photo. Resting elegantly on a light travertine stone step in an outdoor Italian-style terrace during warm afternoon light. Shallow depth of field with blurred terracotta pots in background. STRICT PRODUCT PRESERVATION: Replicate the uploaded shoe's exact saddle strap, metal horsebit buckle, apron stitch line, suede nap texture, and sole thickness without alteration.",
+      "negativeInstructions": [
+        "Do not change suede to shiny leather.",
+        "Do not alter the metal hardware finish (gold/silver/none).",
+        "Do not change the shoe color tone.",
+        "No distorted sole lines."
+      ],
+      "tags": [
+        "footwear",
+        "loafers",
+        "suede",
+        "summer",
+        "casual",
+        "luxury"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-boots-winter-snow",
+      "title": "Qishki etik / Botinka — Qorli qishki muhit",
+      "category": "Footwear",
+      "subcategory": "Winter boots",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Qor kristallari va qalin botinka protektorlarining qishki kontrastini chiroyli beradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Qishki issiq etik yoki botinkani qorli toza tosh ustida, sovuqqa chidamli baquvvat holatda ko'rsatadi.",
+      "whatYouNeed": [
+        "Qishki botinkaning to'liq yon rasmi"
+      ],
+      "prompt": "Commercial winter product photography of the boots shown in the reference photo, standing firmly on a clean granite rock surrounded by freshly fallen crisp white snow. Cold crisp winter sunlight creating sharp contrast and highlighting the waterproof leather/nubuck texture, fur lining at collar, and heavy-duty lugged outsole tread. STRICT PRODUCT PRESERVATION: The boot must exactly preserve its original silhouette, lace hooks, eyelets, sole lugs, material texture, and color.",
+      "negativeInstructions": [
+        "Do not change the boot height or sole thickness.",
+        "Do not remove or invent fur trims.",
+        "Do not make the boots look wet or dirty.",
+        "Do not change the color tone."
+      ],
+      "tags": [
+        "footwear",
+        "boots",
+        "winter",
+        "seasonal",
+        "snow",
+        "outdoor"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-football-boots-stadium",
+      "title": "Futbol butsasi — Stadion yashil maydoni va chiroqlar",
+      "category": "Footwear",
+      "subcategory": "Football boots",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Butsadagi tikanlar (shiplar), sintetik qoplamalar va yorqin ranglarni 100% saqlaydi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "1:1",
+      "description": "Futbol butsasini kechki stadionning yam-yashil chimida, projektor nurlari ostida qahramonona ko'rsatadi.",
+      "whatYouNeed": [
+        "Futbol butsasining yon profili va shiplari ko'ringan rasm"
+      ],
+      "prompt": "Heroic commercial product photography of the football boots from the uploaded photo, resting dynamically on pristine green football stadium grass. Low-angle perspective with evening stadium floodlights in the background creating dramatic lens flare and atmospheric stadium mist. STRICT PRODUCT PRESERVATION: Keep the exact cleat stud configuration, synthetic upper texture, dynamic color accents, lacing offset, and brand stripes exactly as seen in the source image.",
+      "negativeInstructions": [
+        "Do not alter the stud positions or sole plate design.",
+        "Do not modify dynamic brand graphics or stripes.",
+        "Do not change the vibrant colors of the boot.",
+        "No artificial cartoon look."
+      ],
+      "tags": [
+        "footwear",
+        "football",
+        "boots",
+        "sports",
+        "stadium",
+        "dynamic"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "footwear-sandals-beach-resort",
+      "title": "Yozgi bosonojka / Shlyopka — Plyaj qumi va dengiz",
+      "category": "Footwear",
+      "subcategory": "Sandals",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Yozgi yorug'lik va bosonojka tasmalarining to'g'ri joylashuvini ta'minlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Yozgi sandal yoki shlyopkani toza oq plyaj qumi ustida, yozgi dam olish kayfiyatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Sandal yoki bosonojkaning tepadan yoki yondan olingan rasmi"
+      ],
+      "prompt": "Commercial summer product photo of the sandals from the reference image resting naturally on smooth, clean white beach sand near the edge of calm turquoise water. Bright sunny daylight creating warm natural highlights on the sandal straps and footbed. STRICT PRODUCT PRESERVATION: The sandals must exactly match the source image in strap configuration, buckles, footbed texture, sole thickness, and original color.",
+      "negativeInstructions": [
+        "Do not change strap buckle shapes.",
+        "Do not convert flat sandals into high heels.",
+        "Do not cover the product in messy sand grains.",
+        "Do not alter the colorway."
+      ],
+      "tags": [
+        "footwear",
+        "sandals",
+        "summer",
+        "beach",
+        "resort"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "accessories-backpack-studio-pedestal",
+      "title": "Ryukzak — Dumaloq poydevor va toza studiya",
+      "category": "Accessories",
+      "subcategory": "Backpacks",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ryukzakning cho'ntaklari, zamoklari, brend nishoni va mato shaklini to'laqonli saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ryukzakni ichi to'ldirilgan tik holatda, dumaloq minimalist poydevor ustida katalog uchun tayyorlaydi.",
+      "whatYouNeed": [
+        "Ryukzakning tik turgan 1 ta old yoki 3/4 burchakdagi rasmi"
+      ],
+      "prompt": "Commercial ecommerce studio photography of the uploaded backpack standing upright and fully shaped on a smooth circular pedestal against a light pastel gray studio backdrop. 3/4 front angle view, balanced softbox lighting showing zipper pulls, side water bottle pockets, top handle, and strap attachments. STRICT PRODUCT PRESERVATION: Keep the exact zipper style, logo badge, strap webbing, fabric texture (oxford cloth/canvas/leather), and pocket compartments exactly matching the reference image.",
+      "negativeInstructions": [
+        "Do not change the shape or collapse the backpack volume.",
+        "Do not invent extra pockets or zipper compartments.",
+        "Do not alter brand labels or logo embroidery.",
+        "Do not change fabric material or color."
+      ],
+      "tags": [
+        "accessories",
+        "backpack",
+        "school",
+        "studio",
+        "catalog",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "accessories-handbag-luxury-marble",
+      "title": "Ayollar sumkasi — Oq marmar va nafis kafe",
+      "category": "Accessories",
+      "subcategory": "Handbags",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Marmar jilosi va sumkaning tillarang/kumush metall furniturasini hashamatli aks ettiradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ayollar sumkasini oq marmar stol ustida, qahvaxona fonida hashamatli lifestyle sifatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Sumkaning oldi va tutqichi to'liq ko'ringan rasm"
+      ],
+      "prompt": "High-end commercial lifestyle product photo of the handbag from the reference image placed upright on a white Italian marble table in a chic cafe. A small ceramic coffee cup rests softly in the blurred background. Warm morning natural light creating elegant highlights on the bag's hardware. STRICT PRODUCT PRESERVATION: Exact leather grain, metallic hardware color (gold/silver), handle shape, stitching pattern, and clasp lock mechanism from the uploaded photo must remain identical.",
+      "negativeInstructions": [
+        "Do not alter the clasp lock mechanism or handle construction.",
+        "Do not change gold hardware to silver or vice versa.",
+        "Do not modify the leather texture (e.g. crocodile to smooth).",
+        "Do not change the bag's proportions."
+      ],
+      "tags": [
+        "accessories",
+        "handbag",
+        "luxury",
+        "lifestyle",
+        "marble",
+        "women",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "accessories-watch-luxury-slate",
+      "title": "Qo'l soati — Qora tosh va makro yorug'lik",
+      "category": "Accessories",
+      "subcategory": "Watches",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Soat siferblati, metall qirralari va oynadagi mayin jilolarni yuqori sifatda yaratadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Qo'l soatini qora tosh (slanes) ustida, qimmatbaho brend reklama darajasida ko'rsatadi.",
+      "whatYouNeed": [
+        "Soat siferblati va kamari aniq ko'ringan rasm"
+      ],
+      "prompt": "Commercial luxury watch photography of the uploaded timepiece resting on a piece of dark textured slate stone. Controlled studio rim lighting accentuating the bezel bevels, sapphire crystal, dial markers, sub-dials, and strap texture. Extreme focus and clarity. STRICT PRODUCT PRESERVATION: Maintain 100% precision on dial layout, hands, numeral typography, bezel markings, crown position, and strap material. No generated random dial text.",
+      "negativeInstructions": [
+        "Do not invent fake dial text or change brand typography.",
+        "Do not alter the sub-dial positions on chronographs.",
+        "Do not change strap material from leather to steel or vice versa.",
+        "Do not create distorted watch hands."
+      ],
+      "tags": [
+        "accessories",
+        "watch",
+        "luxury",
+        "macro",
+        "slate",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "accessories-sunglasses-summer-sunlight",
+      "title": "Quyosh ko'zoynagi — Yozgi quyosh va mayin soya",
+      "category": "Accessories",
+      "subcategory": "Sunglasses",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Ko'zoynak linzalari shaffofligi va gardish (frame) shaklini buzilmasdan saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Ko'zoynakni toza bej fonda, quyosh nurlari va o'simlikning mayin soyasi bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Ko'zoynakning oldi yoki 45 gradus burchakdagi rasmi"
+      ],
+      "prompt": "Minimalist aesthetic product photography of the sunglasses from the reference image, resting on a textured warm-beige ceramic tile. Crisp summer sunlight casting an artistic palm leaf shadow across the background. Crystal-clear lens tint and frame gloss. STRICT PRODUCT PRESERVATION: The sunglasses must exactly match the source image in frame shape (aviator/wayfarer/cat-eye), bridge width, hinge hardware, and lens tint color.",
+      "negativeInstructions": [
+        "Do not distort frame geometry or asymmetry.",
+        "Do not alter the lens color or transparency gradient.",
+        "Do not add fictional brand marks on lenses.",
+        "No glare obscuring the frame details."
+      ],
+      "tags": [
+        "accessories",
+        "sunglasses",
+        "summer",
+        "minimal",
+        "sunglasses"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "accessories-wallet-leather-craft",
+      "title": "Charm hamyon / Klatch — Hunarmandchilik stoli",
+      "category": "Accessories",
+      "subcategory": "Wallets",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Charm qirralaridagi choklar va hamyon bo'limlarining haqqoniy ko'rinishini ta'minlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Charm hamyonni yog'och stol ustida, haqiqiy tabiiy charm sifatini ko'rsatuvchi burchakda tasvirlaydi.",
+      "whatYouNeed": [
+        "Hamyonning old yoki ochilgan holatdagi rasmi"
+      ],
+      "prompt": "Close-up commercial product shot of the leather wallet from the reference photo, positioned semi-open on a rustic artisan workbench. Soft warm sidelight highlighting the edge burnishing, card slot stitching, and embossed logo stamp. STRICT PRODUCT PRESERVATION: Duplicate the exact leather grain, stitching thread tone, card slot layout, coin pocket snap, and color hue from the uploaded photo.",
+      "negativeInstructions": [
+        "Do not alter the wallet fold style (bifold/trifold/cardholder).",
+        "Do not change the stitching color or pattern.",
+        "Do not alter embossed logos.",
+        "Do not change leather color."
+      ],
+      "tags": [
+        "accessories",
+        "wallet",
+        "leather",
+        "craftsmanship",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "accessories-cap-streetwear-pedestal",
+      "title": "Kepka / Beysbolka — Zamonaviy shahar stili",
+      "category": "Accessories",
+      "subcategory": "Caps",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Kepka soyabonining egilishi, old kashtasi (embroidery) va to'qimasini aynan saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Kepkani toza poydevor ustida, old logotipi va shakli aniq ko'ringan holda tasvirlaydi.",
+      "whatYouNeed": [
+        "Kepkaning oldi va soyaboni aniq ko'ringan rasm"
+      ],
+      "prompt": "Commercial product photography of the baseball cap from the uploaded reference photo, placed at a dynamic 3/4 angle on a light concrete cube pedestal against a clean neutral studio background. Soft studio lighting highlighting the curved brim, panel stitching, ventilation eyelets, and front 3D embroidered logo. STRICT PRODUCT PRESERVATION: Retain the exact logo embroidery, brim curve, panel crown structure, top button, and fabric color tone.",
+      "negativeInstructions": [
+        "Do not change the embroidered logo or text.",
+        "Do not flatten the structured crown.",
+        "Do not alter brim shape from curved to flat or vice versa.",
+        "Do not modify fabric color."
+      ],
+      "tags": [
+        "accessories",
+        "cap",
+        "hat",
+        "streetwear",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "accessories-jewelry-ring-macro-luxury",
+      "title": "Taqinchoq / Uzuk / Zirak — Oliy toifadagi makro jilo",
+      "category": "Accessories",
+      "subcategory": "Jewelry",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Qimmatbaho toshlar qirrasi va oltin/kumush yaltirashini juda yuqori yorug'likda taqdim etadi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "1:1",
+      "description": "Uzuk yoki zirakni baxmal/ipak mato ustida, toshlar jilosi va metalining yaltirashi bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Taqinchoqning juda tiniq va yaqindan olingan rasmi"
+      ],
+      "prompt": "Macro luxury jewelry photography of the uploaded ring/earring resting upright in a crease of champagne silk fabric. Controlled soft studio pin-spot lighting catching the gemstone facets with brilliant clean sparkle and highlighting the polished gold/silver band. STRICT PRODUCT PRESERVATION: The jewelry piece must duplicate the reference image in gemstone cut, prong setting, band thickness, metal color (white gold/yellow gold/rose gold/silver), and fine engravings.",
+      "negativeInstructions": [
+        "Do not invent additional gemstones or change gemstone color.",
+        "Do not alter prong or bezel settings.",
+        "Do not change metal material or shade.",
+        "No blurry stones or artificial haze."
+      ],
+      "tags": [
+        "accessories",
+        "jewelry",
+        "ring",
+        "luxury",
+        "macro",
+        "gold"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "children-boys-casual-playground",
+      "title": "O'g'il bolalar kiyimi — Qiziqarli o'yingoh va bog'",
+      "category": "Children",
+      "subcategory": "Boys clothing",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Bolalar kiyimidagi yorqin ranglar, multfilm/mashina printlarini buzmaydi va tabiiy bolalar harakatini beradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "O'g'il bolalar kiyim to'plamini (futbolka/shortik yoki svitshot) quvnoq bolalar bog'chasida yoki o'yingohda ko'rsatadi.",
+      "whatYouNeed": [
+        "Kiyimning old tomoni to'liq ko'ringan rasmi"
+      ],
+      "prompt": "Bright and cheerful commercial catalog photo of a happy 7-year-old boy model wearing the exact outfit from the reference image, standing in a clean, modern, colorful playground park on a sunny day. Natural joyful expression, active stance. STRICT PRODUCT PRESERVATION: Keep the exact graphic cartoon print, striped pattern, collar trim, pocket details, and fabric colors matching the reference photo 100%.",
+      "negativeInstructions": [
+        "Do not alter cartoon illustrations or printed lettering on the shirt.",
+        "Do not change the clothing colors or proportions.",
+        "Do not create unnatural child facial expressions.",
+        "No complex clutter in the foreground."
+      ],
+      "tags": [
+        "children",
+        "boys",
+        "kids",
+        "clothing",
+        "casual",
+        "playground"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "children-girls-dress-birthday",
+      "title": "Qiz bolalar bayramona ko'ylagi — Ertaknamo bayramona studio",
+      "category": "Children",
+      "subcategory": "Girls clothing",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "To'rli (fatil) matolar, bantlar va yaltiroq detallarni buzmasdan saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Qiz bolalar bayramona ko'ylagini sharlar va nozik bayram bezaklari bilan chiroyli studiyada namoyish etadi.",
+      "whatYouNeed": [
+        "Ko'ylakning old tomoni to'liq ko'ringan rasmi"
+      ],
+      "prompt": "Festive commercial photography of a sweet 6-year-old girl model wearing the exact party dress from the uploaded image. Standing in a brightly lit, pastel-decorated celebratory studio with soft balloons in the blurred background. Joyful posture. STRICT PRODUCT PRESERVATION: Replicate the exact tulle skirt volume, ribbon bow, sequin/lace bodice, sleeve ruffles, and pastel/vibrant color from the reference image.",
+      "negativeInstructions": [
+        "Do not flatten the puffy tulle skirt.",
+        "Do not remove ribbon bows or chest lace.",
+        "Do not change dress length or color.",
+        "No unnatural facial artifacts."
+      ],
+      "tags": [
+        "children",
+        "girls",
+        "dress",
+        "party",
+        "kids",
+        "celebration"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "children-baby-romper-nursery",
+      "title": "Chaqaloqlar body / kiyimi — Yumshoq bolalar xonasi",
+      "category": "Children",
+      "subcategory": "Baby clothing",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "100% paxta chaqaloq kiyimlarining mayinligi va tugmachalarini xatosiz yetkazadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Chaqaloqlar body yoki kiyimchasini yumshoq oq adyol ustida, o'yinchoqlar bilan birga mayin flat lay formatida ko'rsatadi.",
+      "whatYouNeed": [
+        "Chaqaloq kiyimining tekis qo'yilgan 1 ta rasmi"
+      ],
+      "prompt": "Overhead flat lay product photograph of the uploaded baby romper/onesie laid flat on a soft textured white knitted baby blanket. Next to a small wooden baby rattle and soft pastel pacifier. Warm, gentle diffused lighting. STRICT PRODUCT PRESERVATION: The baby garment must duplicate the reference image in snap button placement, neck envelope folds, ribbed cuffs, printed pattern, and soft fabric color.",
+      "negativeInstructions": [
+        "Do not alter the baby print or animal pattern.",
+        "Do not change snap button colors or spacing.",
+        "Do not change the fabric color tone.",
+        "No harsh shadows."
+      ],
+      "tags": [
+        "children",
+        "baby",
+        "onesie",
+        "nursery",
+        "flatlay",
+        "cotton"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "children-winter-jacket-snow",
+      "title": "Bolalar qishki kurtkasi — Qorli quvnoq qish",
+      "category": "Children",
+      "subcategory": "Winter clothing",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Qishki kombinezon va kurtkalarning issiq qoplamasi va yorqin ranglarini to'liq saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Bolalar qishki kurtkasini qor yog'ayotgan toza xiyobonda, issiq va qulay kiyingan bola ustida ko'rsatadi.",
+      "whatYouNeed": [
+        "Qishki kurtkaning oldi va kapyushoni ko'ringan rasm"
+      ],
+      "prompt": "Bright winter commercial photo of a young child wearing the exact padded winter jacket from the reference image, standing in a gentle winter snowfall in a city park. Smiling expression, warm knitted beanie. STRICT PRODUCT PRESERVATION: The puffer jacket must exactly match the source image in baffle quilting lines, fur trim on hood, zipper pull color, reflective safety stripes, and vibrant fabric color.",
+      "negativeInstructions": [
+        "Do not remove reflective safety strips if present.",
+        "Do not change fur hood color or density.",
+        "Do not alter puffer jacket volume or color.",
+        "No unnatural skin tones."
+      ],
+      "tags": [
+        "children",
+        "winter",
+        "jacket",
+        "kids",
+        "snow",
+        "seasonal"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "school-uniform-boys-classic",
+      "title": "O'g'il bolalar maktab formasi — Zamonaviy sinfxona",
+      "category": "School",
+      "subcategory": "School uniforms",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "O'zbekiston maktab formasi standartlari (to'q ko'k/qora ranglar va oq ko'ylak) aniq aks etadi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "O'g'il bolalar maktab kostyum-shimi yoki nimchasini yorug' zamonaviy maktab sinfxonasida to'liq bo'y-basti bilan ko'rsatadi.",
+      "whatYouNeed": [
+        "Maktab formasining (kostyum, nimcha, shim) to'liq rasmi"
+      ],
+      "prompt": "Bright and clean back-to-school commercial catalog photo of an 11-year-old schoolboy standing proudly in a bright, modern school library, wearing the exact school uniform outfit shown in the uploaded reference photo. Natural daylight through large library windows, neatly groomed appearance. STRICT PRODUCT PRESERVATION: Ensure the school uniform jacket, vest, trousers, buttons, and fabric weave perfectly match the reference photo. Preserve exact navy blue / dark color tones without color shifting.",
+      "negativeInstructions": [
+        "Do not change uniform colors from dark navy/black to any other shade.",
+        "Do not remove vest buttons or alter jacket lapels.",
+        "Do not alter trouser fit.",
+        "No messy backgrounds."
+      ],
+      "tags": [
+        "school",
+        "uniform",
+        "boys",
+        "back-to-school",
+        "uzbek-market",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "school-uniform-girls-dress-apron",
+      "title": "Qiz bolalar maktab formasi / Fartuk — Maktab kutubxonasi",
+      "category": "School",
+      "subcategory": "School dresses",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Oq yoqacha, fartuk yoki klassik maktab sarbafini tartibli va estetik ko'rinishda saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Qiz bolalar maktab ko'ylagi yoki to'plamini yorug' maktab muhitida, odobli va saranjom ko'rinishda taqdim etadi.",
+      "whatYouNeed": [
+        "Maktab ko'ylagi va yoqasining to'liq rasmi"
+      ],
+      "prompt": "Neat back-to-school catalog photograph of a 10-year-old schoolgirl wearing the exact school uniform dress from the reference photo, holding a notebook in a modern school corridor. Bright morning natural lighting, neat braided hairstyle. STRICT PRODUCT PRESERVATION: Match the exact white collar lace, pleated skirt hem, sleeve cuff length, button placket, and dark navy fabric color from the uploaded photo.",
+      "negativeInstructions": [
+        "Do not alter the white lace collar pattern or size.",
+        "Do not change dress length or pleating.",
+        "Do not alter dark uniform fabric shade.",
+        "No distorted fingers or books."
+      ],
+      "tags": [
+        "school",
+        "uniform",
+        "girls",
+        "dress",
+        "back-to-school",
+        "uzbek-market"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "school-shoes-classic-catalog",
+      "title": "Maktab tuflisi / Poyabzali — Toza yog'och parta ustida",
+      "category": "School",
+      "subcategory": "School shoes",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Bolalar klassik tuflisining mustahkam tagcharmi va yopishqoq (lipuchka) tasmalarini aniq ifodalaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Maktab o'quvchilarining klassik qora/to'q ko'k tuflisini maktab daftar va qalamlari yonida ko'rsatadi.",
+      "whatYouNeed": [
+        "Maktab poyabzalining yon yoki ustki rasmi"
+      ],
+      "prompt": "Commercial product photography of the school shoes from the reference image, positioned at a 30-degree angle on a light wooden school desk next to a closed notebook and clean pen. Soft morning window daylight highlighting the black leather finish and sturdy sole. STRICT PRODUCT PRESERVATION: The shoes must duplicate the reference image in strap closure (velcro/buckle/laces), toe cap shape, sole thickness, and leather finish.",
+      "negativeInstructions": [
+        "Do not change velcro strap to laces or vice versa.",
+        "Do not alter the sole thickness or tread.",
+        "Do not change leather color from black/navy.",
+        "No messy desks."
+      ],
+      "tags": [
+        "school",
+        "shoes",
+        "leather",
+        "back-to-school",
+        "catalog"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "school-pe-uniform-sport-court",
+      "title": "Maktab jismoniy tarbiya formasi — Maktab sport zali",
+      "category": "School",
+      "subcategory": "PE uniforms",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Maktab jismoniy tarbiya kiyimining qulayligi va toza sport zal fonini ta'minlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "O'quvchilar sport formasini maktab sport zali polida, harakatga qulay tarzda namoyish qiladi.",
+      "whatYouNeed": [
+        "Sport formasi (futbolka + sport shim) rasmi"
+      ],
+      "prompt": "Commercial catalog photo of an energetic school student wearing the exact PE tracksuit from the reference image, standing in a clean indoor wooden basketball gym floor. Bright overhead sports lights, holding a volleyball. STRICT PRODUCT PRESERVATION: Exactly match the tracksuit fabric color, side stripes, elastic cuffs, and school emblem if present.",
+      "negativeInstructions": [
+        "Do not alter side stripe colors.",
+        "Do not change the PE uniform cut.",
+        "Do not alter emblem or text.",
+        "No blurry faces."
+      ],
+      "tags": [
+        "school",
+        "sportswear",
+        "pe-uniform",
+        "gym",
+        "back-to-school"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sports-gym-fitness-wear-studio",
+      "title": "Fitnes va trenajyor kiyimi — Qorong'i dramatik studiya",
+      "category": "Sports",
+      "subcategory": "Gym",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Leonardo",
+        "reason": "Sport kiyimining relyefi va mushaklar konturidagi dramatik yorug'likni professional qiladi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "4:5",
+      "description": "Fitnes kiyimini qoramtir studiyada, yondan tushgan o'tkir yorug'lik (rim lighting) bilan baquvvat qiyofada ko'rsatadi.",
+      "whatYouNeed": [
+        "Kiyimning old yoki orqa rasmi"
+      ],
+      "prompt": "High-impact sports editorial photography of an athletic male model wearing the exact compression gym wear from the reference image. Dark moody studio setting with strong rim lighting outlining the athletic physique and fabric stretch contours. Crisp focus on fabric breathability perforations and brand logo. STRICT PRODUCT PRESERVATION: Keep the exact compression lines, fabric paneling, logo position, and color hue identical to the reference image.",
+      "negativeInstructions": [
+        "Do not alter compression panel layout.",
+        "Do not modify logo size or position.",
+        "Do not change fabric sheen or color.",
+        "No unnatural body distortions."
+      ],
+      "tags": [
+        "sports",
+        "gym",
+        "fitness",
+        "compression",
+        "editorial",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "sports-boxing-gloves-ring-corner",
+      "title": "Boks qo'lqopi — Boks ringi burchagi va kanatlar",
+      "category": "Sports",
+      "subcategory": "Boxing",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Boks qo'lqopining charm jilosi, yozuvlari va tasmalarini (velcro) aynan saqlaydi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Boks qo'lqoplarini boks ringi kanatlari yonida, qat'iyatli va professional sport muhitida ko'rsatadi.",
+      "whatYouNeed": [
+        "Boks qo'lqoplarining juft rasmi"
+      ],
+      "prompt": "Commercial sports photography of the boxing gloves from the reference photo, hanging from or resting on the corner pad of a professional boxing ring. Dramatic spotlight from directly above, highlighting the leather surface, wrist velcro strap, and printed brand emblem. Atmospheric boxing gym background. STRICT PRODUCT PRESERVATION: Retain the exact glove shape (ounce size), thumb padding structure, wrist strap logo, and colorway from the reference.",
+      "negativeInstructions": [
+        "Do not alter the glove brand typography or graphic print.",
+        "Do not change leather color or matte/gloss finish.",
+        "Do not distort the glove thumb attachment.",
+        "No unrealistic blood or sweat stains."
+      ],
+      "tags": [
+        "sports",
+        "boxing",
+        "gloves",
+        "martial-arts",
+        "equipment"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "sports-hiking-outdoor-mountain",
+      "title": "Sayohat va tog' kiyimi / Poyabzali — Tog' manzarasi",
+      "category": "Sports",
+      "subcategory": "Hiking",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Tog' tabiati va sayohat kiyimlarining shamol/suv o'tkazmaslik xususiyatlarini ishonchli aks ettiradi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Tog' kiyimi yoki treking botinkasini purviqor tog' cho'qqilari va toshli so'qmoq fonida ko'rsatadi.",
+      "whatYouNeed": [
+        "Kiyim yoki botinkaning to'liq rasmi"
+      ],
+      "prompt": "Outdoor adventure lifestyle photography of a hiker wearing the exact outdoor trekking jacket/gear from the reference image, standing on a rocky mountain ridge with breathtaking scenic mountains in the background. Crisp morning sunlight, sense of scale and adventure. STRICT PRODUCT PRESERVATION: The trekking gear must replicate the reference image in waterproof zipper tapes, hood adjustments, chest pocket placements, and fabric color blocks.",
+      "negativeInstructions": [
+        "Do not change jacket color blocking.",
+        "Do not remove chest pocket zippers.",
+        "Do not alter the outdoor fabric texture.",
+        "No fantasy mountain landscapes."
+      ],
+      "tags": [
+        "sports",
+        "hiking",
+        "outdoor",
+        "trekking",
+        "mountain",
+        "seasonal"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-instagram-sale-banner-clean",
+      "title": "Instagram aksiya banneri — Katta Chegirma / Sale",
+      "category": "General Ecommerce",
+      "subcategory": "Sale Campaigns",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Ideogram",
+        "reason": "Mahsulot atrofida aniq o'qiladigan yozuvlar va chegirma foizlarini xatosiz joylashtirishda eng kuchli vosita."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Mahsulotni markazda qoldirib, yuqorisiga chiroyli matn va chegirma nishoni bilan professional Instagram reklama posteri yasaydi.",
+      "whatYouNeed": [
+        "Mahsulotning toza fonga olingan 1 ta rasmi",
+        "[DISCOUNT] o'rniga o'z chegirmangizni yozishingiz mumkin (masalan: -30% yoki CHEGIRMA)"
+      ],
+      "prompt": "High-converting social media promotional poster. The uploaded product is centered crisply on a modern minimalist graphic backdrop with deep royal navy and warm amber accents. At the top of the poster, clean bold typography reads: \"KATTA CHEGIRMA\". At the corner, an elegant circular badge displays \"[DISCOUNT]\". Balanced graphic layout with plenty of breathing room. STRICT PRODUCT PRESERVATION: The product in the center must stay completely untouched, preserving its original colors, details, textures, and shape from the uploaded reference image.",
+      "negativeInstructions": [
+        "Do not change or distort the center product.",
+        "Do not invent fake illegible gibberish text.",
+        "Do not cover the product with large graphic banners.",
+        "No messy low-resolution typography."
+      ],
+      "tags": [
+        "general",
+        "promotional",
+        "sale",
+        "instagram",
+        "banner",
+        "ideogram",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "general-new-arrival-announcement",
+      "title": "Yangi Kolleksiya (New Arrival) — Premium anons",
+      "category": "General Ecommerce",
+      "subcategory": "New Arrivals",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Ideogram",
+        "reason": "Yangi kolleksiya uchun nafis va zamonaviy tipografik e'lon hosil qiladi."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "4:5",
+      "description": "Mahsulotni 'Yangi Kolleksiya' yozuvi va nafis studiya estetikasi bilan yangi kelgan mahsulot sifatida tanishtiradi.",
+      "whatYouNeed": [
+        "Yangi kelgan mahsulotning tiniq rasmi"
+      ],
+      "prompt": "Sophisticated product launch poster for social media. The uploaded product rests centered on a sleek textured stone pedestal against a soft neutral beige studio wall. Clean, elegant sans-serif typography above the product reads: \"YANGI KOLLEKSIYA\". Soft cinematic directional lighting. STRICT PRODUCT PRESERVATION: Keep the central product 100% faithful to the uploaded reference in color, form, texture, and brand details. Do not modify the product.",
+      "negativeInstructions": [
+        "Do not modify the product geometry or colors.",
+        "Do not add misspelled or garbled text.",
+        "Do not add cluttered stickers.",
+        "No harsh shadows."
+      ],
+      "tags": [
+        "general",
+        "new-arrival",
+        "instagram",
+        "promotional",
+        "ideogram"
+      ],
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "general-minimal-white-catalog-master",
+      "title": "Universal toza oq katalog (Barcha toifalar uchun)",
+      "category": "General Ecommerce",
+      "subcategory": "Minimal Catalog",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Istalgan mahsulotni ortiqcha elementlarsiz toza oq fonga ko'chirish va mukammal katalog qilish uchun universal."
+      },
+      "difficulty": "easy",
+      "aspectRatio": "1:1",
+      "description": "Istalgan mahsulotni toza oq fonda, to'g'ri burchak va nozik tabiiy soya bilan mukammal katalog holatiga keltiradi.",
+      "whatYouNeed": [
+        "Istalgan mahsulotning 1 ta rasmi"
+      ],
+      "prompt": "Clean professional ecommerce catalog photography of the uploaded product. Centered symmetrically on an immaculate pure solid white studio background (#FFFFFF) with a delicate, realistic soft contact shadow directly underneath. Crisp commercial high-key lighting evenly illuminating all sides, colors, and textures. Razor-sharp focus throughout. STRICT PRODUCT PRESERVATION: The product must remain completely identical to the uploaded reference photo: preserve exact dimensions, silhouette, color hues, materials, logos, and craftsmanship. Zero alteration to the product.",
+      "negativeInstructions": [
+        "Do not redesign or recolor the product.",
+        "Do not remove any logos or features.",
+        "Do not leave messy cutout halos around product edges.",
+        "No colored or busy background."
+      ],
+      "tags": [
+        "general",
+        "catalog",
+        "white-background",
+        "minimal",
+        "ecommerce",
+        "featured"
+      ],
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "general-multi-product-collection",
+      "title": "To'plam (Collection / Lookbook) — Bir nechta mahsulotlar uyg'unligi",
+      "category": "General Ecommerce",
+      "subcategory": "Collection",
+      "contentType": "image",
+      "recommendedTool": {
+        "name": "Gemini",
+        "reason": "Bir nechta mahsulotlarning o'zaro masshtab va ranglarini mutanosib saqlagan holda yagona to'plam qiladi."
+      },
+      "difficulty": "medium",
+      "aspectRatio": "16:9",
+      "description": "Mahsulotlar to'plamini (masalan: poyabzal, sumka va ko'ylak) sayt banneri uchun chiroyli kompozitsiyaga joylashtiradi.",
+      "whatYouNeed": [
+        "Birgalikda ko'rsatilishi kerak bo'lgan to'plam rasmi",
+        "Sayt sarlavhasi (Web Banner) uchun mo'ljallangan"
+      ],
+      "prompt": "Wide horizontal commercial banner photography showcasing the collection of items from the reference image, arranged harmoniously on a clean light-oak wooden surface with a soft cream background. Beautiful balanced spacing, gentle daylight streaming from the left, subtle natural shadows. STRICT PRODUCT PRESERVATION: Every item shown in the reference must strictly retain its exact form, colors, materials, and distinct details without morphing or distortion.",
+      "negativeInstructions": [
+        "Do not morph items together.",
+        "Do not change the relative scale or colors of the items.",
+        "Do not invent random unrequested items in the scene.",
+        "No cluttered composition."
+      ],
+      "tags": [
+        "general",
+        "collection",
+        "banner",
+        "lookbook",
+        "web-banner"
+      ],
+      "featured": false,
+      "published": true
+    }
+  ]
+}
