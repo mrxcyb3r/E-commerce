@@ -63,18 +63,18 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     const files = e.target.files as FileList;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file, fileIndex) => {
-      const progressId = images.length + fileIndex;
+    for (const file of files) {
+      const progressId = images.length + file.name.length;
       
       // Validation
       if (!file.type.startsWith('image/')) {
         setUploadErrors(prev => ({ ...prev, [progressId]: 'Faqat rasm fayllari (JPG, PNG, WEBP) qabul qilinadi.' }));
-        return;
+        continue;
       }
 
       if (file.size > 5 * 1024 * 1024) {
         setUploadErrors(prev => ({ ...prev, [progressId]: "Rasm hajmi 5MB dan oshmasligi kerak." }));
-        return;
+        continue;
       }
 
       setUploadErrors(prev => ({ ...prev, [progressId]: '' }));
@@ -88,7 +88,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       if (uploadError) {
         setUploadErrors(prev => ({ ...prev, [progressId]: uploadError.message }));
-        return;
+        continue;
       }
 
       // Get public URL
@@ -98,7 +98,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       // Add to state
       onChange([...images, publicUrl]);
-    });
+    }
   };
 
   const handleRemove = (index: number) => {
@@ -168,7 +168,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
-              placeholder="https://..."
               className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 text-xs"
               placeholder="Rasm URL manzili"
             />
@@ -213,13 +212,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                     )}
                     <button
                       type="button"
-                      onClick={() => handleMove(index, 'left')}"
+                      onClick={() => handleMove(index, 'left')}
                       className="absolute bottom-1 left-1 rounded-full bg-black/20 text-white text-xs p-1 hover:bg-black/40">
                         <ArrowLeft className="w-2 h-2" />
                       </button>
                     <button
                       type="button"
-                      onClick={() => handleMove(index, 'right')}"
+                      onClick={() => handleMove(index, 'right')}
                       className="absolute bottom-1 right-1 rounded-full bg-black/20 text-white text-xs p-1 hover:bg-black/40">
                         <ArrowRight className="w-2 h-2" />
                       </button>
