@@ -13,6 +13,8 @@ export interface Category {
   featured?: boolean;
   published?: boolean;
   order?: number;
+  is_visible?: boolean;
+  sort_order?: number;
 }
 
 export interface Product {
@@ -34,10 +36,12 @@ export interface Product {
   stockCount?: number;
   isNew?: boolean;
   isFeatured?: boolean;
+  isOnSale?: boolean;
   published?: boolean;
   rating?: number;
   reviewCount?: number;
   sku: string;
+  stockStatus?: string;
   material?: string;
   madeIn?: string;
   tags: string[];

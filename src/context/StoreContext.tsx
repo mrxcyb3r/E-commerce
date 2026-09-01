@@ -387,30 +387,195 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   // Persistence Effects - save changes to Supabase
+  // Product CRUD
   useEffect(() => {
-    // Save products updates to Supabase
-    // Full CRUD operations would need separate mutation handlers
-  }, [products, setProducts]);
+    const saveProduct = async (product: Product) => {
+      try {
+        const { error } = await supabase
+          .from('products')
+          .upsert({
+            id: product.id,
+            slug: product.slug,
+            name: product.name,
+            description: product.description,
+            short_description: product.short_description,
+            price: product.price,
+            original_price: product.original_price,
+            currency: product.currency,
+            category_id: product.category_id,
+            brand: product.brand,
+            is_published: product.is_published,
+            is_featured: product.is_featured,
+            is_new: product.is_new,
+            is_on_sale: product.is_on_sale,
+            stock_status: product.stock_status,
+            stock_count: product.stock_count,
+            sku: product.sku,
+            rating: product.rating,
+            reviewCount: product.reviewCount,
+            tags: product.tags,
+            material: product.material,
+            madeIn: product.madeIn,
+          });
+        if (error) throw error;
+        // Optionally log the activity
+        // await logActivity('product', product.is_published ? 'publish' : 'update', `Product: ${product.name}`);
+      } catch (err) {
+        console.error('Error saving product to Supabase:', err);
+      }
+    };
 
-  useEffect(() => {
-    // Save categories updates to Supabase
-  }, [categories, setCategories]);
+    // Save each product in the state
+    products.forEach(saveProduct);
+  }, [products, supabase]);
 
+  // Category CRUD
   useEffect(() => {
-    // Save store info updates to Supabase
-  }, [storeInfo, setStoreInfo]);
+    const saveCategory = async (category: Category) => {
+      try {
+        const { error } = await supabase
+          .from('categories')
+          .upsert({
+            id: category.id,
+            name: category.name,
+            slug: category.slug,
+            description: category.description,
+            image: category.image,
+            featured: category.featured,
+            sort_order: category.order,
+          });
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving category to Supabase:', err);
+      }
+    };
 
-  useEffect(() => {
-    // Save homepage CMS updates to Supabase
-  }, [homepageCms, setHomepageCms]);
+    categories.forEach(saveCategory);
+  }, [categories, supabase]);
 
+  // Store info CRUD
   useEffect(() => {
-    // Save about CMS updates to Supabase
-  }, [aboutCms, setAboutCms]);
+    const saveStoreInfo = async () => {
+      try {
+        const { error } = await supabase
+          .from('store_settings')
+          .upsert({
+            business_name: storeInfo.businessName,
+            name: storeInfo.name,
+            business_description: storeInfo.businessDescription,
+            tagline: storeInfo.tagline,
+            phone: storeInfo.phone,
+            phone_raw: storeInfo.phoneRaw,
+            phone_numbers: storeInfo.phoneNumbers ?? [],
+            email: storeInfo.email,
+            telegram: storeInfo.telegram,
+            telegram_username: storeInfo.telegramUsername,
+            telegram_channel: storeInfo.telegramChannel,
+            instagram_username: storeInfo.instagramUsername,
+            address: storeInfo.address,
+            city: storeInfo.city,
+            landmark: storeInfo.landmark,
+            working_hours: storeInfo.workingHours,
+            working_hours_detail: storeInfo.workingHoursDetail,
+            social_links: storeInfo.socialLinks,
+            primary_color: storeInfo.primaryColor,
+            currency: storeInfo.currency,
+            coordinates: storeInfo.coordinates,
+          });
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving store info to Supabase:', err);
+      }
+    };
+    saveStoreInfo();
+  }, [storeInfo, supabase]);
 
+  // Homepage CMS CRUD
   useEffect(() => {
-    // Save contact CMS updates to Supabase
-  }, [contactCms, setContactCms]);
+    const saveHomepageCms = async () => {
+      try {
+        const { error } = await supabase
+          .from('homepage_cms')
+          .upsert({
+            hero_badge: homepageCms.hero.badge,
+            hero_title: homepageCms.hero.title,
+            hero_highlighted_title: homepageCms.hero.highlightedTitle,
+            hero_subtitle: homepageCms.hero.subtitle,
+            hero_primary_cta_text: homepageCms.hero.primaryButtonText,
+            hero_primary_cta_link: homepageCms.hero.primaryButtonLink,
+            hero_secondary_cta_text: homepageCms.hero.secondaryButtonText,
+            hero_secondary_cta_link: homepageCms.hero.secondaryButtonLink,
+            hero_image_url: homepageCms.hero.heroImageUrl,
+            promo_banner_badge: homepageCms.promoBanner.badge,
+            promo_banner_title: homepageCms.promoBanner.title,
+            promo_banner_subtitle: homepageCms.promoBanner.subtitle,
+            promo_banner_description: homepageCms.promoBanner.description,
+            promo_banner_button_text: homepageCms.promoBanner.buttonText,
+            promo_banner_button_link: homepageCms.promoBanner.buttonLink,
+            promo_banner_image_url: homepageCms.promoBanner.imageUrl,
+            promo_banner_enabled: homepageCms.promoBanner.enabled,
+            why_choose_us_title: homepageCms.whyChooseUsTitle,
+            why_choose_us_subtitle: homepageCms.whyChooseUsSubtitle,
+            features: homepageCms.features,
+            featured_section_title: homepageCms.featuredSectionTitle,
+            featured_section_subtitle: homepageCms.featuredSectionSubtitle,
+            video_section_title: homepageCms.videoSectionTitle,
+            video_section_subtitle: homepageCms.videoSectionSubtitle,
+          });
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving homepage CMS to Supabase:', err);
+      }
+    };
+    saveHomepageCms();
+  }, [homepageCms, supabase]);
+
+  // About CMS CRUD
+  useEffect(() => {
+    const saveAboutCms = async () => {
+      try {
+        const { error } = await supabase
+          .from('about_cms')
+          .upsert({
+            title: aboutCms.title,
+            subtitle: aboutCms.subtitle,
+            main_story: aboutCms.mainStory,
+            second_story: aboutCms.secondStory,
+            mission: aboutCms.mission,
+            vision: aboutCms.vision,
+            images: aboutCms.images,
+            features: aboutCms.features,
+          });
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving about CMS to Supabase:', err);
+      }
+    };
+    saveAboutCms();
+  }, [aboutCms, supabase]);
+
+  // Contact CMS CRUD
+  useEffect(() => {
+    const saveContactCms = async () => {
+      try {
+        const { error } = await supabase
+          .from('contact_cms')
+          .upsert({
+            title: contactCms.title,
+            subtitle: contactCms.subtitle,
+            description: contactCms.description,
+            form_enabled: contactCms.formEnabled,
+            telegram_direct_note: contactCms.telegramDirectNote,
+            support_note: contactCms.supportNote,
+            direct_help_text: contactCms.directHelpText,
+          });
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving contact CMS to Supabase:', err);
+      }
+    };
+    saveContactCms();
+  }, [contactCms, supabase]);
 
   // ... rest stays the same
 
