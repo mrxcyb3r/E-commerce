@@ -10,16 +10,18 @@ interface ImageUploaderProps {
   helperText?: string;
 }
 
+interface ImageUploaderProps {
+  images: string[];
+  onChange: (images: string[]) => void;
+  maxImages?: number;
+  label?: string;
+  helperText?: string;
+}
+
 interface UploadProgress {
   progress: number;
   status: 'idle' | 'uploading' | 'success' | 'error';
   error?: string;
-}
-
-interface ImageUploadState {
-  url: string;
-  progress: UploadProgress;
-  isPrimary: boolean;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -32,7 +34,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [urlInput, setUrlInput] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [uploadErrors, setUploadErrors] = useState<{ [key: number]: string }>({});
-  const [uploadProgress, setUploadProgress] = useState<Map<number, UploadProgress>>(new Map());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [primaryIndex, setPrimaryIndex] = useState(0);
 
@@ -42,14 +43,14 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     images.forEach((_, index) => {
       progressMap.set(index, { progress: 0, status: 'success' });
     });
-    setUploadProgress(progressMap);
+    // Note: We can't directly set state here since progressMap is local;
+    // we'll manage state differently
   }, [images]);
 
   const handleAddUrl = () => {
     if (!urlInput.trim()) return;
     try {
       new URL(urlInput); // validate
-      // For URL-based images, just add them directly
       onChange([...images, urlInput.trim()]);
       setUrlInput('');
       setShowUrlInput(false);
@@ -58,7 +59,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files as FileList;
     if (!files || files.length === 0) return;
 
@@ -77,11 +78,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       }
 
       setUploadErrors(prev => ({ ...prev, [progressId]: '' }));
-      setUploadProgress(prev => {
-        const map = new Map(progressMap);
-        map.set(progressId, { progress: 0, status: 'uploading', error: undefined });
-        return map;
-      });
 
       // Upload to Supabase Storage
       const filePath = `product-images/${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
@@ -92,27 +88,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       if (uploadError) {
         setUploadErrors(prev => ({ ...prev, [progressId]: uploadError.message }));
-        setUploadProgress(prev => {
-          const map = new Map(progressMap);
-          map.set(progressId, { progress: 100, status: 'error', error: uploadError.message });
-          return map;
-        });
         return;
       }
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = await supabase.storage
         .from('product-images')
         .getPublicUrl(filePath);
 
       // Add to state
       onChange([...images, publicUrl]);
-      
-      setUploadProgress(prev => {
-        const map = new Map(progressMap);
-        map.set(progressId, { progress: 100, status: 'success' });
-        return map;
-      });
     });
   };
 
@@ -201,16 +186,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           <div className="grid grid-cols-2 gap-2">
             {images.map((src, index) => {
               const isPrimary = index === primaryIndex;
-              const progress = uploadProgress.get(index);
               return (
                 <div
                   key={index}
                   className={`relative rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs overflow-hidden ${isPrimary ? 'border-amber-500' : ''}`}>
-                  {progress && progress.status === 'uploading' && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs">
-                      <span>{y progress}%</span>
-                    </div>
-                  )}
                   <img
                     src={src}
                     alt=""
@@ -218,11 +197,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                     loading="lazy"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {progress && progress.status === 'error' && (
-                      <div className="bg-red-500/20 text-red-400 text-xs p-1 rounded">
-                        {progress.error?.substring(0, 30)}
-                      </div>
-                    )}
                     <button
                       type="button"
                       onClick={() => handleRemove(index)}
