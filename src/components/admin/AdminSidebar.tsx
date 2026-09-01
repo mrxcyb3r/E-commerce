@@ -82,7 +82,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           label: 'Jonli Vitrina / Feed',
           path: '/admin/feed',
           icon: Film,
-          badge: publishedVideos.length.toString(),
+          badge: (publishedVideos?.length ?? 0).toString(),
         },
         {
           label: 'AI Prompt Library',
