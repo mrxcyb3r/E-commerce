@@ -54,7 +54,7 @@ export const DashboardPage: React.FC = () => {
     },
     {
       title: 'Jonli Vitrina / Feed',
-      value: publishedVideos.length,
+      value: (publishedVideos?.length ?? 0),
       subtext: 'Faol video va lukbuklar',
       icon: Film,
       color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-900/50',
