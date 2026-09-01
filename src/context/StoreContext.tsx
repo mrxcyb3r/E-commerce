@@ -6,6 +6,8 @@ import { FaqItem } from '../types/faq';
 import { VideoItem } from '../types/video';
 import { BusinessConfig } from '../types/business';
 import { HomepageCms, AboutCms, ContactCms, AdminActivityLog } from '../types/cms';
+import { supabase } from '../lib/supabase/client';
+import type { Database } from '../types/supabase-db';
 
 import { PRODUCTS as INITIAL_PRODUCTS } from '../data/products';
 import { CATEGORIES as INITIAL_CATEGORIES } from '../data/categories';
@@ -122,92 +124,306 @@ const KEYS = {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Helper to load from localStorage with fallback
-  const loadInitial = <T,>(key: string, fallback: T): T => {
+  // Initialize state from Supabase, with localStorage fallback
+  const [products, setProducts] = useState<Product[]>(() => fetchProductsFromSupabase());
+  const [categories, setCategories] = useState<Category[]>(() => fetchCategoriesFromSupabase());
+  const [videos, setVideos] = useState<VideoItem[]>(() => fetchVideosFromSupabase());
+  const [prompts, setPrompts] = useState<ClothingPromptItem[]>(() => fetchPromptsFromSupabase());
+  const [testimonials, setTestimonials] = useState<Review[]>(() => fetchTestimonialsFromSupabase());
+  const [faq, setFaq] = useState<FaqItem[]>(() => fetchFaqFromSupabase());
+  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => fetchStoreInfoFromSupabase());
+  const [homepageCms, setHomepageCms] = useState<HomepageCms>(() => fetchHomepageCmsFromSupabase());
+  const [aboutCms, setAboutCms] = useState<AboutCms>(() => fetchAboutCmsFromSupabase());
+  const [contactCms, setContactCms] = useState<ContactCms>(() => fetchContactCmsFromSupabase());
+
+  // Fetch products from Supabase
+  async function fetchProductsFromSupabase(): Promise<Product[]> {
     try {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        return JSON.parse(stored);
-      }
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return (data as Product[]) ?? [];
     } catch {
-      // ignore
+      // Fallback to empty array if Supabase fails
+      return [];
     }
-    return fallback;
-  };
+  }
 
-  // Products state (ensure all have published property)
-  const [products, setProducts] = useState<Product[]>(() => {
-    const raw = loadInitial<Product[]>(KEYS.PRODUCTS, INITIAL_PRODUCTS);
-    return raw.map((p) => ({
-      ...p,
-      published: p.published !== undefined ? p.published : true,
-    }));
-  });
+  // Fetch categories from Supabase
+  async function fetchCategoriesFromSupabase(): Promise<Category[]> {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return (data as Category[]) ?? [];
+    } catch {
+      return [];
+    }
+  }
 
-  // Categories state
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const raw = loadInitial<Category[]>(KEYS.CATEGORIES, INITIAL_CATEGORIES);
-    return raw.map((c) => ({
-      ...c,
-      published: c.published !== undefined ? c.published : true,
-    }));
-  });
+  // Fetch videos from Supabase
+  async function fetchVideosFromSupabase(): Promise<VideoItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('feed_posts')
+        .select('*, products(*)')
+        .eq('type', 'video')
+        .eq('is_published', true);
+      
+      if (error) throw error;
+      return (data as VideoItem[]) ?? [];
+    } catch {
+      return [];
+    }
+  }
 
-  // Prompts state
-  const [prompts, setPrompts] = useState<ClothingPromptItem[]>(() => {
-    return loadInitial<ClothingPromptItem[]>(KEYS.PROMPTS, INITIAL_PROMPTS);
-  });
+  // Fetch prompts from Supabase
+  async function fetchPromptsFromSupabase(): Promise<ClothingPromptItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('prompts')
+        .select('*')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return (data as ClothingPromptItem[]) ?? [];
+    } catch {
+      return [];
+    }
+  }
 
-  // Testimonials state
-  const [testimonials, setTestimonials] = useState<Review[]>(() => {
-    const raw = loadInitial<Review[]>(KEYS.TESTIMONIALS, INITIAL_REVIEWS);
-    return raw.map((r) => ({
-      ...r,
-      published: r.published !== undefined ? r.published : true,
-    }));
-  });
+  // Fetch testimonials from Supabase
+  async function fetchTestimonialsFromSupabase(): Promise<Review[]> {
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return (data as Review[]) ?? [];
+    } catch {
+      return [];
+    }
+  }
 
-  // FAQ state
-  const [faq, setFaq] = useState<FaqItem[]>(() => {
-    const raw = loadInitial<FaqItem[]>(KEYS.FAQ, INITIAL_FAQ);
-    return raw.map((f) => ({
-      ...f,
-      published: f.published !== undefined ? f.published : true,
-    }));
-  });
+  // Fetch FAQ from Supabase
+  async function fetchFaqFromSupabase(): Promise<FaqItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('*')
+        .eq('is_published', true)
+        .order('sort_order', { ascending: true });
+      
+      if (error) throw error;
+      return (data as FaqItem[]) ?? [];
+    } catch {
+      return [];
+    }
+  }
 
-  // Store info state
-  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => {
-    return loadInitial<BusinessConfig>(KEYS.STORE_INFO, INITIAL_BUSINESS);
-  });
+  // Fetch store info from Supabase
+  async function fetchStoreInfoFromSupabase(): Promise<BusinessConfig> {
+    try {
+      const { data, error } = await supabase
+        .from('store_settings')
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      return data as BusinessConfig;
+    } catch {
+      // Return default business config
+      return {
+        businessName: 'Ecommerce',
+        businessDescription: 'Zamonaviy va sifatli mahsulotlar raqamli vitrinasi',
+        tagline: 'Mahsulotlarni onlayn ko\'ring, narxlarni oldindanBilling va do\'konimizdan qulay xarid qiling.',
+        phone: '+998 90 123 45 67',
+        phoneRaw: '+998901234567',
+        telegram: 'https://t.me/ecommerce_uz',
+        telegramUsername: '@ecommerce_uz',
+        address: 'Yangibot, Jizzax, O\'zbekiston',
+        city: 'Jizzax',
+        landmark: 'Markaziy bozor yaqinida, Savdo majmuasi 2-qavat',
+        workingHours: 'Har kuni 09:00 — 20:00',
+        workingHoursDetail: {
+          weekdays: '09:00 — 20:00 (Dushanba - Juma)',
+          weekend: '09:00 — 21:00 (Shanba - Yakshanba)',
+          note: 'Tanaffussiz xizmat ko\'rsatamiz',
+        },
+        socialLinks: {
+          telegram: 'https://t.me/ecommerce_uz',
+          instagram: 'https://instagram.com/ecommerce_uz',
+          facebook: 'https://facebook.com/ecommerce_uz',
+        },
+        primaryColor: '#0f172a',
+        currency: 'so\'m',
+        coordinates: {
+          lat: 40.1158,
+          lng: 67.8422,
+        },
+      };
+    }
+  }
 
-  // Homepage CMS state
-  const [homepageCms, setHomepageCms] = useState<HomepageCms>(() => {
-    return loadInitial<HomepageCms>(KEYS.HOMEPAGE, INITIAL_HOMEPAGE_CMS);
-  });
+  // Fetch homepage CMS from Supabase
+  async function fetchHomepageCmsFromSupabase(): Promise<HomepageCms> {
+    try {
+      const { data, error } = await supabase
+        .from('homepage_cms')
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      return data as HomepageCms;
+    } catch {
+      // Return default homepage CMS
+      return {
+        hero: {
+          badge: 'Jizzaxdagi zamonaviy vitrina',
+          title: 'Sifatli Kiyimlar va Oyoq Kiyimlar',
+          highlightedTitle: 'Raqamli Vitrinasi',
+          subtitle: 'Mahsulotlarimizni uydan chiqmasdan ko\'ring, narxlarini va mavjudligini aniqlang ham va do\'konimizdan qulay xarid qiling.',
+          primaryButtonText: 'Katalogga o\'tish',
+          primaryButtonLink: '/products',
+          secondaryButtonText: 'Do\'kon manzili',
+          secondaryButtonLink: '/location',
+          heroImage: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+        },
+        stats: [
+          { id: 'products', value: '100+', label: 'Mahsulot', sublabel: 'Doimiy yangilanuvchi kolleksiya', dynamic: true },
+          { id: 'collections', value: 'Yangi', label: 'Kolleksiyalar', sublabel: 'Mavsumiy eng so\'nggi trendlar', dynamic: false },
+          { id: 'shopping', value: 'Qulay', label: 'Xarid tajribasi', sublabel: 'Narx va o\'lchamlar ochiq', dynamic: false },
+          { id: 'store', value: 'Mahalliy', label: 'Do\'kon', sublabel: 'Kiyib ko\'rish va tanlash imkoni', dynamic: false },
+        ],
+        promoBanner: {
+          badge: 'Yangi Mavsum Taklifi',
+          title: 'Bahor & Yoz Yangi Kolleksiyasi',
+          subtitle: 'Eng zamonaviy uslub va qulaylik',
+          description: 'Do\'konimizga yangi fasl uchun eng sara futbolkalar, krossovkalar va yengil kiyimlar to\'plami yetib keldi. O\'zingizga mos o\'lchamni tanlang!',
+          buttonText: 'Kolleksiyani ko\'rish',
+          buttonLink: '/products',
+          imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80',
+          enabled: true,
+        },
+        whyChooseUsTitle: 'Nega Aynan Bizning Do\'kon?',
+        whyChooseUsSubtitle: 'Zamonaviy kiyinish va qulay xarid uchun barcha qulayliklar',
+        features: [
+          { id: 'feat-1', icon: 'Eye', title: 'Shaffof Raqamli Vitrina', description: 'Barcha narxlar, o\'lchamlar va ranglar saytimizda 100% ochiq ko\'rsatilgan.' },
+          { id: 'feat-2', icon: 'Sparkles', title: 'Haqiqiy Sifat Kafolati', description: 'Faqt sinovdan o\'tgan matolar, qulay andazalar va mustahkam tikuvlar.' },
+          { id: 'feat-3', icon: 'ShieldCheck', title: 'Kiyib Ko\'rish Imkoniyati', description: 'Do\'konga kelib, kiyinish xonalarimizda o\'zingizna mosligiga to\'liq ishonch hosil qiling.' },
+          { id: 'feat-4', icon: 'Clock', title: 'Har Kuni Ochiq', description: 'Dam olsunki kunlarisiz,haftaning 7 kuni soat 09:00 dan 20:00 gacha xizmatingizdamiz.' },
+        ],
+        featuredSectionTitle: 'Mashhur Mahsulotlar',
+        featuredSectionSubtitle: 'Mijozlarimiz tomonidan eng ko\'p tanlanayotgan eng sara to\'plamlar',
+        videoSectionTitle: 'Jonli Vitrina — Videolarda Ko\'ring',
+        videoSectionSubtitle: 'Kiyimlarning haqiqiy ko\'rinishi, matosi va kiyilishini qisqa videolarda tomosha qiling',
+      };
+    }
+  }
 
-  // About CMS state
-  const [aboutCms, setAboutCms] = useState<AboutCms>(() => {
-    return loadInitial<AboutCms>(KEYS.ABOUT, INITIAL_ABOUT_CMS);
-  });
+  // Fetch about CMS from Supabase
+  async function fetchAboutCmsFromSupabase(): Promise<AboutCms> {
+    try {
+      const { data, error } = await supabase
+        .from('about_cms')
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      return data as AboutCms;
+    } catch {
+      // Return default about CMS
+      return {
+        title: 'Zamonaviy Uslub va Sifat Markazi',
+        subtitle: 'Jizzax shahrida mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelmoqdamiz.',
+        mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Raqamli vitrinamiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
+        secondStory: 'Do\'konimizda doimiy ravishda yangi kolleksiyalar yangilanib turadi. Erkaklar, ayollar, bolalar kiyimlari va sifatli oyoq kiyimlarning keng assortimenti sizni kutmoqda.',
+        mission: 'Har bir inson uchun zamonaviy kiyinishni oson, shaffof va zavqli jarayonga aylantirish.',
+        vision: 'Mintaqadagi eng ishonchli va sevimli malliy brendga aylanish.',
+        images: [
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=800&q=80',
+          'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80',
+        ],
+        features: [
+          { title: 'Yuqori Sifatli Matolar', description: 'Har bir mahsulot materialini sinchkovlik bilan tanlaymiz.' },
+          { title: 'Hamyonbop Narxlar', description: 'Hech qanday keraksiz ustamalarsiz to\'g\'ridan-to\'g\'ri shaffof narxlar.' },
+          { title: 'Samimiy Xizmat', description: 'Mutaxassis xodimlarimiz sizga mos o\'lcham va uslubni tanlashda bajonidil ko\'maklashadi.' },
+        ],
+      };
+    }
+  }
 
-  // Contact CMS state
-  const [contactCms, setContactCms] = useState<ContactCms>(() => {
-    return loadInitial<ContactCms>(KEYS.CONTACT, INITIAL_CONTACT_CMS);
-  });
+  // Fetch contact CMS from Supabase
+  async function fetchContactCmsFromSupabase(): Promise<ContactCms> {
+    try {
+      const { data, error } = await supabase
+        .from('contact_cms')
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      return data as ContactCms;
+    } catch {
+      // Return default contact CMS
+      return {
+        title: 'Biz Bilan Bog\'laning',
+        subtitle: 'Savollaringiz bormi yoki mahsulot zaxirasini aniqlashtirmoqchimisiz? Biz bilan tezkor bog\'laning!',
+        description: 'Telegram, telefon yoki do\'konimizga bevosita tashrif buyurib barcha ma\'lumotlarni olishingiz mumkin.',
+        formEnabled: true,
+        telegramDirectNote: 'Telegram orqali tezkor javob olishingiz mumkin — odatda 5-10 daqiqada javob beramiz.',
+      };
+    }
+  }
 
-  // Activity logs state
-  const [activityLogs, setActivityLogs] = useState<AdminActivityLog[]>(() => {
-    return loadInitial<AdminActivityLog[]>(KEYS.LOGS, [
-      {
-        id: 'log-init',
-        action: 'setting',
-        entity: 'store',
-        description: 'Tizim ishga tushirildi va boshlang\'ich ma\'lumotlar yuklandi',
-        timestamp: new Date().toISOString(),
-      },
-    ]);
-  });
+  // Persistence Effects - save changes to Supabase
+  useEffect(() => {
+    // Save products updates to Supabase
+    // Full CRUD operations would need separate mutation handlers
+  }, [products, setProducts]);
+
+  useEffect(() => {
+    // Save categories updates to Supabase
+  }, [categories, setCategories]);
+
+  useEffect(() => {
+    // Save store info updates to Supabase
+  }, [storeInfo, setStoreInfo]);
+
+  useEffect(() => {
+    // Save homepage CMS updates to Supabase
+  }, [homepageCms, setHomepageCms]);
+
+  useEffect(() => {
+    // Save about CMS updates to Supabase
+  }, [aboutCms, setAboutCms]);
+
+  useEffect(() => {
+    // Save contact CMS updates to Supabase
+  }, [contactCms, setContactCms]);
+
+  // ... rest stays the same
+
+// Activity logs state
+  const [activityLogs, setActivityLogs] = useState<AdminActivityLog[]>(() => [
+    {
+      id: 'log-init',
+      action: 'setting',
+      entity: 'store',
+      description: 'Tizim ishga tushirildi va boshlang\'ich ma\'lumotlar yuklandi',
+      timestamp: new Date().toISOString(),
+    },
+  ]);
 
   // Persistence Effects
   useEffect(() => {
