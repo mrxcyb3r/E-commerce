@@ -62,6 +62,7 @@ export const TestimonialsAdminPage: React.FC = () => {
         rating,
         avatar: avatar.trim(),
         date,
+        verifiedVisit: true,
       });
       setIsCreating(false);
     } else if (editingReview) {
@@ -72,6 +73,7 @@ export const TestimonialsAdminPage: React.FC = () => {
         rating,
         avatar: avatar.trim(),
         date,
+        verifiedVisit: true,
       });
       setEditingReview(null);
     }

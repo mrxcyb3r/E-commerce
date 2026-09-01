@@ -35,7 +35,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+    const files = e.target.files as FileList;
     if (!files || files.length === 0) return;
 
     Array.from(files).forEach((file) => {
@@ -51,9 +51,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       const reader = new FileReader();
       reader.onload = (event) => {
-        const result = event.target?.result as string;
+        const result = event.target?.result;
         if (result) {
-          onChange([...images, result]);
+          onChange([...images, result as string]);
           setUploadError(null);
         }
       };

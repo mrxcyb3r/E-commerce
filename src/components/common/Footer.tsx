@@ -32,7 +32,7 @@ export const Footer: React.FC = () => {
               </span>
             </Link>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm leading-relaxed font-normal">
-              {storeInfo.description || 'Zamonaviy kiyim-kechak va poyabzallar do\'koni'}. Onlayn ko'ring, tanlang va do'konga kelib qulay xarid qiling.
+              {storeInfo.tagline || 'Zamonaviy kiyim-kechak va poyabzallar do\'koni'}. Onlayn ko'ring, tanlang va do'konga kelib qulay xarid qiling.
             </p>
             
             <div className="pt-2 flex items-center gap-3">
@@ -45,9 +45,9 @@ export const Footer: React.FC = () => {
               >
                 <Send className="w-4 h-4" />
               </a>
-              {storeInfo.instagram && (
+              {storeInfo.socialLinks.instagram && (
                 <a
-                  href={storeInfo.instagram}
+                  href={storeInfo.socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-pink-500 hover:border-pink-500 transition-colors"
@@ -56,9 +56,9 @@ export const Footer: React.FC = () => {
                   <Instagram className="w-4 h-4" />
                 </a>
               )}
-              {storeInfo.facebook && (
+              {storeInfo.socialLinks.facebook && (
                 <a
-                  href={storeInfo.facebook}
+                  href={storeInfo.socialLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-blue-600 hover:border-blue-600 transition-colors"

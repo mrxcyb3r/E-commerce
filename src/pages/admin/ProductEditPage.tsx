@@ -176,6 +176,7 @@ export const ProductEditPage: React.FC = () => {
       isFeatured,
       isNew: isNewBadge,
       published,
+      details: existingProduct ? existingProduct.details : [],
       images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
       sizes,
       colors,

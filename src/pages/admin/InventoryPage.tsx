@@ -71,7 +71,7 @@ export const InventoryPage: React.FC = () => {
   };
 
   const handleSaveAll = () => {
-    Object.entries(localStock).forEach(([id, val]) => {
+    Object.entries(localStock as Record<string, { inStock: boolean; count: number }>).forEach(([id, val]) => {
       updateProduct(id, {
         inStock: val.inStock,
         stockCount: val.count,

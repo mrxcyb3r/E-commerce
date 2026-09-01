@@ -87,8 +87,9 @@ export const FeedAdminPage: React.FC = () => {
         author: author.trim() || undefined,
         productId: productId || undefined,
         badge: badge.trim() || undefined,
-        likesCount: 24,
-        viewsCount: 150,
+        category: 'all',
+        likesCount: 0,
+        viewsCount: 0,
         published,
         order: videos.length + 1,
       });
