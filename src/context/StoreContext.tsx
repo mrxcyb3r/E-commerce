@@ -1120,3 +1120,384 @@ export const useStore = (): StoreContextType => {
   }
   return context;
 };
+// Admin CRUD mutation handlers
+
+// Product CRUD
+export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .insert({
+        id: `prod-${Date.now()}`,
+        slug: product.slug,
+        name: product.name,
+        description: product.description,
+        short_description: product.short_description,
+        price: product.price,
+        original_price: product.original_price,
+        currency: product.currency,
+        category_id: product.category_id,
+        brand: product.brand,
+        is_published: product.is_published ?? true,
+        is_featured: product.is_featured ?? false,
+        is_new: product.is_new ?? false,
+        is_on_sale: product.is_on_sale ?? false,
+        stock_status: product.stock_status ?? 'mavjud',
+        stock_count: product.stockCount ?? 0,
+        sku: product.sku,
+        rating: product.rating ?? 0,
+        review_count: product.reviewCount ?? 0,
+        tags: product.tags ?? [],
+        material: product.material,
+        made_in: product.madeIn,
+        sort_order: product.sort_order ?? 0,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error creating product:', err);
+    return null;
+  }
+};
+
+export const updateProduct = async (id: string, updates: Partial<Product>) => {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        name: updates.name,
+        description: updates.description,
+        short_description: updates.short_description,
+        price: updates.price,
+        original_price: updates.original_price,
+        currency: updates.currency,
+        category_id: updates.category_id,
+        brand: updates.brand,
+        is_published: updates.is_published,
+        is_featured: updates.is_featured,
+        is_new: updates.is_new,
+        is_on_sale: updates.is_on_sale,
+        stock_status: updates.stock_status,
+        stock_count: updates.stockCount,
+        sku: updates.sku,
+        rating: updates.rating,
+        review_count: updates.reviewCount,
+        tags: updates.tags,
+        material: updates.material,
+        made_in: updates.madeIn,
+        sort_order: updates.sort_order,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating product:', err);
+    return null;
+  }
+};
+
+export const deleteProduct = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    return false;
+  }
+};
+
+// Category CRUD
+export const createCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert({
+        id: `cat-${Date.now()}`,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        image: category.image,
+        featured: category.featured ?? false,
+        published: category.published ?? true,
+        order: category.sort_order ?? 0,
+        is_visible: category.is_visible ?? true,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error creating category:', err);
+    return null;
+  }
+};
+
+export const updateCategory = async (id: string, updates: Partial<Category>) => {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .update({
+        name: updates.name,
+        slug: updates.slug,
+        description: updates.description,
+        image: updates.image,
+        featured: updates.featured,
+        published: updates.published,
+        order: updates.sort_order,
+        is_visible: updates.is_visible,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating category:', err);
+    return null;
+  }
+};
+
+export const deleteCategory = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error deleting category:', err);
+    return false;
+  }
+};
+
+// Store info CRUD
+export const updateStoreInfo = async (updates: Partial<BusinessConfig>) => {
+  try {
+    const { data, error } = await supabase
+      .from('store_settings')
+      .upsert({
+        business_name: updates.businessName,
+        name: updates.name,
+        business_description: updates.businessDescription,
+        tagline: updates.tagline,
+        phone: updates.phone,
+        phone_raw: updates.phoneRaw,
+        phone_numbers: updates.phoneNumbers,
+        email: updates.email,
+        telegram: updates.telegram,
+        telegram_username: updates.telegramUsername,
+        telegram_channel: updates.telegramChannel,
+        instagram_username: updates.instagramUsername,
+        address: updates.address,
+        city: updates.city,
+        landmark: updates.landmark,
+        working_hours: updates.workingHours,
+        working_hours_detail: updates.workingHoursDetail,
+        social_links: updates.socialLinks,
+        primary_color: updates.primaryColor,
+        currency: updates.currency,
+        coordinates: updates.coordinates,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating store info:', err);
+    return null;
+  }
+};
+
+// Prompt CRUD
+export const createPrompt = async (prompt: Omit<ClothingPromptItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    const { data, error } = await supabase
+      .from('prompts')
+      .insert({
+        id: `prompt-${Date.now()}`,
+        title: prompt.title,
+        description: prompt.description,
+        content_type: prompt.content_type,
+        category: prompt.category,
+        subcategory: prompt.subcategory,
+        product_type: prompt.product_type,
+        prompt: prompt.prompt,
+        recommended_tool: prompt.recommended_tool,
+        recommended_tool_url: prompt.recommended_tool_url,
+        difficulty: prompt.difficulty,
+        tags: prompt.tags ?? [],
+        aspect_ratio: prompt.aspect_ratio,
+        is_featured: prompt.is_featured ?? false,
+        is_published: prompt.is_published ?? true,
+        sort_order: prompt.sort_order ?? 0,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error creating prompt:', err);
+    return null;
+  }
+};
+
+export const updatePrompt = async (id: string, updates: Partial<ClothingPromptItem>) => {
+  try {
+    const { data, error } = await supabase
+      .from('prompts')
+      .update({
+        title: updates.title,
+        description: updates.description,
+        content_type: updates.content_type,
+        category: updates.category,
+        subcategory: updates.subcategory,
+        product_type: updates.product_type,
+        prompt: updates.prompt,
+        recommended_tool: updates.recommended_tool,
+        recommended_tool_url: updates.recommended_tool_url,
+        difficulty: updates.difficulty,
+        tags: updates.tags,
+        aspect_ratio: updates.aspect_ratio,
+        is_featured: updates.is_featured,
+        is_published: updates.is_published,
+        sort_order: updates.sort_order,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating prompt:', err);
+    return null;
+  }
+};
+
+export const deletePrompt = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('prompts')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error deleting prompt:', err);
+    return false;
+  }
+};
+
+// Testimonial CRUD
+export const createTestimonial = async (testimonial: Omit<Review, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .insert({
+        id: `rev-${Date.now()}`,
+        name: testimonial.name,
+        location: testimonial.location,
+        avatar: testimonial.avatar,
+        rating: testimonial.rating,
+        comment: testimonial.comment,
+        date: testimonial.date,
+        verified_visit: testimonial.verifiedVisit ?? false,
+        purchased_product: testimonial.purchasedProduct,
+        is_published: testimonial.published ?? true,
+        sort_order: testimonial.order ?? 0,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error creating testimonial:', err);
+    return null;
+  }
+};
+
+export const updateTestimonial = async (id: string, updates: Partial<Review>) => {
+  try {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .update({
+        name: updates.name,
+        location: updates.location,
+        avatar_url: updates.avatar_url,
+        rating: updates.rating,
+        comment: updates.comment,
+        date: updates.date,
+        verified_visit: updates.verified_visit,
+        purchased_product: updates.purchased_product,
+        is_published: updates.is_published,
+        sort_order: updates.sort_order,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating testimonial:', err);
+    return null;
+  }
+};
+
+export const deleteTestimonial = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('testimonials')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error deleting testimonial:', err);
+    return false;
+  }
+};
+
+// FAQ CRUD
+export const createFaq = async (faq: Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .insert({
+        id: `faq-${Date.now()}`,
+        question: faq.question,
+        answer: faq.answer,
+        category: faq.category,
+        is_published: faq.is_published ?? true,
+        sort_order: faq.sort_order ?? 0,
+      });
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error creating FAQ:', err);
+    return null;
+  }
+};
+
+export const updateFaq = async (id: string, updates: Partial<FaqItem>) => {
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .update({
+        question: updates.question,
+        answer: updates.answer,
+        category: updates.category,
+        is_published: updates.is_published,
+        sort_order: updates.sort_order,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Error updating FAQ:', err);
+    return null;
+  }
+};
+
+export const deleteFaq = async (id: string) => {
+  try {
+    const { error } = await supabase
+      .from('faqs')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Error deleting FAQ:', err);
+    return false;
+  }
+};

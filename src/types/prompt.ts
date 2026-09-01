@@ -12,16 +12,18 @@ export type PromptDifficulty = 'Beginner' | 'Intermediate';
 export interface ClothingPromptItem {
   id: string;
   title: string;
-  category: PromptCategory;
+  description: string;
+  content_type: string;
+  category: string;
   subcategory: string;
-  productType: string;
-  description: string; // What is this?
-  useCase: string; // When should I use it & what will I get?
-  prompt: string; // Complete, copy-ready AI instruction
-  aspectRatio: PromptAspectRatio;
-  difficulty: PromptDifficulty;
+  product_type: string;
+  prompt: string;
+  recommended_tool: string;
+  recommended_tool_url: string;
+  difficulty: string;
   tags: string[];
+  aspect_ratio: string;
   featured?: boolean;
-  published?: boolean;
-  order?: number;
+  is_published?: boolean;
+  sort_order?: number;
 }
