@@ -669,25 +669,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Derived filtered items for customer site
   const publishedProducts = useMemo(() => {
-    return products.filter((p) => p.published !== false);
+    return (products ?? []).filter((p) => p.published !== false);
   }, [products]);
 
   const featuredProducts = useMemo(() => {
-    return publishedProducts.filter((p) => p.isFeatured);
+    return (publishedProducts ?? []).filter((p) => p.isFeatured);
   }, [publishedProducts]);
 
   const newProducts = useMemo(() => {
-    return publishedProducts.filter((p) => p.isNew);
+    return (publishedProducts ?? []).filter((p) => p.isNew);
   }, [publishedProducts]);
 
   const discountedProducts = useMemo(() => {
-    return publishedProducts.filter((p) => p.originalPrice && p.originalPrice > p.price);
+    return (publishedProducts ?? []).filter((p) => p.originalPrice && p.originalPrice > p.price);
   }, [publishedProducts]);
 
   // Dynamic category product count calculation
   const categoriesWithDynamicCount = useMemo(() => {
     return categories.map((cat) => {
-      const count = publishedProducts.filter(
+      const count = (publishedProducts ?? []).filter(
         (p) => p.category === cat.id || p.category === cat.slug
       ).length;
       return {
