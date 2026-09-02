@@ -125,33 +125,236 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Initialize state from Supabase, with localStorage fallback
-  const [products, setProducts] = useState<Product[]>(() => fetchProductsFromSupabase());
-  const [categories, setCategories] = useState<Category[]>(() => fetchCategoriesFromSupabase());
-  const [videos, setVideos] = useState<VideoItem[]>(() => fetchVideosFromSupabase());
-  const [prompts, setPrompts] = useState<ClothingPromptItem[]>(() => fetchPromptsFromSupabase());
-  const [testimonials, setTestimonials] = useState<Review[]>(() => fetchTestimonialsFromSupabase());
-  const [faq, setFaq] = useState<FaqItem[]>(() => fetchFaqFromSupabase());
-  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => fetchStoreInfoFromSupabase());
-  const [homepageCms, setHomepageCms] = useState<HomepageCms>(() => fetchHomepageCmsFromSupabase());
-  const [aboutCms, setAboutCms] = useState<AboutCms>(() => fetchAboutCmsFromSupabase());
-  const [contactCms, setContactCms] = useState<ContactCms>(() => fetchContactCmsFromSupabase());
-
-  // Fetch products from Supabase
-  async function fetchProductsFromSupabase(): Promise<Product[]> {
+  // Initialize state from local data imports (sync, prevents Promise in state)
+  const [products, setProducts] = useState<Product[]>(() => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      
-      if (error) throw error;
-      return (data as Product[]) ?? [];
+      return INITIAL_PRODUCTS;
     } catch {
-      // Fallback to empty array if Supabase fails
       return [];
     }
-  }
+  });
+  const [categories, setCategories] = useState<Category[]>(() => {
+    try {
+      return INITIAL_CATEGORIES;
+    } catch {
+      return [];
+    }
+  });
+  const [videos, setVideos] = useState<VideoItem[]>(() => {
+    try {
+      return INITIAL_VIDEOS;
+    } catch {
+      return [];
+    }
+  });
+  const [prompts, setPrompts] = useState<ClothingPromptItem[]>(() => {
+    try {
+      return INITIAL_PROMPTS;
+    } catch {
+      return [];
+    }
+  });
+  const [testimonials, setTestimonials] = useState<Review[]>(() => {
+    try {
+      return INITIAL_REVIEWS;
+    } catch {
+      return [];
+    }
+  });
+  const [faq, setFaq] = useState<FaqItem[]>(() => {
+    try {
+      return INITIAL_FAQ;
+    } catch {
+      return [];
+    }
+  });
+  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => {
+    try {
+      return INITIAL_BUSINESS;
+    } catch {
+      return {} as BusinessConfig;
+    }
+  });
+  const [homepageCms, setHomepageCms] = useState<HomepageCms>(() => {
+    try {
+      return INITIAL_HOMEPAGE_CMS;
+    } catch {
+      return {} as HomepageCms;
+    }
+  });
+  const [aboutCms, setAboutCms] = useState<AboutCms>(() => {
+    try {
+      return INITIAL_ABOUT_CMS;
+    } catch {
+      return {} as AboutCms;
+    }
+  });
+  const [contactCms, setContactCms] = useState<ContactCms>(() => {
+    try {
+      return INITIAL_CONTACT_CMS;
+    } catch {
+      return {} as ContactCms;
+    }
+  });
 
+  // Fetch from Supabase after mount (async, won't block initial render)
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (error) throw error;
+        setProducts(data as Product[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch products from Supabase:', err);
+      }
+    }
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (error) throw error;
+        setCategories(data as Category[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch categories from Supabase:', err);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    async function fetchVideos() {
+      try {
+        const { data, error } = await supabase
+          .from('feed_posts')
+          .select('*, products(*)')
+          .eq('type', 'video')
+          .eq('is_published', true);
+        if (error) throw error;
+        setVideos(data as VideoItem[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch videos from Supabase:', err);
+      }
+    }
+    fetchVideos();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPrompts() {
+      try {
+        const { data, error } = await supabase
+          .from('prompts')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order', { ascending: true });
+        if (error) throw error;
+        setPrompts(data as ClothingPromptItem[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch prompts from Supabase:', err);
+      }
+    }
+    fetchPrompts();
+  }, []);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const { data, error } = await supabase
+          .from('testimonials')
+          .select('*')
+          .eq('is_published', true);
+        if (error) throw error;
+        setTestimonials(data as Review[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch testimonials from Supabase:', err);
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
+  useEffect(() => {
+    async function fetchFaq() {
+      try {
+        const { data, error } = await supabase
+          .from('faqs')
+          .select('*')
+          .eq('is_published', true);
+        if (error) throw error;
+        setFaq(data as FaqItem[] ?? []);
+      } catch (err) {
+        console.error('Failed to fetch FAQ from Supabase:', err);
+      }
+    }
+    fetchFaq();
+  }, []);
+
+  useEffect(() => {
+    async function fetchStoreInfo() {
+      try {
+        const { data, error } = await supabase
+          .from('store_settings')
+          .select('*');
+        if (error) throw error;
+        setStoreInfo(data as BusinessConfig ?? {} as BusinessConfig);
+      } catch (err) {
+        console.error('Failed to fetch store info from Supabase:', err);
+      }
+    }
+    fetchStoreInfo();
+  }, []);
+
+  useEffect(() => {
+    async function fetchHomepageCms() {
+      try {
+        const { data, error } = await supabase
+          .from('homepage_cms')
+          .select('*');
+        if (error) throw error;
+        setHomepageCms(data as HomepageCms ?? {} as HomepageCms);
+      } catch (err) {
+        console.error('Failed to fetch homepage CMS from Supabase:', err);
+      }
+    }
+    fetchHomepageCms();
+  }, []);
+
+  useEffect(() => {
+    async function fetchAboutCms() {
+      try {
+        const { data, error } = await supabase
+          .from('about_cms')
+          .select('*');
+        if (error) throw error;
+        setAboutCms(data as AboutCms ?? {} as AboutCms);
+      } catch (err) {
+        console.error('Failed to fetch about CMS from Supabase:', err);
+      }
+    }
+    fetchAboutCms();
+  }, []);
+
+  useEffect(() => {
+    async function fetchContactCms() {
+      try {
+        const { data, error } = await supabase
+          .from('contact_cms')
+          .select('*');
+        if (error) throw error;
+        setContactCms(data as ContactCms ?? {} as ContactCms);
+      } catch (err) {
+        console.error('Failed to fetch contact CMS from Supabase:', err);
+      }
+    }
+    fetchContactCms();
+  }, []);
   // Fetch categories from Supabase
   async function fetchCategoriesFromSupabase(): Promise<Category[]> {
     try {
