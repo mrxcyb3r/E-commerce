@@ -101,15 +101,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
         {/* Multi-Image Dots / 3s Slide Indicator (shown on hover if >1 image) */}
         {(product.images?.length ?? 0) > 1 && (
           <div className="absolute bottom-12 left-0 right-0 z-10 flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            {<ProductImages.map((_, i) => </ProductImages>?map((_, i) => (
-              <span
-                key={i}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  currentImageIndex === i
-                    ? 'w-4 bg-white shadow-sm'
-                    : 'w-1.5 bg-white/50'
-                }`}
-              />
+            {product.images?.length > 0 && (
+              <ProductImages.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    currentImageIndex === i
+                      ? 'w-4 bg-white shadow-sm'
+                      : 'w-1.5 bg-white/50'
+                  }`}
+                >{i + 1}</span>
+              ))}
             ))}
           </div>
         )}
