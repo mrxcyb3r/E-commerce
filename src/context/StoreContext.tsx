@@ -218,8 +218,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       try {
         const { data, error } = await supabase
           .from('categories')
-          .select('*')
-          .order('sort_order', { ascending: true });
+          .select('*');
         if (error) throw error;
         setCategories(data as Category[] ?? []);
       } catch (err) {
@@ -252,8 +251,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const { data, error } = await supabase
           .from('prompts')
           .select('*')
-          .eq('is_published', true)
-          .order('sort_order', { ascending: true });
+          .eq('is_published', true);
         if (error) throw error;
         setPrompts(data as ClothingPromptItem[] ?? []);
       } catch (err) {
@@ -360,7 +358,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('sort_order', { ascending: true });
+        ;
       
       if (error) throw error;
       return (data as Category[]) ?? [];
@@ -392,7 +390,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         .from('prompts')
         .select('*')
         .eq('is_published', true)
-        .order('sort_order', { ascending: true });
+        ;
       
       if (error) throw error;
       return (data as ClothingPromptItem[]) ?? [];
@@ -408,7 +406,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         .from('testimonials')
         .select('*')
         .eq('is_published', true)
-        .order('sort_order', { ascending: true });
+        ;
       
       if (error) throw error;
       return (data as Review[]) ?? [];
@@ -424,7 +422,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         .from('faqs')
         .select('*')
         .eq('is_published', true)
-        .order('sort_order', { ascending: true });
+        ;
       
       if (error) throw error;
       return (data as FaqItem[]) ?? [];
