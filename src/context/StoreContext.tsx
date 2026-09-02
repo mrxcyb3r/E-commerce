@@ -612,7 +612,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             stockCount: product.stock_count,
             sku: product.sku,
             rating: product.rating,
-            reviewCount: product.reviewCount,
+            review_count: product.reviewCount,
             tags: product.tags,
             material: product.material,
             madeIn: product.madeIn,
@@ -1385,7 +1385,7 @@ export const updateProduct = async (id: string, updates: Partial<Product>) => {
         tags: updates.tags,
         material: updates.material,
         made_in: updates.madeIn,
-        sort_order: updates.sort_order,
+        sort_
       })
       .eq('id', id);
     if (error) throw error;
@@ -1442,10 +1442,10 @@ export const updateCategory = async (id: string, updates: Partial<Category>) => 
         name: updates.name,
         slug: updates.slug,
         description: updates.description,
-        image: updates.image,
-        featured: updates.featured,
-        published: updates.published,
-        order: updates.sort_order,
+        image_url: updates.image,
+        
+        
+        
         is_visible: updates.is_visible,
       })
       .eq('id', id);
@@ -1557,7 +1557,7 @@ export const updatePrompt = async (id: string, updates: Partial<ClothingPromptIt
         aspect_ratio: updates.aspect_ratio,
         is_featured: updates.is_featured,
         is_published: updates.is_published,
-        sort_order: updates.sort_order,
+        sort_
       })
       .eq('id', id);
     if (error) throw error;
@@ -1622,7 +1622,7 @@ export const updateTestimonial = async (id: string, updates: Partial<Review>) =>
         verified_visit: updates.verified_visit,
         purchased_product: updates.purchased_product,
         is_published: updates.is_published,
-        sort_order: updates.sort_order,
+        sort_
       })
       .eq('id', id);
     if (error) throw error;
@@ -1677,7 +1677,7 @@ export const updateFaq = async (id: string, updates: Partial<FaqItem>) => {
         answer: updates.answer,
         category: updates.category,
         is_published: updates.is_published,
-        sort_order: updates.sort_order,
+        sort_
       })
       .eq('id', id);
     if (error) throw error;
