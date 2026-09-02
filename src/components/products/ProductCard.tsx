@@ -19,17 +19,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
 
   // Auto-cycle images every 3 seconds while hovered
   useEffect(() => {
-    if (!isHovered || product.images.length <= 1) {
+    if (!isHovered || (product.images?.length ?? 0) <= 1) {
       setCurrentImageIndex(0);
       return;
     }
 
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+      setCurrentImageIndex((prev) => (prev + 1) % product.images?.length ?? 0);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isHovered, product.images.length]);
+  }, [isHovered, product.images?.length ?? 0]);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -99,9 +99,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
         </button>
 
         {/* Multi-Image Dots / 3s Slide Indicator (shown on hover if >1 image) */}
-        {product.images.length > 1 && (
+        {(product.images?.length ?? 0) > 1 && (
           <div className="absolute bottom-12 left-0 right-0 z-10 flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            {product.images.map((_, i) => (
+            {<ProductImages.map((_, i) => </ProductImages>?map((_, i) => (
               <span
                 key={i}
                 className={`h-1.5 rounded-full transition-all duration-300 ${

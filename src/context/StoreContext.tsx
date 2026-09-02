@@ -641,7 +641,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             slug: category.slug,
             description: category.description,
             image: category.image,
-            featured: category.featured,
+            is_visible: category.is_visible ?? true,
             sort_order: category.order,
           });
         if (error) throw error;
