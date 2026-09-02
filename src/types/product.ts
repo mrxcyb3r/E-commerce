@@ -23,6 +23,7 @@ export interface Product {
   slug: string;
   price: number;
   originalPrice?: number;
+  short_description?: string | null;
   category: string;
   categoryName: string;
   subcategory?: string;

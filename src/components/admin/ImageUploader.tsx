@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Image as ImageIcon, Plus, X, Upload, Check, Star, ArrowLeft, ArrowRight } from 'lucide-react';
-import { supabase } from '../lib/supabase/client';
+import { supabase } from '../../lib/supabase/client';
 
 interface ImageUploaderProps {
   images: string[];
