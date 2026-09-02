@@ -3,7 +3,7 @@ import type { Database } from '../../types/supabase-db';
 
 export const supabase: SupabaseClient = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!
 );
 
 // Helper for admin mutations - uses service role key only on server
