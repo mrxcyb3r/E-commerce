@@ -18,25 +18,45 @@ create table if not exists public.analytics_events (
   session_id text not null,
   event_type text not null check (
     event_type in (
+      -- Visitor page events
       'page_view',
+
+      -- Product events
       'product_view',
       'product_dwell',
       'product_share',
       'product_save',
       'product_unsave',
+
+      -- Category events
       'category_view',
+
+      -- Search events
       'search',
+
+      -- Feed events
       'feed_view',
       'feed_like',
+      'feed_unlike',
       'feed_share',
       'feed_product_click',
       'feed_watch',
+      'feed_comment_open',
+      'feed_comment_submit',
+      'feed_comment_view',
+      'feed_comment_delete',
+
+      -- Intent events
       'telegram_click',
       'phone_click',
       'directions_click',
+      'contact_click',
+
+      -- AI events
       'ai_question',
       'price_offer',
-      'contact_click',
+
+      -- Feedback
       'feedback_submit'
     )
   ),

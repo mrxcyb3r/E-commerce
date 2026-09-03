@@ -165,6 +165,17 @@ export interface ProductMetric {
   interest: InterestLevel;
   engagementRate: number; // (saves+telegram+phone+map+feed clicks) / views
   isTrending: boolean; // rising view activity in the recent half of the range
+  feedLikes: number;
+  uniqueLikers: number;
+  wishlistRate: number; // saves / views
+  clickThroughRate: number; // (telegram+phone+map+feed clicks) / views
+  averageViewTimeSec: number;
+  scrollDepthPct: number;
+  conversionFunnelConversion: number; // views -> saves -> telegram -> map
+  popularityRank: number;
+  trendScore: number;
+  trafficSources: Record<string, number>;
+  deviceBreakdown: Record<string, number>;
 }
 
 export function computeProducts(events: AnalyticsEvent[], range: DateRange): ProductMetric[] {
@@ -197,6 +208,8 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
     const mapClicks = list.filter((e) => e.event_type === 'directions_click').length;
     const shareClicks = list.filter((e) => e.event_type === 'product_share').length;
     const feedProductClicks = list.filter((e) => e.event_type === 'feed_product_click').length;
+    const feedLikes = list.filter((e) => e.event_type === 'feed_like').length;
+    const uniqueLikers = new Set(list.filter((e) => e.event_type === 'feed_like').map((e) => e.visitor_id)).size;
 
     // Real measured dwell time (seconds) from product_dwell events.
     const dwellSecs = list
@@ -214,8 +227,26 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
     const isTrending =
       recentViews >= Math.max(2, Math.ceil(earlierViews * 1.5)) && views > 0;
 
-    const times = list.map((e) => e.created_at).filter(Boolean).sort();
-    const engagement = saves + telegramClicks + phoneClicks + mapClicks + feedProductClicks;
+    // Wishlist rate: saves / views
+    const wishlistRate = views > 0 ? saves / views : 0;
+
+    // Click through rate: (telegram+phone+map+feed clicks) / views
+    const clickThroughRate = views > 0 ? (telegramClicks + phoneClicks + mapClicks + feedProductClicks) / views : 0;
+
+    // Average viewing time from product_dwell events
+    const averageViewTimeSec = avgDwellSec;
+
+    // Scroll depth is derived from product_view events with metadata
+    // If no scroll metadata available, default to 0
+    const scrollDepthPct = 0; // Would require additional client-side tracking
+
+    // Conversion funnel conversion: views -> saves -> telegram -> map
+    const saveVisitors = new Set(list.filter((e) => e.event_type === 'product_save').map((e) => e.visitor_id));
+    const telegramFromSaves = list.filter((e) => e.event_type === 'telegram_click' && saveVisitors.has(e.visitor_id)).length;
+    const conversionFunnelConversion = views > 0 ? telegramFromSaves / views : 0;
+
+    // Popularity rank (1 = most viewed)
+    // We'll compute this later after all products are sorted
 
     // Interest reflects the strongest observed signal for this product: repeated
     // views OR repeated saves OR high engagement. A product favorited 3x by 1
@@ -239,14 +270,28 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
       mapClicks,
       shareClicks,
       feedProductClicks,
-      avgDwellSec,
+      feedLikes,
+      uniqueLikers,
+      wishlistRate,
+      clickThroughRate,
+      averageViewTimeSec,
+      scrollDepthPct,
+      conversionFunnelConversion,
       firstSeen: times[0] ?? null,
       lastSeen: times[times.length - 1] ?? null,
       interest,
-      engagementRate: views > 0 ? engagement / views : 0,
+      engagementRate: views > 0 ? (saves + telegramClicks + phoneClicks + mapClicks + feedProductClicks) / views : 0,
       isTrending,
     });
   }
+  // Assign popularity ranks (1 = most views)
+  const sortedByViews = [...metrics].sort((a, b) => b.views - a.views);
+  sortedByViews.forEach((p, i) => { var _p; return (_p = p).popularityRank = i + 1; });
+  // Also update the original metrics array by reference
+  metrics.forEach(p => {
+    const rankRef = sortedByViews.find(x => x.id === p.id);
+    if (rankRef) p.popularityRank = rankRef.popularityRank;
+  });
   return metrics;
 }
 
@@ -267,6 +312,18 @@ export function trendingProducts(products: ProductMetric[], n = 8): ProductMetri
   return [...products].filter((p) => p.isTrending).sort((a, b) => b.views - a.views).slice(0, n);
 }
 
+export function lowestEngagementProducts(products: ProductMetric[], n = 8): ProductMetric[] {
+  // Products with views but very low engagement rate
+  return [...products]
+    .filter((p) => p.views > 0 && p.engagementRate < 0.1)
+    .sort((a, b) => a.engagementRate - b.engagementRate)
+    .slice(0, n);
+}
+
+export function productsByRank(products: ProductMetric[], rank: number): ProductMetric | null {
+  return [...products].find((p) => p.popularityRank === rank) ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // Categories
 // ---------------------------------------------------------------------------
@@ -280,12 +337,17 @@ export interface CategoryMetric {
   uniqueSavers: number;
   conversions: number;
   engagementRate: number;
+  trending: boolean;
+  popularityRank: number;
+  trafficSources: Record<string, number>;
+  topProductId: string | null;
+  topProductViews: number;
 }
 
 export function computeCategories(events: AnalyticsEvent[], range: DateRange): CategoryMetric[] {
   const map = new Map<
     string,
-    { id: string; views: number; unique: Set<string>; opens: number; favs: number; savers: Set<string>; conv: number }
+    { id: string; views: number; unique: Set<string>; opens: number; favs: number; savers: Set<string>; conv: number; productViewsById: Map<string, number> }
   >();
 
   for (const ev of events) {
@@ -294,7 +356,7 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
     if (!catId) continue;
     let m = map.get(catId);
     if (!m) {
-      m = { id: catId, views: 0, unique: new Set(), opens: 0, favs: 0, savers: new Set(), conv: 0 };
+      m = { id: catId, views: 0, unique: new Set(), opens: 0, favs: 0, savers: new Set(), conv: 0, productViewsById: new Map() };
       map.set(catId, m);
     }
     if (ev.event_type === 'category_view') {
@@ -303,6 +365,9 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
     } else if (ev.event_type === 'product_view') {
       m.opens += 1;
       m.unique.add(ev.visitor_id);
+      // Track product views within category
+      const pv = m.productViewsById.get(ev.product_id ?? 'unknown') ?? 0;
+      m.productViewsById.set(ev.product_id ?? 'unknown', pv + 1);
     } else if (ev.event_type === 'product_save') {
       m.favs += 1;
       m.savers.add(ev.visitor_id);
@@ -311,15 +376,62 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
     }
   }
 
-  return Array.from(map.values()).map((m) => ({
+  const metrics: CategoryMetric[] = [];
+  const rankMap = new Map<string, number>();
+  // First pass: compute all metrics and rank by views
+  for (const [id, m] of map.entries()) {
+    const topProduct = m.productViewsById.entries().next().value;
+    const topProductId = topProduct ? (topProduct[0] === 'unknown' ? null : topProduct[0]) : null;
+    const topProductViews = topProduct ? topProduct[1] : 0;
+    rankMap.set(id, topProductViews);
+    metrics.push({
+      id: m.id,
+      views: m.views,
+      uniqueVisitors: m.unique.size,
+      productOpens: m.opens,
+      favorites: m.favs,
+      uniqueSavers: m.savers.size,
+      conversions: m.conv,
+      engagementRate: m.views > 0 ? (m.opens + m.favs + m.conv) / m.views : 0,
+      trending: false, // will be set below
+      topProductId,
+      topProductViews,
+      trafficSources: {},
+    });
+  }
+  // Sort by views descending for ranking
+  metrics.sort((a, b) => b.views - a.views);
+  // Assign popularity ranks
+  metrics.forEach((m, i) => { var _m; return (_m = m).popularityRank = i + 1; });
+
+  // Set trending: categories with rising view activity in recent half
+  const mid = new Date(range.to + 'T00:00:00Z').getTime();
+  const midLow = new Date(range.from + 'T00:00:00Z').getTime();
+  const rangeMid = midLow + (mid - midLow) / 2;
+
+  for (const m of metrics) {
+    const catEvents = events.filter((e) => withinRange(e, range) && e.category_id as string === m.id);
+    const catViews = catEvents.filter((e) => e.event_type === 'category_view').length;
+    const earlierViews = catEvents.filter((e) => e.event_type === 'category_view' && e.created_at && new Date(e.created_at).getTime() < rangeMid).length;
+    const recentViews = catViews - earlierViews;
+    m.trending = recentViews >= Math.max(2, Math.ceil(earlierViews * 1.5)) && catViews > 0;
+  }
+
+  // Re-sort by popularity rank (already done), but ensure trending is set
+  return metrics.map((m) => ({
     id: m.id,
     views: m.views,
-    uniqueVisitors: m.unique.size,
-    productOpens: m.opens,
-    favorites: m.favs,
-    uniqueSavers: m.savers.size,
-    conversions: m.conv,
-    engagementRate: m.views > 0 ? (m.opens + m.favs + m.conv) / m.views : 0,
+    uniqueVisitors: m.uniqueVisitors,
+    productOpens: m.productOpens,
+    favorites: m.favorites,
+    uniqueSavers: m.uniqueSavers,
+    conversions: m.conversions,
+    engagementRate: m.engagementRate,
+    trending: m.trending,
+    popularityRank: m.popularityRank,
+    trafficSources: m.trafficSources,
+    topProductId: m.topProductId,
+    topProductViews: m.topProductViews,
   }));
 }
 
@@ -342,6 +454,7 @@ export interface FeedMetric {
   views: number;
   uniqueViewers: number;
   likes: number;
+  uniqueLikers: number;
   shares: number;
   productClicks: number;
   telegramClicks: number;
@@ -349,6 +462,9 @@ export interface FeedMetric {
   totalWatchSec: number;
   avgWatchSec: number;
   feedProductConversion: number; // productClicks / views
+  comments: number;
+  uniqueCommenters: number;
+  engagementScore: number; // composite score based on available metrics
 }
 
 export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMetric[] {
@@ -359,11 +475,14 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
       views: number;
       viewers: Set<string>;
       likes: number;
+      uniqueLikers: Set<string>;
       shares: number;
       productClicks: number;
       telegramClicks: number;
       watchEvents: number;
       totalWatchSec: number;
+      comments: number;
+      commenterSessions: Set<string>;
     }
   >();
 
@@ -371,7 +490,7 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     if (!withinRange(ev, range) || !ev.feed_id) continue;
     let m = map.get(ev.feed_id);
     if (!m) {
-      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, shares: 0, productClicks: 0, telegramClicks: 0, watchEvents: 0, totalWatchSec: 0 };
+      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, uniqueLikers: new Set(), shares: 0, productClicks: 0, telegramClicks: 0, watchEvents: 0, totalWatchSec: 0, comments: 0, commenterSessions: new Set() };
       map.set(ev.feed_id, m);
     }
     switch (ev.event_type) {
@@ -381,6 +500,7 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
         break;
       case 'feed_like':
         m.likes += 1;
+        m.uniqueLikers.add(ev.visitor_id);
         break;
       case 'feed_share':
         m.shares += 1;
@@ -396,6 +516,15 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
         const sec = Number(ev.metadata?.durationSec);
         if (Number.isFinite(sec)) m.totalWatchSec += sec;
         break;
+      case 'feed_comment_open':
+        m.comments += 1;
+        // We don't have a visitor_id in the comment_open event itself,
+        // but we track sessions that opened the comment modal
+        break;
+      case 'feed_comment_submit':
+        m.comments += 1;
+        m.commenterSessions.add(ev.session_id);
+        break;
       default:
         break;
     }
@@ -406,6 +535,7 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     views: m.views,
     uniqueViewers: m.viewers.size,
     likes: m.likes,
+    uniqueLikers: m.uniqueLikers.size,
     shares: m.shares,
     productClicks: m.productClicks,
     telegramClicks: m.telegramClicks,
@@ -413,6 +543,9 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     totalWatchSec: m.totalWatchSec,
     avgWatchSec: m.watchEvents > 0 ? Math.round(m.totalWatchSec / m.watchEvents) : 0,
     feedProductConversion: m.views > 0 ? m.productClicks / m.views : 0,
+    comments: m.comments,
+    uniqueCommenters: m.commenterSessions.size,
+    engagementScore: m.views > 0 ? Math.round((m.likes + m.shares + m.productClicks + m.telegramClicks) / m.views * 100) / 100 : 0,
   }));
 }
 
