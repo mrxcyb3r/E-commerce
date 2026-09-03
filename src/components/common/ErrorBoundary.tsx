@@ -9,9 +9,12 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  declare state: ErrorBoundaryState;
+
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
+    this.handleReload = this.handleReload.bind(this);
   }
 
   static getDerivedStateFromError(): ErrorBoundaryState {
@@ -22,10 +25,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     console.error('ErrorBoundary caught an error:', error, info);
   }
 
-  handleReload = () => {
+  handleReload(): void {
     this.setState({ hasError: false });
     window.location.reload();
-  };
+  }
 
   render() {
     if (this.state.hasError) {

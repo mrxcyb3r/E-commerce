@@ -68,15 +68,6 @@ interface StoreContextType {
   deleteCategory: (id: string) => void;
   reorderCategories: (startIndex: number, endIndex: number) => void;
 
-  // Videos / Feed
-  videos: VideoItem[];
-  publishedVideos: VideoItem[];
-  addVideo: (video: Omit<VideoItem, 'id' | 'createdAt'>) => VideoItem;
-  updateVideo: (id: string, updates: Partial<VideoItem>) => void;
-  deleteVideo: (id: string) => void;
-  toggleVideoPublished: (id: string) => void;
-  reorderVideos: (startIndex: number, endIndex: number) => void;
-
   // Prompts
   prompts: ClothingPromptItem[];
   publishedPrompts: ClothingPromptItem[];
@@ -120,11 +111,8 @@ interface StoreContextType {
   activityLogs: AdminActivityLog[];
   logActivity: (action: AdminActivityLog['action'], entity: AdminActivityLog['entity'], description: string) => void;
   resetAllToDefaults: () => void;
-  resetAllData: () => void;
   exportDataJSON: () => string;
-  exportData: () => string;
   importDataJSON: (jsonString: string) => boolean;
-  importData: (jsonString: string) => boolean;
 }
 
 const KEYS = {

@@ -18,12 +18,12 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useVideoFeed } from '../../context/VideoContext';
 
 export const DashboardPage: React.FC = () => {
   const {
     products,
     categories,
-    publishedVideos,
     prompts,
     featuredProducts,
     newProducts,
@@ -31,6 +31,7 @@ export const DashboardPage: React.FC = () => {
     activityLogs,
     storeInfo,
   } = useStore();
+  const { publishedVideos } = useVideoFeed();
 
   const outOfStockCount = products.filter((p) => !p.inStock || (p.stockCount !== undefined && p.stockCount <= 0)).length;
   const lowStockCount = products.filter((p) => p.inStock && p.stockCount !== undefined && p.stockCount > 0 && p.stockCount <= 3).length;

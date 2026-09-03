@@ -309,7 +309,9 @@ export const FeedPage: React.FC = () => {
                 {filteredVideos.map((video, idx) => (
                   <div
                     key={video.id}
-                    ref={(el) => (videoRefs.current[idx] = el)}
+                    ref={(el) => {
+                      videoRefs.current[idx] = el;
+                    }}
                     data-index={idx}
                     className="w-full h-full snap-start snap-always flex items-center justify-center"
                   >

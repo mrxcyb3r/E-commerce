@@ -76,7 +76,7 @@ export const ProductEditPage: React.FC = () => {
       setPublished(existingProduct.published !== false);
       setImages(existingProduct.images || []);
       setSizes(existingProduct.sizes || []);
-      setColors(existingProduct.colors || []);
+      setColors((existingProduct.colors || []).map((c) => (typeof c === 'string' ? c : c.name)));
       setMaterial(existingProduct.material || '');
       setMadeIn(existingProduct.madeIn || '');
       setTags(existingProduct.tags || []);
@@ -179,7 +179,7 @@ export const ProductEditPage: React.FC = () => {
       details: existingProduct ? existingProduct.details : [],
       images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
       sizes,
-      colors,
+      colors: colors.map((c) => ({ name: c, hex: '#18181b' })),
       material: material.trim() || undefined,
       madeIn: madeIn.trim() || undefined,
       tags,

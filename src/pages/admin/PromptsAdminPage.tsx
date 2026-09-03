@@ -119,7 +119,7 @@ Orientation: 4:5 vertical.`);
     setUseCase(pr.useCase || '');
     setPromptText(pr.prompt);
     setAspectRatio(pr.aspectRatio || '4:5');
-    setDifficulty(pr.difficulty || 'Beginner');
+    setDifficulty((pr.difficulty as 'Beginner' | 'Intermediate' | 'Advanced') || 'Beginner');
     setTags(pr.tags || []);
     setFeatured(!!pr.featured);
     setPublished(pr.published !== false);

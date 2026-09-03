@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
+import { useVideoFeed } from '../../context/VideoContext';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -29,7 +30,8 @@ interface AdminSidebarProps {
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const { logout, user } = useAuth();
-  const { storeInfo, products, publishedVideos, prompts } = useStore();
+  const { storeInfo, products, prompts } = useStore();
+  const { publishedVideos } = useVideoFeed();
   const navigate = useNavigate();
 
   const handleLogout = () => {
