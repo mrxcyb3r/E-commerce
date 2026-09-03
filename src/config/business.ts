@@ -2,6 +2,7 @@ import { BusinessConfig } from '../types/business';
 
 export const BUSINESS_CONFIG: BusinessConfig = {
   businessName: 'Ecommerce',
+  name: 'Ecommerce',
   businessDescription: 'Zamonaviy va sifatli mahsulotlar raqamli vitrinasi',
   tagline: 'Mahsulotlarni onlayn ko\'ring, narxlarni oldindan biling va do\'konimizdan qulay xarid qiling.',
   phone: '+998 90 123 45 67',

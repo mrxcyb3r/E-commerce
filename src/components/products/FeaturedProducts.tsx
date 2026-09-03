@@ -6,20 +6,22 @@ import { ProductCard } from './ProductCard';
 import { motion } from 'motion/react';
 
 export const FeaturedProducts: React.FC = () => {
-  const { products, homepageCms, categories } = useStore();
+  const { publishedProducts, homepageCms, publishedCategories } = useStore();
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+
+  const categories = publishedCategories;
 
   const filterTabs = [
     { id: 'all', label: 'Barchasi' },
     ...categories.slice(0, 4).map((c) => ({ id: c.slug, label: c.name })),
   ];
 
-  const featuredProducts = products.filter((p) => p.isFeatured || p.isNew);
+  const featuredProducts = publishedProducts.filter((p) => p.isFeatured || p.isNew);
   const displayedProducts = selectedFilter === 'all'
-    ? (featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : products.slice(0, 8))
+    ? (featuredProducts.length > 0 ? featuredProducts.slice(0, 8) : publishedProducts.slice(0, 8))
     : (featuredProducts.filter((p) => p.category === selectedFilter).length > 0
         ? featuredProducts.filter((p) => p.category === selectedFilter).slice(0, 8)
-        : products.filter((p) => p.category === selectedFilter).slice(0, 8));
+        : publishedProducts.filter((p) => p.category === selectedFilter).slice(0, 8));
 
   return (
     <section id="products" className="py-16 md:py-24 bg-white dark:bg-zinc-900 transition-colors scroll-mt-28">

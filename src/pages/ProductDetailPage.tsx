@@ -29,7 +29,7 @@ export const ProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const product = products.find((p) => p.id === id || p.slug === id);
+  const product = products.find((p) => (p.id === id || p.slug === id) && p.published !== false);
 
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');

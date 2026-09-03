@@ -6,7 +6,7 @@ import { CategoryCard } from './CategoryCard';
 import { motion } from 'motion/react';
 
 export const CategorySection: React.FC = () => {
-  const { categories } = useStore();
+  const { publishedCategories: categories } = useStore();
 
   return (
     <section className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors">

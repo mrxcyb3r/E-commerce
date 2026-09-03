@@ -4,8 +4,8 @@ import { useStore } from '../../context/StoreContext';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const FaqSection: React.FC = () => {
-  const { faq, homepageCms } = useStore();
-  const [openId, setOpenId] = useState<string | null>(faq[0]?.id || null);
+  const { publishedFaq, homepageCms } = useStore();
+  const [openId, setOpenId] = useState<string | null>(publishedFaq[0]?.id || null);
 
   const toggleItem = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -35,7 +35,7 @@ export const FaqSection: React.FC = () => {
 
         {/* Accordion List */}
         <div className="space-y-3">
-          {faq.map((item, index) => {
+          {publishedFaq.map((item, index) => {
             const isOpen = openId === item.id;
             return (
               <motion.div

@@ -13,7 +13,7 @@ import {
   Video as VideoIcon
 } from 'lucide-react';
 import { useVideoFeed } from '../../context/VideoContext';
-import { PRODUCTS } from '../../data/products';
+import { useStore } from '../../context/StoreContext';
 import { VideoBadgeType } from '../../types/video';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -24,6 +24,7 @@ interface AdminVideoModalProps {
 
 export const AdminVideoModal: React.FC<AdminVideoModalProps> = ({ isOpen, onClose }) => {
   const { videos, addVideo, deleteVideo, togglePublish, resetToDefault } = useVideoFeed();
+  const { products: PRODUCTS } = useStore();
   
   const [activeTab, setActiveTab] = useState<'list' | 'add'>('list');
 

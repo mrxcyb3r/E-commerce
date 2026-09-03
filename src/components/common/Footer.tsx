@@ -15,7 +15,7 @@ import {
 import { useStore } from '../../context/StoreContext';
 
 export const Footer: React.FC = () => {
-  const { storeInfo, categories } = useStore();
+  const { storeInfo, publishedCategories: categories } = useStore();
 
   return (
     <footer className="bg-zinc-100 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border-t border-zinc-200 dark:border-zinc-800 pt-16 pb-12 transition-colors">

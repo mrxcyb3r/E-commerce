@@ -4,7 +4,7 @@ import { useStore } from '../../context/StoreContext';
 import { motion } from 'motion/react';
 
 export const ReviewsSection: React.FC = () => {
-  const { testimonials, homepageCms } = useStore();
+  const { publishedTestimonials, homepageCms } = useStore();
 
   return (
     <section className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors">
@@ -30,7 +30,7 @@ export const ReviewsSection: React.FC = () => {
 
         {/* Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((review, index) => (
+          {publishedTestimonials.map((review, index) => (
             <motion.div
               key={review.id}
               initial={{ opacity: 0, y: 15 }}

@@ -152,7 +152,7 @@ export function mapDbFaqToApp(row: DbFaq): FaqItem {
 export function mapDbStoreSettingsToApp(row: DbStoreSettings): BusinessConfig {
   return {
     businessName: row.business_name,
-    name: row.name ?? undefined,
+    name: row.name ?? row.business_name,
     businessDescription: row.business_description ?? '',
     tagline: row.tagline ?? '',
     phone: row.phone,

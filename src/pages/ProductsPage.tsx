@@ -8,7 +8,7 @@ import { Search, SlidersHorizontal, ArrowUpDown, X, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const ProductsPage: React.FC = () => {
-  const { products } = useStore();
+  const { publishedProducts: products } = useStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);

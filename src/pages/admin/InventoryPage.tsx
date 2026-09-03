@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Boxes,
   Search,
@@ -14,7 +14,7 @@ import {
 import { useStore } from '../../context/StoreContext';
 
 export const InventoryPage: React.FC = () => {
-  const { products, updateProduct } = useStore();
+  const { products, updateProductStock } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'in-stock' | 'low' | 'out'>('all');
@@ -28,6 +28,21 @@ export const InventoryPage: React.FC = () => {
     });
     return map;
   });
+
+  // Keep local editable state in sync with source of truth (products)
+  useEffect(() => {
+    setLocalStock((prev) => {
+      const next: Record<string, { inStock: boolean; count: number }> = {};
+      products.forEach((p) => {
+        next[p.id] =
+          prev[p.id] ?? {
+            inStock: p.inStock !== false,
+            count: p.stockCount ?? (p.inStock ? 10 : 0),
+          };
+      });
+      return next;
+    });
+  }, [products]);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -72,10 +87,7 @@ export const InventoryPage: React.FC = () => {
 
   const handleSaveAll = () => {
     Object.entries(localStock as Record<string, { inStock: boolean; count: number }>).forEach(([id, val]) => {
-      updateProduct(id, {
-        inStock: val.inStock,
-        stockCount: val.count,
-      });
+      updateProductStock(id, val.inStock, val.count);
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);

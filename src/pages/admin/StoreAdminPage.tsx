@@ -16,7 +16,7 @@ import { useStore } from '../../context/StoreContext';
 export const StoreAdminPage: React.FC = () => {
   const { storeInfo, updateStoreInfo } = useStore();
 
-  const [name, setName] = useState(storeInfo.name);
+  const [name, setName] = useState(storeInfo.businessName);
   const [tagline, setTagline] = useState(storeInfo.tagline);
   const [address, setAddress] = useState(storeInfo.address);
   const [landmark, setLandmark] = useState(storeInfo.landmark);
@@ -37,7 +37,7 @@ export const StoreAdminPage: React.FC = () => {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateStoreInfo({
-      name,
+      businessName: name,
       tagline,
       address,
       landmark,

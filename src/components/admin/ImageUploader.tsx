@@ -10,14 +10,6 @@ interface ImageUploaderProps {
   helperText?: string;
 }
 
-interface ImageUploaderProps {
-  images: string[];
-  onChange: (images: string[]) => void;
-  maxImages?: number;
-  label?: string;
-  helperText?: string;
-}
-
 interface UploadProgress {
   progress: number;
   status: 'idle' | 'uploading' | 'success' | 'error';
@@ -104,8 +96,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const handleRemove = (index: number) => {
     // Optionally delete from Supabase Storage
     const primary = images[index];
-    if (primary && primary.includes('product-images')) {
-      const path = primary.split('/').pop();
+    if (primary && primary.includes('product-images/')) {
+      const marker = primary.indexOf('product-images/');
+      const path = primary.substring(marker).split('?')[0];
       supabase.storage.from('product-images').remove([path]);
     }
     const next = images.filter((_, i) => i !== index);
@@ -113,8 +106,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   };
 
   const handleSetPrimary = (index: number) => {
-    if (index === primaryIndex) return;
-    setPrimaryIndex(index);
+    if (index === 0) return;
+    const newArr = [...images];
+    const [target] = newArr.splice(index, 1);
+    if (target) newArr.unshift(target);
+    setPrimaryIndex(0);
+    onChange(newArr);
   };
 
   const handleMove = (index: number, direction: 'left' | 'right') => {
@@ -229,6 +226,18 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           </div>
         )}
       </div>
+
+      {Object.keys(uploadErrors).length > 0 && (
+        <div className="space-y-1">
+          {Object.entries(uploadErrors).map(([key, msg]) =>
+            msg ? (
+              <p key={key} className="text-xs font-medium text-red-600 dark:text-red-400">
+                {msg}
+              </p>
+            ) : null
+          )}
+        </div>
+      )}
 
       <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-300 mt-1">{helperText}</p>
     </div>
