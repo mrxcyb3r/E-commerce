@@ -40,6 +40,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Watch-time accumulation for real video engagement analytics.
+  const watchAccum = useRef(0);
+  const lastTick = useRef(-1);
   
   const { isMuted, toggleMute, getProductForVideo } = useVideoFeed();
   
@@ -123,6 +127,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
       setIsPlaying(false);
       setProgress(0);
     }
+    if (!isActive) {
+      watchAccum.current = 0;
+      lastTick.current = -1;
+    }
   }, [isActive, isCollection]);
 
   // Sync mute state for videos
@@ -137,6 +145,12 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
       const current = videoRef.current.currentTime;
       const duration = videoRef.current.duration || 1;
       setProgress((current / duration) * 100);
+      watchAccum.current += lastTick.current >= 0 ? current - lastTick.current : 0;
+      lastTick.current = current;
+      if (watchAccum.current >= 5) {
+        track('feed_watch', { feedId: video.id, metadata: { durationSec: Math.round(watchAccum.current) } });
+        watchAccum.current = 0;
+      }
     }
   };
 

@@ -1,38 +1,45 @@
 import { supabase } from '../supabase/client';
 import type { AnalyticsEventType } from '../../types/supabase-db';
 import { BUSINESS_CONFIG } from '../../config/business';
+import { getEnrichment, Enrichment } from './enrich';
+import { getVisitorId, getSessionInfo, resetSession } from './session';
 
-const VISITOR_KEY = 'analytics_visitor_id';
-const SESSION_KEY = 'analytics_session_id';
 const SHOP_ID = BUSINESS_CONFIG.name || 'default';
 
-function uid(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  );
+export const SESSION_KEY = 'analytics_session_id';
+
+export { resetSession };
+
+export function getSessionId(): string {
+  return getSessionInfo().sessionId;
 }
 
-function getOrCreateStored(key: string): string {
+/**
+ * Persistent per-visitor de-dup. Unlike the old in-memory Set (which was lost on
+ * refresh and caused duplicate product_view/feed_view rows), this survives page
+ * reloads so a single visitor's repeated interest is counted once for "unique"
+ * metrics while interaction totals remain accurate.
+ */
+const DEDUPE_KEY = 'analytics_deduped_v1';
+
+function loadDeduped(): Set<string> {
   try {
-    const existing = localStorage.getItem(key);
-    if (existing) return existing;
-    const fresh = key === VISITOR_KEY ? uid() : `${uid()}-${Date.now().toString(36)}`;
-    localStorage.setItem(key, fresh);
-    return fresh;
+    const raw = localStorage.getItem(DEDUPE_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw);
+    return new Set(Array.isArray(arr) ? arr : []);
   } catch {
-    return key === VISITOR_KEY ? uid() : `${uid()}-${Date.now().toString(36)}`;
+    return new Set();
   }
 }
 
-export const getVisitorId = (): string => getOrCreateStored(VISITOR_KEY);
-export const getSessionId = (): string => getOrCreateStored(SESSION_KEY);
+let deduped: Set<string> = loadDeduped();
 
-export function resetSession(): void {
+function persistDeduped(): void {
   try {
-    localStorage.removeItem(SESSION_KEY);
+    const arr = Array.from(deduped);
+    if (arr.length > 500) arr.splice(0, arr.length - 500); // keep recent
+    localStorage.setItem(DEDUPE_KEY, JSON.stringify(arr));
   } catch {
     /* ignore */
   }
@@ -44,80 +51,130 @@ export interface TrackOptions {
   categoryId?: string;
   searchQuery?: string;
   metadata?: Record<string, unknown>;
+  /** de-dupe by (eventType + key) for this visitor, persisted across reloads */
   uniquePerVisitor?: boolean;
 }
 
-let inFlight = false;
+interface QueuedEvent {
+  eventType: AnalyticsEventType;
+  options: TrackOptions;
+}
+
+let queue: QueuedEvent[] = [];
+let flushing = false;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+const BATCH_MAX_DELAY_MS = 1500;
 
 /**
- * Non-blocking, buffered event write. Never throws and never blocks the UI.
- * A `uniquePerVisitor` flag lets callers avoid re-recording the same action for
- * the same visitor within the current page session (kept in a simple in-memory set).
+ * Non-blocking, batched event write. Never throws and never blocks the UI.
+ * Multiple events are coalesced and sent to Supabase in batches to avoid one
+ * request per interaction.
  */
-export async function track(
+export function track(
   eventType: AnalyticsEventType,
   options: TrackOptions = {}
 ): Promise<void> {
-  const {
-    productId,
-    feedId,
-    categoryId,
-    searchQuery,
-    metadata,
-    uniquePerVisitor,
-  } = options;
-
-  if (uniquePerVisitor) {
-    const key = `${eventType}:${productId || feedId || categoryId || searchQuery || ''}`;
-    if (uniqueKeys.has(key)) return;
-    uniqueKeys.add(key);
+  const key = options.productId || options.feedId || options.categoryId || options.searchQuery || '';
+  if (options.uniquePerVisitor) {
+    const dedupeKey = `${eventType}:${key}`;
+    if (deduped.has(dedupeKey)) return Promise.resolve();
+    deduped.add(dedupeKey);
+    persistDeduped();
   }
 
-  // Guard against overlapping network writes that could flood the connection.
-  if (inFlight) {
-    pending.push({
-      eventType,
-      options,
-    });
-    return;
+  queue.push({ eventType, options });
+  scheduleFlush();
+  return Promise.resolve();
+}
+
+function scheduleFlush(): void {
+  if (flushTimer != null) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    void flush();
+  }, 80);
+}
+
+function scheduleHardFlush(): void {
+  if (flushTimer != null) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
   }
-  inFlight = true;
+  void flush();
+}
 
-  const payload: Record<string, unknown> = {
-    shop_id: SHOP_ID,
-    visitor_id: getVisitorId(),
-    session_id: getSessionId(),
-    event_type: eventType,
-    product_id: productId ?? null,
-    feed_id: feedId ?? null,
-    category_id: categoryId ?? null,
-    search_query: searchQuery ?? null,
-    page_path:
-      typeof window !== 'undefined' ? window.location.pathname + window.location.search : null,
-    metadata: metadata ?? {},
-  };
+async function flush(): Promise<void> {
+  if (flushing) return;
+  const batch = queue;
+  queue = [];
+  if (batch.length === 0) return;
 
+  flushing = true;
+  const enrichment = getEnrichment();
   try {
-    await supabase.from('analytics_events').insert(payload);
+    const rows = batch.map(({ eventType, options }) => {
+      const session = getSessionInfo();
+      return {
+        shop_id: SHOP_ID,
+        visitor_id: getVisitorId(),
+        session_id: session.sessionId,
+        event_type: eventType,
+        product_id: options.productId ?? null,
+        feed_id: options.feedId ?? null,
+        category_id: options.categoryId ?? null,
+        search_query: options.searchQuery ?? null,
+        page_path:
+          typeof window !== 'undefined'
+            ? window.location.pathname + window.location.search
+            : null,
+        metadata: {
+          ...(options.metadata ?? {}),
+          ...enrichMetadata(enrichment),
+          session_start: session.sessionStart,
+          session_visit: session.visitNumber,
+        },
+      };
+    });
+
+    await supabase.from('analytics_events').insert(rows);
   } catch {
     // Analytics must never break the storefront.
   } finally {
-    await flushPending();
-    inFlight = false;
+    flushing = false;
+    if (queue.length > 0) {
+      scheduleHardFlush();
+    }
   }
 }
 
-let pending: { eventType: AnalyticsEventType; options: TrackOptions }[] = [];
-const uniqueKeys = new Set<string>();
+function enrichMetadata(e: Enrichment): Record<string, unknown> {
+  const meta: Record<string, unknown> = {
+    device: e.device,
+    screen: e.screen,
+    language: e.language,
+  };
+  if (e.source) meta.source = e.source;
+  if (e.referrer) meta.referrer = e.referrer;
+  return meta;
+}
 
-async function flushPending(): Promise<void> {
-  const batch = pending;
-  pending = [];
-  for (const item of batch) {
-    try {
-      await track(item.eventType, item.options);
-    } catch {
-      /* ignore */
+// Best-effort flush before the page is torn down (hidden/beforeunload).
+if (typeof window !== 'undefined') {
+  const teardown = () => {
+    if (flushTimer != null) {
+      clearTimeout(flushTimer);
+      flushTimer = null;
     }
-  }
+    if (queue.length > 0) {
+      // Fire-and-forget; navigator.sendBeacon is unavailable for PostgREST JSON,
+      // so we just attempt a synchronous-ish fetch which may or may not complete.
+      void flush();
+    }
+  };
+  window.addEventListener('beforeunload', teardown);
+  const onVisibility = () => {
+    if (document.visibilityState === 'hidden') teardown();
+  };
+  document.addEventListener('visibilitychange', onVisibility);
 }

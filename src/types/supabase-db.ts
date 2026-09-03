@@ -153,6 +153,7 @@ export type AnalyticsEventType =
   | 'feed_like'
   | 'feed_share'
   | 'feed_product_click'
+  | 'feed_watch'
   | 'telegram_click'
   | 'phone_click'
   | 'directions_click'
