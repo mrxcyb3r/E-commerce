@@ -112,7 +112,7 @@ export const AdminVideoModal: React.FC<AdminVideoModalProps> = ({ isOpen, onClos
                 Videolar boshqaruvi
               </h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Do'kon vitrinasi uchun qisqa video roliklarni qo'shing va boshqaring
+                Do'kon uchun qisqa video roliklarni qo'shing va boshqaring
               </p>
             </div>
           </div>

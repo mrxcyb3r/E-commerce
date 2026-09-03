@@ -94,7 +94,7 @@ export const PromptsAdminPage: React.FC = () => {
     setSubcategory('Klassik');
     setProductType('Kostyum-shim');
     setDescription('Rasmiy kiyimlar uchun fotorealistik studiya surati.');
-    setUseCase('Instagram postlari, katalog va e-tijorat vitrinasi uchun eng qulay.');
+    setUseCase('Instagram postlari, katalog va onlayn do\'kon uchun eng qulay.');
     setPromptText(`Analyze the uploaded clothing item. Preserve the lapel cut, button spacing, shoulder structure, and exact fabric weave pattern.
 
 Scene: Minimalist luxury studio with warm charcoal wall and soft edge lighting.

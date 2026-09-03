@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "contentType": "text",
-  "libraryName": "Raqamli Vitrina Text Prompt Library",
+  "libraryName": "Onlayn Do'kon Text Prompt Library",
   "prompts": [
     {
       "id": "product-description-standard",
@@ -498,8 +498,8 @@
       "published": true
     },
     {
-      "id": "feed-raqamli-vitrina-hook-caption",
-      "title": "Raqamli Vitrina Feedi uchun qisqa mahsulot posti",
+      "id": "feed-onlayn-dokon-hook-caption",
+      "title": "Onlayn do'kon Feedi uchun qisqa mahsulot posti",
       "category": "Feed",
       "subcategory": "Feed Captions",
       "contentType": "text",
@@ -508,16 +508,16 @@
         "reason": "Ilova ichki feedida xaridor tasmani aylantirayotganda bir zumda ko'zga tashlanadigan lo'nda matn tuzadi."
       },
       "difficulty": "easy",
-      "description": "Raqamli Vitrina ilovasi tasmada (Feed) ko'rinadigan, to'g'ridan-to'g'ri mahsulot sahifasiga o'tishga undovchi matn.",
+      "description": "Onlayn do'kon tarmog'ida (Feed) ko'rinadigan, to'g'ridan-to'g'ri mahsulot sahifasiga o'tishga undovchi matn.",
       "whatYouNeed": [
         "Mahsulot nomi",
         "Narxi",
         "1 ta asosiy afzalligi"
       ],
-      "prompt": "Raqamli Vitrina mobil ilovasi Feedi (tasma) uchun juda ixcham, zamonaviy va sotuvchi post matnini yozing.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Narxi: [NARXI]\n- Asosiy plyusi: [1 TA ENG ASOSIY AFZALLIGI]\n\nFORMAT:\n- 1-qator: E'tibor tortuvchi 1 ta gap.\n- 2-qator: Narx va mavjud o'lchamlar.\n- 3-qator: 'Batafsil ko'rish va buyurtma berish uchun mahsulot ustiga bosing' chaqirig'i.\n\nJuda qisqa va qulay bo'lsin.",
+      "prompt": "Onlayn do'kon Feedi (tasma) uchun juda ixcham, zamonaviy va sotuvchi post matnini yozing.\n\nMAHSULOT:\n- Nomi: [MAHSULOT NOMI]\n- Narxi: [NARXI]\n- Asosiy plyusi: [1 TA ENG ASOSIY AFZALLIGI]\n\nFORMAT:\n- 1-qator: E'tibor tortuvchi 1 ta gap.\n- 2-qator: Narx va mavjud o'lchamlar.\n- 3-qator: 'Batafsil ko'rish va buyurtma berish uchun mahsulot ustiga bosing' chaqirig'i.\n\nJuda qisqa va qulay bo'lsin.",
       "tags": [
         "feed",
-        "raqamli-vitrina",
+        "onlayn-dokon",
         "mobile-app",
         "caption",
         "featured"

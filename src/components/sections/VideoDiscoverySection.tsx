@@ -29,7 +29,7 @@ export const VideoDiscoverySection: React.FC = () => {
           >
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500 text-zinc-950">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Jonli Vitrina</span>
+              <span>Yangi videolar</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black font-['Outfit',sans-serif] tracking-tight">
               Videolarda ko'ring

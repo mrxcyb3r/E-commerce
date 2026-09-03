@@ -3,7 +3,7 @@ import type { AdvancedFunnelStage } from '../../../lib/analytics/advanced';
 
 export const FunnelView: React.FC<{ stages: AdvancedFunnelStage[] }> = ({ stages }) => {
   if (stages.length === 0) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Funnel uchun ma'lumot yetarli emas</p>;
+    return <p className="text-xs text-neutral-400 text-center py-6">Ma'lumot yetarli emas</p>;
   }
   const first = stages[0].value || 1;
   return (

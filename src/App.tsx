@@ -39,6 +39,7 @@ import { AboutAdminPage } from './pages/admin/AboutAdminPage';
 import { ContactAdminPage } from './pages/admin/ContactAdminPage';
 import { SettingsAdminPage } from './pages/admin/SettingsAdminPage';
 import { AnalyticsAdminPage } from './pages/admin/AnalyticsAdminPage';
+import { CommentsAdminPage } from './pages/admin/CommentsAdminPage';
 import { useAnalytics } from './hooks/useAnalytics';
 
 const AnalyticsTracker: React.FC = () => {
@@ -113,6 +114,7 @@ export default function App() {
                     <Route path="contact" element={<ContactAdminPage />} />
                     <Route path="settings" element={<SettingsAdminPage />} />
                     <Route path="analytics" element={<AnalyticsAdminPage />} />
+                    <Route path="comments" element={<CommentsAdminPage />} />
                   </Route>
                 </Routes>
               </BrowserRouter>

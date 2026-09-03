@@ -129,7 +129,7 @@ export const HomepageCmsPage: React.FC = () => {
               type="text"
               value={heroBadge}
               onChange={(e) => setHeroBadge(e.target.value)}
-              placeholder="Jizzaxdagi zamonaviy vitrina"
+              placeholder="Jizzaxdagi zamonaviy do'kon"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
             />
           </div>
@@ -156,7 +156,7 @@ export const HomepageCmsPage: React.FC = () => {
                 type="text"
                 value={heroHighlightedTitle}
                 onChange={(e) => setHeroHighlightedTitle(e.target.value)}
-                placeholder="Raqamli Vitrinasi"
+                placeholder="Onlayn do'konimiz"
                 className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold text-amber-600 dark:text-amber-400"
               />
             </div>
@@ -366,7 +366,7 @@ export const HomepageCmsPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                Jonli Vitrina (Video) Bo'limi Sarlavhasi
+                Videolar bo'limi sarlavhasi
               </label>
               <input
                 type="text"
@@ -378,7 +378,7 @@ export const HomepageCmsPage: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                Jonli Vitrina Izohi
+                Videolar bo'limi izohi
               </label>
               <input
                 type="text"

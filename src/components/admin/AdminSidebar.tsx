@@ -19,6 +19,7 @@ import {
   ChevronRight,
   X,
   BarChart3,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -107,6 +108,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           label: 'Mijozlar sharhlari',
           path: '/admin/testimonials',
           icon: MessageSquareQuote,
+        },
+        {
+          label: 'Video izohlari',
+          path: '/admin/comments',
+          icon: MessageCircle,
         },
         {
           label: 'Savol-Javoblar (FAQ)',

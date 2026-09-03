@@ -117,7 +117,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
   {
     id: 'vid-5',
     type: 'video',
-    title: 'Do\'konimiz Muhiti & Yangi Mavsum Vitrinasi',
+    title: 'Do\'konimiz va Yangi Mavsum Mahsulotlari',
     description: 'Bizning do\'konga tashrif buyurib, eng so\'nggi to\'plamlarni kiyib ko\'rishingiz va o\'zingizga mos o\'lchamlarni tanlashingiz mumkin.',
     videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-walking-through-a-modern-fashion-boutique-41535-large.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80',

@@ -399,7 +399,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Return default business config
       return {
         businessName: 'Ecommerce',
-        businessDescription: 'Zamonaviy va sifatli mahsulotlar raqamli vitrinasi',
+        businessDescription: 'Zamonaviy onlayn do\'kon — mahsulotlarni onlayn ko\'ring, narxlarni bilib oling',
         tagline: 'Mahsulotlarni onlayn ko\'ring, narxlarni oldindanBilling va do\'konimizdan qulay xarid qiling.',
         phone: '+998 90 123 45 67',
         phoneRaw: '+998901234567',
@@ -479,7 +479,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         ],
         featuredSectionTitle: 'Mashhur Mahsulotlar',
         featuredSectionSubtitle: 'Mijozlarimiz tomonidan eng ko\'p tanlanayotgan eng sara to\'plamlar',
-        videoSectionTitle: 'Jonli Vitrina — Videolarda Ko\'ring',
+        videoSectionTitle: 'Videolarda ko\'ring',
         videoSectionSubtitle: 'Kiyimlarning haqiqiy ko\'rinishi, matosi va kiyilishini qisqa videolarda tomosha qiling',
       };
     }

@@ -73,7 +73,7 @@ export const LoginPage: React.FC = () => {
             Tizimga kirish
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-neutral-400">
-            Do'kon vitrinasi, mahsulotlar va kontentni boshqarish uchun tizimga kiring
+            Do'kon, mahsulotlar va kontentni boshqarish uchun tizimga kiring
           </p>
         </div>
 
@@ -178,7 +178,7 @@ export const LoginPage: React.FC = () => {
             className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
           >
             <Store className="w-4 h-4" />
-            <span>Mijozlar vitrinasiga qaytish</span>
+            <span>Do'konga qaytish</span>
           </Link>
         </div>
       </div>

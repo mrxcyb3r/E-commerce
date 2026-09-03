@@ -223,7 +223,7 @@ export const Navbar: React.FC = () => {
                   {storeInfo.name}
                 </span>
                 <span className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400 hidden sm:block">
-                  Raqamli Vitrina
+                  Onlayn Do'kon
                 </span>
               </div>
             </Link>

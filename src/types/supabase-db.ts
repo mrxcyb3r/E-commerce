@@ -94,6 +94,24 @@ type FeedPost = {
   product?: Product;
 };
 
+export type FeedLike = {
+  id: string;
+  feed_id: string;
+  visitor_id: string;
+  created_at: string;
+};
+
+export type FeedComment = {
+  id: string;
+  feed_id: string;
+  visitor_id: string;
+  display_name: string;
+  text: string;
+  moderation_status: 'pending' | 'visible' | 'hidden' | 'deleted';
+  created_at: string;
+  updated_at: string;
+};
+
 type Prompt = {
   id: string;
   title: string;
@@ -153,9 +171,16 @@ export type AnalyticsEventType =
   | 'search'
   | 'feed_view'
   | 'feed_like'
+  | 'feed_unlike'
   | 'feed_share'
   | 'feed_product_click'
   | 'feed_watch'
+  | 'feed_comment_open'
+  | 'feed_comment_submit'
+  | 'feed_comment_view'
+  | 'feed_comment_delete'
+  | 'feed_comment_hide'
+  | 'feed_comment_restore'
   | 'telegram_click'
   | 'phone_click'
   | 'directions_click'
@@ -330,6 +355,16 @@ export type Database = {
         Row: FeedPost;
         Insert: Omit<FeedPost, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<FeedPost, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      feed_likes: {
+        Row: FeedLike;
+        Insert: Omit<FeedLike, 'id' | 'created_at'>;
+        Update: Partial<Omit<FeedLike, 'id' | 'created_at'>>;
+      };
+      feed_comments: {
+        Row: FeedComment;
+        Insert: Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>>;
       };
       prompts: {
         Row: Prompt;

@@ -160,7 +160,7 @@ export const DashboardPage: React.FC = () => {
               rel="noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-all shadow-md active:scale-95"
             >
-              <span>Vitrinani ko'rish</span>
+              <span>Do'koni ko'rish</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
             <span className="text-[11px] text-neutral-400 font-medium">

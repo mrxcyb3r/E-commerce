@@ -98,7 +98,6 @@ export const Footer: React.FC = () => {
               <li>
                 <Link to="/feed" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1.5 font-bold">
                   <span>Videolar</span>
-                  <span className="px-1.5 py-0.2 text-[9px] font-black uppercase bg-amber-400 text-zinc-950 rounded">Reels</span>
                 </Link>
               </li>
               <li>

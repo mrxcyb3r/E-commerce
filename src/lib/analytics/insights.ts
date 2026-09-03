@@ -43,12 +43,12 @@ export function buildInsights(input: InsightInput): Insight[] {
     if (stats.returningRate >= 0.2) {
       insights.push({
         kind: 'good',
-        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchidan ${fmt(stats.returningVisitors)} tasi qayta kelgan (${Math.round(stats.returningRate * 100)}%) — do'konga sodiq mijozlar shakllanmoqda.`,
+        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchidan ${fmt(stats.returningVisitors)} tasi qayta kelgan (${Math.round(stats.returningRate * 100)}%) — do'konga qaytib kelayotganlar ko'paymoqda.`,
       });
     } else {
       insights.push({
         kind: 'info',
-        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchi qayd etildi. Qayta tashriflar hali kam — mijozlarni Telegram orqali qayta jalb qilish mumkin.`,
+        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchi qayd etildi. Qayta tashriflar hali kam — Telegram orqali xabar yuborib chaqirish mumkin.`,
       });
     }
   }
@@ -121,7 +121,7 @@ export function buildInsights(input: InsightInput): Insight[] {
     const best = [...categories].sort((a, b) => b.views - a.views)[0];
     insights.push({
       kind: 'good',
-      text: `Eng kuchli toifa: ${fmt(best.views)} ko'rish, ${fmt(best.productOpens)} mahsulot ochilishi, ${fmt(best.conversions)} bog'lanish harakati.`,
+      text: `Eng kuchli toifa: ${fmt(best.views)} ko'rish, ${fmt(best.productOpens)} mahsulot ochilishi, ${fmt(best.conversions)} aloqa qilish.`,
     });
   }
 
@@ -139,7 +139,7 @@ export function buildInsights(input: InsightInput): Insight[] {
   if (evening > 0 && daytime > 0 && evening >= daytime) {
     insights.push({
       kind: 'info',
-      text: `Faollik asosan kechki soatlarda (18:00–23:59): ${fmt(evening)} ta harakat kunduzgi ${fmt(daytime)} tadan ko'p.`,
+      text: `Faollik asosan kechki soatlarda (18:00–23:59): ${fmt(evening)} ta harakat, kunduzgi ${fmt(daytime)} tadan ko'proq.`,
     });
   }
 
@@ -150,12 +150,12 @@ export function buildInsights(input: InsightInput): Insight[] {
     const topFeed = [...feedWithViews].sort((a, b) => b.views - a.views)[0];
     insights.push({
       kind: 'good',
-      text: `Video kontent ishlayapti: eng yaxshi post ${fmt(topFeed.views)} ko'rish va ${fmt(topFeed.productClicks)} mahsulotga o'tish berdi.`,
+      text: `Video ko'rishlar samara bermoqda: eng yaxshi post ${fmt(topFeed.views)} ko'rish va ${fmt(topFeed.productClicks)} mahsulotga o'tish berdi.`,
     });
     if (totalFeedProductClicks > 0 && stats.totalPageViews > 0) {
       insights.push({
         kind: 'info',
-        text: `Feed video orqali ${fmt(totalFeedProductClicks)} ta mahsulotga o'tish qayd etildi — kashfiyot kanali sifatida ishlayapti.`,
+        text: `Feed orqali ${fmt(totalFeedProductClicks)} ta mahsulotga o'tish qayd etildi — videolar mijozlarni mahsulotlarga olib kelyapti.`,
       });
     }
   }
@@ -164,7 +164,7 @@ export function buildInsights(input: InsightInput): Insight[] {
   if (intent.total > 0) {
     insights.push({
       kind: 'good',
-      text: `${fmt(intent.total)} ta yuqori niyatli harakat (${fmt(intent.telegram)} Telegram, ${fmt(intent.phone)} qo'ng'iroq, ${fmt(intent.directions)} manzil) qayd etildi.`,
+      text: `${fmt(intent.total)} ta aloqa harakati (${fmt(intent.telegram)} Telegram, ${fmt(intent.phone)} qo'ng'iroq, ${fmt(intent.directions)} manzil) qayd etildi.`,
     });
   }
 

@@ -423,7 +423,7 @@ export const FeedAdminPage: React.FC = () => {
               <div className="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
                 <div>
                   <span className="block text-xs font-bold text-neutral-900 dark:text-white">
-                    Jonli Vitrinada Nashr Qilish
+                    Videolarda ko'rsatish
                   </span>
                   <span className="text-[11px] text-neutral-500">
                     Mijozlar lentada ko'ra oladi

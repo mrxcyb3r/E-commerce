@@ -44,7 +44,7 @@ export const WhyChooseUs: React.FC = () => {
             Nega bizni tanlashadi?
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            An'anaviy do'kon xaridini zamonaviy raqamli qulaylik bilan birlashtirdik.
+            Do'kondagi sifatli mahsulotlarni onlayn ko'rib, o'zingizga mosini tanlang.
           </p>
         </motion.div>
 

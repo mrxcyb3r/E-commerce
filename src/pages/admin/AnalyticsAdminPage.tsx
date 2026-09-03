@@ -102,13 +102,13 @@ export const AnalyticsAdminPage: React.FC = () => {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-400/20 text-blue-300 text-xs font-bold">
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Premium Business Intelligence</span>
+              <span>Do'kon tahlili</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Xaridor xatti-harakati tahlili
+              Mijozlar harakati tahlili
             </h2>
             <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-2xl">
-              Faqat haqiqiy foydalanuvchi harakatlaridan yig'ilgan ma'lumotlar asosida tayyorlangan
+              Haqiqiy mijozlar harakatlaridan yig'ilgan ma'lumotlar asosida tayyorlangan
               tahlil. Har bir ko'rsatkich real 'analytics_events' ma'lumotlaridan hisoblanadi.
             </p>
           </div>
@@ -169,7 +169,7 @@ export const AnalyticsAdminPage: React.FC = () => {
                 target="_blank"
                 className="text-[11px] text-neutral-400 hover:text-white inline-flex items-center gap-1 font-medium"
               >
-                <span>Vitrina</span>
+                <span>Do'kon</span>
                 <ArrowUpRight className="w-3 h-3" />
               </Link>
             </div>
@@ -219,7 +219,7 @@ export const AnalyticsAdminPage: React.FC = () => {
             <MiniStat label="Sahifa/sessiya" value={stats.avgPagesPerSession.toFixed(1)} icon={Gauge} />
             <MiniStat label="O'rtacha sessiya" value={formatDuration(stats.avgSessionLengthSec)} icon={Clock} />
             <MiniStat label="Qaytish darajasi" value={percent(stats.returningRate)} icon={TrendingUp} />
-            <MiniStat label="Bounce" value={percent(data.audience.bounceRate)} icon={Activity} />
+            <MiniStat label="Sakrash" value={percent(data.audience.bounceRate)} icon={Activity} />
           </div>
 
           {/* Traffic + funnel + hourly */}
@@ -227,7 +227,7 @@ export const AnalyticsAdminPage: React.FC = () => {
             <SectionCard title="Traffik" icon={CalendarDays} subtitle={`${RANGE_PRESETS.find((r) => r.key === data.range)?.label ?? ''} — kunlik sahifa ochilishlari`} action={data.traffic.length > 1 ? <TrendCompare traffic={data.traffic} /> : undefined}>
               <SimpleBarChart data={data.traffic} />
             </SectionCard>
-            <SectionCard title="Xaridor yo'li (funnel)" icon={Filter} subtitle="Faoliyat chuqurligi bo'yicha noyob foydalanuvchilar va bosqich konversiyasi">
+            <SectionCard title="Xaridor yo'li" icon={Filter} subtitle="Noyob foydalanuvchilar va har bosqich o'tish darajasi">
               <FunnelView stages={data.advancedFunnel} />
             </SectionCard>
           </div>
@@ -286,7 +286,7 @@ export const AnalyticsAdminPage: React.FC = () => {
           </div>
 
           {/* Insights */}
-          <SectionCard title="Avtomatik tahlillar" icon={Lightbulb} accent="text-amber-500" subtitle="Faqat real ma'lumotlar asosida avtomatik yaratilgan xulosalar">
+          <SectionCard title="Avtomatik tahlillar" icon={Lightbulb} accent="text-amber-500" subtitle="Haqiqiy ma'lumotlar asosida yaratilgan xulosalar">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
               {insights.map((ins, idx) => (
                 <div
@@ -353,11 +353,11 @@ const EmptyState: React.FC = () => (
     <div className="space-y-1">
       <h3 className="text-lg font-black text-neutral-900 dark:text-white">Hozircha ma'lumot yo'q</h3>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
-        Vitrinda foydalanuvchi harakatlari qayd etilishi bilan bu yerda real tahlil paydo bo'ladi.
+        Mijozlar do'konga kirganda, bu yerda real tahlil paydo bo'ladi.
       </p>
     </div>
     <Link to="/" target="_blank" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 text-xs font-black">
-      <span>Vitrina</span>
+      <span>Do'kon</span>
       <ArrowUpRight className="w-3.5 h-3.5" />
     </Link>
   </div>
@@ -410,7 +410,7 @@ const ProductsSection: React.FC<{
       title="Mahsulot tahlili"
       icon={ShoppingBag}
       accent="text-amber-500"
-      subtitle="Har bir mahsulot bo'yicha noyob foydalanuvchi va ishtirok ko'rsatkichlari"
+      subtitle="Har bir mahsulot bo'yicha noyob tashrifchilar va faollik ko'rsatkichlari"
     >
       {top.length === 0 ? (
         <p className="text-xs text-neutral-400 text-center py-6">Hali mahsulot ko'rishlari yo'q</p>
@@ -440,7 +440,7 @@ const ProductsSection: React.FC<{
       {least.length > 0 && (
         <>
           <p className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mt-5 mb-2">
-            Kam ishtirok (e'tibor talab qiladi)
+            Kam faollik (e'tibor talab qiladi)
           </p>
           <div className="flex flex-wrap gap-2">
             {least.map((p) => (
@@ -513,7 +513,7 @@ const CategoriesSection: React.FC<{ metrics: CategoryMetric[]; cName: (id: strin
     return <SectionCard title="Kategoriyalar" icon={Activity}><p className="text-xs text-neutral-400 text-center py-6">Ma'lumot yo'q</p></SectionCard>;
   }
   return (
-    <SectionCard title="Kategoriyalar" icon={Activity} accent="text-purple-500" subtitle="Toifa faolligi va aylanish">
+    <SectionCard title="Kategoriyalar" icon={Activity} accent="text-purple-500" subtitle="Toifa bo'yicha tashriflar va saqlashlar">
       <div className="space-y-3">
         {sorted.map((c) => (
           <div key={c.id} className="space-y-1">
@@ -528,7 +528,7 @@ const CategoriesSection: React.FC<{ metrics: CategoryMetric[]; cName: (id: strin
               <span>{c.productOpens} ochilish</span>
               <span>{c.favorites} saqlash</span>
               <span>{c.conversions} bog'lanish</span>
-              <span className="ml-auto">{Math.round(c.engagementRate * 100)}% ishtirok</span>
+              <span className="ml-auto">{Math.round(c.engagementRate * 100)}% faollik</span>
             </div>
           </div>
         ))}
@@ -544,7 +544,7 @@ const CategoriesSection: React.FC<{ metrics: CategoryMetric[]; cName: (id: strin
 const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => string }> = ({ metrics, fName }) => {
   const sorted = useMemo(() => [...metrics].sort((a, b) => b.views - a.views), [metrics]);
   return (
-    <SectionCard title="Video / Feed" icon={Film} accent="text-teal-500" subtitle="Post ko'rishlari va konversiya">
+    <SectionCard title="Videolar" icon={Film} accent="text-teal-500" subtitle="Video ko'rishlar va mahsulotga o'tishlar">
       {sorted.length === 0 ? (
         <p className="text-xs text-neutral-400 text-center py-6">Feed faolligi yo'q</p>
       ) : (
@@ -564,7 +564,7 @@ const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => stri
               </div>
               {f.views > 0 && (
                 <div className="mt-2 text-[10px] text-neutral-400">
-                  Feed → mahsulot konversiyasi: <span className="font-black text-neutral-700 dark:text-neutral-200">{percent(f.feedProductConversion)}</span>
+                  Feed → mahsulot o'tishi: <span className="font-black text-neutral-700 dark:text-neutral-200">{percent(f.feedProductConversion)}</span>
                 </div>
               )}
             </div>
@@ -580,7 +580,7 @@ const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => stri
 // ---------------------------------------------------------------------------
 
 const SearchSection: React.FC<{ summary: ReturnType<typeof useAnalyticsData>['search'] }> = ({ summary }) => (
-  <SectionCard title="Qidiruv tahlili" icon={Search} accent="text-amber-500" subtitle={`${summary.totalSearches} ta qidiruv, konversiya ${percent(summary.searchConversionRate)}`}>
+  <SectionCard title="Qidiruv tahlili" icon={Search} accent="text-amber-500" subtitle={`${summary.totalSearches} ta qidiruv, mahsulotga o'tish ${percent(summary.searchConversionRate)}`}>
     <p className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mb-2">Eng keng tarqalgan</p>
     <div className="flex flex-wrap gap-2 mb-5">
       {summary.topSearches.length === 0 && <p className="text-xs text-neutral-400 py-1">Qidiruvlar yo'q</p>}
@@ -625,7 +625,7 @@ const IntentSection: React.FC<{ intent: ReturnType<typeof useAnalyticsData>['int
     { label: 'Aloqa', value: intent.contact, icon: MessageCircle, color: 'text-purple-500 bg-purple-500/10' },
   ];
   return (
-    <SectionCard title="Sotib olish niyati" icon={MousePointerClick} accent="text-purple-500" subtitle={`${intent.uniqueIntentVisitors} noyob foydalanuvchi yuqori niyat bildirgan`}>
+    <SectionCard title="Aloqa harakatlari" icon={MousePointerClick} accent="text-purple-500" subtitle={`${intent.uniqueIntentVisitors} noyob tashrifchi do'kon bilan bog'langan`}>
       <div className="grid grid-cols-2 gap-3 mb-3">
         {cards.map((card) => {
           const Icon = card.icon;
@@ -641,7 +641,7 @@ const IntentSection: React.FC<{ intent: ReturnType<typeof useAnalyticsData>['int
         })}
       </div>
       <div className="rounded-xl p-3 bg-gradient-to-r from-neutral-50 to-neutral-100 dark:from-neutral-800/50 dark:to-neutral-800/30 border border-neutral-100 dark:border-neutral-800 text-xs">
-        <div className="font-black text-neutral-900 dark:text-white mb-1">Jami yuqori niyat harakatlari</div>
+        <div className="font-black text-neutral-900 dark:text-white mb-1">Jami aloqa harakatlari</div>
         <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{intent.total.toLocaleString('uz-UZ')}</div>
         <p className="text-[10px] text-neutral-400 mt-1">Telegram + Qo'ng'iroq + Manzil + Aloqa</p>
       </div>
@@ -674,6 +674,7 @@ const AudienceSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   ];
   return (
     <SectionCard title="Auditoriya tarkibi" icon={Users} accent="text-indigo-500" subtitle="Qurilma, brauzer, tizim, til va kun/rejim">
+
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2 sm:col-span-1">
           <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Qurilma</p>
@@ -735,7 +736,8 @@ const TimeSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const activeDayName = ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'][ta.activeDay];
   const total = ta.eveningCount + ta.morningCount;
   return (
-    <SectionCard title="Vaqt tahlili" icon={Timer} accent="text-emerald-500" subtitle="Mijozlar qachon faol">
+  <SectionCard title="Vaqt tahlili" icon={Timer} accent="text-emerald-500" subtitle="Mijozlar qachon faol">
+
       <div className="grid grid-cols-2 gap-2 mb-3">
         <MiniStat label="Eng faol soat" value={`${ta.activeHour}:00`} icon={Clock} />
         <MiniStat label="Eng faol kun" value={activeDayName} icon={CalendarDays} />
@@ -775,15 +777,15 @@ const GrowthSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 const KpiSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const k = data.kpis;
   const cards = [
-    { label: 'Konversiya (niyat/sahifa)', value: percent(k.conversionRate) },
-    { label: 'Ishtirok (voqealar/davr)', value: data.rows.toLocaleString('uz-UZ') },
-    { label: 'Favorite darajasi', value: percent(k.favoriteRate) },
-    { label: 'Mahsulot CTR', value: percent(k.productCtr) },
-    { label: 'Feed CTR', value: percent(k.feedCtr) },
+    { label: 'Mahsulotga o\'tish', value: percent(k.conversionRate) },
+    { label: 'Jami voqealar', value: data.rows.toLocaleString('uz-UZ') },
+    { label: 'Saqlash darajasi', value: percent(k.favoriteRate) },
+    { label: 'Mahsulot bosish', value: percent(k.productCtr) },
+    { label: 'Video bosish', value: percent(k.feedCtr) },
     { label: 'Qaytish darajasi', value: percent(k.returningRate) },
   ];
   return (
-    <SectionCard title="Biznes KPI" icon={BarChart3} accent="text-blue-500" subtitle="Asosiy samaradorlik ko'rsatkichlari">
+    <SectionCard title="Asosiy ko'rsatkichlar" icon={BarChart3} accent="text-blue-500" subtitle="Sotish va foydalanuvchi faolligi">
       <div className="grid grid-cols-2 gap-2 mb-3">
         {cards.map((c) => (
           <div key={c.label} className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800">
@@ -802,7 +804,7 @@ const KpiSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 };
 
 const JourneySection: React.FC<{ data: AnalyticsData }> = ({ data }) => (
-  <SectionCard title="Xaridor yo'nalishlari" icon={Filter} accent="text-purple-500" subtitle="Eng keng tarqalgan sahifa ketma-ketliklari">
+    <SectionCard title="Mijozlar manzillari" icon={Filter} accent="text-purple-500" subtitle="Eng ko'p ko'rilgan sahifalar ketma-ketligi">
     {data.journeys.length === 0 ? (
       <p className="text-xs text-neutral-400 text-center py-6">Yo'nalishlar yo'q</p>
     ) : (
@@ -840,7 +842,7 @@ const pathLabel = (p: string): string => {
 const WishlistSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const w = data.wishlist;
   return (
-    <SectionCard title="Sevimlilar (Wishlist)" icon={Heart} accent="text-rose-500" subtitle="Saqlash xulq-atvori">
+    <SectionCard title="Sevimlilar" icon={Heart} accent="text-rose-500" subtitle="Saqlash va o'chirish holatlari">
       <div className="grid grid-cols-2 gap-2 mb-3">
         <MiniStat label="Noyob mijozlar" value={w.uniqueSavers} icon={Users} />
         <MiniStat label="Jami saqlashlar" value={w.totalSaves} icon={Heart} />
@@ -869,7 +871,7 @@ const WishlistSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 };
 
 const AlertsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => (
-  <SectionCard title="Avtomatik ogohlantirishlar" icon={Bell} accent="text-amber-500" subtitle="Real ma'lumotlardan aniqlangan holatlar">
+  <SectionCard title="Ogohlantirishlar" icon={Bell} accent="text-amber-500" subtitle="Ma'lumotlardan aniqlangan holatlar">
     {data.alerts.length === 0 ? (
       <p className="text-xs text-neutral-400 text-center py-6">Hozircha ogohlantirish yo'q</p>
     ) : (
@@ -901,7 +903,7 @@ const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
     void label;
   };
   return (
-    <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="CSV eksport (kunlik/haftalik/oylik)">
+    <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="Ma'lumotlarni yuklab olish (kunlik/haftalik/oylik)">
       <div className="grid grid-cols-1 gap-2 mb-3">
         <button type="button" onClick={() => download('daily', "Kunlik")} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
           <span>Kunlik hisobot</span>

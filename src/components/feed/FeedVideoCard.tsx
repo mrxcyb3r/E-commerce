@@ -14,11 +14,15 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Images
+  Images,
+  Heart,
+  MessageCircle
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
 import { track } from '../../lib/analytics/client';
+import { useFeedLikes, useFeedComments } from '../../hooks/useFeedSocial';
+import { CommentsModal } from './CommentsModal';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface FeedVideoCardProps {
@@ -61,6 +65,11 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [slideProgress, setSlideProgress] = useState<number>(0);
 
   const product = getProductForVideo(video.productId);
+
+  // Social features: likes and comments
+  const { likeCount, isLiked, toggleLike } = useFeedLikes(video.id);
+  const { commentCount } = useFeedComments(video.id);
+  const [showComments, setShowComments] = useState(false);
 
   // --- Collection 3-Second Automatic Slider Logic ---
   const handleNextSlide = useCallback(() => {
@@ -403,6 +412,45 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
 
         {/* Bottom Product Info & CTA Overlay */}
         <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 space-y-3 pointer-events-auto">
+          {/* Like & Comment Buttons */}
+          <div className="flex items-center gap-3 px-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleLike();
+                track('feed_like', { feedId: video.id, metadata: { action: isLiked ? 'unlike' : 'like' } });
+              }}
+              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
+              aria-label={isLiked ? 'Yoqdi' : 'Yoqtirish'}
+            >
+              <Heart
+                className={`w-6 h-6 drop-shadow-lg ${
+                  isLiked ? 'text-rose-500 fill-rose-500' : 'text-white fill-white/20'
+                }`}
+              />
+              <span className="text-xs font-bold text-white drop-shadow-md">
+                {likeCount > 0 ? likeCount.toLocaleString('uz-UZ') : ''}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowComments(true);
+                track('feed_comment_open', { feedId: video.id });
+              }}
+              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
+              aria-label="Izohlar"
+            >
+              <MessageCircle className="w-6 h-6 text-white fill-white/20 drop-shadow-lg" />
+              <span className="text-xs font-bold text-white drop-shadow-md">
+                {commentCount > 0 ? commentCount.toLocaleString('uz-UZ') : ''}
+              </span>
+            </button>
+          </div>
+
           {/* Title and Description */}
           <div className="space-y-1 text-left px-1">
             <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md font-['Outfit',sans-serif] leading-snug line-clamp-2">
@@ -493,6 +541,12 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
           )}
         </div>
       </div>
+
+      <CommentsModal
+        feedId={video.id}
+        isOpen={showComments}
+        onClose={() => setShowComments(false)}
+      />
     </div>
   );
 };
