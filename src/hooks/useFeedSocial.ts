@@ -62,8 +62,8 @@ export function useFeedLikes(feedId: string) {
     fetchLikes();
   }, [feedId, visitorId]);
 
-  const toggleLike = useCallback(async () => {
-    if (loading) return;
+  const toggleLike = useCallback(async (): Promise<boolean> => {
+    if (loading) return false;
     setLoading(true);
 
     const wasLiked = isLiked;
@@ -81,20 +81,30 @@ export function useFeedLikes(feedId: string) {
           .eq('feed_id', feedId)
           .eq('visitor_id', visitorId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('[feed_likes delete error]', { code: error.code, message: error.message, details: error.details, hint: error.hint });
+          throw error;
+        }
       } else {
         const { error } = await supabase
           .from('feed_likes')
           .insert({ feed_id: feedId, visitor_id: visitorId });
 
-        if (error) throw error;
+        if (error) {
+          console.error('[feed_likes insert error]', { code: error.code, message: error.message, details: error.details, hint: error.hint });
+          throw error;
+        }
       }
+
+      if (mountedRef.current) setLoading(false);
+      return true;
     } catch {
       // Rollback optimistic update
       if (mountedRef.current) {
         setIsLiked(wasLiked);
         setLikeCount(prevCount);
       }
+      return false;
     } finally {
       if (mountedRef.current) setLoading(false);
     }
@@ -156,14 +166,25 @@ export function useFeedComments(feedId: string) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Log full Supabase error details in dev for debugging (code, message, details, hint)
+        console.error('[feed_comments insert error]', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw error;
+      }
 
       if (mountedRef.current && data) {
         setComments((prev) => [...prev, data]);
       }
       track('feed_comment_submit', { feedId });
       return true;
-    } catch {
+    } catch (err) {
+      // Only log in dev; in production the UI shows a clean retry message
+      if (import.meta.env.DEV) console.error('[feed_comments] submit failed:', err);
       return false;
     } finally {
       if (mountedRef.current) setSubmitting(false);

@@ -59,6 +59,13 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
+  // Reset error state when video source changes (new card, new URL)
+  useEffect(() => {
+    setHasError(false);
+    setIsLoading(true);
+    setProgress(0);
+  }, [video.videoUrl]);
+
   // Collection Slider state (3s timer)
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
   const [isSlidePaused, setIsSlidePaused] = useState<boolean>(false);
@@ -247,52 +254,72 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               title="Keyingi rasm"
             />
           </div>
-        ) : !hasError ? (
-          /* HTML5 Video Player */
-          <video
-            ref={videoRef}
-            src={video.videoUrl}
-            poster={video.posterUrl}
-            playsInline
-            loop
-            muted={isMuted}
-            preload="metadata"
-            onWaiting={() => setIsLoading(true)}
-            onPlaying={() => {
-              setIsLoading(false);
-              setIsPlaying(true);
-            }}
-            onTimeUpdate={handleTimeUpdate}
-            onError={() => {
-              setHasError(true);
-              setIsLoading(false);
-            }}
-            className="w-full h-full object-cover object-center"
-          />
         ) : (
-          /* Error Fallback */
-          <div className="flex flex-col items-center justify-center p-8 text-center text-zinc-400 space-y-4 bg-zinc-900 w-full h-full">
-            <div className="w-14 h-14 rounded-2xl bg-zinc-800 text-zinc-300 flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-amber-500" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-black text-white">Video vaqtincha mavjud emas</p>
-              <p className="text-xs text-zinc-400">Internet aloqasi yoki video fayl manzilini tekshiring.</p>
-            </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setHasError(false);
-                if (videoRef.current) {
-                  videoRef.current.load();
-                }
+          /* Video area: always show poster as background; video layer on top when available */
+          <div className="relative w-full h-full">
+            {/* Poster / fallback background — always visible until video loads over it */}
+            <img
+              src={video.posterUrl}
+              alt={video.title}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              referrerPolicy="no-referrer"
+            />
+
+            {/* Video element — rendered on top of poster; invisible until loaded */}
+            <video
+              ref={videoRef}
+              src={video.videoUrl}
+              poster={video.posterUrl}
+              playsInline
+              loop
+              muted={isMuted}
+              preload="metadata"
+              onWaiting={() => setIsLoading(true)}
+              onPlaying={() => {
+                setIsLoading(false);
+                setIsPlaying(true);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Qayta urinish</span>
-            </button>
+              onLoadedData={() => {
+                setIsLoading(false);
+                setHasError(false);
+              }}
+              onTimeUpdate={handleTimeUpdate}
+              onError={() => {
+                setHasError(true);
+                setIsLoading(false);
+              }}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 ${
+                hasError ? 'opacity-0' : 'opacity-100'
+              }`}
+            />
+
+            {/* Error overlay — small banner over poster, not full-screen */}
+            {hasError && (
+              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-25 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl max-w-[280px] w-full pointer-events-auto">
+                <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4 text-amber-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-bold text-white leading-snug">Video yuklanmadi</p>
+                  <p className="text-[10px] text-zinc-400 leading-snug mt-0.5">Manzil yoki internetni tekshiring</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHasError(false);
+                    setIsLoading(true);
+                    if (videoRef.current) {
+                      videoRef.current.load();
+                    }
+                  }}
+                  className="shrink-0 p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                  title="Qayta urinish"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-zinc-300" />
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -416,10 +443,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
           <div className="flex items-center gap-3 px-1">
             <button
               type="button"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-                toggleLike();
-                track('feed_like', { feedId: video.id, metadata: { action: isLiked ? 'unlike' : 'like' } });
+                const success = await toggleLike();
+                if (success) track('feed_like', { feedId: video.id, metadata: { action: isLiked ? 'unlike' : 'like' } });
               }}
               className="inline-flex items-center gap-1.5 transition-all active:scale-90"
               aria-label={isLiked ? 'Yoqdi' : 'Yoqtirish'}

@@ -4,11 +4,16 @@
 
 -- ============================================================
 -- FEED LIKES
--- One like per visitor per feed post (unique constraint)
+-- One like per visitor per feed post (unique constraint).
+-- NOTE: feed_id intentionally has NO foreign key to feed_posts.
+-- The storefront feed is client-managed (localStorage/INITIAL_VIDEOS
+-- with ids like 'vid-1'), so feed_posts is NOT the source of feed
+-- items. A FK here would make every anon like/comment insert fail
+-- with a 23503 (surfaced as Supabase 409 conflict).
 -- ============================================================
 create table if not exists public.feed_likes (
   id uuid default uuid_generate_v4() primary key,
-  feed_id text not null references public.feed_posts on delete cascade,
+  feed_id text not null,
   visitor_id text not null,
   created_at timestamp with time zone default timezone('utc'::text, now()),
   unique (feed_id, visitor_id)
@@ -19,11 +24,13 @@ create index if not exists idx_feed_likes_visitor_id on public.feed_likes(visito
 
 -- ============================================================
 -- FEED COMMENTS
--- Anonymous comments with moderation status
+-- Anonymous comments with moderation status.
+-- feed_id has NO FK to feed_posts for the same reason as above;
+-- one user can post many comments on one feed item (no unique rule).
 -- ============================================================
 create table if not exists public.feed_comments (
   id uuid default uuid_generate_v4() primary key,
-  feed_id text not null references public.feed_posts on delete cascade,
+  feed_id text not null,
   visitor_id text not null,
   display_name text not null,
   text text not null,

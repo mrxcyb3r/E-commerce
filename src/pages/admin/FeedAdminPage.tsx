@@ -51,7 +51,7 @@ export const FeedAdminPage: React.FC = () => {
   const openCreateModal = () => {
     setTitle('');
     setDescription('');
-    setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4');
+    setVideoUrl('https://samplelib.com/preview/mp4/sample-5s.mp4');
     setPosterUrl('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80');
     setAuthor('@jizzax_style');
     setProductId(products[0]?.id || '');
