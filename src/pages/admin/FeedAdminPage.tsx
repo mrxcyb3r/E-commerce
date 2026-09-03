@@ -68,7 +68,7 @@ export const FeedAdminPage: React.FC = () => {
     setPosterUrl(v.posterUrl || '');
     setAuthor(v.author || '');
     setProductId(v.productId || '');
-    setBadge(v.badge || '');
+    setBadge(v.badge?.text || '');
     setPublished(v.published !== false);
     setEditingVideo(v);
     setIsCreating(false);
@@ -86,7 +86,7 @@ export const FeedAdminPage: React.FC = () => {
         posterUrl: posterUrl.trim() || undefined,
         author: author.trim() || undefined,
         productId: productId || undefined,
-        badge: badge.trim() || undefined,
+        badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
         category: 'all',
         likesCount: 0,
         viewsCount: 0,
@@ -102,7 +102,7 @@ export const FeedAdminPage: React.FC = () => {
         posterUrl: posterUrl.trim() || undefined,
         author: author.trim() || undefined,
         productId: productId || undefined,
-        badge: badge.trim() || undefined,
+        badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
         published,
       });
       setEditingVideo(null);
@@ -175,7 +175,7 @@ export const FeedAdminPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       {vid.badge ? (
                         <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-neutral-950 text-[10px] font-black uppercase tracking-wider">
-                          {vid.badge}
+                          {vid.badge.text}
                         </span>
                       ) : <div />}
 
