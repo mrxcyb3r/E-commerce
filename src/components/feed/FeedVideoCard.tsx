@@ -406,7 +406,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-12 h-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0 border border-white/10">
                   <img
-                    src={product.images[0]}
+                    src={product.images?.[0]}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"

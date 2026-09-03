@@ -144,7 +144,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       className="w-full flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition-colors text-left group"
                     >
                       <img
-                        src={product.images[0]}
+                        src={product.images?.[0]}
                         alt={product.name}
                         className="w-12 h-12 rounded-xl object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0"
                       />

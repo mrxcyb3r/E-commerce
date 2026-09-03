@@ -8,6 +8,26 @@ import { BusinessConfig } from '../types/business';
 import { HomepageCms, AboutCms, ContactCms, AdminActivityLog } from '../types/cms';
 import { supabase } from '../lib/supabase/client';
 import type { Database } from '../types/supabase-db';
+import {
+  mapDbCategoryToApp,
+  mapDbProductToApp,
+  mapDbPromptToApp,
+  mapDbTestimonialToApp,
+  mapDbFaqToApp,
+  mapDbStoreSettingsToApp,
+  mapDbHomepageCmsToApp,
+  mapDbAboutCmsToApp,
+  mapDbContactCmsToApp,
+  productToDb,
+  categoryToDb,
+  promptToDb,
+  testimonialToDb,
+  faqToDb,
+  businessConfigToDb,
+  homepageCmsToDb,
+  aboutCmsToDb,
+  contactCmsToDb,
+} from '../lib/supabase/mappers';
 
 import { PRODUCTS as INITIAL_PRODUCTS } from '../data/products';
 import { CATEGORIES as INITIAL_CATEGORIES } from '../data/categories';
@@ -197,160 +217,106 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   });
 
-  // Fetch from Supabase after mount (async, won't block initial render)
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*');
-        if (error) throw error;
-        setProducts(data as Product[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch products from Supabase:', err);
-      }
-    }
-    fetchProducts();
-  }, []);
+  // Hydration flag: set true once the primary DB initial load completes so the
+  // persistence effects below never write the initial fallback dataset over real data.
+  const [hydrated, setHydrated] = useState(false);
 
+  // Fetch everything from Supabase after mount (async, won't block initial render).
+  // Errors are isolated per resource: one failing table never cascades into the
+  // rest of the application state. Database-level failures are logged explicitly.
   useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('*');
-        if (error) throw error;
-        setCategories(data as Category[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch categories from Supabase:', err);
-      }
-    }
-    fetchCategories();
-  }, []);
+    let cancelled = false;
 
-  useEffect(() => {
-    async function fetchVideos() {
-      try {
-        const { data, error } = await supabase
-          .from('feed_posts')
-          .select('*, products(*)')
-          .eq('type', 'video')
-          .eq('is_published', true);
-        if (error) throw error;
-        setVideos(data as VideoItem[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch videos from Supabase:', err);
-      }
+    async function fetchCategoriesToState() {
+      const { data, error } = await supabase.from('categories').select('*');
+      if (error) throw error;
+      if (!cancelled) setCategories((data ?? []).map((c) => mapDbCategoryToApp(c)));
     }
-    fetchVideos();
-  }, []);
 
-  useEffect(() => {
-    async function fetchPrompts() {
-      try {
-        const { data, error } = await supabase
-          .from('prompts')
-          .select('*')
-          .eq('is_published', true);
-        if (error) throw error;
-        setPrompts(data as ClothingPromptItem[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch prompts from Supabase:', err);
+    async function fetchProductsToState() {
+      const { data: cats, error: catErr } = await supabase.from('categories').select('*');
+      const catLookup = new Map<string, ReturnType<typeof mapDbCategoryToApp>>();
+      if (!catErr && cats) {
+        for (const c of cats) catLookup.set(c.id, mapDbCategoryToApp(c));
       }
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, product_images(*), product_sizes(*), product_colors(*)');
+      if (error) throw error;
+      if (cancelled) return;
+      const mapped = (data ?? []).map((row) =>
+        mapDbProductToApp(row, (id) => (id ? catLookup.get(id) : undefined)),
+      );
+      setProducts(mapped);
     }
-    fetchPrompts();
-  }, []);
 
-  useEffect(() => {
-    async function fetchTestimonials() {
-      try {
-        const { data, error } = await supabase
-          .from('testimonials')
-          .select('*')
-          .eq('is_published', true);
-        if (error) throw error;
-        setTestimonials(data as Review[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch testimonials from Supabase:', err);
-      }
+    async function fetchPromptsToState() {
+      const { data, error } = await supabase.from('prompts').select('*');
+      if (error) throw error;
+      if (!cancelled) setPrompts((data ?? []).map((r) => mapDbPromptToApp(r)));
     }
-    fetchTestimonials();
-  }, []);
 
-  useEffect(() => {
-    async function fetchFaq() {
-      try {
-        const { data, error } = await supabase
-          .from('faqs')
-          .select('*')
-          .eq('is_published', true);
-        if (error) throw error;
-        setFaq(data as FaqItem[] ?? []);
-      } catch (err) {
-        console.error('Failed to fetch FAQ from Supabase:', err);
-      }
+    async function fetchTestimonialsToState() {
+      const { data, error } = await supabase.from('testimonials').select('*');
+      if (error) throw error;
+      if (!cancelled) setTestimonials((data ?? []).map((r) => mapDbTestimonialToApp(r)));
     }
-    fetchFaq();
-  }, []);
 
-  useEffect(() => {
-    async function fetchStoreInfo() {
-      try {
-        const { data, error } = await supabase
-          .from('store_settings')
-          .select('*');
-        if (error) throw error;
-        setStoreInfo(data as BusinessConfig ?? {} as BusinessConfig);
-      } catch (err) {
-        console.error('Failed to fetch store info from Supabase:', err);
-      }
+    async function fetchFaqToState() {
+      const { data, error } = await supabase.from('faqs').select('*');
+      if (error) throw error;
+      if (!cancelled) setFaq((data ?? []).map((r) => mapDbFaqToApp(r)));
     }
-    fetchStoreInfo();
-  }, []);
 
-  useEffect(() => {
-    async function fetchHomepageCms() {
-      try {
-        const { data, error } = await supabase
-          .from('homepage_cms')
-          .select('*');
-        if (error) throw error;
-        setHomepageCms(data as HomepageCms ?? {} as HomepageCms);
-      } catch (err) {
-        console.error('Failed to fetch homepage CMS from Supabase:', err);
-      }
+    async function fetchStoreInfoToState() {
+      const { data, error } = await supabase.from('store_settings').select('*').maybeSingle();
+      if (error) throw error;
+      if (!cancelled && data) setStoreInfo(mapDbStoreSettingsToApp(data));
     }
-    fetchHomepageCms();
-  }, []);
 
-  useEffect(() => {
-    async function fetchAboutCms() {
-      try {
-        const { data, error } = await supabase
-          .from('about_cms')
-          .select('*');
-        if (error) throw error;
-        setAboutCms(data as AboutCms ?? {} as AboutCms);
-      } catch (err) {
-        console.error('Failed to fetch about CMS from Supabase:', err);
-      }
+    async function fetchHomepageCmsToState() {
+      const { data, error } = await supabase.from('homepage_cms').select('*').maybeSingle();
+      if (error) throw error;
+      if (!cancelled && data) setHomepageCms(mapDbHomepageCmsToApp(data));
     }
-    fetchAboutCms();
-  }, []);
 
-  useEffect(() => {
-    async function fetchContactCms() {
-      try {
-        const { data, error } = await supabase
-          .from('contact_cms')
-          .select('*');
-        if (error) throw error;
-        setContactCms(data as ContactCms ?? {} as ContactCms);
-      } catch (err) {
-        console.error('Failed to fetch contact CMS from Supabase:', err);
-      }
+    async function fetchAboutCmsToState() {
+      const { data, error } = await supabase.from('about_cms').select('*').maybeSingle();
+      if (error) throw error;
+      if (!cancelled && data) setAboutCms(mapDbAboutCmsToApp(data));
     }
-    fetchContactCms();
+
+    async function fetchContactCmsToState() {
+      const { data, error } = await supabase.from('contact_cms').select('*').maybeSingle();
+      if (error) throw error;
+      if (!cancelled && data) setContactCms(mapDbContactCmsToApp(data));
+    }
+
+    const tasks = [
+      fetchCategoriesToState(),
+      fetchProductsToState(),
+      fetchPromptsToState(),
+      fetchTestimonialsToState(),
+      fetchFaqToState(),
+      fetchStoreInfoToState(),
+      fetchHomepageCmsToState(),
+      fetchAboutCmsToState(),
+      fetchContactCmsToState(),
+    ];
+
+    Promise.allSettled(tasks).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          // eslint-disable-next-line no-console
+          console.error(`[StoreContext] Hydration failed for resource ${i}:`, r.reason);
+        }
+      });
+      if (!cancelled) setHydrated(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
   // Fetch categories from Supabase
   async function fetchCategoriesFromSupabase(): Promise<Category[]> {
@@ -587,195 +553,75 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   // Persistence Effects - save changes to Supabase
-  // Product CRUD
-  useEffect(() => {
-    const saveProduct = async (product: Product) => {
-      try {
-        const { error } = await supabase
-          .from('products')
-          .upsert({
-            id: product.id,
-            slug: product.slug,
-            name: product.name,
-            description: product.description,
-            short_description: product.short_description ?? "",
-            price: product.price,
-            originalPrice: product.original_price,
-            currency: product.currency,
-            category: product.category_id,
-            brand: product.brand,
-            is_published: product.published ?? true,
-            isFeatured: product.is_featured,
-            isNew: product.is_new,
-            isOnSale: product.is_on_sale,
-            stockStatus: product.stock_status,
-            stockCount: product.stock_count,
-            sku: product.sku,
-            rating: product.rating,
-            review_count: product.reviewCount,
-            tags: product.tags,
-            material: product.material,
-            madeIn: product.madeIn,
-          });
-        if (error) throw error;
-        // Optionally log the activity
-        // await logActivity('product', product.is_published ? 'publish' : 'update', `Product: ${product.name}`);
-      } catch (err) {
-        console.error('Error saving product to Supabase:', err);
-      }
-    };
-
-    // Save each product in the state
-    products.forEach(saveProduct);
-  }, [products, supabase]);
-
-  // Category CRUD
-  useEffect(() => {
-    const saveCategory = async (category: Category) => {
-      try {
-        const { error } = await supabase
-          .from('categories')
-          .upsert({
-            id: category.id,
-            name: category.name,
-            slug: category.slug,
-            description: category.description,
-            image: category.image,
-            is_visible: category.is_visible ?? true,
-            sort_order: category.order,
-          });
-        if (error) throw error;
-      } catch (err) {
-        console.error('Error saving category to Supabase:', err);
-      }
-    };
-
-    categories.forEach(saveCategory);
-  }, [categories, supabase]);
+  // Product and Category array persistence is handled inside the individual
+  // action handlers (add/update/delete/duplicate/toggle), which write only the
+  // specific changed record with correct DB column names. We intentionally do
+  // NOT blanket-upsert the entire products/categories arrays here: doing so
+  // would destroy real database rows on load by writing the initial fallback
+  // dataset over them.
 
   // Store info CRUD
+  // Single-row tables are safe to upsert, but only after the initial DB load has
+  // completed (hydrated) so that the fallback defaults are never written over
+  // real data on first mount.
   useEffect(() => {
+    if (!hydrated) return;
     const saveStoreInfo = async () => {
       try {
-        const { error } = await supabase
+        await supabase
           .from('store_settings')
-          .upsert({
-            business_name: storeInfo.businessName,
-            name: storeInfo.name,
-            business_description: storeInfo.businessDescription,
-            tagline: storeInfo.tagline,
-            phone: storeInfo.phone,
-            phone_raw: storeInfo.phoneRaw,
-            phone_numbers: storeInfo.phoneNumbers ?? [],
-            email: storeInfo.email,
-            telegram: storeInfo.telegram,
-            telegram_username: storeInfo.telegramUsername,
-            telegram_channel: storeInfo.telegramChannel,
-            instagram_username: storeInfo.instagramUsername,
-            address: storeInfo.address,
-            city: storeInfo.city,
-            landmark: storeInfo.landmark,
-            working_hours: storeInfo.workingHours,
-            working_hours_detail: storeInfo.workingHoursDetail,
-            social_links: storeInfo.socialLinks,
-            primary_color: storeInfo.primaryColor,
-            currency: storeInfo.currency,
-            coordinates: storeInfo.coordinates,
-          });
-        if (error) throw error;
+          .upsert(businessConfigToDb(storeInfo));
       } catch (err) {
         console.error('Error saving store info to Supabase:', err);
       }
     };
     saveStoreInfo();
-  }, [storeInfo, supabase]);
+  }, [storeInfo, hydrated, supabase]);
 
   // Homepage CMS CRUD
   useEffect(() => {
+    if (!hydrated) return;
     const saveHomepageCms = async () => {
       try {
-        const { error } = await supabase
+        await supabase
           .from('homepage_cms')
-          .upsert({
-            hero_badge: homepageCms.hero.badge,
-            hero_title: homepageCms.hero.title,
-            hero_highlighted_title: homepageCms.hero.highlightedTitle,
-            hero_subtitle: homepageCms.hero.subtitle,
-            hero_primary_cta_text: homepageCms.hero.primaryButtonText,
-            hero_primary_cta_link: homepageCms.hero.primaryButtonLink,
-            hero_secondary_cta_text: homepageCms.hero.secondaryButtonText,
-            hero_secondary_cta_link: homepageCms.hero.secondaryButtonLink,
-            hero_image_url: homepageCms.hero.heroImageUrl,
-            promo_banner_badge: homepageCms.promoBanner.badge,
-            promo_banner_title: homepageCms.promoBanner.title,
-            promo_banner_subtitle: homepageCms.promoBanner.subtitle,
-            promo_banner_description: homepageCms.promoBanner.description,
-            promo_banner_button_text: homepageCms.promoBanner.buttonText,
-            promo_banner_button_link: homepageCms.promoBanner.buttonLink,
-            promo_banner_image_url: homepageCms.promoBanner.imageUrl,
-            promo_banner_enabled: homepageCms.promoBanner.enabled,
-            why_choose_us_title: homepageCms.whyChooseUsTitle,
-            why_choose_us_subtitle: homepageCms.whyChooseUsSubtitle,
-            features: homepageCms.features,
-            featured_section_title: homepageCms.featuredSectionTitle,
-            featured_section_subtitle: homepageCms.featuredSectionSubtitle,
-            video_section_title: homepageCms.videoSectionTitle,
-            video_section_subtitle: homepageCms.videoSectionSubtitle,
-          });
-        if (error) throw error;
+          .upsert(homepageCmsToDb(homepageCms));
       } catch (err) {
         console.error('Error saving homepage CMS to Supabase:', err);
       }
     };
     saveHomepageCms();
-  }, [homepageCms, supabase]);
+  }, [homepageCms, hydrated, supabase]);
 
   // About CMS CRUD
   useEffect(() => {
+    if (!hydrated) return;
     const saveAboutCms = async () => {
       try {
-        const { error } = await supabase
+        await supabase
           .from('about_cms')
-          .upsert({
-            title: aboutCms.title,
-            subtitle: aboutCms.subtitle,
-            main_story: aboutCms.mainStory,
-            second_story: aboutCms.secondStory,
-            mission: aboutCms.mission,
-            vision: aboutCms.vision,
-            images: aboutCms.images,
-            features: aboutCms.features,
-          });
-        if (error) throw error;
+          .upsert(aboutCmsToDb(aboutCms));
       } catch (err) {
         console.error('Error saving about CMS to Supabase:', err);
       }
     };
     saveAboutCms();
-  }, [aboutCms, supabase]);
+  }, [aboutCms, hydrated, supabase]);
 
   // Contact CMS CRUD
   useEffect(() => {
+    if (!hydrated) return;
     const saveContactCms = async () => {
       try {
-        const { error } = await supabase
+        await supabase
           .from('contact_cms')
-          .upsert({
-            title: contactCms.title,
-            subtitle: contactCms.subtitle,
-            description: contactCms.description,
-            form_enabled: contactCms.formEnabled,
-            telegram_direct_note: contactCms.telegramDirectNote,
-            support_note: contactCms.supportNote,
-            direct_help_text: contactCms.directHelpText,
-          });
-        if (error) throw error;
+          .upsert(contactCmsToDb(contactCms));
       } catch (err) {
         console.error('Error saving contact CMS to Supabase:', err);
       }
     };
     saveContactCms();
-  }, [contactCms, supabase]);
+  }, [contactCms, hydrated, supabase]);
 
   // ... rest stays the same
 
@@ -917,6 +763,99 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return faq.filter((f) => f.published !== false);
   }, [faq]);
 
+  // Targeted persistence helpers for array resources. Each writes only the
+  // specific changed record with correct DB column names (via mappers), and
+  // never writes the fallback dataset. Fire-and-forget with error isolation.
+  const persistProduct = async (product: Product) => {
+    try {
+      await supabase
+        .from('products')
+        .upsert({ ...productToDb(product), id: product.id });
+    } catch (err) {
+      console.error('Error saving product to Supabase:', err);
+    }
+  };
+
+  const deleteProductRow = async (id: string) => {
+    try {
+      await supabase.from('products').delete().eq('id', id);
+    } catch (err) {
+      console.error('Error deleting product from Supabase:', err);
+    }
+  };
+
+  const persistCategory = async (category: Category) => {
+    try {
+      await supabase
+        .from('categories')
+        .upsert({ ...categoryToDb(category), id: category.id });
+    } catch (err) {
+      console.error('Error saving category to Supabase:', err);
+    }
+  };
+
+  const deleteCategoryRow = async (id: string) => {
+    try {
+      await supabase.from('categories').delete().eq('id', id);
+    } catch (err) {
+      console.error('Error deleting category from Supabase:', err);
+    }
+  };
+
+  const persistPrompt = async (prompt: ClothingPromptItem) => {
+    try {
+      await supabase
+        .from('prompts')
+        .upsert({ ...promptToDb(prompt), id: prompt.id });
+    } catch (err) {
+      console.error('Error saving prompt to Supabase:', err);
+    }
+  };
+
+  const deletePromptRow = async (id: string) => {
+    try {
+      await supabase.from('prompts').delete().eq('id', id);
+    } catch (err) {
+      console.error('Error deleting prompt from Supabase:', err);
+    }
+  };
+
+  const persistTestimonial = async (review: Review) => {
+    try {
+      await supabase
+        .from('testimonials')
+        .upsert({ ...testimonialToDb(review), id: review.id });
+    } catch (err) {
+      console.error('Error saving testimonial to Supabase:', err);
+    }
+  };
+
+  const deleteTestimonialRow = async (id: string) => {
+    try {
+      await supabase.from('testimonials').delete().eq('id', id);
+    } catch (err) {
+      console.error('Error deleting testimonial from Supabase:', err);
+    }
+  };
+
+  const persistFaq = async (faqItem: FaqItem) => {
+    try {
+      await supabase
+        .from('faqs')
+        .upsert({ ...faqToDb(faqItem), id: faqItem.id });
+    } catch (err) {
+      console.error('Error saving FAQ to Supabase:', err);
+    }
+  };
+
+  const deleteFaqRow = async (id: string) => {
+    try {
+      await supabase.from('faqs').delete().eq('id', id);
+    } catch (err) {
+      console.error('Error deleting FAQ from Supabase:', err);
+    }
+  };
+
   // Product Actions
   const addProduct = (productData: Omit<Product, 'id'>): Product => {
     const id = `prod-${Date.now()}`;
@@ -929,26 +868,31 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
     setProducts((prev) => [newProduct, ...prev]);
     logActivity('create', 'product', `Yangi mahsulot qo'shildi: "${newProduct.name}" (${newProduct.price.toLocaleString('uz-UZ')} so'm)`);
+    persistProduct(newProduct);
     return newProduct;
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
+    let updatedRef: Product | undefined;
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id === id) {
           const updated = { ...p, ...updates, updatedAt: new Date().toISOString() };
+          updatedRef = updated;
           return updated;
         }
         return p;
       })
     );
     const existing = products.find((p) => p.id === id);
+    if (updatedRef) persistProduct(updatedRef);
     logActivity('update', 'product', `Mahsulot yangilandi: "${updates.name || existing?.name || id}"`);
   };
 
   const deleteProduct = (id: string) => {
     const target = products.find((p) => p.id === id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    deleteProductRow(id);
     logActivity('delete', 'product', `Mahsulot o'chirildi: "${target?.name || id}"`);
   };
 
@@ -966,38 +910,71 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       updatedAt: new Date().toISOString(),
     };
     setProducts((prev) => [copy, ...prev]);
+    persistProduct(copy);
     logActivity('create', 'product', `Mahsulotdan nusxa yaratildi: "${copy.name}"`);
     return copy;
   };
 
   const toggleProductFeatured = (id: string) => {
+    let updatedRef: Product | undefined;
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, isFeatured: !p.isFeatured } : p))
+      prev.map((p) => {
+        if (p.id === id) {
+          updatedRef = { ...p, isFeatured: !p.isFeatured };
+          return updatedRef;
+        }
+        return p;
+      })
     );
+    if (updatedRef) persistProduct(updatedRef);
     const p = products.find((item) => item.id === id);
     logActivity('update', 'product', `Mahsulot tanlanganlar holati o'zgardi: "${p?.name}"`);
   };
 
   const toggleProductNew = (id: string) => {
+    let updatedRef: Product | undefined;
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, isNew: !p.isNew } : p))
+      prev.map((p) => {
+        if (p.id === id) {
+          updatedRef = { ...p, isNew: !p.isNew };
+          return updatedRef;
+        }
+        return p;
+      })
     );
+    if (updatedRef) persistProduct(updatedRef);
     const p = products.find((item) => item.id === id);
     logActivity('update', 'product', `Mahsulot yangilik belgisi o'zgardi: "${p?.name}"`);
   };
 
   const toggleProductPublished = (id: string) => {
+    let updatedRef: Product | undefined;
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, published: !p.published } : p))
+      prev.map((p) => {
+        if (p.id === id) {
+          updatedRef = { ...p, published: !p.published };
+          return updatedRef;
+        }
+        return p;
+      })
     );
+    if (updatedRef) persistProduct(updatedRef);
     const p = products.find((item) => item.id === id);
     logActivity('publish', 'product', `Mahsulot nashr holati o'zgardi: "${p?.name}"`);
   };
 
   const updateProductStock = (id: string, inStock: boolean, count?: number) => {
+    let updatedRef: Product | undefined;
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, inStock, stockCount: count ?? p.stockCount } : p))
+      prev.map((p) => {
+        if (p.id === id) {
+          updatedRef = { ...p, inStock, stockCount: count ?? p.stockCount, stockStatus: inStock ? 'mavjud' : 'tugagan' };
+          return updatedRef;
+        }
+        return p;
+      })
     );
+    if (updatedRef) persistProduct(updatedRef);
     const p = products.find((item) => item.id === id);
     logActivity('update', 'product', `Zaxira yangilandi: "${p?.name}" (${inStock ? 'Mavjud' : 'Tugagan'}, soni: ${count ?? p?.stockCount})`);
   };
@@ -1020,13 +997,22 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       productCount: 0,
     };
     setCategories((prev) => [...prev, newCategory]);
+    persistCategory(newCategory);
     logActivity('create', 'category', `Yangi kategoriya qo'shildi: "${newCategory.name}"`);
   };
 
   const updateCategory = (id: string, updates: Partial<Category>) => {
+    let updatedRef: Category | undefined;
     setCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+      prev.map((c) => {
+        if (c.id === id) {
+          updatedRef = { ...c, ...updates };
+          return updatedRef;
+        }
+        return c;
+      })
     );
+    if (updatedRef) persistCategory(updatedRef);
     const cat = categories.find((c) => c.id === id);
     logActivity('update', 'category', `Kategoriya yangilandi: "${updates.name || cat?.name || id}"`);
   };
@@ -1034,6 +1020,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const deleteCategory = (id: string) => {
     const target = categories.find((c) => c.id === id);
     setCategories((prev) => prev.filter((c) => c.id !== id));
+    deleteCategoryRow(id);
     logActivity('delete', 'category', `Kategoriya o'chirildi: "${target?.name || id}"`);
   };
 
@@ -1054,18 +1041,27 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const newPrompt: ClothingPromptItem = {
       ...promptData,
       id,
-      is_published: promptData.is_published !== undefined ? promptData.published : true,
-      order: prompts.length + 1,
+      is_published: promptData.is_published !== undefined ? promptData.is_published : true,
+      sort_order: promptData.sort_order ?? prompts.length + 1,
     };
     setPrompts((prev) => [newPrompt, ...prev]);
+    persistPrompt(newPrompt);
     logActivity('create', 'prompt', `Yangi AI Prompt qo'shildi: "${newPrompt.title}" (${newPrompt.category})`);
     return newPrompt;
   };
 
   const updatePrompt = (id: string, updates: Partial<ClothingPromptItem>) => {
+    let updatedRef: ClothingPromptItem | undefined;
     setPrompts((prev) =>
-      prev.map((pr) => (pr.id === id ? { ...pr, ...updates } : pr))
+      prev.map((pr) => {
+        if (pr.id === id) {
+          updatedRef = { ...pr, ...updates };
+          return updatedRef;
+        }
+        return pr;
+      })
     );
+    if (updatedRef) persistPrompt(updatedRef);
     const item = prompts.find((pr) => pr.id === id);
     logActivity('update', 'prompt', `AI Prompt yangilandi: "${updates.title || item?.title || id}"`);
   };
@@ -1073,6 +1069,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const deletePrompt = (id: string) => {
     const target = prompts.find((pr) => pr.id === id);
     setPrompts((prev) => prev.filter((pr) => pr.id !== id));
+    deletePromptRow(id);
     logActivity('delete', 'prompt', `AI Prompt o'chirildi: "${target?.title || id}"`);
   };
 
@@ -1085,22 +1082,40 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       title: `${target.title} (Nusxa)`,
     };
     setPrompts((prev) => [copy, ...prev]);
+    persistPrompt(copy);
     logActivity('create', 'prompt', `AI Promptdan nusxa olindi: "${copy.title}"`);
     return copy;
   };
 
   const togglePromptPublished = (id: string) => {
+    let updatedRef: ClothingPromptItem | undefined;
     setPrompts((prev) =>
-      prev.map((pr) => (pr.id === id ? { ...pr, published: !pr.published } : pr))
+      prev.map((pr) => {
+        if (pr.id === id) {
+          const base = { ...pr, published: !pr.published };
+          updatedRef = { ...base, is_published: base.published !== false };
+          return updatedRef;
+        }
+        return pr;
+      })
     );
+    if (updatedRef) persistPrompt(updatedRef);
     const pr = prompts.find((item) => item.id === id);
     logActivity('publish', 'prompt', `AI Prompt nashr holati o'zgardi: "${pr?.title}"`);
   };
 
   const togglePromptFeatured = (id: string) => {
+    let updatedRef: ClothingPromptItem | undefined;
     setPrompts((prev) =>
-      prev.map((pr) => (pr.id === id ? { ...pr, featured: !pr.featured } : pr))
+      prev.map((pr) => {
+        if (pr.id === id) {
+          updatedRef = { ...pr, featured: !pr.featured };
+          return updatedRef;
+        }
+        return pr;
+      })
     );
+    if (updatedRef) persistPrompt(updatedRef);
     const pr = prompts.find((item) => item.id === id);
     logActivity('update', 'prompt', `AI Prompt tanlanganlar belgisi o'zgardi: "${pr?.title}"`);
   };
@@ -1113,25 +1128,43 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       published: true,
     };
     setTestimonials((prev) => [newReview, ...prev]);
+    persistTestimonial(newReview);
     logActivity('create', 'testimonial', `Yangi sharh qo'shildi: ${newReview.name}`);
   };
 
   const updateTestimonial = (id: string, updates: Partial<Review>) => {
+    let updatedRef: Review | undefined;
     setTestimonials((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      prev.map((t) => {
+        if (t.id === id) {
+          updatedRef = { ...t, ...updates };
+          return updatedRef;
+        }
+        return t;
+      })
     );
+    if (updatedRef) persistTestimonial(updatedRef);
     logActivity('update', 'testimonial', `Sharh tahrirlandi: ${id}`);
   };
 
   const deleteTestimonial = (id: string) => {
     setTestimonials((prev) => prev.filter((t) => t.id !== id));
+    deleteTestimonialRow(id);
     logActivity('delete', 'testimonial', `Sharh o'chirildi: ${id}`);
   };
 
   const toggleTestimonialPublished = (id: string) => {
+    let updatedRef: Review | undefined;
     setTestimonials((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, published: !t.published } : t))
+      prev.map((t) => {
+        if (t.id === id) {
+          updatedRef = { ...t, published: !t.published };
+          return updatedRef;
+        }
+        return t;
+      })
     );
+    if (updatedRef) persistTestimonial(updatedRef);
   };
 
   // FAQ Actions
@@ -1142,25 +1175,43 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       published: true,
     };
     setFaq((prev) => [...prev, newFaq]);
+    persistFaq(newFaq);
     logActivity('create', 'faq', `Yangi savol-javob qo'shildi: "${newFaq.question.slice(0, 40)}..."`);
   };
 
   const updateFaq = (id: string, updates: Partial<FaqItem>) => {
+    let updatedRef: FaqItem | undefined;
     setFaq((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, ...updates } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          updatedRef = { ...f, ...updates };
+          return updatedRef;
+        }
+        return f;
+      })
     );
+    if (updatedRef) persistFaq(updatedRef);
     logActivity('update', 'faq', `Savol-javob tahrirlandi: ${id}`);
   };
 
   const deleteFaq = (id: string) => {
     setFaq((prev) => prev.filter((f) => f.id !== id));
+    deleteFaqRow(id);
     logActivity('delete', 'faq', `Savol-javob o'chirildi: ${id}`);
   };
 
   const toggleFaqPublished = (id: string) => {
+    let updatedRef: FaqItem | undefined;
     setFaq((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, published: !f.published } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          updatedRef = { ...f, published: !f.published };
+          return updatedRef;
+        }
+        return f;
+      })
     );
+    if (updatedRef) persistFaq(updatedRef);
   };
 
   // Store Info
@@ -1321,36 +1372,18 @@ export const useStore = (): StoreContextType => {
   return context;
 };
 // Admin CRUD mutation handlers
+// These are direct Supabase writes used outside the React tree. Each converts
+// the app-level object to DB columns via the mappers so column names and types
+// always match the schema (no incorrect camelCase/snake_case mixing).
 
 // Product CRUD
-export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createProduct = async (product: Partial<Product>) => {
   try {
     const { data, error } = await supabase
       .from('products')
       .insert({
         id: `prod-${Date.now()}`,
-        slug: product.slug,
-        name: product.name,
-        description: product.description,
-        short_description: product.short_description ?? "",
-        price: product.price,
-        originalPrice: product.original_price,
-        currency: product.currency,
-        category: product.category_id,
-        brand: product.brand,
-        is_published: product.is_published ?? true,
-        is_featured: product.is_featured ?? false,
-        is_new: product.is_new ?? false,
-        is_on_sale: product.is_on_sale ?? false,
-        stock_status: product.stock_status ?? 'mavjud',
-        stock_count: product.stockCount ?? 0,
-        sku: product.sku,
-        rating: product.rating ?? 0,
-        review_count: product.reviewCount ?? 0,
-        tags: product.tags ?? [],
-        material: product.material,
-        made_in: product.madeIn,
-        sort_order: product.sort_order ?? 0,
+        ...productToDb(product as Product),
       });
     if (error) throw error;
     return data;
@@ -1364,29 +1397,7 @@ export const updateProduct = async (id: string, updates: Partial<Product>) => {
   try {
     const { data, error } = await supabase
       .from('products')
-      .update({
-        name: updates.name,
-        description: updates.description,
-        short_description: updates.short_description,
-        price: updates.price,
-        original_price: updates.original_price,
-        currency: updates.currency,
-        category_id: updates.category_id,
-        brand: updates.brand,
-        is_published: updates.is_published,
-        is_featured: updates.is_featured,
-        is_new: updates.is_new,
-        is_on_sale: updates.is_on_sale,
-        stock_status: updates.stock_status,
-        stock_count: updates.stockCount,
-        sku: updates.sku,
-        rating: updates.rating,
-        review_count: updates.reviewCount,
-        tags: updates.tags,
-        material: updates.material,
-        made_in: updates.madeIn,
-        sort_
-      })
+      .update(productToDb(updates as Product))
       .eq('id', id);
     if (error) throw error;
     return data;
@@ -1411,20 +1422,13 @@ export const deleteProduct = async (id: string) => {
 };
 
 // Category CRUD
-export const createCategory = async (category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createCategory = async (category: Partial<Category>) => {
   try {
     const { data, error } = await supabase
       .from('categories')
       .insert({
         id: `cat-${Date.now()}`,
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-        image: category.image,
-        featured: category.featured ?? false,
-        published: category.published ?? true,
-        order: category.sort_order ?? 0,
-        is_visible: category.is_visible ?? true,
+        ...categoryToDb(category as Category),
       });
     if (error) throw error;
     return data;
@@ -1438,16 +1442,7 @@ export const updateCategory = async (id: string, updates: Partial<Category>) => 
   try {
     const { data, error } = await supabase
       .from('categories')
-      .update({
-        name: updates.name,
-        slug: updates.slug,
-        description: updates.description,
-        image_url: updates.image,
-        
-        
-        
-        is_visible: updates.is_visible,
-      })
+      .update(categoryToDb(updates as Category))
       .eq('id', id);
     if (error) throw error;
     return data;
@@ -1476,29 +1471,7 @@ export const updateStoreInfo = async (updates: Partial<BusinessConfig>) => {
   try {
     const { data, error } = await supabase
       .from('store_settings')
-      .upsert({
-        business_name: updates.businessName,
-        name: updates.name,
-        business_description: updates.businessDescription,
-        tagline: updates.tagline,
-        phone: updates.phone,
-        phone_raw: updates.phoneRaw,
-        phone_numbers: updates.phoneNumbers,
-        email: updates.email,
-        telegram: updates.telegram,
-        telegram_username: updates.telegramUsername,
-        telegram_channel: updates.telegramChannel,
-        instagram_username: updates.instagramUsername,
-        address: updates.address,
-        city: updates.city,
-        landmark: updates.landmark,
-        working_hours: updates.workingHours,
-        working_hours_detail: updates.workingHoursDetail,
-        social_links: updates.socialLinks,
-        primary_color: updates.primaryColor,
-        currency: updates.currency,
-        coordinates: updates.coordinates,
-      });
+      .upsert(businessConfigToDb(updates as BusinessConfig));
     if (error) throw error;
     return data;
   } catch (err) {
@@ -1508,27 +1481,13 @@ export const updateStoreInfo = async (updates: Partial<BusinessConfig>) => {
 };
 
 // Prompt CRUD
-export const createPrompt = async (prompt: Omit<ClothingPromptItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createPrompt = async (prompt: Partial<ClothingPromptItem>) => {
   try {
     const { data, error } = await supabase
       .from('prompts')
       .insert({
         id: `prompt-${Date.now()}`,
-        title: prompt.title,
-        description: prompt.description,
-        content_type: prompt.content_type,
-        category: prompt.category,
-        subcategory: prompt.subcategory,
-        product_type: prompt.product_type,
-        prompt: prompt.prompt,
-        recommended_tool: prompt.recommended_tool,
-        recommended_tool_url: prompt.recommended_tool_url,
-        difficulty: prompt.difficulty,
-        tags: prompt.tags ?? [],
-        aspect_ratio: prompt.aspect_ratio,
-        is_featured: prompt.is_featured ?? false,
-        is_published: prompt.is_published ?? true,
-        sort_order: prompt.sort_order ?? 0,
+        ...promptToDb(prompt as ClothingPromptItem),
       });
     if (error) throw error;
     return data;
@@ -1542,23 +1501,7 @@ export const updatePrompt = async (id: string, updates: Partial<ClothingPromptIt
   try {
     const { data, error } = await supabase
       .from('prompts')
-      .update({
-        title: updates.title,
-        description: updates.description,
-        content_type: updates.content_type,
-        category: updates.category,
-        subcategory: updates.subcategory,
-        product_type: updates.product_type,
-        prompt: updates.prompt,
-        recommended_tool: updates.recommended_tool,
-        recommended_tool_url: updates.recommended_tool_url,
-        difficulty: updates.difficulty,
-        tags: updates.tags,
-        aspect_ratio: updates.aspect_ratio,
-        is_featured: updates.is_featured,
-        is_published: updates.is_published,
-        sort_
-      })
+      .update(promptToDb(updates as ClothingPromptItem))
       .eq('id', id);
     if (error) throw error;
     return data;
@@ -1583,22 +1526,13 @@ export const deletePrompt = async (id: string) => {
 };
 
 // Testimonial CRUD
-export const createTestimonial = async (testimonial: Omit<Review, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createTestimonial = async (testimonial: Partial<Review>) => {
   try {
     const { data, error } = await supabase
       .from('testimonials')
       .insert({
         id: `rev-${Date.now()}`,
-        name: testimonial.name,
-        location: testimonial.location,
-        avatar: testimonial.avatar,
-        rating: testimonial.rating,
-        comment: testimonial.comment,
-        date: testimonial.date,
-        verified_visit: testimonial.verifiedVisit ?? false,
-        purchased_product: testimonial.purchasedProduct,
-        is_published: testimonial.published ?? true,
-        sort_order: testimonial.order ?? 0,
+        ...testimonialToDb(testimonial as Review),
       });
     if (error) throw error;
     return data;
@@ -1612,18 +1546,7 @@ export const updateTestimonial = async (id: string, updates: Partial<Review>) =>
   try {
     const { data, error } = await supabase
       .from('testimonials')
-      .update({
-        name: updates.name,
-        location: updates.location,
-        avatar_url: updates.avatar_url,
-        rating: updates.rating,
-        comment: updates.comment,
-        date: updates.date,
-        verified_visit: updates.verified_visit,
-        purchased_product: updates.purchased_product,
-        is_published: updates.is_published,
-        sort_
-      })
+      .update(testimonialToDb(updates as Review))
       .eq('id', id);
     if (error) throw error;
     return data;
@@ -1648,17 +1571,13 @@ export const deleteTestimonial = async (id: string) => {
 };
 
 // FAQ CRUD
-export const createFaq = async (faq: Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const createFaq = async (faq: Partial<FaqItem>) => {
   try {
     const { data, error } = await supabase
       .from('faqs')
       .insert({
         id: `faq-${Date.now()}`,
-        question: faq.question,
-        answer: faq.answer,
-        category: faq.category,
-        is_published: faq.is_published ?? true,
-        sort_order: faq.sort_order ?? 0,
+        ...faqToDb(faq as FaqItem),
       });
     if (error) throw error;
     return data;
@@ -1672,13 +1591,7 @@ export const updateFaq = async (id: string, updates: Partial<FaqItem>) => {
   try {
     const { data, error } = await supabase
       .from('faqs')
-      .update({
-        question: updates.question,
-        answer: updates.answer,
-        category: updates.category,
-        is_published: updates.is_published,
-        sort_
-      })
+      .update(faqToDb(updates as FaqItem))
       .eq('id', id);
     if (error) throw error;
     return data;

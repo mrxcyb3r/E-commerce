@@ -81,7 +81,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           {/* Product Summary Mini Card */}
           <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60">
             <img
-              src={product.images[0]}
+              src={product.images?.[0]}
               alt={product.name}
               className="w-16 h-16 rounded-xl object-cover bg-zinc-200 shrink-0"
             />
