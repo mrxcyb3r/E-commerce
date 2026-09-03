@@ -1041,7 +1041,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const newPrompt: ClothingPromptItem = {
       ...promptData,
       id,
-      is_published: promptData.is_published !== undefined ? promptData.is_published : true,
+      published: promptData.published !== undefined ? promptData.published : true,
       sort_order: promptData.sort_order ?? prompts.length + 1,
     };
     setPrompts((prev) => [newPrompt, ...prev]);
@@ -1092,8 +1092,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setPrompts((prev) =>
       prev.map((pr) => {
         if (pr.id === id) {
-          const base = { ...pr, published: !pr.published };
-          updatedRef = { ...base, is_published: base.published !== false };
+          updatedRef = { ...pr, published: !pr.published };
           return updatedRef;
         }
         return pr;

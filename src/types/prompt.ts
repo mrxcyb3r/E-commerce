@@ -13,17 +13,18 @@ export interface ClothingPromptItem {
   id: string;
   title: string;
   description: string;
-  content_type: string;
+  content_type?: string;
   category: string;
   subcategory: string;
-  product_type: string;
+  productType: string;
   prompt: string;
-  recommended_tool: string;
-  recommended_tool_url: string;
+  recommended_tool?: string;
+  recommended_tool_url?: string;
   difficulty: string;
   tags: string[];
-  aspect_ratio: string;
+  aspectRatio: string;
+  useCase?: string;
   featured?: boolean;
-  is_published?: boolean;
+  published?: boolean;
   sort_order?: number;
 }

@@ -158,19 +158,13 @@ export const AboutAdminPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-              Missiyamiz Sarlavhasi
+              Missiyamiz
             </label>
-            <input
-              type="text"
-              value={missionTitle}
-              onChange={(e) => setMissionTitle(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
-            />
             <textarea
-              rows={3}
-              value={missionText}
-              onChange={(e) => setMissionText(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              rows={4}
+              value={mission}
+              onChange={(e) => setMission(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs leading-relaxed rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
             />
           </div>
 
@@ -178,17 +172,11 @@ export const AboutAdminPage: React.FC = () => {
             <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
               Nigohimiz / Vision
             </label>
-            <input
-              type="text"
-              value={visionTitle}
-              onChange={(e) => setVisionTitle(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
-            />
             <textarea
-              rows={3}
-              value={visionText}
-              onChange={(e) => setVisionText(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              rows={4}
+              value={vision}
+              onChange={(e) => setVision(e.target.value)}
+              className="w-full px-3.5 py-2.5 text-xs leading-relaxed rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
             />
           </div>
         </div>
