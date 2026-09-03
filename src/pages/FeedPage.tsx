@@ -13,12 +13,14 @@ import {
   VolumeX
 } from 'lucide-react';
 import { useVideoFeed } from '../context/VideoContext';
+import { useAuth } from '../context/AuthContext';
 import { FeedVideoCard } from '../components/feed/FeedVideoCard';
 import { AdminVideoModal } from '../components/feed/AdminVideoModal';
 import { FeedCategoryFilter } from '../types/video';
 
 export const FeedPage: React.FC = () => {
   const { publishedVideos, isMuted, toggleMute, getProductForVideo } = useVideoFeed();
+  const { isAuthenticated } = useAuth();
   const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<FeedCategoryFilter>('all');
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -222,16 +224,18 @@ export const FeedPage: React.FC = () => {
               Aksessuarlar
             </button>
 
-            {/* Admin Management Trigger Button */}
-            <button
-              type="button"
-              onClick={() => setAdminModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold shrink-0 flex items-center gap-1.5 border border-zinc-700 transition-colors ml-1"
-              title="Do'kon egasi uchun video boshqaruvi"
-            >
-              <Settings className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Boshqaruv</span>
-            </button>
+            {/* Admin Management Trigger Button (admin only) */}
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => setAdminModalOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold shrink-0 flex items-center gap-1.5 border border-zinc-700 transition-colors ml-1"
+                title="Do'kon egasi uchun video boshqaruvi"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Boshqaruv</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

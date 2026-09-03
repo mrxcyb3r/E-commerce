@@ -17,7 +17,7 @@ import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
 export const SettingsAdminPage: React.FC = () => {
   const { adminUsername, changeCredentials } = useAuth();
-  const { exportData, importData, resetAllData } = useStore();
+  const { exportDataJSON, importDataJSON, resetAllToDefaults } = useStore();
 
   // Change Password state
   const [newUsername, setNewUsername] = useState(adminUsername);
@@ -56,7 +56,7 @@ export const SettingsAdminPage: React.FC = () => {
   };
 
   const handleExport = () => {
-    const data = exportData();
+    const data = exportDataJSON();
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -74,7 +74,7 @@ export const SettingsAdminPage: React.FC = () => {
     reader.onload = (event) => {
       try {
         const content = event.target?.result as string;
-        const res = importData(content);
+        const res = importDataJSON(content);
         if (res) {
           setImportStatus('Nusxa muvaffaqiyatli tiklandi! Sahifa yangilanmoqda...');
           setTimeout(() => {
@@ -261,7 +261,7 @@ export const SettingsAdminPage: React.FC = () => {
         message="Barcha o'zingiz kiritgan mahsulotlar, tahrirlangan matnlar o'chiriladi va dastlabki standart namunalarga qaytariladi. Davom etasizmi?"
         confirmLabel="Ha, tozalash va qaytarish"
         onConfirm={() => {
-          resetAllData();
+          resetAllToDefaults();
           setShowResetConfirm(false);
           window.location.reload();
         }}

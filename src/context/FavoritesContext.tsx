@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { Product } from '../types/product';
-import { PRODUCTS } from '../data/products';
+import { useStore } from './StoreContext';
 
 interface FavoritesContextType {
   favoriteIds: string[];
@@ -17,6 +17,8 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 const STORAGE_KEY = 'ecommerce_saved_favorites';
 
 export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { products } = useStore();
+
   const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -52,8 +54,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const favoriteProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => favoriteIds.includes(product.id));
-  }, [favoriteIds]);
+    return products.filter((product) => favoriteIds.includes(product.id));
+  }, [products, favoriteIds]);
 
   return (
     <FavoritesContext.Provider

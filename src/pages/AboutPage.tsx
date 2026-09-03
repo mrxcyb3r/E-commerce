@@ -25,7 +25,7 @@ export const AboutPage: React.FC = () => {
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed">
-            {aboutCms.story || "Biz xaridorlarimizga do'konga kelishdan oldin mahsulotlarni onlayn ko'rish, ularning narxi va mavjudligini bilib olish hamda eng ma'qul tanlovni amalga oshirish imkoniyatini taqdim etamiz."}
+            {aboutCms.mainStory || "Biz xaridorlarimizga do'konga kelishdan oldin mahsulotlarni onlayn ko'rish, ularning narxi va mavjudligini bilib olish hamda eng ma'qul tanlovni amalga oshirish imkoniyatini taqdim etamiz."}
           </p>
         </div>
 

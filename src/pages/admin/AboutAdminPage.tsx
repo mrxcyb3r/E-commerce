@@ -14,16 +14,13 @@ export const AboutAdminPage: React.FC = () => {
 
   const [title, setTitle] = useState(aboutCms.title);
   const [subtitle, setSubtitle] = useState(aboutCms.subtitle);
-  const [storyTitle, setStoryTitle] = useState(aboutCms.storyTitle);
-  const [storyParagraph1, setStoryParagraph1] = useState(aboutCms.storyParagraph1);
-  const [storyParagraph2, setStoryParagraph2] = useState(aboutCms.storyParagraph2);
-  const [missionTitle, setMissionTitle] = useState(aboutCms.missionTitle);
-  const [missionText, setMissionText] = useState(aboutCms.missionText);
-  const [visionTitle, setVisionTitle] = useState(aboutCms.visionTitle);
-  const [visionText, setVisionText] = useState(aboutCms.visionText);
+  const [mainStory, setMainStory] = useState(aboutCms.mainStory);
+  const [secondStory, setSecondStory] = useState(aboutCms.secondStory);
+  const [mission, setMission] = useState(aboutCms.mission);
+  const [vision, setVision] = useState(aboutCms.vision);
 
   // Gallery
-  const [galleryImages, setGalleryImages] = useState<string[]>(aboutCms.galleryImages || []);
+  const [galleryImages, setGalleryImages] = useState<string[]>(aboutCms.images || []);
   const [newImageInput, setNewImageInput] = useState('');
 
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -44,14 +41,11 @@ export const AboutAdminPage: React.FC = () => {
     updateAboutCms({
       title,
       subtitle,
-      storyTitle,
-      storyParagraph1,
-      storyParagraph2,
-      missionTitle,
-      missionText,
-      visionTitle,
-      visionText,
-      galleryImages,
+      mainStory,
+      secondStory,
+      mission,
+      vision,
+      images: galleryImages,
     });
 
     setSavedSuccess(true);
@@ -131,24 +125,12 @@ export const AboutAdminPage: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-              Tarix Bo'limi Sarlavhasi
-            </label>
-            <input
-              type="text"
-              value={storyTitle}
-              onChange={(e) => setStoryTitle(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
               1-Paragraf
             </label>
             <textarea
               rows={3}
-              value={storyParagraph1}
-              onChange={(e) => setStoryParagraph1(e.target.value)}
+              value={mainStory}
+              onChange={(e) => setMainStory(e.target.value)}
               className="w-full px-3.5 py-2.5 text-xs leading-relaxed rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
             />
           </div>
@@ -159,8 +141,8 @@ export const AboutAdminPage: React.FC = () => {
             </label>
             <textarea
               rows={3}
-              value={storyParagraph2}
-              onChange={(e) => setStoryParagraph2(e.target.value)}
+              value={secondStory}
+              onChange={(e) => setSecondStory(e.target.value)}
               className="w-full px-3.5 py-2.5 text-xs leading-relaxed rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
             />
           </div>
