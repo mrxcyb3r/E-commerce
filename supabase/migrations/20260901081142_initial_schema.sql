@@ -17,7 +17,7 @@ create table if not exists public.profiles (
 
 -- Categories table
 create table if not exists public.categories (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   name text not null,
   slug text unique not null,
   description text,
@@ -26,12 +26,12 @@ create table if not exists public.categories (
   featured boolean not null default false,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Products table
 create table if not exists public.products (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   slug text unique not null,
   name text not null,
   description text,
@@ -55,12 +55,12 @@ create table if not exists public.products (
   made_in text,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Product Images table
 create table if not exists public.product_images (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   product_id uuid references public.products on delete cascade not null,
   url text not null,
   alt_text text,
@@ -71,7 +71,7 @@ create table if not exists public.product_images (
 
 -- Product Sizes table
 create table if not exists public.product_sizes (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   product_id uuid references public.products on delete cascade not null,
   size text not null,
   is_available boolean not null default true,
@@ -81,7 +81,7 @@ create table if not exists public.product_sizes (
 
 -- Product Colors table
 create table if not exists public.product_colors (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   product_id uuid references public.products on delete cascade not null,
   name text not null,
   hex_code text,
@@ -92,7 +92,7 @@ create table if not exists public.product_colors (
 
 -- Feed Posts table (videos/collections)
 create table if not exists public.feed_posts (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   title text not null,
   description text,
   video_url text,
@@ -106,12 +106,12 @@ create table if not exists public.feed_posts (
   is_published boolean not null default true,
   is_featured boolean not null default false,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Prompts table (AI prompt library)
 create table if not exists public.prompts (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   title text not null,
   description text,
   content_type text not null default 'image' check (content_type in ('image', 'video', 'text')),
@@ -128,12 +128,12 @@ create table if not exists public.prompts (
   is_published boolean not null default true,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Testimonials table
 create table if not exists public.testimonials (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   name text not null,
   location text,
   avatar_url text,
@@ -145,24 +145,24 @@ create table if not exists public.testimonials (
   is_published boolean not null default true,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- FAQ table
 create table if not exists public.faqs (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   question text not null,
   answer text not null,
   category text,
   is_published boolean not null default true,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()),
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Homepage CMS table
 create table if not exists public.homepage_cms (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   hero_badge text,
   hero_title text,
   hero_highlighted_title text,
@@ -187,12 +187,12 @@ create table if not exists public.homepage_cms (
   featured_section_subtitle text,
   video_section_title text,
   video_section_subtitle text,
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- About CMS table
 create table if not exists public.about_cms (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   title text not null,
   subtitle text,
   main_story text,
@@ -201,12 +201,12 @@ create table if not exists public.about_cms (
   vision text,
   images text[] default '{}',
   features jsonb default '[]',
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Contact CMS table
 create table if not exists public.contact_cms (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   title text not null,
   subtitle text,
   description text,
@@ -214,12 +214,12 @@ create table if not exists public.contact_cms (
   telegram_direct_note text,
   support_note text,
   direct_help_text text,
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Store Settings table
 create table if not exists public.store_settings (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   business_name text not null default 'Ecommerce',
   name text,
   business_description text,
@@ -243,7 +243,7 @@ create table if not exists public.store_settings (
   coordinates jsonb default '{"lat":40.1158,"lng":67.8422}',
   google_maps_url text,
   yandex_maps_url text,
-  updated_at timestamp with time zone default timezone('utc'::text, now()
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Indexes for performance
