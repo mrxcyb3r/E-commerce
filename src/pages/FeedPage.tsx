@@ -332,7 +332,7 @@ export const FeedPage: React.FC = () => {
                   {/* Product Image */}
                   <div className="w-full h-60 rounded-2xl bg-zinc-800 overflow-hidden border border-zinc-700/60 shadow-lg group">
                     <img
-                      src={activeProduct.images[0]}
+                      src={activeProduct.images?.[0]}
                       alt={activeProduct.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       referrerPolicy="no-referrer"

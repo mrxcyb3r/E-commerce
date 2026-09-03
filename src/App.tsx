@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 import { HomePage } from './pages/HomePage';
 import { ProductsPage } from './pages/ProductsPage';
@@ -55,19 +56,21 @@ export default function App() {
                       <div className="min-h-screen bg-[#fafafa] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans transition-colors duration-200 selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-950">
                         <Navbar />
                         <main className="flex-grow">
-                          <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/products" element={<ProductsPage />} />
-                            <Route path="/products/:id" element={<ProductDetailPage />} />
-                            <Route path="/feed" element={<FeedPage />} />
-                            <Route path="/videos" element={<FeedPage />} />
-                            <Route path="/prompts" element={<PromptLibraryPage />} />
-                            <Route path="/favorites" element={<FavoritesPage />} />
-                            <Route path="/about" element={<AboutPage />} />
-                            <Route path="/location" element={<LocationPage />} />
-                            <Route path="/contact" element={<ContactPage />} />
-                            <Route path="*" element={<HomePage />} />
-                          </Routes>
+                          <ErrorBoundary>
+                            <Routes>
+                              <Route path="/" element={<HomePage />} />
+                              <Route path="/products" element={<ProductsPage />} />
+                              <Route path="/products/:id" element={<ProductDetailPage />} />
+                              <Route path="/feed" element={<FeedPage />} />
+                              <Route path="/videos" element={<FeedPage />} />
+                              <Route path="/prompts" element={<PromptLibraryPage />} />
+                              <Route path="/favorites" element={<FavoritesPage />} />
+                              <Route path="/about" element={<AboutPage />} />
+                              <Route path="/location" element={<LocationPage />} />
+                              <Route path="/contact" element={<ContactPage />} />
+                              <Route path="*" element={<HomePage />} />
+                            </Routes>
+                          </ErrorBoundary>
                         </main>
                         <Footer />
                       </div>

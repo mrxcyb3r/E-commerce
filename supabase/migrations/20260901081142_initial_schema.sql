@@ -17,7 +17,7 @@ create table if not exists public.profiles (
 
 -- Categories table
 create table if not exists public.categories (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   name text not null,
   slug text unique not null,
   description text,
@@ -31,7 +31,7 @@ create table if not exists public.categories (
 
 -- Products table
 create table if not exists public.products (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   slug text unique not null,
   name text not null,
   description text,
@@ -39,7 +39,7 @@ create table if not exists public.products (
   price integer not null default 0,
   original_price integer default null,
   currency text not null default 'uzs',
-  category_id uuid references public.categories on delete set null,
+  category_id text references public.categories on delete set null,
   brand text,
   is_published boolean not null default true,
   is_featured boolean not null default false,
@@ -60,19 +60,19 @@ create table if not exists public.products (
 
 -- Product Images table
 create table if not exists public.product_images (
-  id uuid default gen_random_uuid() primary key,
-  product_id uuid references public.products on delete cascade not null,
+  id text primary key,
+  product_id text references public.products on delete cascade not null,
   url text not null,
   alt_text text,
-  is_boolean not null default false,
+  is_primary boolean not null default false,
   sort_order integer not null default 0,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
 
 -- Product Sizes table
 create table if not exists public.product_sizes (
-  id uuid default gen_random_uuid() primary key,
-  product_id uuid references public.products on delete cascade not null,
+  id text primary key,
+  product_id text references public.products on delete cascade not null,
   size text not null,
   is_available boolean not null default true,
   sort_order integer not null default 0,
@@ -81,8 +81,8 @@ create table if not exists public.product_sizes (
 
 -- Product Colors table
 create table if not exists public.product_colors (
-  id uuid default gen_random_uuid() primary key,
-  product_id uuid references public.products on delete cascade not null,
+  id text primary key,
+  product_id text references public.products on delete cascade not null,
   name text not null,
   hex_code text,
   is_available boolean not null default true,
@@ -92,12 +92,12 @@ create table if not exists public.product_colors (
 
 -- Feed Posts table (videos/collections)
 create table if not exists public.feed_posts (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   title text not null,
   description text,
   video_url text,
   thumbnail_url text,
-  product_id uuid references public.products on delete set null,
+  product_id text references public.products on delete set null,
   type text not null default 'video' check (type in ('video', 'collection')),
   badge_text text,
   badge_type text,
@@ -111,7 +111,7 @@ create table if not exists public.feed_posts (
 
 -- Prompts table (AI prompt library)
 create table if not exists public.prompts (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   title text not null,
   description text,
   content_type text not null default 'image' check (content_type in ('image', 'video', 'text')),
@@ -133,7 +133,7 @@ create table if not exists public.prompts (
 
 -- Testimonials table
 create table if not exists public.testimonials (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   name text not null,
   location text,
   avatar_url text,
@@ -150,7 +150,7 @@ create table if not exists public.testimonials (
 
 -- FAQ table
 create table if not exists public.faqs (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   question text not null,
   answer text not null,
   category text,
@@ -162,7 +162,7 @@ create table if not exists public.faqs (
 
 -- Homepage CMS table
 create table if not exists public.homepage_cms (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   hero_badge text,
   hero_title text,
   hero_highlighted_title text,
@@ -192,7 +192,7 @@ create table if not exists public.homepage_cms (
 
 -- About CMS table
 create table if not exists public.about_cms (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   title text not null,
   subtitle text,
   main_story text,
@@ -206,7 +206,7 @@ create table if not exists public.about_cms (
 
 -- Contact CMS table
 create table if not exists public.contact_cms (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   title text not null,
   subtitle text,
   description text,
@@ -219,7 +219,7 @@ create table if not exists public.contact_cms (
 
 -- Store Settings table
 create table if not exists public.store_settings (
-  id uuid default gen_random_uuid() primary key,
+  id text primary key,
   business_name text not null default 'Ecommerce',
   name text,
   business_description text,
