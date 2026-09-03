@@ -145,6 +145,8 @@ type FaqItem = {
 export type AnalyticsEventType =
   | 'page_view'
   | 'product_view'
+  | 'product_dwell'
+  | 'product_share'
   | 'product_save'
   | 'product_unsave'
   | 'category_view'

@@ -63,6 +63,28 @@ export function buildInsights(input: InsightInput): Insight[] {
     });
   }
 
+  // Trending products — rising view activity in the recent half of the range.
+  const trending = productsWithViews.filter((p) => p.isTrending).sort((a, b) => b.views - a.views);
+  if (trending.length > 0) {
+    const t = trending[0];
+    insights.push({
+      kind: 'good',
+      text: `Trenddagi mahsulot: "${t.id}" — so'nggi davrda ko'rishlar oshib bormoqda (${fmt(t.views)} ko'rish).`,
+    });
+  }
+
+  // Long-dwell products — real measured time spent on the product page.
+  const dwellers = productsWithViews
+    .filter((p) => p.avgDwellSec >= 10)
+    .sort((a, b) => b.avgDwellSec - a.avgDwellSec);
+  if (dwellers.length > 0) {
+    const d = dwellers[0];
+    insights.push({
+      kind: 'info',
+      text: `Mijozlar "${d.id}" sahifasida uzoq qolmoqda (o'rtacha ${fmt(d.avgDwellSec)} soniya) — tavsif va rasmlar diqqatni tortmoqda.`,
+    });
+  }
+
   // Products with views but low engagement (actionable)
   const lowEngagement = [...productsWithViews]
     .filter((p) => p.views >= 2 && p.engagementRate < 0.15)

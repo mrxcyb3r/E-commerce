@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { BUSINESS_CONFIG } from '../config/business';
@@ -36,9 +36,20 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const mountedAt = useRef<number>(0);
+  const maxScroll = useRef<number>(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    maxScroll.current = 0;
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = doc.scrollHeight;
+      const pct = total > 0 ? Math.round((scrolled / total) * 100) : 0;
+      if (pct > maxScroll.current) maxScroll.current = Math.min(100, pct);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     if (product) {
       if (product.sizes.length > 0) setSelectedSize(product.sizes[0]);
       if (product.colors.length > 0) setSelectedColor(product.colors[0].name);
@@ -47,7 +58,21 @@ export const ProductDetailPage: React.FC = () => {
         categoryId: product.category,
         uniquePerVisitor: true,
       });
+      mountedAt.current = Date.now();
     }
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (product && mountedAt.current > 0) {
+        const dwellSec = Math.round((Date.now() - mountedAt.current) / 1000);
+        if (dwellSec >= 1) {
+          track('product_dwell', {
+            productId: product.id,
+            categoryId: product.category,
+            metadata: { durationSec: dwellSec, maxScrollDepth: maxScroll.current },
+          });
+        }
+      }
+    };
   }, [id, product]);
 
   if (!product) {
@@ -82,6 +107,9 @@ export const ProductDetailPage: React.FC = () => {
       navigator.clipboard.writeText(window.location.href);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
+    }
+    if (product) {
+      track('product_share', { productId: product.id, categoryId: product.category });
     }
   };
 

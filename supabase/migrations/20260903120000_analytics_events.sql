@@ -20,6 +20,8 @@ create table if not exists public.analytics_events (
     event_type in (
       'page_view',
       'product_view',
+      'product_dwell',
+      'product_share',
       'product_save',
       'product_unsave',
       'category_view',
@@ -78,6 +80,8 @@ create policy "anon insert analytics events" on public.analytics_events
     and event_type in (
       'page_view',
       'product_view',
+      'product_dwell',
+      'product_share',
       'product_save',
       'product_unsave',
       'category_view',

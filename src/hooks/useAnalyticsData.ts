@@ -31,9 +31,32 @@ import {
   sourceBreakdown,
 } from '../lib/analytics/aggregate';
 import { buildInsights, type Insight } from '../lib/analytics/insights';
+import {
+  computeAudience,
+  computeTimeAnalytics,
+  computeVisitorWindows,
+  computeJourneys,
+  computeComparison,
+  computeWishlist,
+  computeBusinessKpis,
+  buildAdvancedFunnel,
+  type Audience,
+  type TimeAnalytics,
+  type VisitorWindows,
+  type Journey,
+  type KpiCompare,
+  type WishlistMetric,
+  type BusinessKpis,
+  type AdvancedFunnelStage,
+} from '../lib/analytics/advanced';
+import { buildAlerts, type Alert } from '../lib/analytics/alerts';
+import { buildReport, productCsv, reportCsv, type ReportPeriod, type ReportSummary } from '../lib/analytics/reports';
 
 const SHOP_ID = BUSINESS_CONFIG.name || 'default';
-export const POLL_INTERVAL_MS = 15000;
+export const POLL_INTERVAL_MS = 6000;
+export const LIVE_WINDOW_MS = 5 * 60 * 1000;
+
+type CustomRange = { from: string; to: string } | null;
 
 export interface AnalyticsData {
   loading: boolean;
@@ -49,12 +72,27 @@ export interface AnalyticsData {
   intent: IntentMetric;
   traffic: TrafficPoint[];
   funnel: FunnelStage[];
+  advancedFunnel: AdvancedFunnelStage[];
   hourly: HourBucket[];
   devices: BreakdownRow[];
   sources: BreakdownRow[];
   insights: Insight[];
-  range: RangeKey;
+  alerts: Alert[];
+  audience: Audience;
+  timeAnalytics: TimeAnalytics;
+  visitorWindows: VisitorWindows;
+  journeys: Journey[];
+  comparison: Record<string, KpiCompare>;
+  wishlist: WishlistMetric;
+  kpis: BusinessKpis;
+  report: ReportSummary;
+  range: RangeKey | 'custom';
+  rangeDate: DateRange;
+  isCustomRange: boolean;
   setRange: (r: RangeKey) => void;
+  setCustomRange: (from: string, to: string) => void;
+  buildReportCsv: (period: ReportPeriod) => string;
+  buildProductCsv: () => string;
   refresh: () => Promise<void>;
   lastUpdated: number | null;
 }
@@ -64,7 +102,8 @@ export function useAnalyticsData(): AnalyticsData {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<AnalyticsEvent[]>([]);
-  const [rangeKey, setRangeKey] = useState<RangeKey>('14d');
+  const [rangeKey, setRangeKey] = useState<RangeKey | 'custom'>('14d');
+  const [custom, setCustom] = useState<CustomRange>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
   const load = useCallback(async (opts?: { silent?: boolean }) => {
@@ -99,15 +138,33 @@ export function useAnalyticsData(): AnalyticsData {
     return () => clearInterval(id);
   }, [load]);
 
+  // Refresh immediately when the tab regains focus.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void load({ silent: true });
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [load]);
+
   const refresh = useCallback(async () => {
     await load();
   }, [load]);
 
   const setRange = useCallback((r: RangeKey) => {
     setRangeKey(r);
+    setCustom(null);
   }, []);
 
-  const range: DateRange = useMemo(() => presetRange(rangeKey), [rangeKey]);
+  const setCustomRange = useCallback((from: string, to: string) => {
+    setRangeKey('custom');
+    setCustom({ from, to });
+  }, []);
+
+  const range: DateRange = useMemo(() => {
+    if (rangeKey === 'custom' && custom) return custom;
+    return presetRange(rangeKey as RangeKey);
+  }, [rangeKey, custom]);
 
   const aggregate = useMemo(() => {
     const stats = computeVisitorStats(rows, range);
@@ -119,6 +176,7 @@ export function useAnalyticsData(): AnalyticsData {
     const intent = computeIntent(rows, range);
     const traffic = trafficSeries(rows, range);
     const funnel = buildFunnel(rows, range);
+    const advancedFunnel = buildAdvancedFunnel(rows, range);
     const hourly = hourlyActivity(rows, range);
     const devices = deviceBreakdown(rows, range);
     const sources = sourceBreakdown(rows, range);
@@ -132,6 +190,15 @@ export function useAnalyticsData(): AnalyticsData {
       events: rows,
       range,
     });
+    const alerts = buildAlerts({ events: rows, range, products, feed, search });
+    const audience = computeAudience(rows, range);
+    const timeAnalytics = computeTimeAnalytics(rows, range);
+    const visitorWindows = computeVisitorWindows(rows, range, LIVE_WINDOW_MS);
+    const journeys = computeJourneys(rows, range);
+    const comparison = computeComparison({ events: rows, range, products, feed });
+    const wishlist = computeWishlist(rows, range);
+    const kpis = computeBusinessKpis({ events: rows, range, products, feed, categories, returningRate: stats.returningRate });
+    const report = buildReport(rows, range, products, categories, feed, 'weekly');
     return {
       stats,
       eventsByType,
@@ -142,12 +209,32 @@ export function useAnalyticsData(): AnalyticsData {
       intent,
       traffic,
       funnel,
+      advancedFunnel,
       hourly,
       devices,
       sources,
       insights,
+      alerts,
+      audience,
+      timeAnalytics,
+      visitorWindows,
+      journeys,
+      comparison,
+      wishlist,
+      kpis,
+      report,
     };
   }, [rows, range]);
+
+  const buildReportCsv = useCallback(
+    (period: ReportPeriod) => {
+      const r = buildReport(rows, range, aggregate.products, aggregate.categories, aggregate.feed, period);
+      return reportCsv(r);
+    },
+    [rows, range, aggregate]
+  );
+
+  const buildProductCsv = useCallback(() => productCsv(aggregate.products), [aggregate]);
 
   return {
     loading,
@@ -163,12 +250,27 @@ export function useAnalyticsData(): AnalyticsData {
     intent: aggregate.intent,
     traffic: aggregate.traffic,
     funnel: aggregate.funnel,
+    advancedFunnel: aggregate.advancedFunnel,
     hourly: aggregate.hourly,
     devices: aggregate.devices,
     sources: aggregate.sources,
     insights: aggregate.insights,
+    alerts: aggregate.alerts,
+    audience: aggregate.audience,
+    timeAnalytics: aggregate.timeAnalytics,
+    visitorWindows: aggregate.visitorWindows,
+    journeys: aggregate.journeys,
+    comparison: aggregate.comparison,
+    wishlist: aggregate.wishlist,
+    kpis: aggregate.kpis,
+    report: aggregate.report,
     range: rangeKey,
+    rangeDate: range,
+    isCustomRange: rangeKey === 'custom',
     setRange,
+    setCustomRange,
+    buildReportCsv,
+    buildProductCsv,
     refresh,
     lastUpdated,
   };

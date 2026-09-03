@@ -27,6 +27,9 @@ import {
   AlertTriangle,
   Filter,
   Sparkles,
+  Bell,
+  Download,
+  Timer,
 } from 'lucide-react';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import { useStore } from '../../context/StoreContext';
@@ -37,6 +40,8 @@ import { TrendBadge } from '../../components/admin/analytics/TrendBadge';
 import { SimpleBarChart } from '../../components/admin/analytics/SimpleBarChart';
 import { FunnelView } from '../../components/admin/analytics/FunnelView';
 import { formatDuration, percent } from '../../components/admin/analytics/util';
+import { DonutChart } from '../../components/admin/analytics/DonutChart';
+import { Heatmap } from '../../components/admin/analytics/Heatmap';
 import { RANGE_PRESETS } from '../../lib/analytics/aggregate';
 import type { ProductMetric, CategoryMetric, FeedMetric, InterestLevel } from '../../lib/analytics/aggregate';
 
@@ -115,7 +120,7 @@ export const AnalyticsAdminPage: React.FC = () => {
                   type="button"
                   onClick={() => data.setRange(r.key)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all ${
-                    data.range === r.key
+                    !data.isCustomRange && data.range === r.key
                       ? 'bg-white text-neutral-950 shadow'
                       : 'text-neutral-300 hover:text-white'
                   }`}
@@ -123,6 +128,27 @@ export const AnalyticsAdminPage: React.FC = () => {
                   {r.label}
                 </button>
               ))}
+              <div className="flex items-center gap-1 pl-1">
+                <input
+                  type="date"
+                  value={data.isCustomRange ? data.rangeDate.from : ''}
+                  onChange={(e) => {
+                    const to = data.isCustomRange ? data.rangeDate.to : e.target.value;
+                    if (e.target.value && to) data.setCustomRange(e.target.value, to);
+                  }}
+                  className={`px-2 py-1.5 rounded-xl bg-transparent text-[11px] font-black outline-none ${data.isCustomRange ? 'bg-white text-neutral-950' : 'text-neutral-300'} [color-scheme:dark]`}
+                />
+                <span className="text-neutral-500">→</span>
+                <input
+                  type="date"
+                  value={data.isCustomRange ? data.rangeDate.to : ''}
+                  onChange={(e) => {
+                    const from = data.isCustomRange ? data.rangeDate.from : e.target.value;
+                    if (from && e.target.value) data.setCustomRange(from, e.target.value);
+                  }}
+                  className={`px-2 py-1.5 rounded-xl bg-transparent text-[11px] font-black outline-none ${data.isCustomRange ? 'bg-white text-neutral-950' : 'text-neutral-300'} [color-scheme:dark]`}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               {data.lastUpdated && (
@@ -180,12 +206,20 @@ export const AnalyticsAdminPage: React.FC = () => {
             <KpiCard label="Manzil ko'rish" value={intent.directions} icon={MapPin} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
           </div>
 
+          {/* Live visitors strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <MiniStat label="Hozir onlayn" value={data.visitorWindows.liveNow} icon={Activity} live />
+            <MiniStat label="Bugun" value={data.visitorWindows.today} icon={Users} />
+            <MiniStat label="Shu hafta" value={data.visitorWindows.thisWeek} icon={CalendarDays} />
+            <MiniStat label="Shu oy" value={data.visitorWindows.thisMonth} icon={Gauge} />
+          </div>
+
           {/* Visitor insights strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <MiniStat label="Sahifa/sessiya" value={stats.avgPagesPerSession.toFixed(1)} icon={Gauge} />
             <MiniStat label="O'rtacha sessiya" value={formatDuration(stats.avgSessionLengthSec)} icon={Clock} />
             <MiniStat label="Qaytish darajasi" value={percent(stats.returningRate)} icon={TrendingUp} />
-            <MiniStat label="Voqealar" value={totalEvents} icon={Activity} />
+            <MiniStat label="Bounce" value={percent(data.audience.bounceRate)} icon={Activity} />
           </div>
 
           {/* Traffic + funnel + hourly */}
@@ -193,8 +227,8 @@ export const AnalyticsAdminPage: React.FC = () => {
             <SectionCard title="Traffik" icon={CalendarDays} subtitle={`${RANGE_PRESETS.find((r) => r.key === data.range)?.label ?? ''} — kunlik sahifa ochilishlari`} action={data.traffic.length > 1 ? <TrendCompare traffic={data.traffic} /> : undefined}>
               <SimpleBarChart data={data.traffic} />
             </SectionCard>
-            <SectionCard title="Xaridor yo'li (funnel)" icon={Filter} subtitle="Faoliyat chuqurligi bo'yicha noyob foydalanuvchilar">
-              <FunnelView stages={data.funnel} />
+            <SectionCard title="Xaridor yo'li (funnel)" icon={Filter} subtitle="Faoliyat chuqurligi bo'yicha noyob foydalanuvchilar va bosqich konversiyasi">
+              <FunnelView stages={data.advancedFunnel} />
             </SectionCard>
           </div>
 
@@ -225,6 +259,30 @@ export const AnalyticsAdminPage: React.FC = () => {
             <SectionCard title="Trafik manbai" icon={Globe}>
               <BreakdownList rows={data.sources} />
             </SectionCard>
+          </div>
+
+          {/* Audience + Time analytics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AudienceSection data={data} />
+            <TimeSection data={data} />
+          </div>
+
+          {/* Growth comparison + Business KPIs */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <GrowthSection data={data} />
+            <KpiSection data={data} />
+          </div>
+
+          {/* Journeys + Wishlist */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <JourneySection data={data} />
+            <WishlistSection data={data} />
+          </div>
+
+          {/* Alerts + Reports */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AlertsSection data={data} />
+            <ReportsSection data={data} />
           </div>
 
           {/* Insights */}
@@ -259,13 +317,19 @@ export const AnalyticsAdminPage: React.FC = () => {
   );
 };
 
-const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }> }> = ({ label, value, icon: Icon }) => (
+const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }>; live?: boolean }> = ({ label, value, icon: Icon, live }) => (
   <div className="p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
     <div className="flex items-center gap-1.5 text-neutral-400 mb-1">
-      <Icon className="w-3.5 h-3.5" />
+      {live && (
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+        </span>
+      )}
+      {!live && <Icon className="w-3.5 h-3.5" />}
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </div>
-    <div className="text-lg font-black text-neutral-900 dark:text-white">{value}</div>
+    <div className="text-lg font-black text-neutral-900 dark:text-white">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
   </div>
 );
 
@@ -333,6 +397,7 @@ const ProductsSection: React.FC<{
     () => ranked.filter((p) => p.views > 0).sort((a, b) => a.engagementRate - b.engagementRate || a.views - b.views).slice(0, 5),
     [ranked]
   );
+  const trending = useMemo(() => ranked.filter((p) => p.isTrending).slice(0, 5), [ranked]);
   const top = ranked.slice(0, 6);
 
   const fmtPrice = (id: string) => {
@@ -355,6 +420,22 @@ const ProductsSection: React.FC<{
             <ProductRow key={p.id} metric={p} name={pName(p.id)} price={fmtPrice(p.id)} rank={i + 1} />
           ))}
         </div>
+      )}
+      {trending.length > 0 && (
+        <>
+          <p className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mt-5 mb-2">
+            Trenddagi mahsulotlar
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {trending.map((p) => (
+              <span key={p.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-[11px] font-bold text-blue-700 dark:text-blue-300">
+                <TrendingUp className="w-3 h-3" />
+                {pName(p.id)}
+                <span className="text-neutral-500 dark:text-neutral-400">{p.views} ko'r</span>
+              </span>
+            ))}
+          </div>
+        </>
       )}
       {least.length > 0 && (
         <>
@@ -388,17 +469,27 @@ const ProductRow: React.FC<{ metric: ProductMetric; name: string; price: string;
           {price && <div className="text-[10px] text-neutral-400">{price}</div>}
         </div>
       </div>
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 ${LEVEL_BADGE[p.interest]}`}>
-        Qiziqish: {LEVEL_LABEL[p.interest]}
-      </span>
+      <div className="flex items-center gap-2 shrink-0">
+        {p.isTrending && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black">
+            <TrendingUp className="w-3 h-3" />
+            Trend
+          </span>
+        )}
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black ${LEVEL_BADGE[p.interest]}`}>
+          Qiziqish: {LEVEL_LABEL[p.interest]}
+        </span>
+      </div>
     </div>
-    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-3 text-center">
+    <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2 mt-3 text-center">
       <ProductStat label="Ko'rish" value={p.views} />
       <ProductStat label="Noyob" value={p.uniqueViewers} />
       <ProductStat label="Saqlash" value={p.saves} sub={`${p.uniqueSavers} kishi`} />
+      <ProductStat label="O'rt. vaqt" value={formatDuration(p.avgDwellSec)} />
       <ProductStat label="Telegram" value={p.telegramClicks} />
       <ProductStat label="Manzil" value={p.mapClicks} />
-      <ProductStat label="Feed→Mahsulot" value={p.feedProductClicks} />
+      <ProductStat label="Ulashish" value={p.shareClicks} />
+      <ProductStat label="Feed→Mah" value={p.feedProductClicks} />
     </div>
   </div>
 );
@@ -496,7 +587,11 @@ const SearchSection: React.FC<{ summary: ReturnType<typeof useAnalyticsData>['se
       {summary.topSearches.map((s) => (
         <span key={s.query} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200">
           "{s.query}"
-          {s.ledToProductView && <span title="Mahsulot ko'rishga olib bordi"><ShoppingBag className="w-3 h-3 text-emerald-500" /></span>}
+          <span className="inline-flex items-center gap-0.5">
+            {s.ledToProductView && <span title="Mahsulot ko'rishga olib bordi"><ShoppingBag className="w-3 h-3 text-emerald-500" /></span>}
+            {s.ledToFavorite && <span title="Sevimlilarga olib bordi"><Heart className="w-3 h-3 text-rose-500" /></span>}
+            {s.ledToTelegram && <span title="Telegramga olib bordi"><Send className="w-3 h-3 text-blue-500" /></span>}
+          </span>
           <span className="text-amber-600 dark:text-amber-400 font-black">{s.count}</span>
         </span>
       ))}
@@ -550,6 +645,286 @@ const IntentSection: React.FC<{ intent: ReturnType<typeof useAnalyticsData>['int
         <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{intent.total.toLocaleString('uz-UZ')}</div>
         <p className="text-[10px] text-neutral-400 mt-1">Telegram + Qo'ng'iroq + Manzil + Aloqa</p>
       </div>
+    </SectionCard>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Advanced sections
+// ---------------------------------------------------------------------------
+
+type AnalyticsData = ReturnType<typeof useAnalyticsData>;
+
+const downloadFile = (filename: string, content: string, mime = 'text/csv;charset=utf-8') => {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+const AudienceSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const { audience } = data;
+  const rows: { label: string; value: number }[] = [
+    ...data.devices.filter((d) => d.label !== 'unknown'),
+  ];
+  return (
+    <SectionCard title="Auditoriya tarkibi" icon={Users} accent="text-indigo-500" subtitle="Qurilma, brauzer, tizim, til va kun/rejim">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="col-span-2 sm:col-span-1">
+          <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Qurilma</p>
+          <DonutChart data={rows} />
+        </div>
+        <div className="col-span-2 sm:col-span-1 space-y-3">
+          <MiniList title="Brauzer" rows={audience.browsers} />
+          <MiniList title="Operatsion tizim" rows={audience.oses} />
+        </div>
+        <div className="col-span-2 grid grid-cols-3 gap-2">
+          <MiniBox label="Rejim" rows={audience.darkMode} />
+          <MiniBox label="Til (asosiy)" rows={audience.languages.slice(0, 3)} />
+          <MiniBox label="Ekran (asosiy)" rows={audience.screens.slice(0, 3)} />
+        </div>
+        <div className="col-span-2 grid grid-cols-2 gap-3">
+          <MiniList title="Kirish sahifasi" rows={audience.entryPages.slice(0, 4)} />
+          <MiniList title="Chiqish sahifasi" rows={audience.exitPages.slice(0, 4)} />
+        </div>
+      </div>
+    </SectionCard>
+  );
+};
+
+const MiniList: React.FC<{ title: string; rows: { label: string; value: number }[] }> = ({ title, rows }) => (
+  <div>
+    <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">{title}</p>
+    {rows.length === 0 ? (
+      <p className="text-xs text-neutral-400">Ma'lumot yo'q</p>
+    ) : (
+      <div className="space-y-1.5">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center justify-between text-[11px]">
+            <span className="text-neutral-600 dark:text-neutral-300 truncate">{r.label}</span>
+            <span className="font-black text-neutral-900 dark:text-white shrink-0">{r.value}</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+const MiniBox: React.FC<{ label: string; rows: { label: string; value: number }[] }> = ({ label, rows }) => (
+  <div className="rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 p-2.5">
+    <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">{label}</p>
+    <div className="space-y-1">
+      {rows.map((r) => (
+        <div key={r.label} className="flex items-center justify-between text-[11px]">
+          <span className="text-neutral-600 dark:text-neutral-300 capitalize truncate">{r.label}</span>
+          <span className="font-black text-neutral-900 dark:text-white shrink-0">{r.value}</span>
+        </div>
+      ))}
+      {rows.length === 0 && <p className="text-[11px] text-neutral-400">—</p>}
+    </div>
+  </div>
+);
+
+const TimeSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const { timeAnalytics: ta } = data;
+  const activeDayName = ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'][ta.activeDay];
+  const total = ta.eveningCount + ta.morningCount;
+  return (
+    <SectionCard title="Vaqt tahlili" icon={Timer} accent="text-emerald-500" subtitle="Mijozlar qachon faol">
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <MiniStat label="Eng faol soat" value={`${ta.activeHour}:00`} icon={Clock} />
+        <MiniStat label="Eng faol kun" value={activeDayName} icon={CalendarDays} />
+        <MiniStat label="Dam olish (shb/sha)" value={percent(ta.weekendShare)} icon={Gauge} />
+        <MiniStat label="Kechki faollik" value={total > 0 ? `${Math.round((ta.eveningCount / total) * 100)}%` : '—'} icon={TrendingUp} />
+      </div>
+      <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Hafta va soat xaritasi</p>
+      <Heatmap data={ta.weekdayHourly} />
+    </SectionCard>
+  );
+};
+
+const GrowthSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const comps = Object.values(data.comparison);
+  return (
+    <SectionCard title="O'sish (oldingi davr bilan)" icon={TrendingUp} accent="text-emerald-500" subtitle={`${data.rangeDate.from} → ${data.rangeDate.to}`}>
+      {comps.every((c) => c.current === 0 && c.previous === 0) ? (
+        <p className="text-xs text-neutral-400 text-center py-6">Ma'lumot yo'q</p>
+      ) : (
+        <div className="space-y-2">
+          {comps.map((c) => (
+            <div key={c.label} className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 text-xs">
+              <span className="font-bold text-neutral-700 dark:text-neutral-200">{c.label}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-neutral-900 dark:text-white">{c.current.toLocaleString('uz-UZ')}</span>
+                {c.previous > 0 && <span className="text-[10px] text-neutral-400">avval {c.previous.toLocaleString('uz-UZ')}</span>}
+                {c.previous > 0 && <TrendBadge value={c.changePct} />}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionCard>
+  );
+};
+
+const KpiSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const k = data.kpis;
+  const cards = [
+    { label: 'Konversiya (niyat/sahifa)', value: percent(k.conversionRate) },
+    { label: 'Ishtirok (voqealar/davr)', value: data.rows.toLocaleString('uz-UZ') },
+    { label: 'Favorite darajasi', value: percent(k.favoriteRate) },
+    { label: 'Mahsulot CTR', value: percent(k.productCtr) },
+    { label: 'Feed CTR', value: percent(k.feedCtr) },
+    { label: 'Qaytish darajasi', value: percent(k.returningRate) },
+  ];
+  return (
+    <SectionCard title="Biznes KPI" icon={BarChart3} accent="text-blue-500" subtitle="Asosiy samaradorlik ko'rsatkichlari">
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        {cards.map((c) => (
+          <div key={c.label} className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800">
+            <div className="text-lg font-black text-blue-600 dark:text-blue-400">{c.value}</div>
+            <p className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400">{c.label}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mb-2">O'rtacha qiziqish</p>
+      <div className="flex items-end gap-2">
+        <div className="text-3xl font-black text-neutral-900 dark:text-white">{k.avgInterest.toFixed(1)}</div>
+        <span className="text-[10px] text-neutral-400 mb-1">(0 = past, 2 = yuqori)</span>
+      </div>
+    </SectionCard>
+  );
+};
+
+const JourneySection: React.FC<{ data: AnalyticsData }> = ({ data }) => (
+  <SectionCard title="Xaridor yo'nalishlari" icon={Filter} accent="text-purple-500" subtitle="Eng keng tarqalgan sahifa ketma-ketliklari">
+    {data.journeys.length === 0 ? (
+      <p className="text-xs text-neutral-400 text-center py-6">Yo'nalishlar yo'q</p>
+    ) : (
+      <div className="space-y-2">
+        {data.journeys.map((j, i) => (
+          <div key={i} className="flex items-center flex-wrap gap-1 p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 text-[11px]">
+            {j.path.map((p, pi) => (
+              <React.Fragment key={pi}>
+                {pi > 0 && <span className="text-neutral-400">→</span>}
+                <span className="px-1.5 py-0.5 rounded-md bg-white dark:bg-neutral-700/60 text-neutral-600 dark:text-neutral-200 font-bold">{pathLabel(p) || '/'}</span>
+              </React.Fragment>
+            ))}
+            <span className="ml-auto text-neutral-400 font-black shrink-0">{j.count} marta</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </SectionCard>
+);
+
+const pathLabel = (p: string): string => {
+  if (!p) return '/';
+  const path = p.split('?')[0];
+  if (path === '/' || path === '') return 'Bosh sahifa';
+  const segs = path.split('/').filter(Boolean);
+  if (segs[0] === 'products' && segs[1]) return 'Mahsulot';
+  if (segs[0] === 'products') return 'Katalog';
+  if (segs[0] === 'feed') return 'Feed';
+  if (segs[0] === 'about') return 'Biz haqimizda';
+  if (segs[0] === 'contact') return 'Aloqa';
+  if (segs[0] === 'favorites') return 'Sevimlilar';
+  return segs[0] ?? path;
+};
+
+const WishlistSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const w = data.wishlist;
+  return (
+    <SectionCard title="Sevimlilar (Wishlist)" icon={Heart} accent="text-rose-500" subtitle="Saqlash xulq-atvori">
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <MiniStat label="Noyob mijozlar" value={w.uniqueSavers} icon={Users} />
+        <MiniStat label="Jami saqlashlar" value={w.totalSaves} icon={Heart} />
+        <MiniStat label="Takroriy saqlashlar" value={w.repeatedSaves} icon={TrendingUp} />
+        <MiniStat label="O'chirilgan" value={w.removedCount} icon={AlertTriangle} />
+      </div>
+      <div className="rounded-xl p-3 bg-gradient-to-r from-rose-50 to-neutral-50 dark:from-rose-950/20 dark:to-neutral-800/30 border border-rose-100 dark:border-rose-900/40 text-xs mb-3">
+        <span className="font-black text-neutral-900 dark:text-white">Saqlash o'sishi:</span>{' '}
+        <span className={w.saveGrowth >= 0 ? 'text-emerald-600 dark:text-emerald-400 font-black' : 'text-rose-500 font-black'}>{w.saveGrowth >= 0 ? '+' : ''}{w.saveGrowth}</span>
+      </div>
+      <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Eng ko'p saqlangan</p>
+      <div className="space-y-1.5">
+        {w.mostSaved.length === 0 ? (
+          <p className="text-xs text-neutral-400">Ma'lumot yo'q</p>
+        ) : (
+          w.mostSaved.slice(0, 5).map((r) => (
+            <div key={r.label} className="flex items-center justify-between text-[11px]">
+              <span className="text-neutral-600 dark:text-neutral-300 truncate">{r.label}</span>
+              <span className="font-black text-neutral-900 dark:text-white shrink-0">{r.value}</span>
+            </div>
+          ))
+        )}
+      </div>
+    </SectionCard>
+  );
+};
+
+const AlertsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => (
+  <SectionCard title="Avtomatik ogohlantirishlar" icon={Bell} accent="text-amber-500" subtitle="Real ma'lumotlardan aniqlangan holatlar">
+    {data.alerts.length === 0 ? (
+      <p className="text-xs text-neutral-400 text-center py-6">Hozircha ogohlantirish yo'q</p>
+    ) : (
+      <div className="space-y-2">
+        {data.alerts.map((a, i) => (
+          <div
+            key={i}
+            className={`p-3 rounded-xl border text-xs ${
+              a.level === 'alert'
+                ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-200/60 dark:border-rose-900/40 text-rose-800 dark:text-rose-300'
+                : a.level === 'warn'
+                ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200/60 dark:border-amber-900/40 text-amber-800 dark:text-amber-300'
+                : 'bg-blue-50 dark:bg-blue-950/30 border-blue-200/60 dark:border-blue-900/40 text-blue-800 dark:text-blue-300'
+            }`}
+          >
+            <div className="font-black mb-0.5">{a.title}</div>
+            <div className="leading-relaxed opacity-90">{a.detail}</div>
+          </div>
+        ))}
+      </div>
+    )}
+  </SectionCard>
+);
+
+const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+  const download = (period: 'daily' | 'weekly' | 'monthly', label: string) => {
+    const csv = data.buildReportCsv(period);
+    downloadFile(`analytics-${period}-report.csv`, csv);
+    void label;
+  };
+  return (
+    <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="CSV eksport (kunlik/haftalik/oylik)">
+      <div className="grid grid-cols-1 gap-2 mb-3">
+        <button type="button" onClick={() => download('daily', "Kunlik")} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+          <span>Kunlik hisobot</span>
+          <Download className="w-4 h-4 text-emerald-500" />
+        </button>
+        <button type="button" onClick={() => download('weekly', 'Haftalik')} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+          <span>Haftalik hisobot</span>
+          <Download className="w-4 h-4 text-emerald-500" />
+        </button>
+        <button type="button" onClick={() => download('monthly', 'Oylik')} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+          <span>Oylik hisobot</span>
+          <Download className="w-4 h-4 text-emerald-500" />
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={() => downloadFile('analytics-products.csv', data.buildProductCsv())}
+        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 text-xs font-black hover:opacity-90 transition-opacity"
+      >
+        <Download className="w-4 h-4" />
+        Mahsulotlar CSV
+      </button>
+      <p className="text-[10px] text-neutral-400 mt-2">Hozirgi tanlangan davr bo'yicha.</p>
     </SectionCard>
   );
 };

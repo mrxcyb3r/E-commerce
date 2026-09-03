@@ -153,6 +153,9 @@ function enrichMetadata(e: Enrichment): Record<string, unknown> {
     device: e.device,
     screen: e.screen,
     language: e.language,
+    browser: e.browser,
+    os: e.os,
+    dark_mode: e.darkMode,
   };
   if (e.source) meta.source = e.source;
   if (e.referrer) meta.referrer = e.referrer;

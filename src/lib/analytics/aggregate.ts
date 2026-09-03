@@ -157,11 +157,14 @@ export interface ProductMetric {
   telegramClicks: number;
   phoneClicks: number;
   mapClicks: number;
+  shareClicks: number;
   feedProductClicks: number;
+  avgDwellSec: number; // real measured time on product pages
   firstSeen: string | null;
   lastSeen: string | null;
   interest: InterestLevel;
   engagementRate: number; // (saves+telegram+phone+map+feed clicks) / views
+  isTrending: boolean; // rising view activity in the recent half of the range
 }
 
 export function computeProducts(events: AnalyticsEvent[], range: DateRange): ProductMetric[] {
@@ -172,6 +175,12 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
     if (!byProduct.has(ev.product_id)) byProduct.set(ev.product_id, []);
     byProduct.get(ev.product_id)!.push(ev);
   }
+
+  // Midpoint within the range, used to separate "earlier" vs "recent" for
+  // trend detection (based only on real event timestamps).
+  const mid = new Date(range.to + 'T00:00:00Z').getTime();
+  const midLow = new Date(range.from + 'T00:00:00Z').getTime();
+  const rangeMid = midLow + (mid - midLow) / 2;
 
   const metrics: ProductMetric[] = [];
   for (const [id, list] of byProduct) {
@@ -186,7 +195,24 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
     const telegramClicks = list.filter((e) => e.event_type === 'telegram_click').length;
     const phoneClicks = list.filter((e) => e.event_type === 'phone_click').length;
     const mapClicks = list.filter((e) => e.event_type === 'directions_click').length;
+    const shareClicks = list.filter((e) => e.event_type === 'product_share').length;
     const feedProductClicks = list.filter((e) => e.event_type === 'feed_product_click').length;
+
+    // Real measured dwell time (seconds) from product_dwell events.
+    const dwellSecs = list
+      .filter((e) => e.event_type === 'product_dwell')
+      .map((e) => Number(e.metadata?.durationSec))
+      .filter((n) => Number.isFinite(n) && n > 0);
+    const avgDwellSec =
+      dwellSecs.length > 0 ? Math.round(dwellSecs.reduce((s, n) => s + n, 0) / dwellSecs.length) : 0;
+
+    // Trend: view events in the recent half vs the earlier half of the range.
+    const earlierViews = list.filter(
+      (e) => e.event_type === 'product_view' && e.created_at && new Date(e.created_at).getTime() < rangeMid
+    ).length;
+    const recentViews = views - earlierViews;
+    const isTrending =
+      recentViews >= Math.max(2, Math.ceil(earlierViews * 1.5)) && views > 0;
 
     const times = list.map((e) => e.created_at).filter(Boolean).sort();
     const engagement = saves + telegramClicks + phoneClicks + mapClicks + feedProductClicks;
@@ -211,11 +237,14 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
       telegramClicks,
       phoneClicks,
       mapClicks,
+      shareClicks,
       feedProductClicks,
+      avgDwellSec,
       firstSeen: times[0] ?? null,
       lastSeen: times[times.length - 1] ?? null,
       interest,
       engagementRate: views > 0 ? engagement / views : 0,
+      isTrending,
     });
   }
   return metrics;
@@ -231,6 +260,11 @@ export function leastEngagedProducts(products: ProductMetric[], n = 8): ProductM
     .filter((p) => p.views > 0)
     .sort((a, b) => a.engagementRate - b.engagementRate || a.views - b.views)
     .slice(0, n);
+}
+
+export function trendingProducts(products: ProductMetric[], n = 8): ProductMetric[] {
+  // Products whose view activity is rising in the recent half of the range.
+  return [...products].filter((p) => p.isTrending).sort((a, b) => b.views - a.views).slice(0, n);
 }
 
 // ---------------------------------------------------------------------------
@@ -561,6 +595,11 @@ export interface FunnelStage {
 export function buildFunnel(events: AnalyticsEvent[], range: DateRange): FunnelStage[] {
   const inRange = events.filter((e) => withinRange(e, range));
   const visitors = new Set(inRange.filter((e) => e.event_type === 'page_view').map((e) => e.visitor_id));
+  const categoryVisitors = new Set(
+    inRange
+      .filter((e) => e.event_type === 'category_view' || (e.event_type === 'product_view' && e.category_id))
+      .map((e) => e.visitor_id)
+  );
   const productVisitors = new Set(inRange.filter((e) => e.event_type === 'product_view').map((e) => e.visitor_id));
   const saveVisitors = new Set(inRange.filter((e) => e.event_type === 'product_save').map((e) => e.visitor_id));
   const contactVisitors = new Set(
@@ -572,6 +611,7 @@ export function buildFunnel(events: AnalyticsEvent[], range: DateRange): FunnelS
 
   const stages: FunnelStage[] = [];
   if (visitors.size > 0) stages.push({ label: 'Tashrifchilar', value: visitors.size });
+  if (categoryVisitors.size > 0) stages.push({ label: 'Kategoriya', value: categoryVisitors.size });
   if (productVisitors.size > 0) stages.push({ label: 'Mahsulot ko\'rgan', value: productVisitors.size });
   if (saveVisitors.size > 0) stages.push({ label: 'Saqlagan', value: saveVisitors.size });
   if (contactVisitors.size > 0) stages.push({ label: 'Bog\'langan', value: contactVisitors.size });
