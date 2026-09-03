@@ -2,9 +2,9 @@ import { HomepageCms, AboutCms, ContactCms } from '../types/cms';
 
 export const INITIAL_HOMEPAGE_CMS: HomepageCms = {
   hero: {
-    badge: 'Jizzaxdagi zamonaviy vitrina',
+    badge: 'O\'lningizdagi mahsulotlar',
     title: 'Sifatli Kiyimlar va Oyoq Kiyimlar',
-    highlightedTitle: 'Raqamli Vitrinasi',
+    highlightedTitle: 'Mahsulotlar',
     subtitle: 'Mahsulotlarimizni uydan chiqmasdan ko\'ring, narxlarini va mavjudligini aniqlang hamda do\'konimizdan qulay xarid qiling.',
     primaryButtonText: 'Katalogga o\'tish',
     primaryButtonLink: '/products',
@@ -58,7 +58,7 @@ export const INITIAL_HOMEPAGE_CMS: HomepageCms = {
     {
       id: 'feat-1',
       icon: 'Eye',
-      title: 'Shaffof Raqamli Vitrina',
+      title: 'Shaffof Onlayn Ko\'rish',
       description: 'Barcha narxlar, o\'lchamlar va ranglar saytimizda 100% ochiq ko\'rsatilgan.',
     },
     {
@@ -82,14 +82,14 @@ export const INITIAL_HOMEPAGE_CMS: HomepageCms = {
   ],
   featuredSectionTitle: 'Mashhur Mahsulotlar',
   featuredSectionSubtitle: 'Mijozlarimiz tomonidan eng ko\'p tanlanayotgan eng sara to\'plamlar',
-  videoSectionTitle: 'Jonli Vitrina — Videolarda Ko\'ring',
+  videoSectionTitle: 'Onlayn Ko\'rish',
   videoSectionSubtitle: 'Kiyimlarning haqiqiy ko\'rinishi, matosi va kiyilishini qisqa videolarda tomosha qiling',
 };
 
 export const INITIAL_ABOUT_CMS: AboutCms = {
   title: 'Zamonaviy Uslub va Sifat Markazi',
   subtitle: 'Jizzax shahrida mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelmoqdamiz.',
-  mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Raqamli vitrinamiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
+  mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Onlayn do\'konimiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
   secondStory: 'Do\'konimizda doimiy ravishda yangi kolleksiyalar yangilanib turadi. Erkaklar, ayollar, bolalar kiyimlari va sifatli oyoq kiyimlarining keng assortimenti sizni kutmoqda.',
   mission: 'Har bir inson uchun zamonaviy kiyinishni oson, shaffof va zavqli jarayonga aylantirish.',
   vision: 'Mintaqadagi eng ishonchli va sevimli mahalliy brendga aylanish.',

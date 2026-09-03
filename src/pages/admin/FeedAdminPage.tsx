@@ -121,8 +121,8 @@ export const FeedAdminPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
-            Jonli Vitrina / Video Reels Boshqaruvi
+<h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+            Jonli Feed / Videolar
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
             Mijozlar ko'radigan vertikal qisqa videolavhalar va ularga biriktirilgan mahsulotlar ({videos.length} ta video)

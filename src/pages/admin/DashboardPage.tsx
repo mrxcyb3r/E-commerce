@@ -54,7 +54,7 @@ export const DashboardPage: React.FC = () => {
       link: '/admin/categories',
     },
     {
-      title: 'Jonli Vitrina / Feed',
+      title: 'Jonli Feed / Videolar',
       value: (publishedVideos?.length ?? 0),
       subtext: 'Faol video va lukbuklar',
       icon: Film,
@@ -113,7 +113,7 @@ export const DashboardPage: React.FC = () => {
     },
     {
       title: 'Video / Reel qo\'shish',
-      desc: 'Jonli vitrinaga yangi video yuklash',
+      desc: 'Yangi video yuklash yoki mavjud videolarni boshqarish',
       link: '/admin/feed',
       icon: Film,
       color: 'bg-neutral-900 text-white dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700',

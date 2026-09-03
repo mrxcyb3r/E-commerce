@@ -4,7 +4,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'faq-1',
     question: 'Mahsulotlarni onlayn sotib olish mumkinmi?',
-    answer: 'Hozircha saytimiz raqamli vitrina vazifasini bajaradi: siz barcha mahsulotlar, ularning narxi va mavjudligini onlayn ko\'rib, tanlaysiz hamda do\'konimizga tashrif buyurib, kiyib ko\'rgan holda xarid qilasiz. Bu sizga o\'lcham va sifatda adashmaslik imkonini beradi.',
+    answer: 'Siz barcha mahsulotlar, ularning narxi va mavjudligini onlayn ko\'rib, tanlaysiz hamda do\'konimizga tashrif buyurib, kiyib ko\'rgan holda xarid qilasiz. Bu sizga o\'lcham va sifatda adashmaslik imkonini beradi.',
   },
   {
     id: 'faq-2',

@@ -443,9 +443,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Return default homepage CMS
       return {
         hero: {
-          badge: 'Jizzaxdagi zamonaviy vitrina',
+          badge: 'O\'nliningizdagi mahsulotlar',
           title: 'Sifatli Kiyimlar va Oyoq Kiyimlar',
-          highlightedTitle: 'Raqamli Vitrinasi',
+          highlightedTitle: 'Mahsulotlar',
           subtitle: 'Mahsulotlarimizni uydan chiqmasdan ko\'ring, narxlarini va mavjudligini aniqlang ham va do\'konimizdan qulay xarid qiling.',
           primaryButtonText: 'Katalogga o\'tish',
           primaryButtonLink: '/products',
@@ -472,7 +472,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         whyChooseUsTitle: 'Nega Aynan Bizning Do\'kon?',
         whyChooseUsSubtitle: 'Zamonaviy kiyinish va qulay xarid uchun barcha qulayliklar',
         features: [
-          { id: 'feat-1', icon: 'Eye', title: 'Shaffof Raqamli Vitrina', description: 'Barcha narxlar, o\'lchamlar va ranglar saytimizda 100% ochiq ko\'rsatilgan.' },
+          { id: 'feat-1', icon: 'Eye', title: 'Shaffof Onlayn Ko\'rish', description: 'Barcha narxlar, o\'lchamlar va ranglar saytimizda 100% ochiq ko\'rsatilgan.' },
           { id: 'feat-2', icon: 'Sparkles', title: 'Haqiqiy Sifat Kafolati', description: 'Faqt sinovdan o\'tgan matolar, qulay andazalar va mustahkam tikuvlar.' },
           { id: 'feat-3', icon: 'ShieldCheck', title: 'Kiyib Ko\'rish Imkoniyati', description: 'Do\'konga kelib, kiyinish xonalarimizda o\'zingizna mosligiga to\'liq ishonch hosil qiling.' },
           { id: 'feat-4', icon: 'Clock', title: 'Har Kuni Ochiq', description: 'Dam olsunki kunlarisiz,haftaning 7 kuni soat 09:00 dan 20:00 gacha xizmatingizdamiz.' },
@@ -500,7 +500,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return {
         title: 'Zamonaviy Uslub va Sifat Markazi',
         subtitle: 'Jizzax shahrida mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelmoqdamiz.',
-        mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Raqamli vitrinamiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
+        mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Onlayn do\'konimiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
         secondStory: 'Do\'konimizda doimiy ravishda yangi kolleksiyalar yangilanib turadi. Erkaklar, ayollar, bolalar kiyimlari va sifatli oyoq kiyimlarning keng assortimenti sizni kutmoqda.',
         mission: 'Har bir inson uchun zamonaviy kiyinishni oson, shaffof va zavqli jarayonga aylantirish.',
         vision: 'Mintaqadagi eng ishonchli va sevimli malliy brendga aylanish.',

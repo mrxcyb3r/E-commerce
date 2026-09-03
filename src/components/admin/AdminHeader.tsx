@@ -20,7 +20,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
     categories: 'Kategoriyalar',
     inventory: 'Inventar & Zaxira',
     homepage: 'Bosh sahifa (CMS)',
-    feed: 'Jonli Vitrina / Feed',
+    feed: 'Jonli Feed / Videolar',
     prompts: 'AI Prompt Library',
     testimonials: 'Mijozlar Sharhlari',
     faq: 'Savol-Javoblar (FAQ)',
@@ -83,7 +83,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
           target="_blank"
           rel="noreferrer"
           className="p-2 rounded-xl text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors hidden xs:flex items-center gap-1.5 text-xs font-semibold"
-          title="Vitrinani yangi oynada ochish"
+          title="Jonli ko'reshga yangilash"
         >
           <ExternalLink className="w-4 h-4" />
         </a>

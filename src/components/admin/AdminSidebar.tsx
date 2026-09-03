@@ -92,7 +92,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           icon: Home,
         },
         {
-          label: 'Jonli Vitrina / Feed',
+          label: 'Jonli Feed / Videolar',
           path: '/admin/feed',
           icon: Film,
           badge: (publishedVideos?.length ?? 0).toString(),
