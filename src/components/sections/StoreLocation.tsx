@@ -10,6 +10,7 @@ import {
   Check
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { track } from '../../lib/analytics/client';
 import { motion } from 'motion/react';
 
 export const StoreLocation: React.FC = () => {
@@ -110,6 +111,7 @@ export const StoreLocation: React.FC = () => {
                   <div>
                     <a
                       href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
+                      onClick={() => track('phone_click')}
                       className="text-base font-black text-zinc-900 dark:text-white hover:underline font-['Outfit',sans-serif]"
                     >
                       {storeInfo.phone}
@@ -128,6 +130,7 @@ export const StoreLocation: React.FC = () => {
                 href={googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => track('directions_click', { metadata: { via: 'google-maps' } })}
                 className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
               >
                 <Navigation className="w-4 h-4" />
@@ -139,6 +142,7 @@ export const StoreLocation: React.FC = () => {
                   href={storeInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('telegram_click')}
                   className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" />
@@ -146,6 +150,7 @@ export const StoreLocation: React.FC = () => {
                 </a>
                 <a
                   href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
+                  onClick={() => track('phone_click')}
                   className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5" />
@@ -212,6 +217,7 @@ export const StoreLocation: React.FC = () => {
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('directions_click', { metadata: { via: 'google-maps' } })}
                   className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center gap-1 shadow-xs"
                 >
                   <span>Google Maps</span>
@@ -221,6 +227,7 @@ export const StoreLocation: React.FC = () => {
                   href={yandexMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('directions_click', { metadata: { via: 'yandex-maps' } })}
                   className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center gap-1 shadow-xs"
                 >
                   <span>Yandex Xarita</span>

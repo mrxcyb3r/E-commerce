@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useVideoFeed } from '../context/VideoContext';
 import { useAuth } from '../context/AuthContext';
+import { track } from '../lib/analytics/client';
 import { FeedVideoCard } from '../components/feed/FeedVideoCard';
 import { AdminVideoModal } from '../components/feed/AdminVideoModal';
 import { FeedCategoryFilter } from '../types/video';
@@ -126,6 +127,12 @@ export const FeedPage: React.FC = () => {
 
   const activeVideo = filteredVideos[activeIndex];
   const activeProduct = activeVideo ? getProductForVideo(activeVideo.productId) : undefined;
+
+  useEffect(() => {
+    if (activeVideo) {
+      track('feed_view', { feedId: activeVideo.id, uniquePerVisitor: true });
+    }
+  }, [activeVideo]);
 
   return (
     <div className="pt-20 sm:pt-24 pb-12 min-h-screen bg-zinc-950 text-white flex flex-col justify-center">
@@ -373,6 +380,7 @@ export const FeedPage: React.FC = () => {
 
                   <Link
                     to={`/products/${activeProduct.id}`}
+                    onClick={() => track('feed_product_click', { feedId: activeVideo?.id, productId: activeProduct.id })}
                     className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95"
                   >
                     <span>Mahsulotni ko'rish</span>

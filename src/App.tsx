@@ -38,6 +38,13 @@ import { StoreAdminPage } from './pages/admin/StoreAdminPage';
 import { AboutAdminPage } from './pages/admin/AboutAdminPage';
 import { ContactAdminPage } from './pages/admin/ContactAdminPage';
 import { SettingsAdminPage } from './pages/admin/SettingsAdminPage';
+import { AnalyticsAdminPage } from './pages/admin/AnalyticsAdminPage';
+import { useAnalytics } from './hooks/useAnalytics';
+
+const AnalyticsTracker: React.FC = () => {
+  useAnalytics();
+  return null;
+};
 
 export default function App() {
   return (
@@ -48,6 +55,7 @@ export default function App() {
             <VideoProvider>
               <BrowserRouter>
                 <ScrollToTop />
+                <AnalyticsTracker />
                 <Routes>
                   {/* Public Store Routes */}
                   <Route
@@ -104,6 +112,7 @@ export default function App() {
                     <Route path="about" element={<AboutAdminPage />} />
                     <Route path="contact" element={<ContactAdminPage />} />
                     <Route path="settings" element={<SettingsAdminPage />} />
+                    <Route path="analytics" element={<AnalyticsAdminPage />} />
                   </Route>
                 </Routes>
               </BrowserRouter>

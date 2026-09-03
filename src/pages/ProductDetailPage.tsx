@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { BUSINESS_CONFIG } from '../config/business';
 import { formatPrice, generateTelegramProductLink } from '../lib/utils';
 import { useFavorites } from '../hooks/useFavorites';
+import { track } from '../lib/analytics/client';
 import { ProductGallery } from '../components/products/ProductGallery';
 import { StoreVisitModal } from '../components/products/StoreVisitModal';
 import { ProductCard } from '../components/products/ProductCard';
@@ -41,6 +42,11 @@ export const ProductDetailPage: React.FC = () => {
     if (product) {
       if (product.sizes.length > 0) setSelectedSize(product.sizes[0]);
       if (product.colors.length > 0) setSelectedColor(product.colors[0].name);
+      track('product_view', {
+        productId: product.id,
+        categoryId: product.category,
+        uniquePerVisitor: true,
+      });
     }
   }, [id, product]);
 
@@ -252,6 +258,7 @@ export const ProductDetailPage: React.FC = () => {
               href={telegramInquiryLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track('telegram_click', { productId: product.id })}
               className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
             >
               <Send className="w-4 h-4 text-blue-500" />

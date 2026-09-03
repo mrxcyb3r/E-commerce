@@ -18,6 +18,7 @@ import {
   ExternalLink,
   ChevronRight,
   X,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -48,6 +49,16 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           path: '/admin',
           icon: LayoutDashboard,
           end: true,
+        },
+      ],
+    },
+    {
+      title: 'TAHLIL VA TASHHIS',
+      items: [
+        {
+          label: 'Analytics',
+          path: '/admin/analytics',
+          icon: BarChart3,
         },
       ],
     },

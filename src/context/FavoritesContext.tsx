@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { Product } from '../types/product';
 import { useStore } from './StoreContext';
+import { track } from '../lib/analytics/client';
 
 interface FavoritesContextType {
   favoriteIds: string[];
@@ -40,9 +41,11 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const toggleFavorite = (item: Product | string) => {
     const id = typeof item === 'string' ? item : item.id;
-    setFavoriteIds((prev) =>
-      prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]
-    );
+    const next = favoriteIds.includes(id)
+      ? favoriteIds.filter((favId) => favId !== id)
+      : [...favoriteIds, id];
+    setFavoriteIds(next);
+    track(next.includes(id) ? 'product_save' : 'product_unsave', { productId: id });
   };
 
   const removeFavorite = (id: string) => {

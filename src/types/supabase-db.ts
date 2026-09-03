@@ -142,6 +142,40 @@ type FaqItem = {
   updated_at: string;
 };
 
+export type AnalyticsEventType =
+  | 'page_view'
+  | 'product_view'
+  | 'product_save'
+  | 'product_unsave'
+  | 'category_view'
+  | 'search'
+  | 'feed_view'
+  | 'feed_like'
+  | 'feed_share'
+  | 'feed_product_click'
+  | 'telegram_click'
+  | 'phone_click'
+  | 'directions_click'
+  | 'ai_question'
+  | 'price_offer'
+  | 'contact_click'
+  | 'feedback_submit';
+
+export type AnalyticsEvent = {
+  id: number;
+  shop_id: string;
+  visitor_id: string;
+  session_id: string;
+  event_type: AnalyticsEventType;
+  product_id: string | null;
+  feed_id: string | null;
+  category_id: string | null;
+  search_query: string | null;
+  page_path: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
 type HomepageCms = {
   id: string;
   hero_badge: string | null;
@@ -328,6 +362,11 @@ export type Database = {
         Row: StoreSettings;
         Insert: Omit<StoreSettings, 'id' | 'updated_at'>;
         Update: Partial<Omit<StoreSettings, 'id' | 'updated_at'>>;
+      };
+      analytics_events: {
+        Row: AnalyticsEvent;
+        Insert: Omit<AnalyticsEvent, 'id' | 'created_at'>;
+        Update: Partial<Omit<AnalyticsEvent, 'id' | 'created_at'>>;
       };
     };
     Views: {};

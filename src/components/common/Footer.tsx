@@ -13,6 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { track } from '../../lib/analytics/client';
 
 export const Footer: React.FC = () => {
   const { storeInfo, publishedCategories: categories } = useStore();
@@ -40,6 +41,7 @@ export const Footer: React.FC = () => {
                 href={storeInfo.telegram}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => track('telegram_click')}
                 className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:text-blue-500 hover:border-blue-500 transition-colors"
                 aria-label="Telegram"
               >
@@ -156,6 +158,7 @@ export const Footer: React.FC = () => {
                 <Phone className="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0" />
                 <a
                   href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
+                  onClick={() => track('phone_click')}
                   className="hover:text-zinc-900 dark:hover:text-white transition-colors font-bold"
                 >
                   {storeInfo.phone}
@@ -167,6 +170,7 @@ export const Footer: React.FC = () => {
                   href={storeInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('telegram_click')}
                   className="inline-flex items-center gap-1 text-zinc-900 dark:text-white font-bold hover:underline"
                 >
                   {storeInfo.telegramUsername}

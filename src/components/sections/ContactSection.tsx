@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Phone, MapPin, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { track } from '../../lib/analytics/client';
 import { motion } from 'motion/react';
 
 export const ContactSection: React.FC = () => {
@@ -48,6 +49,7 @@ export const ContactSection: React.FC = () => {
       `👤 Ism: ${formData.name}%0A` +
       `📞 Tel: ${formData.phone}%0A` +
       `💬 Xabar: ${formData.message}`;
+    track('contact_click', { metadata: { via: 'telegram-form' } });
     window.open(`${storeInfo.telegram}?text=${text}`, '_blank');
   };
 
@@ -92,6 +94,7 @@ export const ContactSection: React.FC = () => {
                   href={storeInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('telegram_click')}
                   className="flex items-center gap-3.5 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -107,6 +110,7 @@ export const ContactSection: React.FC = () => {
 
                 <a
                   href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
+                  onClick={() => track('phone_click')}
                   className="flex items-center gap-3.5 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">

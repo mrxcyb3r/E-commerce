@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useFavorites } from '../../hooks/useFavorites';
+import { track } from '../../lib/analytics/client';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchModal } from './SearchModal';
 import { motion, AnimatePresence } from 'motion/react';
@@ -293,6 +294,7 @@ export const Navbar: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 id="navbar-telegram-cta"
+                onClick={() => track('telegram_click')}
                 className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-xs font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-xs hover:shadow-sm"
               >
                 <Send className="w-3.5 h-3.5" />
@@ -397,6 +399,7 @@ export const Navbar: React.FC = () => {
 
                   <a
                     href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
+                    onClick={() => track('phone_click')}
                     className="flex items-center gap-2 px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400"
                   >
                     <span className="font-black text-zinc-900 dark:text-zinc-100">Telefon:</span>
@@ -416,6 +419,7 @@ export const Navbar: React.FC = () => {
                   href={storeInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('telegram_click')}
                   className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
                 >
                   <Send className="w-4 h-4" />

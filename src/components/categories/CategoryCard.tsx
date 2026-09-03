@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Category } from '../../types/product';
 import { ArrowUpRight } from 'lucide-react';
+import { track } from '../../lib/analytics/client';
 import { motion } from 'motion/react';
 
 interface CategoryCardProps {
@@ -19,6 +20,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index }) =
     >
       <Link
         to={`/products?category=${category.slug}`}
+        onClick={() => track('category_view', { categoryId: category.slug, uniquePerVisitor: true })}
         className="group relative block rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300"
       >
         {/* Background Image with Zoom on Hover */}

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
+import { track } from '../../lib/analytics/client';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface FeedVideoCardProps {
@@ -170,6 +171,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const handleShare = (e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}/feed?v=${video.id}`;
+    track('feed_share', { feedId: video.id, metadata: { url } });
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       setCopiedLink(true);

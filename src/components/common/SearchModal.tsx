@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X, ArrowRight, Tag } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatPrice } from '../../lib/utils';
+import { track } from '../../lib/analytics/client';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SearchModalProps {
@@ -33,11 +34,15 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose();
+      } else if (e.key === 'Enter' && query.trim()) {
+        recordSearch(query);
+        onClose();
+        navigate(`/products?q=${encodeURIComponent(query)}`);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, query]);
 
   const filteredProducts = query.trim() === ''
     ? PRODUCTS.slice(0, 4)
@@ -52,12 +57,23 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
         );
       });
 
+  const recordSearch = (q: string) => {
+    if (q.trim()) {
+      track('search', {
+        searchQuery: q.trim(),
+        metadata: { noResults: filteredProducts.length === 0 },
+      });
+    }
+  };
+
   const handleSelectProduct = (productId: string) => {
+    recordSearch(query);
     onClose();
     navigate(`/products/${productId}`);
   };
 
   const handleViewAllResults = () => {
+    recordSearch(query);
     onClose();
     navigate(`/products?q=${encodeURIComponent(query)}`);
   };
