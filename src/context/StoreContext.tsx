@@ -3,7 +3,6 @@ import { Product, Category } from '../types/product';
 import { ClothingPromptItem } from '../types/prompt';
 import { Review } from '../types/review';
 import { FaqItem } from '../types/faq';
-import { VideoItem } from '../types/video';
 import { BusinessConfig } from '../types/business';
 import { HomepageCms, AboutCms, ContactCms, AdminActivityLog } from '../types/cms';
 import { supabase } from '../lib/supabase/client';
@@ -34,7 +33,6 @@ import { CATEGORIES as INITIAL_CATEGORIES } from '../data/categories';
 import { INITIAL_PROMPTS } from '../data/prompts';
 import { REVIEWS as INITIAL_REVIEWS } from '../data/reviews';
 import { FAQ_ITEMS as INITIAL_FAQ } from '../data/faq';
-import { INITIAL_VIDEOS } from '../data/videos';
 import { BUSINESS_CONFIG as INITIAL_BUSINESS } from '../config/business';
 import {
   INITIAL_HOMEPAGE_CMS,
@@ -144,13 +142,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [categories, setCategories] = useState<Category[]>(() => {
     try {
       return INITIAL_CATEGORIES;
-    } catch {
-      return [];
-    }
-  });
-  const [videos, setVideos] = useState<VideoItem[]>(() => {
-    try {
-      return INITIAL_VIDEOS;
     } catch {
       return [];
     }
@@ -316,22 +307,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       
       if (error) throw error;
       return (data as Category[]) ?? [];
-    } catch {
-      return [];
-    }
-  }
-
-  // Fetch videos from Supabase
-  async function fetchVideosFromSupabase(): Promise<VideoItem[]> {
-    try {
-      const { data, error } = await supabase
-        .from('feed_posts')
-        .select('*, products(*)')
-        .eq('type', 'video')
-        .eq('is_published', true);
-      
-      if (error) throw error;
-      return (data as VideoItem[]) ?? [];
     } catch {
       return [];
     }

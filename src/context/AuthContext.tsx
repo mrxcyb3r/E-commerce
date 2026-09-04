@@ -1,4 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '../lib/supabase/client';
+
+const ADMIN_EMAIL = 'admin@dokon.uz';
+const ADMIN_NAME = 'Do\'kon Administratori';
 
 export interface AdminUser {
   username: string;
@@ -13,105 +17,87 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateCredentials: (newUsername: string, newPassword: string) => void;
-  changeCredentials: (currentPassword: string, newUsername?: string, newPassword?: string) => boolean;
+  changeCredentials: (currentPassword: string, newUsername?: string, newPassword?: string) => Promise<boolean>;
 }
-
-const AUTH_STORAGE_KEY = 'store_admin_auth_user';
-const CREDENTIALS_STORAGE_KEY = 'store_admin_custom_credentials';
-
-const DEFAULT_USERNAME = 'admin';
-const DEFAULT_PASSWORD = '12345678';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const toAdminUser = (email: string | undefined): AdminUser => ({
+  username: email ? email.split('@')[0] : 'admin',
+  role: 'admin',
+  name: ADMIN_NAME,
+});
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AdminUser | null>(() => {
-    try {
-      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+  const [user, setUser] = useState<AdminUser | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user?.email === ADMIN_EMAIL) {
+        setUser(toAdminUser(data.session.user.email));
+      } else {
+        setUser(null);
       }
-    } catch {
-      // ignore
-    }
-    return null;
-  });
+      setSessionChecked(true);
+    });
 
-  const getSavedCredentials = () => {
-    try {
-      const stored = localStorage.getItem(CREDENTIALS_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email === ADMIN_EMAIL) {
+        setUser(toAdminUser(session.user.email));
+      } else {
+        setUser(null);
       }
-    } catch {
-      // ignore
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const login = useCallback(async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const cleanUser = username.trim();
+    const email = cleanUser.includes('@') || cleanUser === ADMIN_EMAIL ? cleanUser : ADMIN_EMAIL;
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password: password.trim() });
+    if (error) {
+      return { success: false, error: "Login yoki parol noto'g'ri." };
     }
-    return { username: DEFAULT_USERNAME, password: DEFAULT_PASSWORD };
-  };
+    setUser(toAdminUser(email));
+    return { success: true };
+  }, []);
 
-  const login = async (usernameInput: string, passwordInput: string): Promise<{ success: boolean; error?: string }> => {
-    // Artificial slight delay for realistic auth feedback
-    await new Promise((resolve) => setTimeout(resolve, 350));
-
-    const creds = getSavedCredentials();
-    const cleanUser = usernameInput.trim();
-    const cleanPass = passwordInput.trim();
-
-    if (cleanUser === creds.username && cleanPass === creds.password) {
-      const adminUser: AdminUser = {
-        username: creds.username,
-        role: 'admin',
-        name: 'Do\'kon Administratori',
-      };
-      setUser(adminUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(adminUser));
-      return { success: true };
-    }
-
-    return { success: false, error: "Login yoki parol noto'g'ri." };
-  };
-
-  const logout = () => {
+  const logout = useCallback(() => {
+    supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  };
+  }, []);
 
-  const updateCredentials = (newUsername: string, newPassword: string) => {
-    const creds = { username: newUsername.trim(), password: newPassword.trim() };
-    localStorage.setItem(CREDENTIALS_STORAGE_KEY, JSON.stringify(creds));
-    if (user) {
-      const updatedUser = { ...user, username: creds.username };
-      setUser(updatedUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
-    }
-  };
+  const updateCredentials = useCallback((_newUsername: string, _newPassword: string) => {
+    // Supabase Auth uses email managed in the dashboard; username is no longer stored locally.
+    // Kept for interface compatibility.
+  }, []);
 
-  const changeCredentials = (currentPassword: string, newUsername?: string, newPassword?: string): boolean => {
-    const creds = getSavedCredentials();
-    if (currentPassword.trim() !== creds.password) {
-      return false;
-    }
-    const updated = {
-      username: newUsername ? newUsername.trim() : creds.username,
-      password: newPassword ? newPassword.trim() : creds.password,
-    };
-    localStorage.setItem(CREDENTIALS_STORAGE_KEY, JSON.stringify(updated));
-    if (user) {
-      const updatedUser = { ...user, username: updated.username };
-      setUser(updatedUser);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser));
-    }
+  const changeCredentials = useCallback(async (currentPassword: string, _newUsername?: string, newPassword?: string): Promise<boolean> => {
+    if (!newPassword) return false;
+
+    // Verify current password is valid for the admin account
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: ADMIN_EMAIL,
+      password: currentPassword.trim(),
+    });
+    if (verifyError) return false;
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword.trim() });
+    if (error) return false;
     return true;
-  };
+  }, []);
 
-  const currentUsername = user?.username || getSavedCredentials().username;
+  const adminUsername = user?.username || 'admin';
 
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !!user,
+        isAuthenticated: sessionChecked && !!user,
         user,
-        adminUsername: currentUsername,
+        adminUsername,
         login,
         logout,
         updateCredentials,

@@ -1,9 +1,33 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../../types/supabase-db';
 
+const VISITOR_KEY = 'analytics_visitor_id';
+
+function getVisitorIdForHeader(): string {
+  try {
+    const existing = localStorage.getItem(VISITOR_KEY);
+    if (existing) return existing;
+    const fresh =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(VISITOR_KEY, fresh);
+    return fresh;
+  } catch {
+    return '';
+  }
+}
+
 export const supabase: SupabaseClient = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!,
+  {
+    global: {
+      headers: {
+        'x-visitor-id': getVisitorIdForHeader(),
+      },
+    },
+  }
 );
 
 // Helper for admin mutations - uses service role key only on server

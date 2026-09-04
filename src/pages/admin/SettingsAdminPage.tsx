@@ -20,7 +20,6 @@ export const SettingsAdminPage: React.FC = () => {
   const { exportDataJSON, importDataJSON, resetAllToDefaults } = useStore();
 
   // Change Password state
-  const [newUsername, setNewUsername] = useState(adminUsername);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,7 +29,7 @@ export const SettingsAdminPage: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
-  const handleCredentialsSubmit = (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordMsg(null);
 
@@ -44,9 +43,9 @@ export const SettingsAdminPage: React.FC = () => {
       return;
     }
 
-    const success = changeCredentials(currentPassword, newUsername, newPassword || undefined);
+    const success = await changeCredentials(currentPassword, undefined, newPassword || undefined);
     if (success) {
-      setPasswordMsg({ type: 'success', text: 'Admin ma\'lumotlari muvaffaqiyatli yangilandi!' });
+      setPasswordMsg({ type: 'success', text: 'Admin paroli muvaffaqiyatli yangilandi!' });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -129,15 +128,11 @@ export const SettingsAdminPage: React.FC = () => {
         <form onSubmit={handleCredentialsSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-              Admin Login (Username)
+              Admin Kirish (Email)
             </label>
-            <input
-              type="text"
-              required
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
-            />
+            <div className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium">
+              admin@dokon.uz
+            </div>
           </div>
 
           <div>
@@ -187,7 +182,7 @@ export const SettingsAdminPage: React.FC = () => {
               type="submit"
               className="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-900 text-xs font-bold transition-all shadow-xs"
             >
-              Parol va Loginni Yangilash
+              Parolni Yangilash
             </button>
           </div>
         </form>

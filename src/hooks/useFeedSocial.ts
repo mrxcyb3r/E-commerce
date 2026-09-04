@@ -115,6 +115,7 @@ export function useFeedLikes(feedId: string) {
 
 export function useFeedComments(feedId: string) {
   const [comments, setComments] = useState<FeedComment[]>([]);
+  const [commentCount, setCommentCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const mountedRef = useRef(true);
@@ -140,8 +141,15 @@ export function useFeedComments(feedId: string) {
         .order('created_at', { ascending: true })
         .limit(100);
 
+      const { count } = await supabase
+        .from('feed_comments')
+        .select('id', { count: 'exact', head: true })
+        .eq('feed_id', feedId)
+        .eq('moderation_status', 'visible');
+
       if (mountedRef.current && !error) {
         setComments(data ?? []);
+        setCommentCount(count ?? (data ?? []).length);
       }
       if (mountedRef.current) setLoading(false);
     };
@@ -167,7 +175,6 @@ export function useFeedComments(feedId: string) {
         .single();
 
       if (error) {
-        // Log full Supabase error details in dev for debugging (code, message, details, hint)
         console.error('[feed_comments insert error]', {
           code: error.code,
           message: error.message,
@@ -179,11 +186,11 @@ export function useFeedComments(feedId: string) {
 
       if (mountedRef.current && data) {
         setComments((prev) => [...prev, data]);
+        setCommentCount((c) => c + 1);
       }
       track('feed_comment_submit', { feedId });
       return true;
     } catch (err) {
-      // Only log in dev; in production the UI shows a clean retry message
       if (import.meta.env.DEV) console.error('[feed_comments] submit failed:', err);
       return false;
     } finally {
@@ -191,5 +198,5 @@ export function useFeedComments(feedId: string) {
     }
   }, [feedId, visitorId, displayName, submitting]);
 
-  return { comments, loading, submitting, addComment, commentCount: comments.length };
+  return { comments, loading, submitting, addComment, commentCount };
 }

@@ -14,6 +14,7 @@ import {
   ExternalLink,
   Package,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
@@ -29,6 +30,7 @@ export const FeedAdminPage: React.FC = () => {
     togglePublish,
     reorderVideos,
     resetToDefault,
+    loading: feedLoading,
   } = useVideoFeed();
 
   const { products } = useStore();
@@ -37,6 +39,7 @@ export const FeedAdminPage: React.FC = () => {
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
   const [videoToDelete, setVideoToDelete] = useState<VideoItem | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -51,11 +54,11 @@ export const FeedAdminPage: React.FC = () => {
   const openCreateModal = () => {
     setTitle('');
     setDescription('');
-    setVideoUrl('https://samplelib.com/preview/mp4/sample-5s.mp4');
-    setPosterUrl('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80');
-    setAuthor('@jizzax_style');
+    setVideoUrl('');
+    setPosterUrl('');
+    setAuthor('');
     setProductId(products[0]?.id || '');
-    setBadge('YANGI');
+    setBadge('');
     setPublished(true);
     setIsCreating(true);
     setEditingVideo(null);
@@ -64,7 +67,7 @@ export const FeedAdminPage: React.FC = () => {
   const openEditModal = (v: VideoItem) => {
     setTitle(v.title);
     setDescription(v.description || '');
-    setVideoUrl(v.videoUrl);
+    setVideoUrl(v.videoUrl || '');
     setPosterUrl(v.posterUrl || '');
     setAuthor(v.author || '');
     setProductId(v.productId || '');
@@ -74,58 +77,83 @@ export const FeedAdminPage: React.FC = () => {
     setIsCreating(false);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !videoUrl.trim()) return;
+    if (!title.trim() || saving) return;
+    setSaving(true);
 
-    if (isCreating) {
-      addVideo({
-        title: title.trim(),
-        description: description.trim(),
-        videoUrl: videoUrl.trim(),
-        posterUrl: posterUrl.trim() || undefined,
-        author: author.trim() || undefined,
-        productId: productId || undefined,
-        badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
-        category: 'all',
-        likesCount: 0,
-        viewsCount: 0,
-        published,
-        order: videos.length + 1,
-      });
-      setIsCreating(false);
-    } else if (editingVideo) {
-      updateVideo(editingVideo.id, {
-        title: title.trim(),
-        description: description.trim(),
-        videoUrl: videoUrl.trim(),
-        posterUrl: posterUrl.trim() || undefined,
-        author: author.trim() || undefined,
-        productId: productId || undefined,
-        badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
-        published,
-      });
-      setEditingVideo(null);
+    try {
+      if (isCreating) {
+        const ok = await addVideo({
+          title: title.trim(),
+          description: description.trim(),
+          videoUrl: videoUrl.trim() || undefined,
+          posterUrl: posterUrl.trim() || undefined,
+          author: author.trim() || undefined,
+          productId: productId || undefined,
+          badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
+          category: 'all',
+          published,
+          order: videos.length + 1,
+        });
+        if (ok) setIsCreating(false);
+      } else if (editingVideo) {
+        const ok = await updateVideo(editingVideo.id, {
+          title: title.trim(),
+          description: description.trim(),
+          videoUrl: videoUrl.trim() || undefined,
+          posterUrl: posterUrl.trim() || undefined,
+          author: author.trim() || undefined,
+          productId: productId || undefined,
+          badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
+          published,
+        });
+        if (ok) setEditingVideo(null);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (videoToDelete) {
-      deleteVideo(videoToDelete.id);
+      await deleteVideo(videoToDelete.id);
       setVideoToDelete(null);
     }
   };
+
+  const handleTogglePublish = async (id: string) => {
+    await togglePublish(id);
+  };
+
+  const handleReorder = async (from: number, to: number) => {
+    await reorderVideos(from, to);
+  };
+
+  const handleReset = async () => {
+    await resetToDefault();
+    setShowResetConfirm(false);
+  };
+
+  if (feedLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-neutral-400 animate-spin" />
+        <span className="ml-3 text-sm text-neutral-500">Videolar yuklanmoqda...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-<h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
             Jonli Feed / Videolar
           </h2>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
-            Mijozlar ko'radigan vertikal qisqa videolavhalar va ularga biriktirilgan mahsulotlar ({videos.length} ta video)
+            Mijozlar ko'radigan vertikal qisqa videolavhalar va ularga biriktirilgan mahsulotlar ({videos.length} ta video — Supabase)
           </p>
         </div>
 
@@ -181,7 +209,7 @@ export const FeedAdminPage: React.FC = () => {
 
                       <button
                         type="button"
-                        onClick={() => togglePublish(vid.id)}
+                        onClick={() => handleTogglePublish(vid.id)}
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           vid.published
                             ? 'bg-emerald-500/90 text-white'
@@ -194,7 +222,7 @@ export const FeedAdminPage: React.FC = () => {
 
                     <div className="space-y-1">
                       <p className="text-[11px] font-bold text-amber-400">
-                        {vid.author || '@jizzax_style'}
+                        {vid.author || '@do\'kon'}
                       </p>
                       <h3 className="text-sm font-extrabold text-white leading-snug line-clamp-2">
                         {vid.title}
@@ -233,12 +261,11 @@ export const FeedAdminPage: React.FC = () => {
 
                   <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-1">
                     <span className="flex items-center gap-1">
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>{vid.viewsCount ?? 100} marta ko'rildi</span>
+                      <Film className="w-3.5 h-3.5" />
+                      <span>{vid.type === 'collection' ? 'Kolleksiya' : 'Video'}</span>
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                      <span>{vid.likesCount ?? 15}</span>
+                    <span className="text-neutral-500 font-mono text-[10px]">
+                      {vid.id}
                     </span>
                   </div>
                 </div>
@@ -250,7 +277,7 @@ export const FeedAdminPage: React.FC = () => {
                   <button
                     type="button"
                     disabled={idx === 0}
-                    onClick={() => reorderVideos(idx, idx - 1)}
+                    onClick={() => handleReorder(idx, idx - 1)}
                     className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 disabled:opacity-30"
                     title="Oldinga siljitish"
                   >
@@ -259,7 +286,7 @@ export const FeedAdminPage: React.FC = () => {
                   <button
                     type="button"
                     disabled={idx === videos.length - 1}
-                    onClick={() => reorderVideos(idx, idx + 1)}
+                    onClick={() => handleReorder(idx, idx + 1)}
                     className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 disabled:opacity-30"
                     title="Keyinga siljitish"
                   >
@@ -343,7 +370,7 @@ export const FeedAdminPage: React.FC = () => {
                     type="text"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
-                    placeholder="@jizzax_style"
+                    placeholder="@do'kon"
                     className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
                   />
                 </div>
@@ -364,14 +391,13 @@ export const FeedAdminPage: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Video URL manzili (MP4 yoki WebM) <span className="text-red-500">*</span>
+                  Video URL manzili (MP4 yoki WebM)
                 </label>
                 <input
                   type="url"
-                  required
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://commondatastorage.googleapis.com/... yoki video link"
+                  placeholder="https://... yoki video link"
                   className="w-full px-4 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
                 />
               </div>
@@ -450,9 +476,11 @@ export const FeedAdminPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold shadow-sm"
+                  disabled={saving}
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold shadow-sm disabled:opacity-50 flex items-center gap-2"
                 >
-                  Saqlash
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {isCreating ? 'Yaratish' : 'Saqlash'}
                 </button>
               </div>
             </form>
@@ -476,10 +504,7 @@ export const FeedAdminPage: React.FC = () => {
         message="Barcha video ro'yxati dastlabki namuna videolariga qaytariladi. Davom etasizmi?"
         isDestructive={false}
         confirmLabel="Tiklash"
-        onConfirm={() => {
-          resetToDefault();
-          setShowResetConfirm(false);
-        }}
+        onConfirm={handleReset}
         onCancel={() => setShowResetConfirm(false)}
       />
     </div>

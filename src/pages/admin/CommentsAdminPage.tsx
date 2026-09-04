@@ -22,9 +22,7 @@ export const CommentsAdminPage: React.FC = () => {
   const [comments, setComments] = useState<CommentWithFeed[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'visible' | 'hidden' | 'pending'>('all');
-  const { publishedVideos } = useVideoFeed();
-
-  const feedTitleMap = new Map(publishedVideos.map((v) => [v.id, v.title]));
+  const { videos, loading: feedLoading } = useVideoFeed();
 
   const fetchComments = useCallback(async () => {
     setLoading(true);
@@ -41,14 +39,20 @@ export const CommentsAdminPage: React.FC = () => {
     const { data, error } = await query;
 
     if (!error && data) {
+      // Build title map from all videos (including unpublished, for admin context)
+      const titleMap = new Map(videos.map((v) => [v.id, v.title]));
       const withTitles = data.map((c) => ({
         ...c,
-        feed_title: feedTitleMap.get(c.feed_id) ?? c.feed_id,
+        feed_title: titleMap.get(c.feed_id) ?? c.feed_id,
       }));
       setComments(withTitles);
     }
     setLoading(false);
-  }, [filter, feedTitleMap]);
+  }, [filter, videos]);
+
+  useEffect(() => {
+    if (!feedLoading) fetchComments();
+  }, [fetchComments, feedLoading]);
 
   useEffect(() => {
     fetchComments();

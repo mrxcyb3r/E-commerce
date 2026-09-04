@@ -211,10 +211,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   )}
                 </button>
               </div>
-              <div className="flex items-center justify-between mt-2 px-1">
-                <p className="text-[10px] text-neutral-300 dark:text-neutral-600">
-                  Izohlar namuna asosida ko'rinadi
-                </p>
+              <div className="flex items-center justify-end mt-2 px-1">
                 <p className={`text-[10px] font-medium ${inputText.length > 450 ? 'text-amber-500' : 'text-neutral-300 dark:text-neutral-600'}`}>
                   {inputText.length}/500
                 </p>
