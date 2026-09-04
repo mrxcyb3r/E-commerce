@@ -531,6 +531,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!hydrated) return;
     const saveStoreInfo = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         await supabase
           .from('store_settings')
           .upsert(businessConfigToDb(storeInfo));
@@ -546,6 +548,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!hydrated) return;
     const saveHomepageCms = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         await supabase
           .from('homepage_cms')
           .upsert(homepageCmsToDb(homepageCms));
@@ -561,6 +565,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!hydrated) return;
     const saveAboutCms = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         await supabase
           .from('about_cms')
           .upsert(aboutCmsToDb(aboutCms));
@@ -576,6 +582,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (!hydrated) return;
     const saveContactCms = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
         await supabase
           .from('contact_cms')
           .upsert(contactCmsToDb(contactCms));
