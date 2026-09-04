@@ -40,6 +40,10 @@ import { ContactAdminPage } from './pages/admin/ContactAdminPage';
 import { SettingsAdminPage } from './pages/admin/SettingsAdminPage';
 import { AnalyticsAdminPage } from './pages/admin/AnalyticsAdminPage';
 import { CommentsAdminPage } from './pages/admin/CommentsAdminPage';
+import { FeedAnalyticsAdminPage } from './pages/admin/FeedAnalyticsAdminPage';
+import { FeedLikesAdminPage } from './pages/admin/FeedLikesAdminPage';
+import { FeedPerformanceAdminPage } from './pages/admin/FeedPerformanceAdminPage';
+import { FeedProductPerformancePage } from './pages/admin/FeedProductPerformancePage';
 import { useAnalytics } from './hooks/useAnalytics';
 
 const AnalyticsTracker: React.FC = () => {
@@ -105,6 +109,10 @@ export default function App() {
                     <Route path="categories" element={<CategoriesPage />} />
                     <Route path="inventory" element={<InventoryPage />} />
                     <Route path="feed" element={<FeedAdminPage />} />
+                    <Route path="feed/analytics" element={<FeedAnalyticsAdminPage />} />
+                    <Route path="feed/likes" element={<FeedLikesAdminPage />} />
+                    <Route path="feed/performance" element={<FeedPerformanceAdminPage />} />
+                    <Route path="feed/products" element={<FeedProductPerformancePage />} />
                     <Route path="prompts" element={<PromptsAdminPage />} />
                     <Route path="homepage" element={<HomepageCmsPage />} />
                     <Route path="testimonials" element={<TestimonialsAdminPage />} />

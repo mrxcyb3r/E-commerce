@@ -20,6 +20,8 @@ import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
 import { VideoItem } from '../../types/video';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { useFeedAdmStats } from '../../hooks/useFeedAdmStats';
+import { formatDuration } from '../../components/admin/analytics/util';
 
 export const FeedAdminPage: React.FC = () => {
   const {
@@ -34,6 +36,7 @@ export const FeedAdminPage: React.FC = () => {
   } = useVideoFeed();
 
   const { products } = useStore();
+  const { stats } = useFeedAdmStats();
 
   const [isCreating, setIsCreating] = useState(false);
   const [editingVideo, setEditingVideo] = useState<VideoItem | null>(null);
@@ -268,6 +271,16 @@ export const FeedAdminPage: React.FC = () => {
                       {vid.id}
                     </span>
                   </div>
+
+                  {/* Real engagement stats (from Supabase) */}
+                  {stats[vid.id] && (
+                    <div className="grid grid-cols-4 gap-1.5 pt-2 text-center">
+                      <StatChip label="Ko'r" value={stats[vid.id].views.toLocaleString('uz-UZ')} />
+                      <StatChip label="👍" value={stats[vid.id].likes.toLocaleString('uz-UZ')} />
+                      <StatChip label="Izoh" value={stats[vid.id].comments.toLocaleString('uz-UZ')} />
+                      <StatChip label="Vaqt" value={formatDuration(stats[vid.id].watchSec)} />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -510,3 +523,10 @@ export const FeedAdminPage: React.FC = () => {
     </div>
   );
 };
+
+const StatChip: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div className="rounded-lg bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 px-1 py-1">
+    <div className="text-xs font-black text-neutral-900 dark:text-white">{value}</div>
+    <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-wide">{label}</div>
+  </div>
+);

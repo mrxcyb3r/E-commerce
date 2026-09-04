@@ -477,6 +477,18 @@ export interface FeedMetric {
   comments: number;
   uniqueCommenters: number;
   engagementScore: number; // composite score based on available metrics
+  videoStarts: number;
+  videoCompletes: number;
+  completionRate: number; // completes / starts, 0 if no starts
+  favorites: number; // feed_favorite with action=save
+  unfavorites: number; // feed_favorite with action=unsave
+  retentions: RetentionPoint[]; // per-video retention curve from feed_video_retention events
+}
+
+export interface RetentionPoint {
+  bucket: string; // e.g. '3s','5s','10s','25%','50%','75%','100%'
+  count: number;
+  rate: number; // count / video starts, 0 if no starts
 }
 
 export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMetric[] {
@@ -495,6 +507,11 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
       totalWatchSec: number;
       comments: number;
       commenterSessions: Set<string>;
+      videoStarts: number;
+      videoCompletes: number;
+      favorites: number;
+      unfavorites: number;
+      retentions: Map<string, number>;
     }
   >();
 
@@ -502,7 +519,7 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     if (!withinRange(ev, range) || !ev.feed_id) continue;
     let m = map.get(ev.feed_id);
     if (!m) {
-      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, uniqueLikers: new Set(), shares: 0, productClicks: 0, telegramClicks: 0, watchEvents: 0, totalWatchSec: 0, comments: 0, commenterSessions: new Set() };
+      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, uniqueLikers: new Set(), shares: 0, productClicks: 0, telegramClicks: 0, watchEvents: 0, totalWatchSec: 0, comments: 0, commenterSessions: new Set(), videoStarts: 0, videoCompletes: 0, favorites: 0, unfavorites: 0, retentions: new Map<string, number>() };
       map.set(ev.feed_id, m);
     }
     switch (ev.event_type) {
@@ -528,6 +545,21 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
         const sec = Number(ev.metadata?.durationSec);
         if (Number.isFinite(sec)) m.totalWatchSec += sec;
         break;
+      case 'feed_video_start':
+        m.videoStarts += 1;
+        break;
+      case 'feed_video_complete':
+        m.videoCompletes += 1;
+        break;
+      case 'feed_favorite':
+        if (ev.metadata?.action === 'unsave') m.unfavorites += 1;
+        else m.favorites += 1;
+        break;
+      case 'feed_video_retention': {
+        const bucket = String(ev.metadata?.bucket ?? '');
+        if (bucket) m.retentions.set(bucket, (m.retentions.get(bucket) ?? 0) + 1);
+        break;
+      }
       case 'feed_comment_open':
         m.comments += 1;
         // We don't have a visitor_id in the comment_open event itself,
@@ -542,27 +574,299 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     }
   }
 
-  return Array.from(map.values()).map((m) => ({
-    id: m.id,
-    views: m.views,
-    uniqueViewers: m.viewers.size,
-    likes: m.likes,
-    uniqueLikers: m.uniqueLikers.size,
-    shares: m.shares,
-    productClicks: m.productClicks,
-    telegramClicks: m.telegramClicks,
-    watchEvents: m.watchEvents,
-    totalWatchSec: m.totalWatchSec,
-    avgWatchSec: m.watchEvents > 0 ? Math.round(m.totalWatchSec / m.watchEvents) : 0,
-    feedProductConversion: m.views > 0 ? m.productClicks / m.views : 0,
-    comments: m.comments,
-    uniqueCommenters: m.commenterSessions.size,
-    engagementScore: m.views > 0 ? Math.round((m.likes + m.shares + m.productClicks + m.telegramClicks) / m.views * 100) / 100 : 0,
-  }));
+  const ORDER: string[] = ['start', '3s', '5s', '10s', '25%', '50%', '75%', '100%'];
+
+  return Array.from(map.values()).map((m) => {
+    const retentions: RetentionPoint[] = ORDER.filter((b) => m.retentions.has(b)).map((b) => ({
+      bucket: b,
+      count: m.retentions.get(b) ?? 0,
+      rate: m.videoStarts > 0 ? (m.retentions.get(b) ?? 0) / m.videoStarts : 0,
+    }));
+    return {
+      id: m.id,
+      views: m.views,
+      uniqueViewers: m.viewers.size,
+      likes: m.likes,
+      uniqueLikers: m.uniqueLikers.size,
+      shares: m.shares,
+      productClicks: m.productClicks,
+      telegramClicks: m.telegramClicks,
+      watchEvents: m.watchEvents,
+      totalWatchSec: m.totalWatchSec,
+      avgWatchSec: m.watchEvents > 0 ? Math.round(m.totalWatchSec / m.watchEvents) : 0,
+      feedProductConversion: m.views > 0 ? m.productClicks / m.views : 0,
+      comments: m.comments,
+      uniqueCommenters: m.commenterSessions.size,
+      engagementScore: m.views > 0 ? Math.round((m.likes + m.shares + m.productClicks + m.telegramClicks) / m.views * 100) / 100 : 0,
+      videoStarts: m.videoStarts,
+      videoCompletes: m.videoCompletes,
+      completionRate: m.videoStarts > 0 ? m.videoCompletes / m.videoStarts : 0,
+      favorites: m.favorites,
+      unfavorites: m.unfavorites,
+      retentions,
+    };
+  });
 }
 
 export function topFeed(feed: FeedMetric[], n = 8): FeedMetric[] {
   return [...feed].sort((a, b) => b.views - a.views).slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
+// Feed module analytics (dedicated Feed admin)
+// ---------------------------------------------------------------------------
+
+export interface FeedOverview {
+  impressions: number; // feed_view count
+  uniqueViewers: number;
+  videoStarts: number;
+  videoCompletes: number;
+  averageWatchSec: number; // weighted by watch events
+  totalWatchSec: number;
+  completionRate: number; // completes / starts
+  engagementRate: number; // (likes + shares + productClicks + telegram + favorites) / impressions
+  likes: number;
+  comments: number; // comment_submit events
+  shares: number;
+  productClicks: number;
+  telegramClicks: number;
+  favorites: number;
+  videoCount: number; // distinct feed ids with any activity
+}
+
+export function computeFeedOverview(events: AnalyticsEvent[], range: DateRange): FeedOverview {
+  const inRange = events.filter((e) => withinRange(e, range) && e.feed_id);
+  const feedIds = new Set<string>();
+  const viewers = new Set<string>();
+  let impressions = 0;
+  let starts = 0;
+  let completes = 0;
+  let totalWatchSec = 0;
+  let watchEvents = 0;
+  let likes = 0;
+  let shares = 0;
+  let productClicks = 0;
+  let telegramClicks = 0;
+  let comments = 0;
+  let favorites = 0;
+
+  for (const ev of inRange) {
+    if (!ev.feed_id) continue;
+    feedIds.add(ev.feed_id);
+    viewers.add(ev.visitor_id);
+    switch (ev.event_type) {
+      case 'feed_view': impressions += 1; break;
+      case 'feed_video_start': starts += 1; break;
+      case 'feed_video_complete': completes += 1; break;
+      case 'feed_watch': {
+        watchEvents += 1;
+        const s = Number(ev.metadata?.durationSec);
+        if (Number.isFinite(s)) totalWatchSec += s;
+        break;
+      }
+      case 'feed_like': likes += 1; break;
+      case 'feed_share': shares += 1; break;
+      case 'feed_product_click': productClicks += 1; break;
+      case 'telegram_click': telegramClicks += 1; break;
+      case 'feed_comment_submit': comments += 1; break;
+      case 'feed_favorite':
+        if (ev.metadata?.action !== 'unsave') favorites += 1;
+        break;
+      default: break;
+    }
+  }
+
+  const engagementRate = impressions > 0
+    ? (likes + shares + productClicks + telegramClicks + favorites) / impressions
+    : 0;
+
+  return {
+    impressions,
+    uniqueViewers: viewers.size,
+    videoStarts: starts,
+    videoCompletes: completes,
+    averageWatchSec: watchEvents > 0 ? Math.round(totalWatchSec / watchEvents) : 0,
+    totalWatchSec,
+    completionRate: starts > 0 ? completes / starts : 0,
+    engagementRate,
+    likes,
+    comments,
+    shares,
+    productClicks,
+    telegramClicks,
+    favorites,
+    videoCount: feedIds.size,
+  };
+}
+
+export interface FeedFunnelStage {
+  label: string;
+  value: number;
+  rate: number; // relative to previous stage
+}
+
+export function computeFeedFunnel(events: AnalyticsEvent[], range: DateRange): FeedFunnelStage[] {
+  const inRange = events.filter((e) => withinRange(e, range) && e.feed_id);
+  const counts: Record<string, number> = {
+    impressions: 0,
+    starts: 0,
+    retained5s: 0,
+    productClick: 0,
+    favorite: 0,
+    telegram: 0,
+  };
+  for (const ev of inRange) {
+    if (!ev.feed_id) continue;
+    switch (ev.event_type) {
+      case 'feed_view': counts.impressions += 1; break;
+      case 'feed_video_start': counts.starts += 1; break;
+      case 'feed_video_retention':
+        if (ev.metadata?.bucket === '5s') counts.retained5s += 1;
+        break;
+      case 'feed_product_click': counts.productClick += 1; break;
+      case 'feed_favorite':
+        if (ev.metadata?.action !== 'unsave') counts.favorite += 1;
+        break;
+      case 'telegram_click': counts.telegram += 1; break;
+      default: break;
+    }
+  }
+  const steps: { label: string; key: 'impressions' | 'starts' | 'retained5s' | 'productClick' | 'favorite' | 'telegram' }[] = [
+    { label: 'Feed ko\'rinishi', key: 'impressions' },
+    { label: 'Video boshlandi', key: 'starts' },
+    { label: '5 soniya ushlandi', key: 'retained5s' },
+    { label: 'Mahsulot ochildi', key: 'productClick' },
+    { label: 'Saqlangan', key: 'favorite' },
+    { label: 'Telegram', key: 'telegram' },
+  ];
+  let prev = 0;
+  return steps.map((s) => {
+    const value = counts[s.key];
+    const stage: FeedFunnelStage = { label: s.label, value, rate: prev > 0 ? value / prev : 0 };
+    prev = value;
+    return stage;
+  });
+}
+
+export interface FeedActivityPoint {
+  date: string; // yyyy-mm-dd
+  impressions: number;
+  starts: number;
+  likes: number;
+  shares: number;
+  productClicks: number;
+  favorites: number;
+  watchSec: number;
+  completes: number;
+}
+
+export function computeFeedActivityTrend(events: AnalyticsEvent[], range: DateRange): FeedActivityPoint[] {
+  const inRange = events.filter((e) => withinRange(e, range) && e.feed_id);
+  const map = new Map<string, FeedActivityPoint>();
+  const start = range.from;
+  const end = range.to;
+  let cur = start;
+  while (cur <= end) {
+    map.set(cur, { date: cur, impressions: 0, starts: 0, likes: 0, shares: 0, productClicks: 0, favorites: 0, watchSec: 0, completes: 0 });
+    const d = new Date(cur + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    cur = d.toISOString().slice(0, 10);
+  }
+  for (const ev of inRange) {
+    if (!ev.feed_id) continue;
+    const day = ev.created_at.slice(0, 10);
+    const p = map.get(day);
+    if (!p) continue;
+    switch (ev.event_type) {
+      case 'feed_view': p.impressions += 1; break;
+      case 'feed_video_start': p.starts += 1; break;
+      case 'feed_like': p.likes += 1; break;
+      case 'feed_share': p.shares += 1; break;
+      case 'feed_product_click': p.productClicks += 1; break;
+      case 'feed_video_complete': p.completes += 1; break;
+      case 'feed_favorite':
+        if (ev.metadata?.action !== 'unsave') p.favorites += 1;
+        break;
+      case 'feed_watch': {
+        const s = Number(ev.metadata?.durationSec);
+        if (Number.isFinite(s)) p.watchSec += s;
+        break;
+      }
+      default: break;
+    }
+  }
+  return Array.from(map.values());
+}
+
+export interface FeedLikeTrendPoint {
+  date: string;
+  likes: number;
+  unlikes: number;
+}
+
+export function computeFeedLikeTrend(events: AnalyticsEvent[], range: DateRange): FeedLikeTrendPoint[] {
+  const inRange = events.filter((e) => withinRange(e, range) && e.feed_id);
+  const map = new Map<string, FeedLikeTrendPoint>();
+  let idx = range.from;
+  while (idx <= range.to) {
+    map.set(idx, { date: idx, likes: 0, unlikes: 0 });
+    const d = new Date(idx + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    idx = d.toISOString().slice(0, 10);
+  }
+  for (const ev of inRange) {
+    if (!ev.feed_id) continue;
+    const day = ev.created_at.slice(0, 10);
+    const p = map.get(day);
+    if (!p) continue;
+    if (ev.event_type === 'feed_like') p.likes += 1;
+    else if (ev.event_type === 'feed_unlike') p.unlikes += 1;
+  }
+  return Array.from(map.values());
+}
+
+export interface FeedProductMetric {
+  productId: string;
+  feedClicks: number; // feed_product_click where product_id set
+  labelClicks: number; // clicks without product id (impressions of a product-less card)
+  impressions: number; // feed_view where a product is linked (from metadata productId if present)
+  favorites: number; // feed_favorite (product_id set)
+  productViews: number; // product_view events for that product (post-click)
+  conversionRate: number; // productViews / feedClicks
+}
+
+export function computeFeedProductPerformance(events: AnalyticsEvent[], range: DateRange): FeedProductMetric[] {
+  const map = new Map<
+    string,
+    { feedClicks: number; labelClicks: number; favorites: number; productViews: number }
+  >();
+  for (const ev of events) {
+    if (!withinRange(ev, range)) continue;
+    const pid = ev.product_id || (ev.metadata?.productId as string | undefined);
+    if (!pid) continue;
+    let m = map.get(pid);
+    if (!m) {
+      m = { feedClicks: 0, labelClicks: 0, favorites: 0, productViews: 0 };
+      map.set(pid, m);
+    }
+    switch (ev.event_type) {
+      case 'feed_product_click': m.feedClicks += 1; break;
+      case 'feed_favorite':
+        if (ev.metadata?.action !== 'unsave') m.favorites += 1;
+        break;
+      case 'product_view': m.productViews += 1; break;
+      default: break;
+    }
+  }
+  return Array.from(map.entries()).map(([productId, m]) => ({
+    productId,
+    feedClicks: m.feedClicks,
+    labelClicks: 0,
+    impressions: 0,
+    favorites: m.favorites,
+    productViews: m.productViews,
+    conversionRate: m.feedClicks > 0 ? m.productViews / m.feedClicks : 0,
+  }));
 }
 
 // ---------------------------------------------------------------------------

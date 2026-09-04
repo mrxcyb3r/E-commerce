@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Images,
   Heart,
-  MessageCircle
+  MessageCircle,
+  Bookmark,
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
@@ -48,6 +49,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   // Watch-time accumulation for real video engagement analytics.
   const watchAccum = useRef(0);
   const lastTick = useRef(-1);
+
+  // Retention/start/completion tracking — fire each milestone once per play session.
+  const startedRef = useRef(false);
+  const firedRetention = useRef<Set<string>>(new Set());
   
   const { isMuted, toggleMute, getProductForVideo } = useVideoFeed();
   
@@ -58,6 +63,15 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [progress, setProgress] = useState<number>(0);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(() => {
+    try {
+      const raw = window.localStorage.getItem('feed_saved_videos');
+      const set = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+      return set.has(video.id);
+    } catch {
+      return false;
+    }
+  });
 
   // Reset error state when video source changes (new card, new URL)
   useEffect(() => {
@@ -146,6 +160,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     if (!isActive) {
       watchAccum.current = 0;
       lastTick.current = -1;
+      startedRef.current = false;
+      firedRetention.current = new Set();
     }
   }, [isActive, isCollection]);
 
@@ -160,14 +176,50 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     if (videoRef.current) {
       const current = videoRef.current.currentTime;
       const duration = videoRef.current.duration || 1;
-      setProgress((current / duration) * 100);
+      const progressPct = (current / duration) * 100;
+      setProgress(progressPct);
       watchAccum.current += lastTick.current >= 0 ? current - lastTick.current : 0;
       lastTick.current = current;
       if (watchAccum.current >= 5) {
         track('feed_watch', { feedId: video.id, metadata: { durationSec: Math.round(watchAccum.current) } });
         watchAccum.current = 0;
       }
+
+      // Retention milestones (fire each bucket once per play session)
+      const buckets: { key: string; name: string; pct: number }[] = [
+        { key: 'start', name: 'start', pct: 1 },
+        { key: '3s', name: '3s', pct: 3 },
+        { key: '5s', name: '5s', pct: 5 },
+        { key: '10s', name: '10s', pct: 10 },
+        { key: '25%', name: '25%', pct: 25 },
+        { key: '50%', name: '50%', pct: 50 },
+        { key: '75%', name: '75%', pct: 75 },
+        { key: '100%', name: '100%', pct: 100 },
+      ];
+      // Time-based buckets (3s/5s/10s) map on seconds played (for long videos).
+      if (!startedRef.current && current > 0) {
+        startedRef.current = true;
+        track('feed_video_start', { feedId: video.id, metadata: { } });
+      }
+      for (const b of buckets) {
+        if (b.key === 'start') continue;
+        const reachTime = b.key.includes('%') ? duration * (b.pct / 100) : b.pct;
+        const reachPct = b.key.includes('%') ? b.pct : (b.pct / (duration || 1)) * 100;
+        if (current >= reachTime && !firedRetention.current.has(b.key)) {
+          firedRetention.current.add(b.key);
+          track('feed_video_retention', {
+            feedId: video.id,
+            metadata: { bucket: b.name, watchPercent: Math.round(Math.min(progressPct, reachPct)) },
+          });
+        }
+      }
     }
+  };
+
+  const handleEnded = () => {
+    track('feed_video_complete', { feedId: video.id, metadata: { watchPercent: 100 } });
+    firedRetention.current = new Set();
+    startedRef.current = false;
   };
 
   const togglePlayPause = (e?: React.MouseEvent) => {
@@ -284,6 +336,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 setHasError(false);
               }}
               onTimeUpdate={handleTimeUpdate}
+              onEnded={handleEnded}
               onError={() => {
                 setHasError(true);
                 setIsLoading(false);
@@ -475,6 +528,37 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               <span className="text-xs font-bold text-white drop-shadow-md">
                 {commentCount > 0 ? commentCount.toLocaleString('uz-UZ') : ''}
               </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = !isSaved;
+                setIsSaved(next);
+                try {
+                  const raw = window.localStorage.getItem('feed_saved_videos');
+                  const set = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+                  if (next) set.add(video.id);
+                  else set.delete(video.id);
+                  window.localStorage.setItem('feed_saved_videos', JSON.stringify(Array.from(set)));
+                } catch {
+                  /* ignore */
+                }
+                track('feed_favorite', {
+                  feedId: video.id,
+                  productId: product?.id,
+                  metadata: { action: next ? 'save' : 'unsave' },
+                });
+              }}
+              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
+              aria-label={isSaved ? 'Olib tashlandi' : 'Saqlash'}
+            >
+              <Bookmark
+                className={`w-6 h-6 drop-shadow-lg ${
+                  isSaved ? 'text-amber-400 fill-amber-400' : 'text-white fill-white/20'
+                }`}
+              />
             </button>
           </div>
 

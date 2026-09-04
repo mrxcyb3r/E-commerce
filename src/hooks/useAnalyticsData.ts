@@ -22,6 +22,11 @@ import {
   computeProducts,
   computeCategories,
   computeFeed,
+  computeFeedOverview,
+  computeFeedFunnel,
+  computeFeedActivityTrend,
+  computeFeedLikeTrend,
+  computeFeedProductPerformance,
   computeSearch,
   computeIntent,
   trafficSeries,
@@ -68,6 +73,11 @@ export interface AnalyticsData {
   products: ProductMetric[];
   categories: CategoryMetric[];
   feed: FeedMetric[];
+  feedOverview: ReturnType<typeof computeFeedOverview>;
+  feedFunnel: ReturnType<typeof computeFeedFunnel>;
+  feedActivityTrend: ReturnType<typeof computeFeedActivityTrend>;
+  feedLikeTrend: ReturnType<typeof computeFeedLikeTrend>;
+  feedProductPerformance: ReturnType<typeof computeFeedProductPerformance>;
   search: SearchSummary;
   intent: IntentMetric;
   traffic: TrafficPoint[];
@@ -172,6 +182,11 @@ export function useAnalyticsData(): AnalyticsData {
     const products = computeProducts(rows, range);
     const categories = computeCategories(rows, range);
     const feed = computeFeed(rows, range);
+    const feedOverview = computeFeedOverview(rows, range);
+    const feedFunnel = computeFeedFunnel(rows, range);
+    const feedActivityTrend = computeFeedActivityTrend(rows, range);
+    const feedLikeTrend = computeFeedLikeTrend(rows, range);
+    const feedProductPerformance = computeFeedProductPerformance(rows, range);
     const search = computeSearch(rows, range);
     const intent = computeIntent(rows, range);
     const traffic = trafficSeries(rows, range);
@@ -205,6 +220,11 @@ export function useAnalyticsData(): AnalyticsData {
       products,
       categories,
       feed,
+      feedOverview,
+      feedFunnel,
+      feedActivityTrend,
+      feedLikeTrend,
+      feedProductPerformance,
       search,
       intent,
       traffic,
@@ -246,6 +266,11 @@ export function useAnalyticsData(): AnalyticsData {
     products: aggregate.products,
     categories: aggregate.categories,
     feed: aggregate.feed,
+    feedOverview: aggregate.feedOverview,
+    feedFunnel: aggregate.feedFunnel,
+    feedActivityTrend: aggregate.feedActivityTrend,
+    feedLikeTrend: aggregate.feedLikeTrend,
+    feedProductPerformance: aggregate.feedProductPerformance,
     search: aggregate.search,
     intent: aggregate.intent,
     traffic: aggregate.traffic,

@@ -20,6 +20,9 @@ import {
   X,
   BarChart3,
   MessageCircle,
+  Heart,
+  TrendingUp,
+  ShoppingBag,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -85,18 +88,48 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       ],
     },
     {
+      title: 'FEED',
+      items: [
+        {
+          label: 'Video kutubxonasi',
+          path: '/admin/feed',
+          icon: Film,
+          badge: (publishedVideos?.length ?? 0).toString(),
+        },
+        {
+          label: 'Feed tahlili',
+          path: '/admin/feed/analytics',
+          icon: BarChart3,
+        },
+        {
+          label: 'Yoqtirishlar',
+          path: '/admin/feed/likes',
+          icon: Heart,
+        },
+        {
+          label: 'Izohlar',
+          path: '/admin/comments',
+          icon: MessageCircle,
+        },
+        {
+          label: 'Video samaradorlik',
+          path: '/admin/feed/performance',
+          icon: TrendingUp,
+        },
+        {
+          label: 'Mahsulot samaradorligi',
+          path: '/admin/feed/products',
+          icon: ShoppingBag,
+        },
+      ],
+    },
+    {
       title: 'KONTENT VA MEDIA',
       items: [
         {
           label: 'Bosh sahifa (CMS)',
           path: '/admin/homepage',
           icon: Home,
-        },
-        {
-          label: 'Jonli Feed / Videolar',
-          path: '/admin/feed',
-          icon: Film,
-          badge: (publishedVideos?.length ?? 0).toString(),
         },
         {
           label: 'AI Prompt Library',
@@ -108,11 +141,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           label: 'Mijozlar sharhlari',
           path: '/admin/testimonials',
           icon: MessageSquareQuote,
-        },
-        {
-          label: 'Video izohlari',
-          path: '/admin/comments',
-          icon: MessageCircle,
         },
         {
           label: 'Savol-Javoblar (FAQ)',
