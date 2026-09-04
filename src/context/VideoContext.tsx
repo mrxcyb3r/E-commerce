@@ -10,7 +10,7 @@ interface VideoContextType {
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
   toggleMute: () => void;
-  addVideo: (video: Omit<VideoItem, 'id' | 'createdAt'>) => Promise<boolean>;
+  addVideo: (video: Omit<VideoItem, 'id' | 'createdAt'>, id?: string) => Promise<boolean>;
   updateVideo: (id: string, updates: Partial<VideoItem>) => Promise<boolean>;
   deleteVideo: (id: string) => Promise<boolean>;
   togglePublish: (id: string) => Promise<boolean>;
@@ -100,11 +100,17 @@ export const VideoProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsMuted((prev) => !prev);
   };
 
-  const addVideo = useCallback(async (newVideoData: Omit<VideoItem, 'id' | 'createdAt'>): Promise<boolean> => {
+  const addVideo = useCallback(async (
+    newVideoData: Omit<VideoItem, 'id' | 'createdAt'>,
+    explicitId?: string,
+  ): Promise<boolean> => {
     try {
       const row = videoItemToRow(newVideoData);
       // Compute sort_order as max + 1
       row.sort_order = Math.max(0, ...videos.map((v) => v.order || 0)) + 1;
+      // feed_posts.id is a text PK with no server default: generate a stable
+      // id (optionally provided by the caller so storage paths keyed by it work)
+      row.id = explicitId && explicitId.trim() ? explicitId.trim() : `feed-${Date.now()}`;
 
       const { data, error: err } = await supabase
         .from('feed_posts')

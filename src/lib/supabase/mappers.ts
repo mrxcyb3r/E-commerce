@@ -94,6 +94,8 @@ export function mapDbProductToApp(
     material: row.material ?? undefined,
     madeIn: row.made_in ?? undefined,
     tags: row.tags ?? [],
+    videoUrl: row.video_url ?? undefined,
+    videoPosterUrl: row.video_poster_url ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -278,6 +280,8 @@ export function productToDb(product: Product) {
     tags: product.tags ?? [],
     material: product.material ?? null,
     made_in: product.madeIn ?? null,
+    video_url: product.videoUrl ?? null,
+    video_poster_url: product.videoPosterUrl ?? null,
   };
 }
 

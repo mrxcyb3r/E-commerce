@@ -55,6 +55,8 @@ type Product = {
   tags: string[];
   material: string | null;
   made_in: string | null;
+  video_url: string | null;
+  video_poster_url: string | null;
   created_at: string;
   updated_at: string;
   product_images: ProductImage[];

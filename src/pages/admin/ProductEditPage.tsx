@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ImageUploader } from '../../components/admin/ImageUploader';
+import { VideoUploader } from '../../components/admin/VideoUploader';
+import { deleteMediaObjects, MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { Product } from '../../types/product';
 
 const PRESET_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '38', '39', '40', '41', '42', '43', '44', '45', 'Standart'];
@@ -58,6 +60,35 @@ export const ProductEditPage: React.FC = () => {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Stable storage scope for media. New products get an id up-front so uploads
+  // land under products/{id}/...; addProduct is told to reuse this id.
+  const createScopeId = useRef(`prod-${Date.now()}`).current;
+  const storageScope = existingProduct ? existingProduct.id : createScopeId;
+
+  // Track uploaded objects this session for orphan cleanup if the admin
+  // navigates away without saving (DB save would otherwise orphan them).
+  const pendingUploadsRef = useRef<{ bucket: string; path: string }[]>([]);
+  const savedRef = useRef(false);
+
+  const recordUploaded = (media: { bucket: string; path: string }) => {
+    pendingUploadsRef.current.push(media);
+  };
+
+  // Product video (optional)
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [videoPosterUrl, setVideoPosterUrl] = useState<string>('');
+
+  useEffect(() => {
+    return () => {
+      if (!savedRef.current) {
+        const pending = pendingUploadsRef.current.splice(0, pendingUploadsRef.current.length);
+        for (const item of pending) {
+          void deleteMediaObjects(item.bucket, [item.path]);
+        }
+      }
+    };
+  }, []);
+
   // Initialize data
   useEffect(() => {
     if (existingProduct) {
@@ -75,6 +106,8 @@ export const ProductEditPage: React.FC = () => {
       setIsNewBadge(!!existingProduct.isNew);
       setPublished(existingProduct.published !== false);
       setImages(existingProduct.images || []);
+      setVideoUrl(existingProduct.videoUrl || '');
+      setVideoPosterUrl(existingProduct.videoPosterUrl || '');
       setSizes(existingProduct.sizes || []);
       setColors((existingProduct.colors || []).map((c) => (typeof c === 'string' ? c : c.name)));
       setMaterial(existingProduct.material || '');
@@ -177,22 +210,28 @@ export const ProductEditPage: React.FC = () => {
       isNew: isNewBadge,
       published,
       details: existingProduct ? existingProduct.details : [],
-      images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'],
+      images,
       sizes,
       colors: colors.map((c) => ({ name: c, hex: '#18181b' })),
       material: material.trim() || undefined,
       madeIn: madeIn.trim() || undefined,
       tags,
+      videoUrl: videoUrl.trim() || undefined,
+      videoPosterUrl: videoPosterUrl.trim() || undefined,
     };
 
     if (isNew) {
-      const created = addProduct(payload);
+      const created = addProduct(payload, storageScope);
+      savedRef.current = true;
+      pendingUploadsRef.current = [];
       setSavedSuccess(true);
       setTimeout(() => {
         navigate(`/admin/products/${created.id}`);
       }, 700);
     } else if (id) {
       updateProduct(id, payload);
+      savedRef.current = true;
+      pendingUploadsRef.current = [];
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);
     }
@@ -361,14 +400,30 @@ export const ProductEditPage: React.FC = () => {
           </div>
 
           {/* Card: Images */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
+          <div className="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-6">
             <ImageUploader
               images={images}
               onChange={setImages}
               maxImages={8}
               label="Mahsulot Rasmlari"
-              helperText="Mijozlarga turli burchaklardan ko'rsatish uchun kamida 2-3 ta sifatli rasm qo'shing."
+              helperText="Kompyuterdan fayllarni tanlang — birinchi rasm asosiy rasm sifatida ko'rsatiladi (JPG, PNG, WebP; 5 MB gacha)."
+              scope={storageScope}
+              onUploaded={recordUploaded}
             />
+
+            <div className="pt-5 border-t border-neutral-100 dark:border-neutral-800">
+              <VideoUploader
+                value={videoUrl || undefined}
+                onChange={(url) => setVideoUrl(url || '')}
+                poster={videoPosterUrl || undefined}
+                onPosterChange={(url) => setVideoPosterUrl(url || '')}
+                bucket={MEDIA_BUCKETS.PRODUCT_IMAGES}
+                scope={storageScope}
+                label="Mahsulot Videosi (ixtiyoriy)"
+                helperText="Mahsulot katalog kartasida videoli ko'rsatiladi. MP4 yoki WebM faylni yuklang (100 MB gacha)."
+                onUploaded={recordUploaded}
+              />
+            </div>
           </div>
 
           {/* Card: Pricing & Stock */}
@@ -740,12 +795,18 @@ export const ProductEditPage: React.FC = () => {
 
             <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-white dark:bg-neutral-900 shadow-sm">
               <div className="relative aspect-4/3 bg-neutral-100 dark:bg-neutral-800">
-                <img
-                  src={images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500'}
-                  alt=""
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
+                {images[0] ? (
+                  <img
+                    src={images[0]}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Boxes className="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
+                  </div>
+                )}
                 <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
                   {isFeatured && (
                     <span className="px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950 text-[10px] font-extrabold">

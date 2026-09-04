@@ -47,7 +47,7 @@ interface StoreContextType {
   featuredProducts: Product[];
   newProducts: Product[];
   discountedProducts: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => Product;
+  addProduct: (product: Omit<Product, 'id'>, explicitId?: string) => Product;
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   duplicateProduct: (id: string) => Product | undefined;
@@ -737,11 +737,34 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Targeted persistence helpers for array resources. Each writes only the
   // specific changed record with correct DB column names (via mappers), and
   // never writes the fallback dataset. Fire-and-forget with error isolation.
+  const imageSigCache = new Map<string, string>();
+
   const persistProduct = async (product: Product) => {
     try {
-      await supabase
-        .from('products')
-        .upsert({ ...productToDb(product), id: product.id });
+      // main row (includes optional video_url / video_poster_url)
+      await supabase.from('products').upsert({ ...productToDb(product), id: product.id });
+
+      // Sync product_images: keep ordering + primary identical to the images
+      // array so uploaded images survive navigation/refresh. Skipped when the
+      // image list did not change (e.g. stock toggle saves).
+      const images = product.images ?? [];
+      const sig = images.join('|');
+      if (imageSigCache.get(product.id) !== sig) {
+        await supabase.from('product_images').delete().eq('product_id', product.id);
+        if (images.length > 0) {
+          const stampPrefix = Date.now();
+          const rows = images.map((url, index) => ({
+            id: `pi-${product.id}-${stampPrefix}-${index}`,
+            product_id: product.id,
+            url,
+            is_primary: index === 0,
+            sort_order: index,
+          }));
+          const { error: insErr } = await supabase.from('product_images').insert(rows);
+          if (insErr) throw insErr;
+        }
+        imageSigCache.set(product.id, sig);
+      }
     } catch (err) {
       console.error('Error saving product to Supabase:', err);
     }
@@ -828,8 +851,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // Product Actions
-  const addProduct = (productData: Omit<Product, 'id'>): Product => {
-    const id = `prod-${Date.now()}`;
+  const addProduct = (productData: Omit<Product, 'id'>, explicitId?: string): Product => {
+    const id = explicitId && explicitId.trim() ? explicitId.trim() : `prod-${Date.now()}`;
     const newProduct: Product = {
       ...productData,
       id,

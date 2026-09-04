@@ -46,6 +46,8 @@ export interface Product {
   stockStatus?: string;
   material?: string;
   madeIn?: string;
+  videoUrl?: string;
+  videoPosterUrl?: string;
   tags: string[];
   createdAt?: string;
   updatedAt?: string;

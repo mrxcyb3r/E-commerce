@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Film,
   Plus,
@@ -20,8 +20,12 @@ import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
 import { VideoItem } from '../../types/video';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { VideoUploader } from '../../components/admin/VideoUploader';
+import { deleteMediaObjects, MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { useFeedAdmStats } from '../../hooks/useFeedAdmStats';
 import { formatDuration } from '../../components/admin/analytics/util';
+
+const FEED_CATEGORIES = ['all', 'erkaklar', 'ayollar', 'oyoq-kiyimlar', 'aksessuarlar'] as const;
 
 export const FeedAdminPage: React.FC = () => {
   const {
@@ -52,7 +56,25 @@ export const FeedAdminPage: React.FC = () => {
   const [author, setAuthor] = useState('');
   const [productId, setProductId] = useState<string>('');
   const [badge, setBadge] = useState('');
+  const [category, setCategory] = useState<string>('all');
   const [published, setPublished] = useState(true);
+
+  // Storage scope: id of the feed post being created/edited (used for
+  // storage paths feed/{id}/...). For new videos it is generated up-front so
+  // uploads land under the future row id.
+  const [pendingFeedId, setPendingFeedId] = useState<string>('feed-' + Date.now());
+  const pendingUploadsRef = useRef<{ bucket: string; path: string }[]>([]);
+
+  const recordUploaded = (media: { bucket: string; path: string }) => {
+    pendingUploadsRef.current.push(media);
+  };
+
+  const cleanupPendingUploads = () => {
+    const pending = pendingUploadsRef.current.splice(0, pendingUploadsRef.current.length);
+    for (const item of pending) {
+      void deleteMediaObjects(item.bucket, [item.path]);
+    }
+  };
 
   const openCreateModal = () => {
     setTitle('');
@@ -62,7 +84,9 @@ export const FeedAdminPage: React.FC = () => {
     setAuthor('');
     setProductId(products[0]?.id || '');
     setBadge('');
+    setCategory('all');
     setPublished(true);
+    setPendingFeedId('feed-' + Date.now());
     setIsCreating(true);
     setEditingVideo(null);
   };
@@ -75,9 +99,17 @@ export const FeedAdminPage: React.FC = () => {
     setAuthor(v.author || '');
     setProductId(v.productId || '');
     setBadge(v.badge?.text || '');
+    setCategory(v.category || 'all');
     setPublished(v.published !== false);
+    setPendingFeedId(v.id);
     setEditingVideo(v);
     setIsCreating(false);
+  };
+
+  const closeModal = () => {
+    cleanupPendingUploads();
+    setIsCreating(false);
+    setEditingVideo(null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -95,11 +127,16 @@ export const FeedAdminPage: React.FC = () => {
           author: author.trim() || undefined,
           productId: productId || undefined,
           badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
-          category: 'all',
+          category: category || 'all',
           published,
           order: videos.length + 1,
-        });
-        if (ok) setIsCreating(false);
+        }, pendingFeedId);
+        if (ok) {
+          pendingUploadsRef.current = [];
+          setIsCreating(false);
+        } else {
+          cleanupPendingUploads();
+        }
       } else if (editingVideo) {
         const ok = await updateVideo(editingVideo.id, {
           title: title.trim(),
@@ -109,9 +146,15 @@ export const FeedAdminPage: React.FC = () => {
           author: author.trim() || undefined,
           productId: productId || undefined,
           badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined,
+          category: category || 'all',
           published,
         });
-        if (ok) setEditingVideo(null);
+        if (ok) {
+          pendingUploadsRef.current = [];
+          setEditingVideo(null);
+        } else {
+          cleanupPendingUploads();
+        }
       }
     } finally {
       setSaving(false);
@@ -120,6 +163,16 @@ export const FeedAdminPage: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (videoToDelete) {
+      const owned = [videoToDelete.videoUrl, videoToDelete.posterUrl]
+        .map((url) => {
+          if (!url) return null;
+          const match = url.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+          return match ? { bucket: match[1], path: decodeURIComponent(match[2].split('?')[0]) } : null;
+        })
+        .filter((item): item is { bucket: string; path: string } => item !== null);
+      for (const item of owned) {
+        void deleteMediaObjects(item.bucket, [item.path]);
+      }
       await deleteVideo(videoToDelete.id);
       setVideoToDelete(null);
     }
@@ -335,10 +388,7 @@ export const FeedAdminPage: React.FC = () => {
       {(isCreating || editingVideo) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            onClick={() => {
-              setIsCreating(false);
-              setEditingVideo(null);
-            }}
+            onClick={closeModal}
             className="fixed inset-0 bg-black/60 backdrop-blur-xs"
           />
 
@@ -349,10 +399,7 @@ export const FeedAdminPage: React.FC = () => {
               </h3>
               <button
                 type="button"
-                onClick={() => {
-                  setIsCreating(false);
-                  setEditingVideo(null);
-                }}
+                onClick={closeModal}
                 className="p-1.5 rounded-xl text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
               >
                 <X className="w-5 h-5" />
@@ -403,48 +450,54 @@ export const FeedAdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Video URL manzili (MP4 yoki WebM)
-                </label>
-                <input
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://... yoki video link"
-                  className="w-full px-4 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Kategoriya
+                    </label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                    >
+                      {FEED_CATEGORIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c === 'all' ? 'Barchasi' : c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                      Biriktirilgan Mahsulot
+                    </label>
+                    <select
+                      value={productId}
+                      onChange={(e) => setProductId(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                    >
+                      <option value="">-- Mahsulot tanlanmagan --</option>
+                      {products.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} — {p.price.toLocaleString('uz-UZ')} so'm
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Muqova / Poster Rasmi URL manzili
-                </label>
-                <input
-                  type="url"
-                  value={posterUrl}
-                  onChange={(e) => setPosterUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Biriktirilgan Mahsulot
-                </label>
-                <select
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
-                >
-                  <option value="">-- Mahsulot tanlanmagan --</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} — {p.price.toLocaleString('uz-UZ')} so'm
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <VideoUploader
+                value={videoUrl || undefined}
+                onChange={(url) => setVideoUrl(url || '')}
+                poster={posterUrl || undefined}
+                onPosterChange={(url) => setPosterUrl(url || '')}
+                bucket={MEDIA_BUCKETS.FEED_MEDIA}
+                scope={pendingFeedId}
+                label="Video fayl"
+                helperText="Mijoz lentasida ko'rsatiladigan video. MP4 yoki WebM faylni yuklang yoki mavjud URL manzil orqali import qiling."
+                onUploaded={recordUploaded}
+              />
 
               <div>
                 <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
@@ -479,10 +532,7 @@ export const FeedAdminPage: React.FC = () => {
               <div className="pt-4 flex items-center justify-end gap-3 border-t border-neutral-100 dark:border-neutral-800">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsCreating(false);
-                    setEditingVideo(null);
-                  }}
+                  onClick={closeModal}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100"
                 >
                   Bekor qilish

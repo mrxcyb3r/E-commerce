@@ -141,7 +141,12 @@ export const ProductDetailPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
         {/* Left Column: Gallery (6 cols) */}
         <div className="lg:col-span-6">
-          <ProductGallery images={product.images} productName={product.name} />
+          <ProductGallery
+            images={product.images}
+            productName={product.name}
+            videoUrl={product.videoUrl}
+            videoPosterUrl={product.videoPosterUrl}
+          />
         </div>
 
         {/* Right Column: Product Information & Purchase CTAs (6 cols) */}
