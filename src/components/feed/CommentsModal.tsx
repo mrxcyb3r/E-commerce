@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { X, Send, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useFeedComments } from '../../hooks/useFeedSocial';
@@ -37,17 +37,39 @@ function getAvatarColor(name: string): string {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
+function useIsDesktop(): boolean {
+  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 768px)').matches : false
+  );
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  return isDesktop;
+}
+
 export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, onClose }) => {
   const { comments, loading, submitting, addComment, commentCount } = useFeedComments(feedId);
   const [inputText, setInputText] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     if (isOpen) {
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', onKey);
       setTimeout(() => inputRef.current?.focus(), 350);
+      return () => window.removeEventListener('keydown', onKey);
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (listRef.current) {
@@ -57,8 +79,12 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
 
   const handleSubmit = async () => {
     if (!inputText.trim() || submitting) return;
+    const inputWas = inputText;
     const ok = await addComment(inputText);
     if (ok) setInputText('');
+    else if (ok === false && inputText === inputWas) {
+      // Keep the user's text on failure so nothing is lost.
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -67,6 +93,10 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
       handleSubmit();
     }
   };
+
+  const sheetProps = isDesktop
+    ? { initial: { x: '100%' }, animate: { x: 0 }, exit: { x: '100%' } }
+    : { initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' } };
 
   return (
     <AnimatePresence>
@@ -81,21 +111,25 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
             onClick={onClose}
           />
 
-          {/* Bottom Sheet */}
+          {/* Desktop: right drawer / Mobile: bottom sheet */}
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            {...sheetProps}
             transition={{ type: 'spring', damping: 32, stiffness: 340, mass: 0.8 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-neutral-950 rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.25)] border-t border-neutral-200 dark:border-neutral-800 max-h-[80vh] flex flex-col"
+            className={`fixed z-50 bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 flex flex-col ${
+              isDesktop
+                ? 'inset-y-0 right-0 w-full sm:w-[400px] shadow-[-12px_0_40px_rgba(0,0,0,0.25)] border-l rounded-l-3xl'
+                : 'bottom-0 left-0 right-0 rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.25)] border-t max-h-[80vh]'
+            }`}
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1 pointer-events-none">
-              <div className="w-10 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-            </div>
+            {/* Drag handle (mobile only) */}
+            {!isDesktop && (
+              <div className="flex justify-center pt-3 pb-1 pointer-events-none">
+                <div className="w-10 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+              </div>
+            )}
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-4 pt-1 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between px-5 pb-4 pt-4 border-b border-neutral-100 dark:border-neutral-800">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
                   <MessageCircle className="w-4.5 h-4.5 text-neutral-500 dark:text-neutral-400" />
@@ -115,6 +149,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                 type="button"
                 onClick={onClose}
                 className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
+                aria-label="Izohlarni yopish"
               >
                 <X className="w-4 h-4 text-neutral-500" />
               </button>

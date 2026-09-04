@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Node version pinned for Netlify's build image.
+  # Secrets (VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY) are configured
+  # in the Netlify dashboard (Site settings → Environment variables).
+  # Never commit real values here.
+  NODE_VERSION = "20"
+  # These env vars are NOT secrets — their values are public infrastructure
+  # identifiers that legitimately appear in the client bundle (project URL,
+  # publishable key, JWKS URL). Keep secret scanning ENABLED for everything
+  # else (SUPABASE_SECRET_KEY, custom values, etc.).
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_PROJECT_ID,SUPABASE_URL,SUPABASE_JWKS_URL,SUPABASE_PUBLISHABLE_KEY"
+
+# SPA fallback: all routes served by index.html (client-side router handles 404s).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.io wss://*.supabase.io; font-src 'self' data: https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"

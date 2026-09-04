@@ -19,12 +19,12 @@ import { ClothingPromptItem } from '../../types/prompt';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
 const CATEGORIES = [
-  "Erkaklar Kiyimlari (Men's Wear)",
-  "Ayollar Kiyimlari (Women's Fashion)",
-  "Bolalar Kiyimlari (Kids & Teens)",
+  "Erkaklar kiyimlari (Men's Wear)",
+  "Ayollar kiyimlari (Women's Fashion)",
+  "Bolalar va o'smirlar kiyimlari (Kids & Teens)",
   "Poyabzallar (Footwear & Shoes)",
-  "Sport Kiyimlari (Sportswear)",
-  "Mavsumiy & Aksiya (Seasonal & Campaigns)",
+  "Sport kiyimlari (Sportswear)",
+  "Mavsumiy va aksiyalar (Seasonal & Campaigns)",
 ];
 
 export const PromptsAdminPage: React.FC = () => {
@@ -90,7 +90,7 @@ export const PromptsAdminPage: React.FC = () => {
 
   const openCreateModal = () => {
     setTitle('');
-    setCategory("Erkaklar Kiyimlari (Men's Wear)");
+    setCategory("Erkaklar kiyimlari (Men's Wear)");
     setSubcategory('Klassik');
     setProductType('Kostyum-shim');
     setDescription('Rasmiy kiyimlar uchun fotorealistik studiya surati.');

@@ -1,7 +1,7 @@
 # Ecommerce Storefront — Audit + Premium Analytics Report
 
 Date: 2026-09-03
-Live Supabase project: `cjqvcfbabwuqrwrnoiag` (E-commerce)
+Live Supabase project: `YOUR_PROJECT_REF` (E-commerce)
 
 ---
 

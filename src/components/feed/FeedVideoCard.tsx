@@ -1,14 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Play, 
-  Pause, 
-  Volume2, 
-  VolumeX, 
-  ShoppingBag, 
-  ArrowRight, 
-  Tag, 
-  Sparkles, 
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  ShoppingBag,
+  ArrowRight,
+  Sparkles,
   AlertCircle,
   RotateCcw,
   Check,
@@ -18,9 +17,15 @@ import {
   Heart,
   MessageCircle,
   Bookmark,
+  Share2,
+  Link2,
+  Send,
+  AtSign,
+  X,
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
+import { useFavorites } from '../../context/FavoritesContext';
 import { track } from '../../lib/analytics/client';
 import { useFeedLikes, useFeedComments } from '../../hooks/useFeedSocial';
 import { CommentsModal } from './CommentsModal';
@@ -32,6 +37,14 @@ interface FeedVideoCardProps {
   onSelect?: () => void;
   index: number;
   total: number;
+}
+
+interface ShareOption {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  action: () => void;
+  className: string;
 }
 
 export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
@@ -53,25 +66,20 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   // Retention/start/completion tracking — fire each milestone once per play session.
   const startedRef = useRef(false);
   const firedRetention = useRef<Set<string>>(new Set());
-  
+
   const { isMuted, toggleMute, getProductForVideo } = useVideoFeed();
-  
+  const { isFavorite, toggleFavorite } = useFavorites();
+
   // Video Player state
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
-  const [copiedLink, setCopiedLink] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState<boolean>(() => {
-    try {
-      const raw = window.localStorage.getItem('feed_saved_videos');
-      const set = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
-      return set.has(video.id);
-    } catch {
-      return false;
-    }
-  });
+
+  // Share sheet & toast state
+  const [shareOpen, setShareOpen] = useState<boolean>(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   // Reset error state when video source changes (new card, new URL)
   useEffect(() => {
@@ -86,11 +94,17 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [slideProgress, setSlideProgress] = useState<number>(0);
 
   const product = getProductForVideo(video.productId);
+  const saved = product ? isFavorite(product.id) : false;
 
   // Social features: likes and comments
   const { likeCount, isLiked, toggleLike } = useFeedLikes(video.id);
   const { commentCount } = useFeedComments(video.id);
   const [showComments, setShowComments] = useState(false);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 2200);
+  }, []);
 
   // --- Collection 3-Second Automatic Slider Logic ---
   const handleNextSlide = useCallback(() => {
@@ -131,7 +145,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     return () => clearInterval(timer);
   }, [isCollection, isActive, isSlidePaused, handleNextSlide]);
 
-  // --- Video Playback Logic ---
+  // --- Video Playback Logic (only active videos load & play) ---
   useEffect(() => {
     if (isCollection) return;
 
@@ -172,6 +186,16 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     }
   }, [isMuted]);
 
+  // Close share sheet on Escape
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShareOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [shareOpen]);
+
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const current = videoRef.current.currentTime;
@@ -199,7 +223,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
       // Time-based buckets (3s/5s/10s) map on seconds played (for long videos).
       if (!startedRef.current && current > 0) {
         startedRef.current = true;
-        track('feed_video_start', { feedId: video.id, metadata: { } });
+        track('feed_video_start', { feedId: video.id, metadata: {} });
       }
       for (const b of buckets) {
         if (b.key === 'start') continue;
@@ -222,7 +246,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     startedRef.current = false;
   };
 
-  const togglePlayPause = (e?: React.MouseEvent) => {
+  const togglePlayPause = (e?: React.MouseEvent | React.KeyboardEvent) => {
     e?.stopPropagation();
 
     if (isCollection) {
@@ -250,16 +274,100 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
     toggleMute();
   };
 
-  const handleShare = (e: React.MouseEvent) => {
+  const handleLikeClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const url = `${window.location.origin}/feed?v=${video.id}`;
-    track('feed_share', { feedId: video.id, metadata: { url } });
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(url);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
+    const success = await toggleLike();
+    if (success) {
+      track('feed_like', { feedId: video.id, metadata: { action: isLiked ? 'unlike' : 'like' } });
     }
   };
+
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowComments(true);
+    track('feed_comment_open', { feedId: video.id });
+  };
+
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!product) return;
+    toggleFavorite(product);
+  };
+
+  const shareUrl = `${window.location.origin}/feed?v=${encodeURIComponent(video.id)}`;
+  const shareText = `${video.title} — Do'konimizdan ko'ring`;
+
+  const handleSharePrimary = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title: video.title, text: shareText, url: shareUrl });
+        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'web-share' } });
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        // Fall through to the sheet on failure
+      }
+    }
+    setShareOpen(true);
+  };
+
+  const handleCopyLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).catch(() => {});
+    }
+    showToast('Havola nusxalandi');
+    setShareOpen(false);
+    track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'copy' } });
+  };
+
+  const shareOptions: ShareOption[] = [
+    {
+      key: 'copy',
+      label: 'Havolani nusxalash',
+      icon: <Link2 className="w-5 h-5" />,
+      action: handleCopyLink,
+      className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200',
+    },
+    {
+      key: 'telegram',
+      label: 'Telegram',
+      icon: <Send className="w-5 h-5" />,
+      action: async () => {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank', 'noopener');
+        setShareOpen(false);
+        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'telegram' } });
+      },
+      className: 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300',
+    },
+    {
+      key: 'whatsapp',
+      label: 'WhatsApp',
+      icon: <MessageCircle className="w-5 h-5" />,
+      action: () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank', 'noopener');
+        setShareOpen(false);
+        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'whatsapp' } });
+      },
+      className: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300',
+    },
+    {
+      key: 'x',
+      label: 'X (Twitter)',
+      icon: <AtSign className="w-5 h-5" />,
+      action: () => {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
+        setShareOpen(false);
+        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'x' } });
+      },
+      className: 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100',
+    },
+  ];
+
+  const railButtonClass =
+    'flex flex-col items-center gap-0.5 transition-all active:scale-90 select-none touch-manipulation';
+  const railIconClass =
+    'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/55 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/15 shadow-lg';
 
   return (
     <div
@@ -267,7 +375,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
       className="relative w-full h-[100dvh] sm:h-[820px] max-w-md mx-auto flex items-center justify-center snap-start snap-always shrink-0 select-none overflow-hidden sm:rounded-3xl bg-zinc-950 shadow-2xl border border-zinc-800/80"
     >
       {/* Media Viewport Container */}
-      <div 
+      <div
         onClick={() => togglePlayPause()}
         className="relative w-full h-full cursor-pointer overflow-hidden flex items-center justify-center bg-zinc-950"
       >
@@ -285,6 +393,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 transition={{ duration: 0.4 }}
                 className="w-full h-full object-cover object-center"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
             </AnimatePresence>
 
@@ -302,7 +411,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 e.stopPropagation();
                 handleNextSlide();
               }}
-              className="absolute right-0 top-16 bottom-28 w-1/4 z-15 hover:bg-white/5 transition-colors cursor-e-resize"
+              className="absolute right-0 top-16 bottom-40 w-1/4 z-15 hover:bg-white/5 transition-colors cursor-e-resize"
               title="Keyingi rasm"
             />
           </div>
@@ -315,9 +424,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               alt={video.title}
               className="absolute inset-0 w-full h-full object-cover object-center"
               referrerPolicy="no-referrer"
+              loading={isActive ? 'eager' : 'lazy'}
             />
 
-            {/* Video element — rendered on top of poster; invisible until loaded */}
+            {/* Video element — rendered on top of poster; lazy when inactive */}
             <video
               ref={videoRef}
               src={video.videoUrl}
@@ -325,7 +435,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               playsInline
               loop
               muted={isMuted}
-              preload="metadata"
+              preload={isActive ? 'metadata' : 'none'}
               onWaiting={() => setIsLoading(true)}
               onPlaying={() => {
                 setIsLoading(false);
@@ -348,7 +458,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
 
             {/* Error overlay — small banner over poster, not full-screen */}
             {hasError && (
-              <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-25 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl max-w-[280px] w-full pointer-events-auto">
+              <div className="absolute bottom-16 left-4 right-4 z-25 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl max-w-[280px] w-full pointer-events-auto">
                 <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center shrink-0">
                   <AlertCircle className="w-4 h-4 text-amber-400" />
                 </div>
@@ -368,6 +478,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                   }}
                   className="shrink-0 p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors"
                   title="Qayta urinish"
+                  aria-label="Qayta urinish"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-zinc-300" />
                 </button>
@@ -459,116 +570,16 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               </span>
             )}
           </div>
-
-          {/* Quick Sound / Slide & Share Controls */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleShare}
-              className="w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 border border-white/10"
-              aria-label="Ulashish"
-              title="Havolani nusxalash"
-            >
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Tag className="w-4 h-4" />}
-            </button>
-
-            {!isCollection && (
-              <button
-                type="button"
-                onClick={handleMuteClick}
-                className="w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white flex items-center justify-center transition-all active:scale-90 border border-white/10"
-                aria-label={isMuted ? 'Ovozni yoqish' : 'Ovozni o\'chirish'}
-                title={isMuted ? 'Ovozni yoqish' : 'Ovozni o\'chirish'}
-              >
-                {isMuted ? (
-                  <VolumeX className="w-4.5 h-4.5 text-zinc-300" />
-                ) : (
-                  <Volume2 className="w-4.5 h-4.5 text-amber-400" />
-                )}
-              </button>
-            )}
-          </div>
         </div>
 
-        {/* Bottom Product Info & CTA Overlay */}
-        <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 space-y-3 pointer-events-auto">
-          {/* Like & Comment Buttons */}
-          <div className="flex items-center gap-3 px-1">
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.stopPropagation();
-                const success = await toggleLike();
-                if (success) track('feed_like', { feedId: video.id, metadata: { action: isLiked ? 'unlike' : 'like' } });
-              }}
-              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
-              aria-label={isLiked ? 'Yoqdi' : 'Yoqtirish'}
-            >
-              <Heart
-                className={`w-6 h-6 drop-shadow-lg ${
-                  isLiked ? 'text-rose-500 fill-rose-500' : 'text-white fill-white/20'
-                }`}
-              />
-              <span className="text-xs font-bold text-white drop-shadow-md">
-                {likeCount > 0 ? likeCount.toLocaleString('uz-UZ') : ''}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowComments(true);
-                track('feed_comment_open', { feedId: video.id });
-              }}
-              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
-              aria-label="Izohlar"
-            >
-              <MessageCircle className="w-6 h-6 text-white fill-white/20 drop-shadow-lg" />
-              <span className="text-xs font-bold text-white drop-shadow-md">
-                {commentCount > 0 ? commentCount.toLocaleString('uz-UZ') : ''}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                const next = !isSaved;
-                setIsSaved(next);
-                try {
-                  const raw = window.localStorage.getItem('feed_saved_videos');
-                  const set = new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
-                  if (next) set.add(video.id);
-                  else set.delete(video.id);
-                  window.localStorage.setItem('feed_saved_videos', JSON.stringify(Array.from(set)));
-                } catch {
-                  /* ignore */
-                }
-                track('feed_favorite', {
-                  feedId: video.id,
-                  productId: product?.id,
-                  metadata: { action: next ? 'save' : 'unsave' },
-                });
-              }}
-              className="inline-flex items-center gap-1.5 transition-all active:scale-90"
-              aria-label={isSaved ? 'Olib tashlandi' : 'Saqlash'}
-            >
-              <Bookmark
-                className={`w-6 h-6 drop-shadow-lg ${
-                  isSaved ? 'text-amber-400 fill-amber-400' : 'text-white fill-white/20'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Title and Description */}
-          <div className="space-y-1 text-left px-1">
+        {/* Bottom Left: Title, Description & Compact Product CTA */}
+        <div className="absolute bottom-3 left-3 right-24 sm:bottom-4 sm:left-4 sm:right-28 z-20 space-y-2.5 pointer-events-auto">
+          <div className="space-y-0.5 text-left px-1">
             <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md font-['Outfit',sans-serif] leading-snug line-clamp-2">
               {video.title}
             </h3>
             {video.description && (
-              <p className="text-xs text-zinc-300/90 line-clamp-2 leading-relaxed drop-shadow-sm font-medium">
+              <p className="text-[11px] sm:text-xs text-zinc-300/90 line-clamp-2 leading-relaxed drop-shadow-sm font-medium">
                 {video.description}
               </p>
             )}
@@ -576,19 +587,20 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
 
           {/* Connected Product Card OR General Lookbook CTA */}
           {product ? (
-            <div className="bg-zinc-900/95 backdrop-blur-xl border border-white/15 p-3 sm:p-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-3 text-left">
+            <div className="bg-zinc-900/95 backdrop-blur-xl border border-white/15 p-2.5 sm:p-3 rounded-2xl shadow-xl flex items-center justify-between gap-3 text-left">
               {/* Product Thumbnail & Details */}
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-12 h-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0 border border-white/10">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-800 overflow-hidden shrink-0 border border-white/10">
                   <img
                     src={product.images?.[0]}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                   />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs font-black text-white truncate font-['Outfit',sans-serif]">
+                  <div className="text-[11px] sm:text-xs font-black text-white truncate font-['Outfit',sans-serif]">
                     {product.name}
                   </div>
                   <div className="flex items-baseline gap-2 mt-0.5">
@@ -608,7 +620,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               <Link
                 to={`/products/${product.id}`}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black shrink-0 transition-all active:scale-95 shadow-md uppercase tracking-wider"
+                className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-[11px] sm:text-xs font-black shrink-0 transition-all active:scale-95 shadow-md uppercase tracking-wider"
+                aria-label={`${product.name} mahsulotini ko'rish`}
               >
                 <span>Ko'rish</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -616,13 +629,13 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
             </div>
           ) : (
             /* General Styling / Lookbook / Store Tour Banner */
-            <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-3 rounded-2xl shadow-lg flex items-center justify-between gap-3">
+            <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-2.5 rounded-2xl shadow-lg flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center shrink-0">
                   <ShoppingBag className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-zinc-200 truncate">
+                  <p className="text-[11px] sm:text-xs font-bold text-zinc-200 truncate">
                     Barcha yangi to'plamlar
                   </p>
                   <p className="text-[10px] text-zinc-400">
@@ -633,7 +646,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               <Link
                 to="/products"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black shrink-0 transition-colors"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-[11px] sm:text-xs font-black shrink-0 transition-colors"
+                aria-label="Katalogga o'tish"
               >
                 <span>Katalog</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -651,8 +665,206 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
             </div>
           )}
         </div>
+
+        {/* Right Vertical Action Rail (like, comment, save, share, mute) */}
+        <div className="absolute right-1.5 sm:right-2.5 bottom-24 sm:bottom-24 z-30 flex flex-col items-center gap-1.5 sm:gap-2 pointer-events-auto">
+          {/* Like */}
+          <div className="flex flex-col items-center gap-0.5">
+            <button
+              type="button"
+              onClick={handleLikeClick}
+              className={`${railButtonClass} group`}
+              aria-label={isLiked ? 'Yoqdi (bekor qilish)' : 'Yoqtirish'}
+              title={isLiked ? 'Yoqmaydi' : 'Yoqadi'}
+            >
+              <span className={`${railIconClass}`}>
+                <Heart
+                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
+                    isLiked ? 'text-rose-500 fill-rose-500' : 'text-white group-hover:text-rose-400'
+                  } transition-colors`}
+                />
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                {likeCount > 0 ? likeCount.toLocaleString('uz-UZ') : '0'}
+              </span>
+            </button>
+          </div>
+
+          {/* Comment */}
+          <div className="flex flex-col items-center gap-0.5">
+            <button
+              type="button"
+              onClick={handleCommentClick}
+              className={`${railButtonClass} group`}
+              aria-label="Izohlar"
+              title="Izohlar"
+            >
+              <span className={`${railIconClass}`}>
+                <MessageCircle
+                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-white group-hover:text-amber-400 transition-colors`}
+                />
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                {commentCount > 0 ? commentCount.toLocaleString('uz-UZ') : '0'}
+              </span>
+            </button>
+          </div>
+
+          {/* Save (only when linked to a real product) */}
+          {product && (
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                type="button"
+                onClick={handleSaveClick}
+                className={`${railButtonClass} group`}
+                aria-label={saved ? 'Saqlanganlardan olib tashlash' : 'Saqlash'}
+                title={saved ? 'Saqlanganlar' : 'Saqlash'}
+              >
+                <span className={`${railIconClass}`}>
+                  <Bookmark
+                    className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
+                      saved ? 'text-amber-400 fill-amber-400' : 'text-white group-hover:text-amber-300'
+                    } transition-colors`}
+                  />
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                  {saved ? 'Saqlangan' : 'Saqlash'}
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* Share */}
+          <div className="flex flex-col items-center gap-0.5">
+            <button
+              type="button"
+              onClick={handleSharePrimary}
+              className={`${railButtonClass} group`}
+              aria-label="Ulashish"
+              title="Ulashish"
+            >
+              <span className={`${railIconClass}`}>
+                <Share2
+                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-white group-hover:text-sky-300 transition-colors`}
+                />
+              </span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">Ulashish</span>
+            </button>
+          </div>
+
+          {/* Mute (videos only) */}
+          {!isCollection && (
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                type="button"
+                onClick={handleMuteClick}
+                className={`${railButtonClass} group`}
+                aria-label={isMuted ? 'Ovozni yoqish' : "Ovozni o'chirish"}
+                title={isMuted ? 'Ovozni yoqish' : "Ovozni o'chirish"}
+              >
+                <span className={`${railIconClass}`}>
+                  {isMuted ? (
+                    <VolumeX className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-zinc-200 group-hover:text-white transition-colors`} />
+                  ) : (
+                    <Volume2 className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-amber-400 group-hover:text-amber-300 transition-colors`} />
+                  )}
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                  {isMuted ? 'Ovozsiz' : 'Ovozli'}
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-white dark:bg-zinc-800 text-xs font-bold text-zinc-900 dark:text-white shadow-2xl border border-zinc-200 dark:border-zinc-700 flex items-center gap-2"
+            role="status"
+          >
+            <Check className="w-4 h-4 text-emerald-500" />
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Share Sheet */}
+      <AnimatePresence>
+        {shareOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShareOpen(false);
+              }}
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 340 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] border-t border-neutral-200 dark:border-neutral-700 pb-6 pt-4 px-6 max-w-md mx-auto"
+            >
+              <div className="flex justify-center pb-2 pointer-events-none">
+                <div className="w-10 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-base font-black text-neutral-900 dark:text-white">Ulashish</h3>
+                  <p className="text-[11px] text-neutral-400 font-medium mt-0.5 line-clamp-1">
+                    {video.title}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShareOpen(false);
+                  }}
+                  className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
+                  aria-label="Yopish"
+                >
+                  <X className="w-4 h-4 text-neutral-500" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-4 gap-3">
+                {shareOptions.map((opt) => (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      opt.action();
+                    }}
+                    className="flex flex-col items-center gap-2 transition-all active:scale-95"
+                    aria-label={opt.label}
+                  >
+                    <span className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm ${opt.className}`}>
+                      {opt.icon}
+                    </span>
+                    <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 text-center leading-tight">
+                      {opt.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Comments Drawer / Sheet */}
       <CommentsModal
         feedId={video.id}
         isOpen={showComments}

@@ -1,7 +1,7 @@
 # Premium Business-Intelligence Analytics Report
 
 Date: 2026-09-03
-Live Supabase project: `cjqvcfbabwuqrwrnoiag` (E-commerce)
+Live Supabase project: `YOUR_PROJECT_REF` (E-commerce)
 Scope: Transform the phase-1 analytics into a premium BI dashboard — customer behavior, not raw click counters. Built **only** on real collected `analytics_events`; no fake AI, no invented metrics.
 
 ---

@@ -5,7 +5,7 @@ Complete CMS/Control Center built for the existing ecommerce application, enabli
 
 ## Authentication
 - **Route**: `/login`
-- **Credentials**: `admin` / `12345678` (MVP, easily replaceable)
+- **Credentials**: `admin@dokon.uz` — password is set via the Supabase Auth dashboard (Supabase CLI: `supabase db run` + `supabase seed`). Never stored in the repository.
 - **Protection**: `AdminRoute` component using `useAuth()` — redirects unauthenticated to `/login`
 - **Logout**: Invalidates session, redirects to `/login`
 - **Security**: Credentials not exposed on public website
@@ -128,7 +128,7 @@ All customer-facing pages consume `useStore()` from StoreContext:
 
 ### Test 1 — Login
 ```
-Visit /login → Enter admin / 12345678 → Redirect to /admin → Admin in navbar
+Visit /login → Enter admin@dokon.uz / (password set in Supabase Auth) → Redirect to /admin → Admin in navbar
 ```
 
 ### Test 2 — Product Price
