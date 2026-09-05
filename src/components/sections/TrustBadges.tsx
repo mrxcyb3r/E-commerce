@@ -1,27 +1,22 @@
 import React from 'react';
-import { ShieldCheck, Store, RotateCcw, Ruler } from 'lucide-react';
+import { ShieldCheck, Store, Ruler } from 'lucide-react';
 import { motion } from 'motion/react';
 
-const GUARANTEES = [
+const BENEFITS = [
   {
     icon: <ShieldCheck className="w-5 h-5" />,
-    title: "Haqiqiy kafolat",
-    sublabel: 'Faqat original mahsulotlar',
+    title: "Narxlar ochiq",
+    sublabel: "Mahsulot narxini oldindan ko'ring.",
   },
   {
     icon: <Store className="w-5 h-5" />,
-    title: "Mahalliy do'kon",
-    sublabel: 'Kiyib ko\'rish imkoniyati',
-  },
-  {
-    icon: <RotateCcw className="w-5 h-5" />,
-    title: 'Oson qaytarish',
-    sublabel: 'Yoqmagan narsani qaytaring',
+    title: "O'lcham va ranglar",
+    sublabel: "Mavjud variantlarni mahsulot sahifasida tekshiring.",
   },
   {
     icon: <Ruler className="w-5 h-5" />,
-    title: "O'lcham almashinuvi",
-    sublabel: 'Bepul o\'lcham almashtirish',
+    title: "Mahalliy do'kon",
+    sublabel: "Mahsulotni kelib ko'rish va kiyib ko'rish mumkin.",
   },
 ];
 
@@ -30,7 +25,7 @@ export const TrustBadges: React.FC = () => {
     <section className="bg-zinc-50/50 dark:bg-zinc-950 py-8 border-b border-zinc-200 dark:border-zinc-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {GUARANTEES.map((item, index) => (
+          {BENEFITS.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 10 }}

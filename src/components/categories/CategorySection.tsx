@@ -22,13 +22,13 @@ export const CategorySection: React.FC = () => {
           >
             <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <Layers className="w-3.5 h-3.5" />
-              <span>Katalog</span>
+              <span>Kerakli bo‘limni tanlang</span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-              Toifalarni kashf eting
+              Kerakli bo‘limni tanlang
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">
-              Erkaklar, ayollar, bolalar kiyimlari, poyabzallar va aksessuarlar to'plamini ko'rib chiqing.
+              Erkaklar, ayollar va bolalar kiyimlari, poyabzallar va aksessuarlarni bir joydan ko‘rib chiqing.
             </p>
           </motion.div>
 

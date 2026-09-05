@@ -26,7 +26,7 @@ export const FaqSection: React.FC = () => {
             <span>Savol-javoblar</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            {homepageCms.faqSectionTitle || "Ko'p beriladigan savollar"}
+            {homepageCms.faqSectionTitle || "Umumiy savollar"}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto font-normal">
             {homepageCms.faqSectionSubtitle || "Do'konimiz xizmati va mahsulotlar bo'yicha eng ko'p uchraydigan savollarga javoblar."}

@@ -47,19 +47,15 @@ export const HeroSection: React.FC = () => {
             >
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-extrabold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 shadow-2xs">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>{homepageCms.heroBadge || 'Zamonaviy xarid tajribasi'}</span>
+                <span>{homepageCms.heroBadge || 'O‘zingizga mosini onlayn toping'}</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-[1.05]">
-                {homepageCms.heroTitle || 'Kerakli mahsulotni toping.'}{' '}
+                {homepageCms.heroTitle || 'O‘zingizga mosini onlayn toping. Do‘konda kiyib ko‘ring.'}
                 <span className="text-zinc-500 dark:text-zinc-400 block mt-1">
-                  {homepageCms.heroSubtitle || "Do'konga tayyor holda boring."}
+                  {homepageCms.heroSubtitle || "Kiyim, poyabzal va aksessuarlarni uydan chiqmasdan ko‘rib chiqing. Narxi, o‘lchami va mavjudligini tekshiring — yoqqan mahsulotingizni do‘konimizda ko‘rib, kiyib ko‘ring."}
                 </span>
               </h1>
-
-              <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                {homepageCms.heroDescription || "Mahsulotlarni onlayn ko'ring, narxlarni oldindan bilib oling va o'zingizga mos tanlovni do'konimizdan toping."}
-              </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
                 <Link
@@ -67,32 +63,17 @@ export const HeroSection: React.FC = () => {
                   id="hero-primary-cta"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl font-black text-sm tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-md hover:shadow-lg group"
                 >
-                  <span>{homepageCms.heroPrimaryCtaText || "Mahsulotlarni ko'rish"}</span>
+                  <span>{homepageCms.heroPrimaryCtaText || "Katalogni ko'rish"}</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
 
                 <Link
-                  to={homepageCms.heroSecondaryCtaLink || '/about'}
+                  to={homepageCms.heroSecondaryCtaLink || '/location'}
                   id="hero-secondary-cta"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-extrabold text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-2 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-extrabold text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-2 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-100 transition-colors"
                 >
-                  <span>{homepageCms.heroSecondaryCtaText || "Biz haqimizda"}</span>
+                  <span>{homepageCms.heroSecondaryCtaText || "Do‘kon manzili"}</span>
                 </Link>
-              </div>
-
-              <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs font-semibold text-zinc-600 dark:text-zinc-400">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>Haqiqiy do'kon narxlari</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>O'lcham va ranglar aniq</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-zinc-800 dark:text-zinc-200 shrink-0" />
-                  <span>{storeInfo.city}</span>
-                </div>
               </div>
             </motion.div>
 

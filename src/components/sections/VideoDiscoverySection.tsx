@@ -29,13 +29,13 @@ export const VideoDiscoverySection: React.FC = () => {
           >
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500 text-zinc-950">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Yangi videolar</span>
+              <span>Mahsulot videolari</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black font-['Outfit',sans-serif] tracking-tight">
-              Videolarda ko'ring
+              Mahsulotni videoda ham ko'ring
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base max-w-xl">
-              Mahsulotlarni real hayotda ko'ring, kiyilishi va sifatini qisqa videolarda baholang.
+              Mahsulotning ko'rinishi, materiali va qanday turishini qisqa videolarda ko'rib chiqing.
             </p>
           </motion.div>
 
