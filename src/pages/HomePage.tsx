@@ -1,28 +1,30 @@
 import React from 'react';
 import { HeroSection } from '../components/hero/HeroSection';
-import { CategorySection } from '../components/categories/CategorySection';
+import { TrustStrip } from '../components/sections/TrustStrip';
 import { FeaturedProducts } from '../components/products/FeaturedProducts';
+import { CategoriesSection } from '../components/sections/CategoriesSection';
 import { VideoDiscoverySection } from '../components/sections/VideoDiscoverySection';
-import { WhyChooseUs } from '../components/sections/WhyChooseUs';
-import { HowItWorks } from '../components/sections/HowItWorks';
+import { NewAppArrivals } from '../components/sections/NewAppArrivals';
+import { EditorialCampaign } from '../components/sections/EditorialCampaign';
+import { ShoppingJourneySection } from '../components/sections/ShoppingJourneySection';
 import { StoreLocation } from '../components/sections/StoreLocation';
 import { FaqSection } from '../components/sections/FaqSection';
-import { ContactSection } from '../components/sections/ContactSection';
-import { TrustBadges } from '../components/sections/TrustBadges';
+import { FinalCTASection } from '../components/sections/FinalCTASection';
 
 export const HomePage: React.FC = () => {
   return (
-    <div className="space-y-0">
+    <main className="flex-grow space-y-0">
       <HeroSection />
-      <TrustBadges />
-      <CategorySection />
+      <TrustStrip />
       <FeaturedProducts />
+      <CategoriesSection />
       <VideoDiscoverySection />
-      <WhyChooseUs />
-      <HowItWorks />
+      <NewAppArrivals />
+      <EditorialCampaign />
+      <ShoppingJourneySection />
       <StoreLocation />
       <FaqSection />
-      <ContactSection />
-    </div>
+      <FinalCTASection />
+    </main>
   );
 };

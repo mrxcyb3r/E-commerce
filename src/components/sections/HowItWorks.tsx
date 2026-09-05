@@ -28,114 +28,39 @@ export const HowItWorks: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Steps Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          <motion.div
-            key="01"
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="relative p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-xs font-mono font-black text-zinc-900 dark:text-white px-2.5 py-1 bg-white dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-700 shadow-2xs">
-                  {t('pages', 'sections.how1Title')}
-                </span>
-                <Smartphone className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-xs">
-                </Smartphone>
-              </div>
-
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] mb-2">
-                {t('pages', 'sections.how1Title')}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                {t('pages', 'sections.how1Desc')}
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-zinc-300 dark:text-zinc-600 pointer-events-none">
-            <ArrowRight className="w-6 h-6" />
+        {/* Shopping Journey Steps */}
+        <div className="grid max-w-4xl mx-auto grid-cols-1 gap-4">
+          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/20 p-6 pt-8 pb-10 transition-colors">
+            <div className="text-4xl font-black text-zinc-900 dark:text-white mb-4">01</div>
+            <h3 className="font-black text-zinc-900 dark:text-white mb-2">Ko'ring</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+              {t('pages', 'sections.how1Desc')}
+            </p>
           </div>
 
-          <motion.div
-            key="02"
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="relative p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <CheckSquare className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-xs">
-                </CheckSquare>
-              </div>
-
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] mb-2">
-                {t('pages', 'sections.how2Title')}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                {t('pages', 'sections.how2Desc')}
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-zinc-300 dark:text-zinc-600 pointer-events-none">
-            <ArrowRight className="w-6 h-6" />
+          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/20 p-6 pt-8 pb-10 transition-colors">
+            <div className="text-4xl font-black text-zinc-900 dark:text-white mb-4">02</div>
+            <h3 className="font-black text-zinc-900 dark:text-white mb-2">Tanlang</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+              {t('pages', 'sections.how2Desc')}
+            </p>
           </div>
 
-          <motion.div
-            key="03"
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className="relative p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <ArrowRight className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-xs">
-                </ArrowRight>
-              </div>
-
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] mb-2">
-                {t('pages', 'sections.how3Title')}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                {t('pages', 'sections.how3Desc')}
-              </p>
-            </div>
-          </motion.div>
-
-          <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 z-10 text-zinc-300 dark:text-zinc-600 pointer-events-none">
-            <ArrowRight className="w-6 h-6" />
+          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/20 p-6 pt-8 pb-10 transition-colors">
+            <div className="text-4xl font-black text-zinc-900 dark:text-white mb-4">03</div>
+            <h3 className="font-black text-zinc-900 dark:text-white mb-2">Bog'laning</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+              {t('pages', 'sections.how3Desc')}
+            </p>
           </div>
 
-          <motion.div
-            key="04"
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-            className="relative p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <Store className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-xs">
-                </Store>
-              </div>
-
-              <h3 className="text-lg font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] mb-2">
-                {t('pages', 'sections.how4Title')}
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">
-                {t('pages', 'sections.how4Desc')}
-              </p>
-            </div>
-          </motion.div>
+          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/20 p-6 pt-8 pb-10 transition-colors">
+            <div className="text-4xl font-black text-zinc-900 dark:text-white mb-4">04</div>
+            <h3 className="font-black text-zinc-900 dark:text-white mb-2">Do'konga keling</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+              {t('pages', 'sections.how4Desc')}
+            </p>
+          </div>
         </div>
       </div>
     </section>

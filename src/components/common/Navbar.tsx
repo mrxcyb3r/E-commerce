@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Heart, 
-  Menu, 
-  X, 
-  MapPin, 
-  ShoppingBag,
+import {
+  Search,
+  Heart,
+  Menu,
+  X,
+  MapPin,
   Send,
-  ArrowRight
+  ArrowRight,
+  ShoppingBag
 } from 'lucide-react';
 import { useBrand } from '../../hooks/useBrand';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -41,7 +41,7 @@ export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  
+
   const { totalFavorites } = useFavorites();
   const location = useLocation();
   const navigate = useNavigate();
@@ -88,9 +88,9 @@ export const Navbar: React.FC = () => {
     }
 
     const sectionIds = ['hero', 'products', 'video-discovery', 'about', 'location', 'contact'];
-    
+
     const observers: IntersectionObserver[] = [];
-    
+
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -187,7 +187,7 @@ export const Navbar: React.FC = () => {
         <div
           className={`pointer-events-auto max-w-7xl mx-auto transition-all duration-300 ${
             isScrolled
-              ? 'rounded-2xl sm:rounded-3xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800/90 shadow-lg shadow-zinc-950/5 dark:shadow-black/40 py-2 sm:py-2.5 px-3.5 sm:px-5'
+              ? 'rounded-xl sm:rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2 sm:py-2.5 px-3.5 sm:px-5'
               : 'w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 py-3.5 sm:py-4 px-4 sm:px-6 lg:px-8'
           }`}
         >
@@ -203,7 +203,7 @@ export const Navbar: React.FC = () => {
                   setActiveSection('hero');
                 }
               }}
-              className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
+              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
               aria-label={`${storeInfo.name} ${t('nav', 'home')}`}
             >
               {storeInfo.logoUrl ? (
@@ -211,26 +211,26 @@ export const Navbar: React.FC = () => {
                   src={storeInfo.logoUrl}
                   referrerPolicy="no-referrer"
                   alt=""
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl object-cover shadow-xs transition-transform duration-200 group-hover:scale-105"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover shadow-xs transition-transform duration-200 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-200 group-hover:scale-105">
-                  <ShoppingBag className="w-5 h-5" />
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-200 group-hover:scale-105">
+                  <ShoppingBag className="w-4.5 h-4.5" />
                 </div>
               )}
               <div className="flex flex-col">
-                <span className="font-black text-lg sm:text-xl tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-tight">
+                <span className="font-black text-sm sm:text-base tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-tight">
                   {storeInfo.name}
                 </span>
-                <span className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400 hidden sm:block">
+                <span className="text-[8px] sm:text-[9px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400 hidden sm:block">
                   {storeInfo.tagline || storeInfo.businessCategory || t('footer', 'tagline')}
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav 
-              className="hidden md:flex items-center gap-1 p-1 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200/50 dark:border-zinc-700/50"
+            <nav
+              className="hidden md:flex items-center gap-2 p-1 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50"
               aria-label={t('nav', 'mainNavigation')}
             >
               {NAV_ITEMS.map((item) => {
@@ -243,7 +243,7 @@ export const Navbar: React.FC = () => {
                     href={linkHref}
                     id={`nav-link-${item.id}`}
                     onClick={(e) => handleNavClick(e, item)}
-                    className={`relative px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm rounded-xl transition-all duration-200 ${
+                    className={`relative px-2.5 py-1.5 text-xs sm:text-sm rounded-xl transition-all duration-200 ${
                       isActive
                         ? 'text-white dark:text-zinc-950 font-black bg-zinc-900 dark:bg-white shadow-xs'
                         : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-700/60 font-bold'
@@ -257,15 +257,15 @@ export const Navbar: React.FC = () => {
 
             {/* Right Action Icons & Controls */}
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Clean Quick Search Button (No ⌘K shortcut) */}
+              {/* Clean Quick Search Button */}
               <button
                 id="navbar-search-btn"
                 type="button"
                 onClick={() => setSearchModalOpen(true)}
-                className="flex items-center gap-2 px-3 sm:px-3.5 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100/80 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer shadow-2xs"
+                className="flex items-center gap-2 px-2.5 sm:px-3 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100/80 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer shadow-2xs"
                 aria-label={t('nav', 'searchProducts')}
               >
-                <Search className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                <Search className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                 <span className="hidden sm:inline font-bold">{t('common', 'search')}...</span>
               </button>
 
@@ -273,7 +273,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/favorites"
                 id="navbar-favorites-btn"
-                className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-colors shadow-2xs"
+                className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-colors shadow-2xs"
                 aria-label={t('nav', 'favoritesList')}
                 title={t('nav', 'favoritesList')}
               >
@@ -289,27 +289,29 @@ export const Navbar: React.FC = () => {
               <ThemeToggle />
 
               {/* Telegram Direct CTA (Desktop) */}
-              <a
-                href={storeInfo.telegram}
-                target="_blank"
-                rel="noopener noreferrer"
-                id="navbar-telegram-cta"
-                onClick={() => track('telegram_click')}
-                className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-xs font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-xs hover:shadow-sm"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>{t('common', 'telegram')}</span>
-              </a>
+              {storeInfo.telegram && (
+                <a
+                  href={storeInfo.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  id="navbar-telegram-cta"
+                  onClick={() => track('telegram_click')}
+                  className="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-xs font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-xs hover:shadow-sm"
+                >
+                  <Send className="w-3 h-3.5" />
+                  <span>{t('common', 'telegram')}</span>
+                </a>
+              )}
 
               {/* Mobile Menu Toggle Button */}
               <button
                 id="mobile-menu-toggle-btn"
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 focus:outline-none shadow-2xs"
+                className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 focus:outline-none shadow-2xs"
                 aria-label={mobileMenuOpen ? t('nav', 'closeMenu') : t('nav', 'openMenu')}
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
               </button>
             </div>
           </div>
@@ -328,14 +330,14 @@ export const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs"
             />
-            
+
             {/* Drawer */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[82%] max-w-sm bg-white dark:bg-zinc-900 p-6 pt-20 shadow-2xl flex flex-col justify-between border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto"
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-zinc-900 p-8 pt-16 shadow-2xl flex flex-col justify-between border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto"
             >
               <div className="space-y-6">
                 {/* Search Bar in Mobile Menu */}
@@ -348,10 +350,10 @@ export const Navbar: React.FC = () => {
                   className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-sm font-bold border border-zinc-200 dark:border-zinc-700"
                 >
                   <span className="flex items-center gap-2.5">
-                    <Search className="w-4 h-4 text-zinc-500" />
+                    <Search className="w-3.5 h-3.5 text-zinc-500" />
                     <span>{t('nav', 'searchProducts')}</span>
                   </span>
-                  <ArrowRight className="w-4 h-4 text-zinc-400" />
+                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
                 </button>
 
                 {/* Section Links */}
@@ -375,7 +377,7 @@ export const Navbar: React.FC = () => {
                         }`}
                       >
                         <span>{item.label}</span>
-                        <ArrowRight className={`w-4 h-4 ${isActive ? 'text-zinc-300 dark:text-zinc-700' : 'text-zinc-400'}`} />
+                        <ArrowRight className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-300 dark:text-zinc-700' : 'text-zinc-400'}`} />
                       </a>
                     );
                   })}
@@ -389,7 +391,7 @@ export const Navbar: React.FC = () => {
                     className="flex items-center justify-between px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 text-sm font-bold text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
                   >
                     <span className="flex items-center gap-2.5">
-                      <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                      <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
                       {t('nav', 'favoritesList')}
                     </span>
                     <span className="px-2 py-0.5 text-xs font-black bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white rounded-full">
@@ -407,25 +409,27 @@ export const Navbar: React.FC = () => {
                   </a>
 
                   <div className="flex items-start gap-2 px-4 py-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-zinc-700 dark:text-zinc-300" />
+                    <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-zinc-700 dark:text-zinc-300" />
                     <span>{storeInfo.address}</span>
                   </div>
                 </div>
               </div>
 
               {/* Mobile CTA */}
-              <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                <a
-                  href={storeInfo.telegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => track('telegram_click')}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
-                >
-                  <Send className="w-4 h-4" />
-                  {t('nav', 'telegramContact')}
-                </a>
-              </div>
+              {storeInfo.telegram && (
+                <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                  <a
+                    href={storeInfo.telegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track('telegram_click')}
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    {t('nav', 'telegramContact')}
+                  </a>
+                </div>
+              )}
             </motion.div>
           </div>
         )}
