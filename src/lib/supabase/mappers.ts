@@ -3,7 +3,7 @@ import type { Database } from '../../types/supabase-db';
 import type { Review } from '../../types/review';
 import type { FaqItem } from '../../types/faq';
 import type { ClothingPromptItem } from '../../types/prompt';
-import type { HomepageCms, AboutCms, ContactCms } from '../../types/cms';
+import type { HomepageCms, AboutCms, ContactCms, HomepageSlide } from '../../types/cms';
 import type { BusinessConfig } from '../../types/business';
 
 type DbProduct = Database['public']['Tables']['products']['Row'];
@@ -14,6 +14,7 @@ type DbTestimonial = Database['public']['Tables']['testimonials']['Row'];
 type DbFaq = Database['public']['Tables']['faqs']['Row'];
 type DbStoreSettings = Database['public']['Tables']['store_settings']['Row'];
 type DbHomepageCms = Database['public']['Tables']['homepage_cms']['Row'];
+type DbHomepageSlide = Database['public']['Tables']['homepage_slides']['Row'];
 type DbAboutCms = Database['public']['Tables']['about_cms']['Row'];
 type DbContactCms = Database['public']['Tables']['contact_cms']['Row'];
 
@@ -190,6 +191,36 @@ export function mapDbStoreSettingsToApp(row: DbStoreSettings): BusinessConfig {
       : { lat: 0, lng: 0 },
     googleMapsUrl: row.google_maps_url ?? undefined,
     yandexMapsUrl: row.yandex_maps_url ?? undefined,
+  };
+}
+
+export function mapDbHomepageSlideToApp(row: DbHomepageSlide): HomepageSlide {
+  return {
+    id: row.id,
+    badge: row.badge ?? '',
+    title: row.title ?? '',
+    subtitle: row.subtitle ?? '',
+    ctaText: row.cta_text ?? '',
+    ctaLink: row.cta_link ?? '',
+    imageUrl: row.image_url ?? '',
+    mobileImageUrl: row.mobile_image_url ?? '',
+    active: row.is_active !== false,
+    order: row.sort_order ?? 100,
+  };
+}
+
+export function homepageSlideToDb(slide: HomepageSlide) {
+  return {
+    id: slide.id,
+    badge: slide.badge || null,
+    title: slide.title || null,
+    subtitle: slide.subtitle || null,
+    cta_text: slide.ctaText || null,
+    cta_link: slide.ctaLink || null,
+    image_url: slide.imageUrl || null,
+    mobile_image_url: slide.mobileImageUrl || null,
+    is_active: slide.active,
+    sort_order: slide.order,
   };
 }
 

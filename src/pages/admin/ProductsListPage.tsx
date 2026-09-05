@@ -1,27 +1,35 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus,
   Search,
-  Filter,
   Star,
   Sparkle,
   Percent,
-  CheckCircle2,
-  XCircle,
   Eye,
   Edit,
   Copy,
   Trash2,
-  ExternalLink,
-  ChevronDown,
-  ArrowUpDown,
   Boxes,
-  SlidersHorizontal,
+  Check,
+  X,
+  Layers,
+  Tag,
+  CheckCircle2,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { Product } from '../../types/product';
+
+type BulkAction =
+  | 'publish'
+  | 'unpublish'
+  | 'feature'
+  | 'unfeature'
+  | 'sale-on'
+  | 'sale-off'
+  | 'stock-on'
+  | 'stock-off';
 
 export const ProductsListPage: React.FC = () => {
   const {
@@ -33,6 +41,8 @@ export const ProductsListPage: React.FC = () => {
     toggleProductNew,
     toggleProductPublished,
     updateProductStock,
+    bulkUpdateProducts,
+    bulkDeleteProducts,
   } = useStore();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,13 +56,33 @@ export const ProductsListPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all'); // all, published, draft
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'name'>('newest');
 
+  // Selection & Bulk
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkConfirm, setBulkConfirm] = useState<BulkAction | null>(null);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkCategoryMenu, setBulkCategoryMenu] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [batchStatus, setBatchStatus] = useState<{ ok: boolean; text: string } | null>(null);
+  const statusTimer = useRef<number | null>(null);
+
   // Deletion Modal
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (statusTimer.current) window.clearTimeout(statusTimer.current);
+    };
+  }, []);
+
+  const notify = (ok: boolean, text: string) => {
+    setBatchStatus({ ok, text });
+    if (statusTimer.current) window.clearTimeout(statusTimer.current);
+    statusTimer.current = window.setTimeout(() => setBatchStatus(null), 3000);
+  };
 
   // Filtered & Sorted Products
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      // Search match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesName = product.name.toLowerCase().includes(q);
@@ -62,24 +92,20 @@ export const ProductsListPage: React.FC = () => {
         if (!matchesName && !matchesSku && !matchesDesc && !matchesTags) return false;
       }
 
-      // Category match
       if (selectedCategory !== 'all') {
-        if (product.category !== selectedCategory && product.categoryName !== selectedCategory) {
-          return false;
-        }
+        const cat = categories.find((c) => c.id === selectedCategory);
+        if (product.category !== selectedCategory && product.categoryName !== selectedCategory) return false;
+        if (cat && product.category !== cat.slug && product.categoryName !== cat.name) return false;
       }
 
-      // Stock status match
       if (stockFilter === 'in-stock' && !product.inStock) return false;
       if (stockFilter === 'out-of-stock' && product.inStock && (product.stockCount ?? 1) > 0) return false;
       if (stockFilter === 'low-stock' && (!product.inStock || (product.stockCount ?? 0) > 3 || (product.stockCount ?? 0) <= 0)) return false;
 
-      // Badge filter match
       if (badgeFilter === 'featured' && !product.isFeatured) return false;
       if (badgeFilter === 'new' && !product.isNew) return false;
       if (badgeFilter === 'discount' && (!product.originalPrice || product.originalPrice <= product.price)) return false;
 
-      // Published status match
       if (statusFilter === 'published' && product.published === false) return false;
       if (statusFilter === 'draft' && product.published !== false) return false;
 
@@ -88,16 +114,89 @@ export const ProductsListPage: React.FC = () => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       if (sortBy === 'name') return a.name.localeCompare(b.name);
-      // default newest
       return (new Date(b.createdAt || 0).getTime()) - (new Date(a.createdAt || 0).getTime());
     });
-  }, [products, searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy]);
+  }, [products, searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy, categories]);
+
+  // Keep selection valid when products change (e.g. filters shrink the list).
+  useEffect(() => {
+    setSelectedIds((prev) => prev.filter((id) => products.some((p) => p.id === id)));
+  }, [products]);
+
+  const allVisibleSelected = filteredProducts.length > 0 && filteredProducts.every((p) => selectedIds.includes(p.id));
+
+  const toggleSelectAll = () => {
+    const visibleIds = filteredProducts.map((p) => p.id);
+    if (allVisibleSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const runBulkAction = (action: BulkAction) => {
+    if (selectedIds.length === 0) return;
+    setBulkBusy(true);
+    setBulkConfirm(null);
+    setBulkCategoryMenu(false);
+    const n = selectedIds.length;
+
+    switch (action) {
+      case 'publish': bulkUpdateProducts(selectedIds, { published: true }); break;
+      case 'unpublish': bulkUpdateProducts(selectedIds, { published: false }); break;
+      case 'feature': bulkUpdateProducts(selectedIds, { isFeatured: true }); break;
+      case 'unfeature': bulkUpdateProducts(selectedIds, { isFeatured: false }); break;
+      case 'sale-on': bulkUpdateProducts(selectedIds, { isOnSale: true }); break;
+      case 'sale-off': bulkUpdateProducts(selectedIds, { isOnSale: false }); break;
+      case 'stock-on': bulkUpdateProducts(selectedIds, { inStock: true }); break;
+      case 'stock-off': bulkUpdateProducts(selectedIds, { inStock: false }); break;
+    }
+    notify(true, `${n} ta mahsulot yangilandi`);
+    setSelectedIds([]);
+    setBulkBusy(false);
+  };
+
+  const runBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    setBulkBusy(true);
+    setBulkDeleteOpen(false);
+    const n = selectedIds.length;
+    bulkDeleteProducts(selectedIds);
+    notify(true, `${n} ta mahsulot o'chirildi`);
+    setSelectedIds([]);
+    setBulkBusy(false);
+  };
+
+  const runBulkCategory = (categoryId: string) => {
+    const cat = categories.find((c) => c.id === categoryId);
+    if (!cat) return;
+    if (selectedIds.length === 0) return;
+    bulkUpdateProducts(selectedIds, { category: cat.slug });
+    notify(true, `${selectedIds.length} ta mahsulot "${cat.name}" kategoriyasiga ko'chirildi`);
+    setSelectedIds([]);
+    setBulkCategoryMenu(false);
+  };
 
   const handleDeleteConfirm = () => {
     if (productToDelete) {
       deleteProduct(productToDelete.id);
       setProductToDelete(null);
     }
+  };
+
+  const bulkLabels: Record<BulkAction, { title: string; message: string; confirm: string }> = {
+    publish: { title: 'Nashr etish', message: 'Tanlangan mahsulotlarni saytda ko\'rsatishga ruxsat berasizmi?', confirm: 'Ha, nashr etish' },
+    unpublish: { title: 'Nashrdan olib tashlash', message: 'Tanlangan mahsulotlarni saytdan yashirishni tasdiqlaysizmi?', confirm: 'Ha, yashirish' },
+    feature: { title: 'Mashhur qilish', message: 'Tanlangan mahsulotlarni "Mashhurlar" bo\'limiga qo\'shasizmi?', confirm: 'Ha, mashhur qilish' },
+    unfeature: { title: 'Mashhurlikni olib tashlash', message: 'Tanlangan mahsulotlarni "Mashhurlar" bo\'limidan olasizmi?', confirm: 'Ha, olib tashlash' },
+    'sale-on': { title: 'Chegirmaga qo\'shish', message: 'Tanlangan mahsulotlarni "Chegirmada" sifatida belgilaysizmi?', confirm: 'Ha, belgilash' },
+    'sale-off': { title: 'Chegirmadan chiqarish', message: 'Tanlangan mahsulotlarni chegirmadan chiqarasizmi?', confirm: 'Ha, chiqarish' },
+    'stock-on': { title: 'Zaxirada belgilash', message: 'Tanlangan mahsulotlarni "Mavjud" deb belgilaysizmi?', confirm: 'Ha, mavjud qilish' },
+    'stock-off': { title: 'Tugadi deb belgilash', message: 'Tanlangan mahsulotlarni "Tugagan" deb belgilaysizmi?', confirm: 'Ha, tugadi qilish' },
   };
 
   return (
@@ -122,6 +221,13 @@ export const ProductsListPage: React.FC = () => {
             <span>Zaxira jadvali</span>
           </Link>
           <Link
+            to="/admin/products/bulk-create"
+            className="px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors flex items-center gap-1.5"
+          >
+            <Layers className="w-4 h-4" />
+            <span>Ommaviy yaratish</span>
+          </Link>
+          <Link
             to="/admin/products/new"
             className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold shadow-sm transition-all active:scale-95 flex items-center gap-1.5"
           >
@@ -134,7 +240,6 @@ export const ProductsListPage: React.FC = () => {
       {/* Search & Filter Bar */}
       <div className="p-4 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Search Box */}
           <div className="relative lg:col-span-2">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
               <Search className="w-4 h-4" />
@@ -157,7 +262,6 @@ export const ProductsListPage: React.FC = () => {
             )}
           </div>
 
-          {/* Category Filter */}
           <div>
             <select
               value={selectedCategory}
@@ -173,7 +277,6 @@ export const ProductsListPage: React.FC = () => {
             </select>
           </div>
 
-          {/* Sort By */}
           <div>
             <select
               value={sortBy}
@@ -194,7 +297,6 @@ export const ProductsListPage: React.FC = () => {
             Filtrlar:
           </span>
 
-          {/* Badge Filter Tabs */}
           <button
             type="button"
             onClick={() => setBadgeFilter('all')}
@@ -243,7 +345,6 @@ export const ProductsListPage: React.FC = () => {
             <span>Chegirmada</span>
           </button>
 
-          {/* Stock status filter */}
           <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-700 mx-1" />
 
           <select
@@ -257,7 +358,6 @@ export const ProductsListPage: React.FC = () => {
             <option value="out-of-stock">Tugagan mahsulotlar</option>
           </select>
 
-          {/* Publish status filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -270,6 +370,108 @@ export const ProductsListPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300/60 dark:border-amber-900/60 shadow-xs flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 mr-2">
+            <span className="w-6 h-6 rounded-lg bg-amber-500 text-neutral-950 flex items-center justify-center text-xs font-black">
+              {selectedIds.length}
+            </span>
+            <span className="text-xs font-extrabold text-amber-900 dark:text-amber-200">
+              mahsulot tanlandi
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedIds([])}
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline"
+          >
+            <X className="w-3.5 h-3.5" />
+            Bekor qilish
+          </button>
+
+          <div className="w-px h-5 bg-amber-300/70 dark:bg-amber-900/60 mx-1" />
+
+          <button type="button" onClick={() => runBulkAction('publish')} className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-[11px] font-black shadow-sm transition-all flex items-center gap-1">
+            <Check className="w-3.5 h-3.5 stroke-[3]" />
+            Nashr
+          </button>
+          <button type="button" onClick={() => setBulkConfirm('unpublish')} className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1">
+            Yashirish
+          </button>
+          <button type="button" onClick={() => runBulkAction('feature')} className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1">
+            <Star className="w-3.5 h-3.5 fill-current" />
+            Mashhur
+          </button>
+          <button type="button" onClick={() => runBulkAction('sale-on')} className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1">
+            <Percent className="w-3.5 h-3.5" />
+            Chegirma
+          </button>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setBulkCategoryMenu((v) => !v)}
+              className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1"
+            >
+              <Tag className="w-3.5 h-3.5" />
+              Kategoriya
+            </button>
+            {bulkCategoryMenu && (
+              <div className="absolute left-0 top-full mt-1.5 z-30 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-lg p-1.5 max-h-56 overflow-auto min-w-40">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => runBulkCategory(c.id)}
+                    className="block w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-amber-50 dark:hover:bg-amber-950/40"
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1"
+              onClick={() => runBulkAction('stock-on')}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Mavjud
+            </button>
+          </div>
+          <button type="button" onClick={() => setBulkConfirm('stock-off')} className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors">
+            Tugadi
+          </button>
+
+          <div className="w-px h-5 bg-amber-300/70 dark:bg-amber-900/60 mx-1" />
+
+          <button
+            type="button"
+            onClick={() => setBulkDeleteOpen(true)}
+            className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-black shadow-sm transition-all flex items-center gap-1"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            O'chirish
+          </button>
+        </div>
+      )}
+
+      {/* Transient status banner */}
+      {batchStatus && (
+        <div className={`px-4 py-3 rounded-2xl border text-xs font-bold flex items-center gap-2 shadow-xs ${
+          batchStatus.ok
+            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300/60 dark:border-emerald-900/60 text-emerald-800 dark:text-emerald-200'
+            : 'bg-red-50 dark:bg-red-950/40 border-red-300/60 dark:border-red-900/60 text-red-800 dark:text-red-200'
+        }`}>
+          <CheckCircle2 className="w-4 h-4" />
+          {batchStatus.text}
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs overflow-hidden">
         {filteredProducts.length > 0 ? (
@@ -277,7 +479,16 @@ export const ProductsListPage: React.FC = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40 text-neutral-500 dark:text-neutral-400 font-bold uppercase text-[10px]">
-                  <th className="py-3.5 pl-5 pr-3">Mahsulot</th>
+                  <th className="py-3.5 pl-5 pr-2 w-8">
+                    <input
+                      type="checkbox"
+                      checked={allVisibleSelected}
+                      onChange={toggleSelectAll}
+                      aria-label="Barchasini tanlash"
+                      className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                    />
+                  </th>
+                  <th className="py-3.5 pr-3">Mahsulot</th>
                   <th className="py-3.5 px-3">Kategoriya</th>
                   <th className="py-3.5 px-3">Narxi</th>
                   <th className="py-3.5 px-3">O'lcham / Rang</th>
@@ -290,21 +501,31 @@ export const ProductsListPage: React.FC = () => {
               <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
                 {filteredProducts.map((p) => {
                   const isPublished = p.published !== false;
+                  const checked = selectedIds.includes(p.id);
                   return (
                     <tr
                       key={p.id}
                       className={`hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40 transition-colors ${
                         !isPublished ? 'opacity-60 bg-neutral-50/40 dark:bg-neutral-950/40' : ''
-                      }`}
+                      } ${checked ? 'bg-amber-50/60 dark:bg-amber-950/20' : ''}`}
                     >
-                      {/* Product Thumbnail & Details */}
-                      <td className="py-3.5 pl-5 pr-3">
+                      <td className="py-3.5 pl-5 pr-2">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSelect(p.id)}
+                          aria-label={`${p.name} tanlash`}
+                          className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                        />
+                      </td>
+                      <td className="py-3.5 pr-3">
                         <div className="flex items-center gap-3">
                           <img
                             src={p.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}
                             alt=""
                             className="w-12 h-12 rounded-xl object-cover border border-neutral-200 dark:border-neutral-700 shrink-0 shadow-2xs"
                             referrerPolicy="no-referrer"
+                            loading="lazy"
                           />
                           <div className="min-w-0">
                             <Link
@@ -325,7 +546,6 @@ export const ProductsListPage: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Category */}
                       <td className="py-3.5 px-3">
                         <span className="font-semibold text-neutral-700 dark:text-neutral-300">
                           {p.categoryName || p.category}
@@ -337,7 +557,6 @@ export const ProductsListPage: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Price & Discount */}
                       <td className="py-3.5 px-3">
                         <div className="font-extrabold text-neutral-900 dark:text-white">
                           {p.price.toLocaleString('uz-UZ')} so'm
@@ -352,7 +571,6 @@ export const ProductsListPage: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Sizes & Colors */}
                       <td className="py-3.5 px-3">
                         <div className="flex flex-wrap gap-1 max-w-[140px]">
                           {p.sizes?.slice(0, 3).map((s, idx) => (
@@ -370,11 +588,10 @@ export const ProductsListPage: React.FC = () => {
                           )}
                         </div>
                         <div className="text-[10px] text-neutral-400 mt-1">
-                          {p.colors?.slice(0, 2).join(', ')}
+                          {p.colors?.slice(0, 2).map((c) => c.name).join(', ')}
                         </div>
                       </td>
 
-                      {/* Stock Toggle */}
                       <td className="py-3.5 px-3 text-center">
                         <button
                           type="button"
@@ -394,7 +611,6 @@ export const ProductsListPage: React.FC = () => {
                         </button>
                       </td>
 
-                      {/* Badges Toggles */}
                       <td className="py-3.5 px-3 text-center">
                         <div className="inline-flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
                           <button
@@ -424,7 +640,6 @@ export const ProductsListPage: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Published Toggle */}
                       <td className="py-3.5 px-3 text-center">
                         <button
                           type="button"
@@ -439,7 +654,6 @@ export const ProductsListPage: React.FC = () => {
                         </button>
                       </td>
 
-                      {/* Actions */}
                       <td className="py-3.5 pr-5 pl-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <a
@@ -519,6 +733,30 @@ export const ProductsListPage: React.FC = () => {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setProductToDelete(null)}
       />
+
+      {/* Bulk action confirmation */}
+      {bulkConfirm && (
+        <ConfirmDialog
+          isOpen
+          title={bulkLabels[bulkConfirm].title}
+          message={`${bulkLabels[bulkConfirm].message} (${selectedIds.length} ta mahsulot)`}
+          confirmLabel={bulkLabels[bulkConfirm].confirm}
+          onConfirm={() => runBulkAction(bulkConfirm)}
+          onCancel={() => setBulkConfirm(null)}
+        />
+      )}
+
+      {/* Bulk delete confirmation */}
+      {bulkDeleteOpen && (
+        <ConfirmDialog
+          isOpen
+          title="Ommaviy o'chirish"
+          message={`${selectedIds.length} ta mahsulot va ularning barcha rasmlari/ma'lumotlari butunlay o'chiriladi. Bu amalni ortga qaytarib bo'lmaydi. Davom etasizmi?`}
+          confirmLabel="Ha, barchasini o'chirish"
+          onConfirm={runBulkDelete}
+          onCancel={() => setBulkDeleteOpen(false)}
+        />
+      )}
     </div>
   );
 };

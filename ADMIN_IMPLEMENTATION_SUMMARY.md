@@ -188,6 +188,63 @@ Admin: Click Chiqqish → Session cleared → /admin redirects to /login → Man
 - **Zero hardcoded admin data** — all data from StoreContext
 - **Mock data preserved** — all 12 products, 5 categories, 7 videos, 4 testimonials, 6 FAQ, prompts, CMS defaults
 
+## Full Product Polish + Feature Completeness Pass
+
+### Data layer (Supabase — no longer localStorage-only)
+- **Migration `20260905010000`**: new tables `favorites`, `feed_saves`, `homepage_slides` with RLS/grants.
+  - `favorites` / `feed_saves`: visitor-scoped (no account required), RLS disabled + anon/authenticated grants (same pattern as `feed_likes`/`feed_comments`). Unique constraint prevents double-save.
+  - `homepage_slides`: RLS ON — public reads only active slides; authenticated role manages slides.
+- **`FavoritesContext`**: rewritten to persist to Supabase (`favorites` by `visitor_id`) with optimistic UI + rollback on failure + localStorage cache merged on load.
+- **`useFeedSave`** (new hook): feed-video saves → `feed_saves`, separate from product favorites; optimistic toggle, count, `feed_favorite` analytics event.
+- **`persistProduct`**: now persists `product_sizes` and `product_colors` (previously only images were synced — bug fixed); signature caches avoid redundant writes.
+- **Bulk product operations** (single DB calls, not per-row loops):
+  - `bulkUpdateProducts(ids, patch)` — one `UPDATE … WHERE id IN (…)`.
+  - `bulkDeleteProducts(ids)` — one `DELETE … WHERE id IN (…)` + storage folder cleanup.
+
+### Admin UI
+- **`/admin/products` (ProductsListPage)**: row checkboxes, select-all-visible, bulk toolbar (Publish / Unpublish / Featured / Sale / Category / Stock on-off / Delete), ConfirmDialog for destructive actions, transient success banner, search by name/SKU/description/tags, category/stock/badge/status filters, sort (newest/price/name).
+- **`ImageUploader`**: multi-file drag & drop, per-file progress, overall progress bar, retry, per-file remove, duplicate/size/type validation — existing flow preserved.
+- **`SingleImageUpload`** (new): single-image widget with preview, progress, replace/remove for slider images.
+- **`/admin/homepage` (HomepageCmsPage)**: new "Aylanma Bannerlar" slider CMS — add/edit slides (badge, title, subtitle, CTA text+link, active toggle), desktop + mobile image upload, reorder, delete with confirm; saves via `publishHomepageSlides` (upsert + cleanup).
+- **`/admin/prompts`**: dedicated protected Prompt Library admin (pre-existing) — CRUD, publish/unpublish, category, search, filter, copy; customer page read-only.
+
+### Customer UI
+- **HeroSection**: renders active homepage slides as a carousel (prev/next, dots, auto-advance, pause on hover, internal/external CTA), falls back to the legacy hero when no slides exist.
+- **ProductDetailPage**: stock badge now reflects real state — "Sotuvda tugagan" (red) / "Kam qolgan" (amber, ≤3) / "Do'konda mavjud"; primary CTA disabled + "Mavjud emas" when out of stock (no more "out of stock + buy" contradiction).
+- **FeedVideoCard**: save button now saves the video to `feed_saves` (works without a linked product) with live count; product CTA ("Ko'rish") links to the real `/product/<id>` page with real price/name.
+
+### Verified at runtime (live project E2E — 15/15 + SQL)
+- Anon reader sees only active `homepage_slides`; anon insert blocked by RLS; admin update visible immediately.
+- Favorites & feed_saves: anon insert/select/delete by `visitor_id`; duplicate rows rejected by unique constraint.
+- Bulk publish→draft, featured+stock update, delete — single batch statements, storefront hides drafts via RLS.
+- Build + typecheck green; production bundle contains no secrets (only the intended public publishable key).
+
+> **Note**: StoreContext is now Supabase-backed (products, categories, CMS carry real DB data, not mock arrays). The "mock data preserved / single source of truth in localStorage" notes above apply to the earlier localStorage era; the current data source is Supabase Postgres with RLS.
+
+## Bulk Product Creation (`/admin/products/bulk-create`)
+
+### Feature
+- **Entry points**: sidebar "Ommaviy yaratish" (KATALOG group) + "Ommaviy yaratish" button on the products list header.
+- **Flow** (5 steps): select files → shared settings → review → running → done.
+  - **Select**: multi-file picker + drag & drop with depth-based dropzone feedback, per-file thumbnail previews (object URLs), per-file remove, validation via the existing `validateMediaFile` (type/size/duplicate) — same rules as single-product uploader.
+  - **Settings**: shared values applied to every item — category, price, eski narx (original), stock count, publish toggle, sizes (S/M/L/XL/XS), colors (Qora/Oq/Ko'k/Qizil/Yashil/Sariq), tags, description, naming mode (from filename or prefix + "#N").
+    - Per-item override rows: name / price / category can be edited individually; once edited they stop following shared changes ("Qayta qo'llash" re-applies shared to all).
+    - Product name auto-derived from filename (`black-shirt.jpg` → `Black Shirt`) or `Prefix #N`; slug auto-generated with in-batch uniqueness.
+  - **Review**: 5 summary rows with prices + image; "Barchasini yaratish" disabled while any price is missing/invalid.
+  - **Running**: concurrency pool of 3 (cursor-based workers), per-item live status (Navbatda → % upload → Yaratildi/Xato), overall progress bar.
+  - **Done**: success/failure summary, per-item retry + "Barcha xatolarni qayta urinish", "Mahsulotlarni ko'rish" / "Saytni yangi oynada ochish", "Yana yaratish" reset.
+- **Data pipeline per item**: deferred upload until "Create All" (no orphans on cancel) → `uploadMediaWithProgress` to `product-images` bucket under `products/<prodId>/images/<stamp>-<file>` → build app `Product` → `insertBulkProduct` (single awaited sequence: products upsert → `product_images` (primary on first) → `product_sizes` → `product_colors` → activity log → prepend to local state). **Failure handling**: on any throw the uploaded object is deleted and the partial DB row is removed (`cleanupBulkProduct`, cascades children) so retries start from scratch; successful items are never duplicated by retries. `runningRef` guard blocks double-submit.
+- **StoreContext additions**: `insertBulkProduct(product, categoryId?)` and `cleanupBulkProduct(id)`.
+
+### Verified at runtime (Playwright end-to-end vs live project)
+- Login → bulk-create page renders; **unauthenticated guests are redirecte to `/login`** (route protected).
+- 5 images → names from files (`Black Shirt` … `Red Shirt`), shared price `120000` on all, individual override isolated to one row (`110000`), category applied.
+- Create All → **5/5 succeeded**; DB has each product with 1 primary image, 4 sizes, 2 colors, correct `category_id`, `is_published = true`; storage objects public-readable; storefront shows them (anon REST + product page renders title/price/gallery/sizes/colors, **no admin controls visible**).
+- **Partial failure + retry**: one upload forced to fail (Playwright route abort) → 2 created + 1 failed with per-item error; retry created the failed item exactly once (no duplicate rows, no orphan objects).
+- Single-product editor (`/admin/products/new`) still opens with the `ImageUploader` after bulk flows.
+- Suites: **15/15 PASS** (main flow) + **4/4 PASS** (partial failure/retry); build + `tsc` clean.
+- **Mobile (390px)**: horizontal overflow fixed — step-indicator pill row made scrollable (`overflow-x-auto`, `shrink-0` pills, no shrink to zero), settings/review footers wrap; verified 0 px overflow on select + settings steps.
+
 ## Architecture
 ```
 ADMIN (React + StoreContext localStorage)

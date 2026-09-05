@@ -27,6 +27,7 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { DashboardPage } from './pages/admin/DashboardPage';
 import { ProductsListPage } from './pages/admin/ProductsListPage';
 import { ProductEditPage } from './pages/admin/ProductEditPage';
+import { BulkCreatePage } from './pages/admin/BulkCreatePage';
 import { CategoriesPage } from './pages/admin/CategoriesPage';
 import { InventoryPage } from './pages/admin/InventoryPage';
 import { FeedAdminPage } from './pages/admin/FeedAdminPage';
@@ -105,6 +106,7 @@ export default function App() {
                     <Route index element={<DashboardPage />} />
                     <Route path="products" element={<ProductsListPage />} />
                     <Route path="products/new" element={<ProductEditPage />} />
+                    <Route path="products/bulk-create" element={<BulkCreatePage />} />
                     <Route path="products/:id" element={<ProductEditPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
                     <Route path="inventory" element={<InventoryPage />} />

@@ -13,6 +13,8 @@ import {
   Send, 
   Store, 
   CheckCircle2, 
+  AlertTriangle,
+  PackageX,
   MapPin, 
   Clock, 
   ChevronRight, 
@@ -199,10 +201,22 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* In stock badge */}
             <div className="flex items-center gap-3 pt-1">
-              <span className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/40 uppercase tracking-wider">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Do'konda mavjud {product.stockCount ? `(${product.stockCount} dona)` : ''}</span>
-              </span>
+              {!product.inStock ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-black text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-2.5 py-1 rounded-lg border border-red-200/60 dark:border-red-800/40 uppercase tracking-wider">
+                  <PackageX className="w-3.5 h-3.5" />
+                  <span>Sotuvda tugagan</span>
+                </span>
+              ) : ((product.stockCount ?? 0) > 0 && (product.stockCount ?? 0) <= 3) ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-200/60 dark:border-amber-800/40 uppercase tracking-wider">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Kam qolgan ({product.stockCount} dona)</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/40 uppercase tracking-wider">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Do'konda mavjud {product.stockCount ? `(${product.stockCount} dona)` : ''}</span>
+                </span>
+              )}
               <span className="text-xs text-zinc-400 font-mono font-bold">
                 Artikul: {product.sku}
               </span>
@@ -281,10 +295,15 @@ export const ProductDetailPage: React.FC = () => {
               id="product-detail-visit-cta"
               type="button"
               onClick={() => setIsVisitModalOpen(true)}
-              className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl font-black text-base bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-md hover:shadow-lg tracking-wide"
+              disabled={!product.inStock}
+              className={`w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl font-black text-base tracking-wide transition-all ${
+                product.inStock
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-md hover:shadow-lg'
+                  : 'bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed shadow-none'
+              }`}
             >
               <Store className="w-5 h-5" />
-              <span>Do'konda ko'rish</span>
+              <span>{product.inStock ? 'Do\'konda ko\'rish' : 'Mavjud emas'}</span>
             </button>
 
             <a

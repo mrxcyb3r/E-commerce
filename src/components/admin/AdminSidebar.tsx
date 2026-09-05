@@ -23,6 +23,7 @@ import {
   Heart,
   TrendingUp,
   ShoppingBag,
+  Layers,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -74,6 +75,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           path: '/admin/products',
           icon: Package,
           badge: products.length.toString(),
+        },
+        {
+          label: 'Ommaviy yaratish',
+          path: '/admin/products/bulk-create',
+          icon: Layers,
         },
         {
           label: 'Kategoriyalar',

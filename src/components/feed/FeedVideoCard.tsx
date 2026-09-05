@@ -25,9 +25,9 @@ import {
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
-import { useFavorites } from '../../context/FavoritesContext';
 import { track } from '../../lib/analytics/client';
 import { useFeedLikes, useFeedComments } from '../../hooks/useFeedSocial';
+import { useFeedSave } from '../../hooks/useFeedSave';
 import { CommentsModal } from './CommentsModal';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -68,7 +68,6 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const firedRetention = useRef<Set<string>>(new Set());
 
   const { isMuted, toggleMute, getProductForVideo } = useVideoFeed();
-  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Video Player state
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -94,11 +93,11 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [slideProgress, setSlideProgress] = useState<number>(0);
 
   const product = getProductForVideo(video.productId);
-  const saved = product ? isFavorite(product.id) : false;
 
-  // Social features: likes and comments
+  // Social features: likes, comments, and feed saves (separate from product favorites)
   const { likeCount, isLiked, toggleLike } = useFeedLikes(video.id);
   const { commentCount } = useFeedComments(video.id);
+  const { saveCount, isSaved, toggleSave } = useFeedSave(video.id);
   const [showComments, setShowComments] = useState(false);
 
   const showToast = useCallback((msg: string) => {
@@ -290,8 +289,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!product) return;
-    toggleFavorite(product);
+    toggleSave();
   };
 
   const shareUrl = `${window.location.origin}/feed?v=${encodeURIComponent(video.id)}`;
@@ -710,29 +708,30 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
             </button>
           </div>
 
-          {/* Save (only when linked to a real product) */}
-          {product && (
-            <div className="flex flex-col items-center gap-0.5">
-              <button
-                type="button"
-                onClick={handleSaveClick}
-                className={`${railButtonClass} group`}
-                aria-label={saved ? 'Saqlanganlardan olib tashlash' : 'Saqlash'}
-                title={saved ? 'Saqlanganlar' : 'Saqlash'}
-              >
-                <span className={`${railIconClass}`}>
-                  <Bookmark
-                    className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
-                      saved ? 'text-amber-400 fill-amber-400' : 'text-white group-hover:text-amber-300'
-                    } transition-colors`}
-                  />
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                  {saved ? 'Saqlangan' : 'Saqlash'}
+          {/* Save */}
+          <div className="flex flex-col items-center gap-0.5">
+            <button
+              type="button"
+              onClick={handleSaveClick}
+              className={`${railButtonClass} group`}
+              aria-label={isSaved ? 'Saqlanganlardan olib tashlash' : 'Saqlash'}
+              title={isSaved ? 'Saqlanganlar' : 'Saqlash'}
+            >
+              <span className={`${railIconClass}`}>
+                <Bookmark
+                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
+                    isSaved ? 'text-amber-400 fill-amber-400' : 'text-white group-hover:text-amber-300'
+                  } transition-colors`}
+                />
+              </span>
+<span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                  {isSaved ? 'Saqlangan' : 'Saqlash'}
                 </span>
               </button>
+              <span className="text-[9px] sm:text-[10px] font-semibold text-white/70 -mt-0.5">
+                {saveCount > 0 ? saveCount.toLocaleString('uz-UZ') : ''}
+              </span>
             </div>
-          )}
 
           {/* Share */}
           <div className="flex flex-col items-center gap-0.5">

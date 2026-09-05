@@ -36,6 +36,19 @@ export interface FeatureItem {
   description: string;
 }
 
+export interface HomepageSlide {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  ctaLink: string;
+  imageUrl: string;
+  mobileImageUrl: string;
+  active: boolean;
+  order: number;
+}
+
 export interface HomepageCms {
   hero: HeroContent;
   stats: TrustStatItem[];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Home,
   Save,
@@ -10,11 +10,19 @@ import {
   Tag,
   ShieldCheck,
   Eye,
+  Plus,
+  ArrowUp,
+  ArrowDown,
+  Trash2,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
+import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
+import { HomepageSlide } from '../../types/cms';
+import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
 export const HomepageCmsPage: React.FC = () => {
-  const { homepageCms, updateHomepageCms } = useStore();
+  const { homepageCms, updateHomepageCms, homepageSlides, publishHomepageSlides } = useStore();
 
   const [heroBadge, setHeroBadge] = useState(homepageCms.hero.badge);
   const [heroTitle, setHeroTitle] = useState(homepageCms.hero.title);
@@ -45,6 +53,51 @@ export const HomepageCmsPage: React.FC = () => {
   const [videoSectionSubtitle, setVideoSectionSubtitle] = useState(homepageCms.videoSectionSubtitle);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Hero slider slides (managed locally, published on save)
+  const [slides, setSlides] = useState<HomepageSlide[]>([]);
+  const [slideToDelete, setSlideToDelete] = useState<HomepageSlide | null>(null);
+
+  useEffect(() => {
+    setSlides(homepageSlides);
+  }, [homepageSlides]);
+
+  const updateSlide = (id: string, patch: Partial<HomepageSlide>) => {
+    setSlides((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+
+  const addSlide = () => {
+    const id = `slide-${Date.now()}`;
+    const newSlide: HomepageSlide = {
+      id,
+      badge: '',
+      title: '',
+      subtitle: '',
+      ctaText: "Ko'rish",
+      ctaLink: '/products',
+      imageUrl: '',
+      mobileImageUrl: '',
+      active: true,
+      order: slides.length * 10 + 10,
+    };
+    setSlides((prev) => [...prev, newSlide]);
+  };
+
+  const moveSlide = (index: number, dir: -1 | 1) => {
+    setSlides((prev) => {
+      const next = [...prev];
+      const target = index + dir;
+      if (target < 0 || target >= next.length) return prev;
+      const [item] = next.splice(index, 1);
+      next.splice(target, 0, item);
+      return next.map((s, i) => ({ ...s, order: i * 10 + 10 }));
+    });
+  };
+
+  const removeSlide = (id: string) => {
+    setSlides((prev) => prev.filter((s) => s.id !== id));
+    setSlideToDelete(null);
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +132,7 @@ export const HomepageCmsPage: React.FC = () => {
     });
 
     setSavedSuccess(true);
+    publishHomepageSlides(slides);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
 
@@ -234,6 +288,180 @@ export const HomepageCmsPage: React.FC = () => {
             />
           </div>
         </div>
+      </div>
+
+      {/* Card: Hero Slider */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-6">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <Layers className="w-4 h-4 text-amber-500" />
+              <span>Aylanma Bannerlar (Slider)</span>
+            </h3>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
+              Bosh sahifadagi aylanma bannerlarni boshqaring. Faol bannerlar mijozlarga ko'rsatiladi.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addSlide}
+            className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-black transition-all active:scale-95 inline-flex items-center gap-1.5 shrink-0"
+          >
+            <Plus className="w-4 h-4 stroke-[3]" />
+            Banner qo'shish
+          </button>
+        </div>
+
+        {slides.length === 0 ? (
+          <div className="py-10 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-3">
+              <ImageIcon className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-neutral-900 dark:text-white">Hali bannerlar yo'q</h4>
+            <p className="text-xs text-neutral-500 mt-1 max-w-xs mx-auto">
+              "Banner qo'shish" tugmasini bosing va birinchi aylanma banneringizni yarating.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {slides.map((slide, idx) => (
+              <div
+                key={slide.id}
+                className={`rounded-2xl border p-4 sm:p-5 space-y-4 ${
+                  slide.active
+                    ? 'border-neutral-200 dark:border-neutral-700 bg-neutral-50/60 dark:bg-neutral-800/40'
+                    : 'border-dashed border-neutral-300 dark:border-neutral-700 opacity-70'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-xs font-black flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-bold text-neutral-600 dark:text-neutral-300">
+                      <input
+                        type="checkbox"
+                        checked={slide.active}
+                        onChange={(e) => updateSlide(slide.id, { active: e.target.checked })}
+                        className="w-4 h-4 accent-amber-500"
+                      />
+                      Faol
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveSlide(idx, -1)}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 disabled:opacity-30"
+                      title="Yuqoriga"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveSlide(idx, 1)}
+                      disabled={idx === slides.length - 1}
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 disabled:opacity-30"
+                      title="Pastga"
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSlideToDelete(slide)}
+                      className="p-1.5 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                      title="O'chirish"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">Kichik Nishon / Badge</label>
+                      <input
+                        type="text"
+                        value={slide.badge}
+                        onChange={(e) => updateSlide(slide.id, { badge: e.target.value })}
+                        placeholder="Yangi kolleksiya"
+                        className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">Sarlavha</label>
+                      <input
+                        type="text"
+                        value={slide.title}
+                        onChange={(e) => updateSlide(slide.id, { title: e.target.value })}
+                        placeholder="Yangi mavsum to'plamlari"
+                        className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">Quyi Matn</label>
+                      <input
+                        type="text"
+                        value={slide.subtitle}
+                        onChange={(e) => updateSlide(slide.id, { subtitle: e.target.value })}
+                        placeholder="Do'kondagi eng so'nggi mahsulotlar"
+                        className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">Tugma Matni</label>
+                        <input
+                          type="text"
+                          value={slide.ctaText}
+                          onChange={(e) => updateSlide(slide.id, { ctaText: e.target.value })}
+                          placeholder="Ko'rish"
+                          className="w-full px-3 py-2 text-xs rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">Tugma Havolasi</label>
+                        <input
+                          type="text"
+                          value={slide.ctaLink}
+                          onChange={(e) => updateSlide(slide.id, { ctaLink: e.target.value })}
+                          placeholder="/products"
+                          className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <SingleImageUpload
+                      label="Banner rasmi (katta ekran)"
+                      value={slide.imageUrl}
+                      onChange={(url) => updateSlide(slide.id, { imageUrl: url })}
+                      bucket={MEDIA_BUCKETS.STORE_ASSETS}
+                      scope={`homepage/${slide.id}`}
+                    />
+                    <SingleImageUpload
+                      label="Mobil rasm (ixtiyoriy)"
+                      value={slide.mobileImageUrl}
+                      onChange={(url) => updateSlide(slide.id, { mobileImageUrl: url })}
+                      bucket={MEDIA_BUCKETS.STORE_ASSETS}
+                      scope={`homepage/${slide.id}`}
+                      hint="Mobilda ko'rsatiladi, bo'sh bo'lsa asosiy rasm ishlatiladi"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {slides.length > 0 && (
+          <p className="text-[11px] text-neutral-400">
+            O'zgarishlar yuqoridagi "Bosh sahifani saqlash" tugmasi bosilganda saqlanadi.
+          </p>
+        )}
       </div>
 
       {/* Card: Promo Banner */}
@@ -416,6 +644,16 @@ export const HomepageCmsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Slide delete confirmation */}
+      <ConfirmDialog
+        isOpen={!!slideToDelete}
+        title="Bannerni o'chirish"
+        message={`"${slideToDelete?.title || slideToDelete?.badge || 'Nomsiz banner'}" bannerni rostdan ham o'chirmoqchimisiz? Rasm fayli ham o'chiriladi.`}
+        confirmLabel="Ha, o'chirish"
+        onConfirm={() => slideToDelete && removeSlide(slideToDelete.id)}
+        onCancel={() => setSlideToDelete(null)}
+      />
     </form>
   );
 };

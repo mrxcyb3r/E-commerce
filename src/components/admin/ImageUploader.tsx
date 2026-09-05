@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, Star, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Upload, Star, ArrowLeft, ArrowRight, RefreshCcw, AlertCircle, Loader2, ImagePlus } from 'lucide-react';
 import {
   MEDIA_BUCKETS,
   buildMediaPath,
@@ -49,6 +49,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [uploadErrors, setUploadErrors] = useState<{ [key: string]: string }>({});
   const [tasks, setTasks] = useState<UploadTask[]>([]);
+  const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const patchTask = (key: number, patch: Partial<UploadTask>) => {
@@ -81,9 +82,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    e.target.value = '';
+  const processFiles = async (files: File[]) => {
     if (files.length === 0) return;
 
     const freeSlots = maxImages - images.length;
@@ -116,6 +115,19 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       setTasks((prev) => [...prev, task]);
       await runUpload(item.key, item.file, batch);
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    processFiles(files);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const files = Array.from(e.dataTransfer.files ?? []);
+    processFiles(files);
   };
 
   const handleAddUrl = () => {
@@ -207,6 +219,38 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         )}
       </div>
 
+      {/* Dropzone for drag & drop */}
+      {images.length < maxImages && (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          className={`mt-2 rounded-xl border-2 border-dashed p-4 sm:p-5 text-center cursor-pointer transition-colors ${
+            dragging
+              ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/30'
+              : 'border-neutral-300 dark:border-neutral-700 hover:border-amber-400 bg-neutral-50/60 dark:bg-neutral-800/40'
+          }`}
+        >
+          <ImagePlus className="w-5 h-5 mx-auto text-neutral-400 mb-1" />
+          <p className="text-xs font-bold text-neutral-700 dark:text-neutral-200">
+            {dragging ? 'Rasmlarni qo\'yib yuboring' : 'Rasmlarni shu yerga tashlang yoki bosing'}
+          </p>
+          <p className="text-[10px] text-neutral-400 mt-0.5">JPG, PNG yoki WebP — har bir fayl maks. 5 MB</p>
+        </div>
+      )}
+
       {showUrlInput && (
         <div className="mt-2 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3 space-y-2 bg-neutral-50 dark:bg-neutral-800/60">
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Bu imkoniyat mavjud rasm URL manzillarini import qilish uchun (ilgari URL orqali saqlangan rasmlar). Oddiy holatda fayl yuklashdan foydalaning.</p>
@@ -297,6 +341,30 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       {tasks.length > 0 && (
         <div className="space-y-2">
+          {(() => {
+            const uploading = tasks.filter((t) => t.status === 'uploading');
+            if (uploading.length > 1) {
+              const overall = uploading.reduce((sum, t) => sum + t.progress, 0) / uploading.length;
+              return (
+                <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 p-3 bg-white dark:bg-neutral-900">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="text-xs font-bold text-neutral-700 dark:text-neutral-200 flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />
+                      {uploading.length} ta fayl yuklanmoqda...
+                    </span>
+                    <span className="text-xs font-black text-amber-600">{Math.round(overall)}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-amber-500 transition-all"
+                      style={{ width: `${overall}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
           {tasks.map((task) => (
             <div key={task.key} className="rounded-xl border border-neutral-200 dark:border-neutral-700 p-3 bg-white dark:bg-neutral-900">
               <div className="flex items-center justify-between gap-2">

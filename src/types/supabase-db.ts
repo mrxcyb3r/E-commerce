@@ -114,6 +114,20 @@ export type FeedComment = {
   updated_at: string;
 };
 
+export type Favorite = {
+  id: string;
+  product_id: string;
+  visitor_id: string;
+  created_at: string;
+};
+
+export type FeedSave = {
+  id: string;
+  feed_id: string;
+  visitor_id: string;
+  created_at: string;
+};
+
 type Prompt = {
   id: string;
   title: string;
@@ -208,6 +222,21 @@ export type AnalyticsEvent = {
   page_path: string | null;
   metadata: Record<string, unknown>;
   created_at: string;
+};
+
+type HomepageSlide = {
+  id: string;
+  badge: string | null;
+  title: string | null;
+  subtitle: string | null;
+  cta_text: string | null;
+  cta_link: string | null;
+  image_url: string | null;
+  mobile_image_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 };
 
 type HomepageCms = {
@@ -371,6 +400,21 @@ export type Database = {
         Row: FeedComment;
         Insert: Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      favorites: {
+        Row: Favorite;
+        Insert: Omit<Favorite, 'id' | 'created_at'>;
+        Update: Partial<Omit<Favorite, 'id' | 'created_at'>>;
+      };
+      feed_saves: {
+        Row: FeedSave;
+        Insert: Omit<FeedSave, 'id' | 'created_at'>;
+        Update: Partial<Omit<FeedSave, 'id' | 'created_at'>>;
+      };
+      homepage_slides: {
+        Row: HomepageSlide;
+        Insert: Omit<HomepageSlide, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<HomepageSlide, 'id' | 'created_at' | 'updated_at'>>;
       };
       prompts: {
         Row: Prompt;

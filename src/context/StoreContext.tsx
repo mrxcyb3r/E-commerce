@@ -4,7 +4,7 @@ import { ClothingPromptItem } from '../types/prompt';
 import { Review } from '../types/review';
 import { FaqItem } from '../types/faq';
 import { BusinessConfig } from '../types/business';
-import { HomepageCms, AboutCms, ContactCms, AdminActivityLog } from '../types/cms';
+import { HomepageCms, AboutCms, ContactCms, AdminActivityLog, HomepageSlide } from '../types/cms';
 import { supabase } from '../lib/supabase/client';
 import type { Database } from '../types/supabase-db';
 import {
@@ -15,6 +15,7 @@ import {
   mapDbFaqToApp,
   mapDbStoreSettingsToApp,
   mapDbHomepageCmsToApp,
+  mapDbHomepageSlideToApp,
   mapDbAboutCmsToApp,
   mapDbContactCmsToApp,
   productToDb,
@@ -24,6 +25,7 @@ import {
   faqToDb,
   businessConfigToDb,
   homepageCmsToDb,
+  homepageSlideToDb,
   aboutCmsToDb,
   contactCmsToDb,
 } from '../lib/supabase/mappers';
@@ -55,8 +57,12 @@ interface StoreContextType {
   toggleProductNew: (id: string) => void;
   toggleProductPublished: (id: string) => void;
   updateProductStock: (id: string, inStock: boolean, count?: number) => void;
+  bulkUpdateProducts: (ids: string[], updates: Partial<Product>) => void;
+  bulkDeleteProducts: (ids: string[]) => void;
   getProductById: (id: string) => Product | undefined;
   getProductBySlug: (slug: string) => Product | undefined;
+  insertBulkProduct: (product: Product, categoryId?: string | null) => Promise<void>;
+  cleanupBulkProduct: (id: string) => Promise<void>;
 
   // Categories
   categories: Category[];
@@ -100,6 +106,8 @@ interface StoreContextType {
   // CMS Content
   homepageCms: HomepageCms;
   updateHomepageCms: (updates: Partial<HomepageCms>) => void;
+  homepageSlides: HomepageSlide[];
+  publishHomepageSlides: (slides: HomepageSlide[]) => void;
   aboutCms: AboutCms;
   updateAboutCms: (updates: Partial<AboutCms>) => void;
   contactCms: ContactCms;
@@ -122,6 +130,7 @@ const KEYS = {
   FAQ: 'store_faq_cms',
   STORE_INFO: 'store_info_cms',
   HOMEPAGE: 'store_homepage_cms',
+  SLIDES: 'store_homepage_slides_cms',
   ABOUT: 'store_about_cms',
   CONTACT: 'store_contact_cms',
   LOGS: 'store_activity_logs_cms',
@@ -179,6 +188,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return INITIAL_HOMEPAGE_CMS;
     } catch {
       return {} as HomepageCms;
+    }
+  });
+  const [homepageSlides, setHomepageSlides] = useState<HomepageSlide[]>(() => {
+    try {
+      return [];
+    } catch {
+      return [];
     }
   });
   const [aboutCms, setAboutCms] = useState<AboutCms>(() => {
@@ -259,6 +275,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (!cancelled && data) setHomepageCms(mapDbHomepageCmsToApp(data));
     }
 
+    async function fetchHomepageSlidesToState() {
+      const { data, error } = await supabase.from('homepage_slides').select('*').order('sort_order');
+      if (error) throw error;
+      if (!cancelled) setHomepageSlides((data ?? []).map((r) => mapDbHomepageSlideToApp(r)));
+    }
+
     async function fetchAboutCmsToState() {
       const { data, error } = await supabase.from('about_cms').select('*').maybeSingle();
       if (error) throw error;
@@ -279,6 +301,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       fetchFaqToState(),
       fetchStoreInfoToState(),
       fetchHomepageCmsToState(),
+      fetchHomepageSlidesToState(),
       fetchAboutCmsToState(),
       fetchContactCmsToState(),
     ];
@@ -560,6 +583,28 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     saveHomepageCms();
   }, [homepageCms, hydrated, supabase]);
 
+  // Homepage slides (owner-managed slider). All slides are saved at once from
+  // the CMS page so ordering and deletions stay consistent.
+  const publishHomepageSlides = async (slides: HomepageSlide[]) => {
+    setHomepageSlides(slides);
+    try {
+      localStorage.setItem(KEYS.SLIDES, JSON.stringify(slides));
+    } catch {}
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const rows = slides.map((s) => ({ ...homepageSlideToDb(s), id: s.id }));
+      if (rows.length > 0) {
+        await supabase.from('homepage_slides').upsert(rows);
+        await supabase.from('homepage_slides').delete().not('id', 'in', `(${rows.map((r) => r.id).join(',')})`);
+      } else {
+        await supabase.from('homepage_slides').delete().neq('id', '__none__');
+      }
+    } catch (err) {
+      console.error('Error saving homepage slides to Supabase:', err);
+    }
+  };
+
   // About CMS CRUD
   useEffect(() => {
     if (!hydrated) return;
@@ -652,6 +697,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   useEffect(() => {
     try {
+      localStorage.setItem(KEYS.SLIDES, JSON.stringify(homepageSlides));
+    } catch {}
+  }, [homepageSlides]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(KEYS.ABOUT, JSON.stringify(aboutCms));
     } catch {}
   }, [aboutCms]);
@@ -738,6 +789,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // specific changed record with correct DB column names (via mappers), and
   // never writes the fallback dataset. Fire-and-forget with error isolation.
   const imageSigCache = new Map<string, string>();
+  const sizeSigCache = new Map<string, string>();
+  const colorSigCache = new Map<string, string>();
 
   const persistProduct = async (product: Product) => {
     try {
@@ -764,6 +817,48 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           if (insErr) throw insErr;
         }
         imageSigCache.set(product.id, sig);
+      }
+
+      // Sync product_sizes: sizes that are not persistable were previously
+      // dropped on every refresh. Now they are written when they change.
+      const sizes = product.sizes ?? [];
+      const sSig = sizes.join('|');
+      if (sizeSigCache.get(product.id) !== sSig) {
+        await supabase.from('product_sizes').delete().eq('product_id', product.id);
+        if (sizes.length > 0) {
+          const stampPrefix = Date.now();
+          const sizeRows = sizes.map((size, index) => ({
+            id: `ps-${product.id}-${stampPrefix}-${index}`,
+            product_id: product.id,
+            size,
+            is_available: true,
+            sort_order: index,
+          }));
+          const { error: sizeErr } = await supabase.from('product_sizes').insert(sizeRows);
+          if (sizeErr) throw sizeErr;
+        }
+        sizeSigCache.set(product.id, sSig);
+      }
+
+      // Sync product_colors similarly.
+      const colors = product.colors ?? [];
+      const cSig = JSON.stringify(colors);
+      if (colorSigCache.get(product.id) !== cSig) {
+        await supabase.from('product_colors').delete().eq('product_id', product.id);
+        if (colors.length > 0) {
+          const stampPrefix = Date.now();
+          const colorRows = colors.map((c, index) => ({
+            id: `pc-${product.id}-${stampPrefix}-${index}`,
+            product_id: product.id,
+            name: c.name,
+            hex_code: c.hex || null,
+            is_available: true,
+            sort_order: index,
+          }));
+          const { error: colorErr } = await supabase.from('product_colors').insert(colorRows);
+          if (colorErr) throw colorErr;
+        }
+        colorSigCache.set(product.id, cSig);
       }
     } catch (err) {
       console.error('Error saving product to Supabase:', err);
@@ -864,6 +959,64 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     logActivity('create', 'product', `Yangi mahsulot qo'shildi: "${newProduct.name}" (${newProduct.price.toLocaleString('uz-UZ')} so'm)`);
     persistProduct(newProduct);
     return newProduct;
+  };
+
+  // Bulk-created products write through the same DB rows as normal products but
+  // awaited, so the caller can observe failures and clean up Storage/rows.
+  const insertBulkProduct = async (product: Product, categoryId?: string | null): Promise<void> => {
+    const stamp = Date.now();
+    const mainResult = await supabase
+      .from('products')
+      .upsert({ ...productToDb(product), id: product.id, category_id: categoryId ?? null });
+    if (mainResult.error) throw mainResult.error;
+
+    const images = product.images ?? [];
+    if (images.length > 0) {
+      const imageRows = images.map((url, index) => ({
+        id: `pi-${product.id}-${stamp}-${index}`,
+        product_id: product.id,
+        url,
+        is_primary: index === 0,
+        sort_order: index,
+      }));
+      const { error: imgErr } = await supabase.from('product_images').insert(imageRows);
+      if (imgErr) throw imgErr;
+    }
+
+    const sizes = product.sizes ?? [];
+    if (sizes.length > 0) {
+      const sizeRows = sizes.map((size, index) => ({
+        id: `ps-${product.id}-${stamp}-${index}`,
+        product_id: product.id,
+        size,
+        is_available: true,
+        sort_order: index,
+      }));
+      const { error: sizeErr } = await supabase.from('product_sizes').insert(sizeRows);
+      if (sizeErr) throw sizeErr;
+    }
+
+    const colors = product.colors ?? [];
+    if (colors.length > 0) {
+      const colorRows = colors.map((c, index) => ({
+        id: `pc-${product.id}-${stamp}-${index}`,
+        product_id: product.id,
+        name: c.name,
+        hex_code: c.hex || null,
+        is_available: true,
+        sort_order: index,
+      }));
+      const { error: colorErr } = await supabase.from('product_colors').insert(colorRows);
+      if (colorErr) throw colorErr;
+    }
+
+    setProducts((prev) => [product, ...prev]);
+    logActivity('create', 'product', `Bulk yaratildi: "${product.name}" (${product.price.toLocaleString('uz-UZ')} so'm)`);
+  };
+
+  const cleanupBulkProduct = async (id: string): Promise<void> => {
+    await supabase.from('products').delete().eq('id', id);
+    setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
@@ -971,6 +1124,76 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (updatedRef) persistProduct(updatedRef);
     const p = products.find((item) => item.id === id);
     logActivity('update', 'product', `Zaxira yangilandi: "${p?.name}" (${inStock ? 'Mavjud' : 'Tugagan'}, soni: ${count ?? p?.stockCount})`);
+  };
+
+  const bulkUpdateProducts = (ids: string[], updates: Partial<Product>) => {
+    if (ids.length === 0) return;
+    const now = new Date().toISOString();
+    setProducts((prev) =>
+      prev.map((p) =>
+        ids.includes(p.id)
+          ? { ...p, ...updates, updatedAt: now, inStock: updates.inStock ?? p.inStock, stockStatus: updates.stockStatus ?? p.stockStatus }
+          : p
+      )
+    );
+    const clean: Record<string, unknown> = { updated_at: now };
+    if ('published' in updates) clean.is_published = updates.published !== false;
+    if ('isFeatured' in updates) clean.is_featured = updates.isFeatured === true;
+    if ('isNew' in updates) clean.is_new = updates.isNew === true;
+    if ('isOnSale' in updates) clean.is_on_sale = updates.isOnSale === true;
+    if ('inStock' in updates || 'stockStatus' in updates) {
+      clean.stock_status = updates.inStock ? 'mavjud' : 'tugagan';
+    }
+    if ('stockCount' in updates) clean.stock_count = updates.stockCount ?? 0;
+    if ('category' in updates && updates.category) {
+      const cat = categories.find((c) => c.slug === updates.category || c.id === updates.category);
+      clean.category_id = cat?.id ?? null;
+    }
+    if (Object.keys(clean).length === 1) return;
+    supabase
+      .from('products')
+      .update(clean)
+      .in('id', ids)
+      .then(({ error }) => {
+        if (error) console.error('Error in bulk product update:', error);
+      });
+    logActivity('update', 'product', `${ids.length} ta mahsulot ommaviy yangilandi`);
+  };
+
+  const bulkDeleteProducts = (ids: string[]) => {
+    if (ids.length === 0) return;
+    const names = products.filter((p) => ids.includes(p.id)).map((p) => p.name).slice(0, 3).join(', ');
+    setProducts((prev) => prev.filter((p) => !ids.includes(p.id)));
+    supabase
+      .from('products')
+      .delete()
+      .in('id', ids)
+      .then(async ({ error }) => {
+        if (error) {
+          console.error('Error in bulk product delete:', error);
+          return;
+        }
+        // Clean up uploaded media folders owned by the deleted products.
+        for (const id of ids) {
+          try {
+            const { data } = await supabase.storage.from('product-images').list(id);
+            if (data && data.length > 0) {
+              await supabase.storage
+                .from('product-images')
+                .remove(data.map((f) => `${id}/${f.name}`));
+            }
+            const { data: videos } = await supabase.storage.from('product-images').list(`${id}/videos`);
+            if (videos && videos.length > 0) {
+              await supabase.storage
+                .from('product-images')
+                .remove(videos.map((f) => `${id}/videos/${f.name}`));
+            }
+          } catch (err) {
+            console.error(`Error cleaning up media for ${id}:`, err);
+          }
+        }
+      });
+    logActivity('delete', 'product', `${ids.length} ta mahsulot ommaviy o'chirildi: ${names}`);
   };
 
   const getProductById = (id: string): Product | undefined => {
@@ -1301,8 +1524,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         toggleProductNew,
         toggleProductPublished,
         updateProductStock,
+        bulkUpdateProducts,
+        bulkDeleteProducts,
         getProductById,
         getProductBySlug,
+        insertBulkProduct,
+        cleanupBulkProduct,
 
         categories: categoriesWithDynamicCount,
         publishedCategories,
@@ -1340,6 +1567,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         homepageCms,
         updateHomepageCms,
+        homepageSlides,
+        publishHomepageSlides,
         aboutCms,
         updateAboutCms,
         contactCms,
