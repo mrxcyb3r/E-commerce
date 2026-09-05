@@ -296,3 +296,8 @@ CUSTOMER WEBSITE (React components use useStore())
 - The reported screenshot (iOS sheet: Copy / QR Code / Mail) matches either a **pre-refactor build** or an explicit tap on that button.
 - "Share using device" button was visually de-emphasized (bordered secondary style below a "yoki" divider) so the in-app targets (Copy/Telegram/WhatsApp/Facebook/Instagram/Email/QR) are clearly the primary path.
 - Regression: smoke **10/10** + share-compliance assertions pass; `tsc` + build clean.
+
+### Mobile overflow hardening + demo-content cleanup
+- Homepage had 18px page-level horizontal overflow at 390px: TrustStats "value + label" row couldn't wrap (`Yangi Kolleksiyalar`, `Qulay Xarid tajribasi`). Fixed with `min-w-0` + `flex-wrap`; decorative hero SVG paths were already clipped by `overflow-hidden` (non-issue).
+- Removed remaining Jizzax/Yangibot-specific hardcoded seed strings (cmsDefaults, faq, reviews, admin placeholders/backup filename, HeroSection fallback) → config/CMS-driven neutrals.
+- `tsc` + build clean; mobile-scan **PASS (9/9 routes @ 390px, 0px overflow)**; smoke **10/10 PASS**.

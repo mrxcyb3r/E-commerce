@@ -22,13 +22,13 @@ export const TrustStats: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="flex items-start gap-3.5"
+              className="flex items-start gap-3.5 min-w-0"
             >
               <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
                 {icons[index % icons.length]}
               </div>
-              <div>
-                <div className="flex items-baseline gap-1.5">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                   <span className="font-black text-lg sm:text-2xl text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
                     {stat.value}
                   </span>
