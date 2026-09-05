@@ -141,7 +141,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             <span className="font-bold uppercase tracking-wider text-[10px] text-zinc-400 dark:text-zinc-500">
               {product.categoryName}
             </span>
-            {product.brand && <span className="font-bold text-zinc-600 dark:text-zinc-400">{product.brand}</span>}
           </div>
 
           <Link
