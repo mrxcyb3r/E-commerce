@@ -11,13 +11,20 @@ import { ReviewsSection } from '../components/sections/ReviewsSection';
 import { StoreLocation } from '../components/sections/StoreLocation';
 import { FaqSection } from '../components/sections/FaqSection';
 import { ContactSection } from '../components/sections/ContactSection';
+import { TrustBadges } from '../components/sections/TrustBadges';
+import { FeaturedCollections } from '../components/sections/FeaturedCollections';
+import { BrandMarquee } from '../components/sections/BrandMarquee';
+import { NewsletterBand } from '../components/sections/NewsletterBand';
 
 export const HomePage: React.FC = () => {
   return (
     <div className="space-y-0">
       <HeroSection />
       <TrustStats />
+      <TrustBadges />
+      <BrandMarquee />
       <CategorySection />
+      <FeaturedCollections />
       <FeaturedProducts />
       <VideoDiscoverySection />
       <WhyChooseUs />
@@ -27,6 +34,7 @@ export const HomePage: React.FC = () => {
       <StoreLocation />
       <FaqSection />
       <ContactSection />
+      <NewsletterBand />
     </div>
   );
 };

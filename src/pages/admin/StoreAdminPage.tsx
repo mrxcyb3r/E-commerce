@@ -42,7 +42,20 @@ export const StoreAdminPage: React.FC = () => {
   const [language, setLanguage] = useState(storeInfo.language || 'uz');
   const [defaultSeoTitle, setDefaultSeoTitle] = useState(storeInfo.defaultSeoTitle || '');
   const [defaultSeoDescription, setDefaultSeoDescription] = useState(storeInfo.defaultSeoDescription || '');
+  const [defaultSeoKeywords, setDefaultSeoKeywords] = useState(storeInfo.defaultSeoKeywords || '');
   const [ogImageUrl, setOgImageUrl] = useState(storeInfo.ogImageUrl || '');
+  const [twitterImageUrl, setTwitterImageUrl] = useState(storeInfo.twitterImageUrl || '');
+  const [shortName, setShortName] = useState(storeInfo.shortName || '');
+  const [secondaryColor, setSecondaryColor] = useState(storeInfo.secondaryColor || storeInfo.primaryColor);
+  const [accentColor, setAccentColor] = useState(storeInfo.accentColor || '#f59e0b');
+  const [heroTitle, setHeroTitle] = useState(storeInfo.heroTitle || '');
+  const [heroSubtitle, setHeroSubtitle] = useState(storeInfo.heroSubtitle || '');
+  const [aboutText, setAboutText] = useState(storeInfo.aboutText || '');
+  const [mission, setMission] = useState(storeInfo.mission || '');
+  const [vision, setVision] = useState(storeInfo.vision || '');
+  const [adminEmail, setAdminEmail] = useState(storeInfo.adminEmail || storeInfo.email || '');
+  const [copyright, setCopyright] = useState(storeInfo.copyright || '');
+  const [footerText, setFooterText] = useState(storeInfo.footerText || '');
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -73,7 +86,20 @@ export const StoreAdminPage: React.FC = () => {
       language,
       defaultSeoTitle: defaultSeoTitle || undefined,
       defaultSeoDescription: defaultSeoDescription || undefined,
+      defaultSeoKeywords: defaultSeoKeywords || undefined,
       ogImageUrl: ogImageUrl || undefined,
+      twitterImageUrl: twitterImageUrl || undefined,
+      shortName: shortName || undefined,
+      secondaryColor: secondaryColor || undefined,
+      accentColor: accentColor || undefined,
+      heroTitle: heroTitle || undefined,
+      heroSubtitle: heroSubtitle || undefined,
+      aboutText: aboutText || undefined,
+      mission: mission || undefined,
+      vision: vision || undefined,
+      adminEmail: adminEmail || undefined,
+      copyright: copyright || undefined,
+      footerText: footerText || undefined,
     });
 
     setSavedSuccess(true);
@@ -419,19 +445,63 @@ export const StoreAdminPage: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-              Savdo Sohasi
-            </label>
-            <input
-              type="text"
-              value={businessCategory}
-              onChange={(e) => setBusinessCategory(e.target.value)}
-              placeholder="Kiyim-kechak, poyabzal"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
-            />
+<div>
+              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                Ikkinchi Rang (Secondary)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  className="w-10 h-9 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-transparent cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  placeholder="#334155"
+                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                Aksent Rang (CTA)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="w-10 h-9 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-transparent cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  placeholder="#f59e0b"
+                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+                Savdo Sohasi
+              </label>
+              <input
+                type="text"
+                value={businessCategory}
+                onChange={(e) => setBusinessCategory(e.target.value)}
+                placeholder="Kiyim-kechak, poyabzal"
+                className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              />
+            </div>
           </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
               Til
@@ -445,6 +515,32 @@ export const StoreAdminPage: React.FC = () => {
               <option value="ru">Русский (ru)</option>
               <option value="en">English (en)</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Qisqa Nomi (Logo alt)
+            </label>
+            <input
+              type="text"
+              value={shortName}
+              onChange={(e) => setShortName(e.target.value)}
+              placeholder="Do'kon"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Administrator E-pochtasi
+            </label>
+            <input
+              type="email"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              placeholder="admin@dokon.uz"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
           </div>
         </div>
 
@@ -487,6 +583,131 @@ export const StoreAdminPage: React.FC = () => {
             placeholder="https://.../og-cover.jpg"
             className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
           />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              SEO: Kalit So'zlar (Keywords)
+            </label>
+            <input
+              type="text"
+              value={defaultSeoKeywords}
+              onChange={(e) => setDefaultSeoKeywords(e.target.value)}
+              placeholder="kiyim, poyabzal, Jizzax do'kon"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              SEO: Twitter/X Rasm
+            </label>
+            <input
+              type="url"
+              value={twitterImageUrl}
+              onChange={(e) => setTwitterImageUrl(e.target.value)}
+              placeholder="https://.../twitter-card.jpg"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Bosh Sahifa Sarlavhasi (Hero)
+            </label>
+            <input
+              type="text"
+              value={heroTitle}
+              onChange={(e) => setHeroTitle(e.target.value)}
+              placeholder="Premium kiyimlar va poyabzallar"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Bosh Sahifa Kichik Matni (Hero)
+            </label>
+            <input
+              type="text"
+              value={heroSubtitle}
+              onChange={(e) => setHeroSubtitle(e.target.value)}
+              placeholder="2026-yilning eng yangi kolleksiyalari"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            Kompaniya Haqida Matn (About)
+          </label>
+          <textarea
+            value={aboutText}
+            onChange={(e) => setAboutText(e.target.value)}
+            rows={3}
+            placeholder="Biz haqimizda qisqacha ma'lumot..."
+            className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Missiya
+            </label>
+            <textarea
+              value={mission}
+              onChange={(e) => setMission(e.target.value)}
+              rows={2}
+              placeholder="Bizning missiyamiz..."
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Vizyon
+            </label>
+            <textarea
+              value={vision}
+              onChange={(e) => setVision(e.target.value)}
+              rows={2}
+              placeholder="Bizning vizyonimiz..."
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Copyright Matni (footer)
+            </label>
+            <input
+              type="text"
+              value={copyright}
+              onChange={(e) => setCopyright(e.target.value)}
+              placeholder="© 2026 Do'kon. Barcha huquqlar himoyalangan."
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              Footer Qo'shimcha Matn
+            </label>
+            <input
+              type="text"
+              value={footerText}
+              onChange={(e) => setFooterText(e.target.value)}
+              placeholder="20 yildan ortiq tajriba"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            />
+          </div>
         </div>
       </div>
     </form>

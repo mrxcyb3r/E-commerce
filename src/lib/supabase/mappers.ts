@@ -198,6 +198,19 @@ export function mapDbStoreSettingsToApp(row: DbStoreSettings): BusinessConfig {
     defaultSeoTitle: row.default_seo_title ?? undefined,
     defaultSeoDescription: row.default_seo_description ?? undefined,
     ogImageUrl: row.og_image_url ?? undefined,
+    shortName: row.short_name ?? undefined,
+    secondaryColor: row.secondary_color ?? undefined,
+    accentColor: row.accent_color ?? undefined,
+    heroTitle: row.hero_title ?? undefined,
+    heroSubtitle: row.hero_subtitle ?? undefined,
+    aboutText: row.about_text ?? undefined,
+    mission: row.mission ?? undefined,
+    vision: row.vision ?? undefined,
+    adminEmail: row.admin_email ?? undefined,
+    defaultSeoKeywords: row.default_seo_keywords ?? undefined,
+    twitterImageUrl: row.twitter_image_url ?? undefined,
+    copyright: row.copyright ?? undefined,
+    footerText: row.footer_text ?? undefined,
   };
 }
 
@@ -434,6 +447,19 @@ export function businessConfigToDb(config: BusinessConfig) {
     default_seo_title: config.defaultSeoTitle ?? null,
     default_seo_description: config.defaultSeoDescription ?? null,
     og_image_url: config.ogImageUrl ?? null,
+    short_name: config.shortName ?? null,
+    secondary_color: config.secondaryColor ?? null,
+    accent_color: config.accentColor ?? null,
+    hero_title: config.heroTitle ?? null,
+    hero_subtitle: config.heroSubtitle ?? null,
+    about_text: config.aboutText ?? null,
+    mission: config.mission ?? null,
+    vision: config.vision ?? null,
+    admin_email: config.adminEmail ?? null,
+    default_seo_keywords: config.defaultSeoKeywords ?? null,
+    twitter_image_url: config.twitterImageUrl ?? null,
+    copyright: config.copyright ?? null,
+    footer_text: config.footerText ?? null,
   };
 }
 

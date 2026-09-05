@@ -110,8 +110,20 @@ export type FeedComment = {
   display_name: string;
   text: string;
   moderation_status: 'pending' | 'visible' | 'hidden' | 'deleted';
+  parent_id: string | null;
+  is_pinned: boolean;
+  is_admin: boolean;
+  is_verified: boolean;
+  like_count: number;
   created_at: string;
   updated_at: string;
+};
+
+export type FeedCommentLike = {
+  id: string;
+  comment_id: string;
+  visitor_id: string;
+  created_at: string;
 };
 
 export type Favorite = {
@@ -345,6 +357,19 @@ type StoreSettings = {
   default_seo_title?: string | null;
   default_seo_description?: string | null;
   og_image_url?: string | null;
+  short_name?: string | null;
+  secondary_color?: string | null;
+  accent_color?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+  about_text?: string | null;
+  mission?: string | null;
+  vision?: string | null;
+  admin_email?: string | null;
+  default_seo_keywords?: string | null;
+  twitter_image_url?: string | null;
+  copyright?: string | null;
+  footer_text?: string | null;
   updated_at: string;
 };
 
@@ -407,6 +432,11 @@ export type Database = {
         Row: FeedComment;
         Insert: Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<FeedComment, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      feed_comment_likes: {
+        Row: FeedCommentLike;
+        Insert: Omit<FeedCommentLike, 'id' | 'created_at'>;
+        Update: Partial<Omit<FeedCommentLike, 'id' | 'created_at'>>;
       };
       favorites: {
         Row: Favorite;

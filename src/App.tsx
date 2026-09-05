@@ -23,6 +23,7 @@ const AboutPage = lazyNamed(() => import('./pages/AboutPage'), 'AboutPage');
 const LocationPage = lazyNamed(() => import('./pages/LocationPage'), 'LocationPage');
 const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
 const PromptLibraryPage = lazyNamed(() => import('./pages/PromptLibraryPage'), 'PromptLibraryPage');
+const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPage');
 
 // Admin pages
 import { LoginPage } from './pages/LoginPage';
@@ -101,8 +102,11 @@ export default function App() {
                     path="/*"
                     element={
                       <div className="min-h-screen bg-[#fafafa] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans transition-colors duration-200 selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-950">
+                        <a href="#main-content" className="skip-link" aria-label="Asosiy kontentga o'tish">
+                          Kontentga o'tish
+                        </a>
                         <Navbar />
-                        <main className="flex-grow">
+                        <main id="main-content" className="flex-grow">
                           <ErrorBoundary>
                             <Suspense fallback={<PageLoader />}>
                               <Routes>
@@ -116,7 +120,7 @@ export default function App() {
                               <Route path="/about" element={<AboutPage />} />
                               <Route path="/location" element={<LocationPage />} />
                               <Route path="/contact" element={<ContactPage />} />
-                              <Route path="*" element={<HomePage />} />
+                              <Route path="*" element={<NotFoundPage />} />
                               </Routes>
                             </Suspense>
                           </ErrorBoundary>

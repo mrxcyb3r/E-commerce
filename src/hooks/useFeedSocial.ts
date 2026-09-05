@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase/client';
 import { getVisitorId } from '../lib/analytics/session';
 import { track } from '../lib/analytics/client';
+import { useAuth } from '../context/AuthContext';
+import { useBrand } from './useBrand';
 import type { FeedLike, FeedComment } from '../types/supabase-db';
 
 const VISITOR_DISPLAY_KEY = 'feed_visitor_display_name';
@@ -23,6 +25,8 @@ function getVisitorDisplayName(): string {
     return generateDisplayName();
   }
 }
+
+export type SortMode = 'newest' | 'oldest' | 'mostLiked';
 
 export function useFeedLikes(feedId: string) {
   const [likeCount, setLikeCount] = useState(0);
@@ -113,19 +117,77 @@ export function useFeedLikes(feedId: string) {
   return { likeCount, isLiked, toggleLike, loading };
 }
 
+function sortComments(comments: FeedComment[], sortMode: SortMode): FeedComment[] {
+  const topLevel = comments.filter((c) => !c.parent_id);
+  const replies = comments.filter((c) => !!c.parent_id);
+
+  const pinned = topLevel.filter((c) => c.is_pinned).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const unpinned = topLevel.filter((c) => !c.is_pinned);
+
+  let sorted: FeedComment[];
+  switch (sortMode) {
+    case 'oldest':
+      unpinned.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      break;
+    case 'mostLiked':
+      unpinned.sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0) || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      break;
+    case 'newest':
+    default:
+      unpinned.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      break;
+  }
+
+  sorted = [...pinned, ...unpinned];
+
+  // Attach replies under their parent
+  const replyMap = new Map<string, FeedComment[]>();
+  for (const r of replies) {
+    const arr = replyMap.get(r.parent_id!) ?? [];
+    arr.push(r);
+    replyMap.set(r.parent_id!, arr);
+  }
+  // Sort replies by created_at asc
+  for (const arr of replyMap.values()) {
+    arr.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  const result: FeedComment[] = [];
+  for (const c of sorted) {
+    result.push(c);
+    const childReplies = replyMap.get(c.id);
+    if (childReplies) result.push(...childReplies);
+  }
+
+  return result;
+}
+
+const PAGE_SIZE = 20;
+
 export function useFeedComments(feedId: string) {
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [sortMode, setSortMode] = useState<SortMode>('newest');
+  const [hasMore, setHasMore] = useState(false);
+  const [likedCommentIds, setLikedCommentIds] = useState<Set<string>>(new Set());
   const mountedRef = useRef(true);
+  const rawCommentsRef = useRef<FeedComment[]>([]);
 
   const visitorId = getVisitorId();
-  const displayName = getVisitorDisplayName();
+  const { isAuthenticated, user } = useAuth();
+  const { displayName: brandDisplayName } = useBrand();
+  const adminDisplayName = user?.name || brandDisplayName;
 
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
+  }, []);
+
+  const reSort = useCallback((raw: FeedComment[], mode: SortMode) => {
+    const sorted = sortComments(raw, mode);
+    if (mountedRef.current) setComments(sorted);
   }, []);
 
   useEffect(() => {
@@ -138,8 +200,8 @@ export function useFeedComments(feedId: string) {
         .select('*')
         .eq('feed_id', feedId)
         .eq('moderation_status', 'visible')
-        .order('created_at', { ascending: true })
-        .limit(100);
+        .order('created_at', { ascending: false })
+        .range(0, PAGE_SIZE - 1);
 
       const { count } = await supabase
         .from('feed_comments')
@@ -148,29 +210,93 @@ export function useFeedComments(feedId: string) {
         .eq('moderation_status', 'visible');
 
       if (mountedRef.current && !error) {
-        setComments(data ?? []);
-        setCommentCount(count ?? (data ?? []).length);
+        const fetched = data ?? [];
+        rawCommentsRef.current = fetched;
+        setHasMore(fetched.length >= PAGE_SIZE);
+        reSort(fetched, sortMode);
+        setCommentCount(count ?? fetched.length);
       }
       if (mountedRef.current) setLoading(false);
     };
 
     fetchComments();
-  }, [feedId]);
 
-  const addComment = useCallback(async (text: string): Promise<boolean> => {
+    // Fetch liked comment ids for this feed
+    const fetchLiked = async () => {
+      const { data: commentIds } = await supabase
+        .from('feed_comments')
+        .select('id')
+        .eq('feed_id', feedId);
+
+      if (commentIds && commentIds.length > 0) {
+        const ids = commentIds.map((c: { id: string }) => c.id);
+        const { data: likes } = await supabase
+          .from('feed_comment_likes')
+          .select('comment_id')
+          .eq('visitor_id', visitorId)
+          .in('comment_id', ids);
+
+        if (mountedRef.current && likes) {
+          setLikedCommentIds(new Set(likes.map((l) => l.comment_id)));
+        }
+      }
+    };
+
+    fetchLiked();
+  }, [feedId, visitorId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-sort when sortMode changes
+  useEffect(() => {
+    if (rawCommentsRef.current.length > 0) {
+      reSort(rawCommentsRef.current, sortMode);
+    }
+  }, [sortMode, reSort]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loading) return;
+    setLoading(true);
+
+    const offset = rawCommentsRef.current.length;
+    const { data, error } = await supabase
+      .from('feed_comments')
+      .select('*')
+      .eq('feed_id', feedId)
+      .eq('moderation_status', 'visible')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    if (mountedRef.current && !error && data) {
+      const merged = [...rawCommentsRef.current, ...data];
+      rawCommentsRef.current = merged;
+      setHasMore(data.length >= PAGE_SIZE);
+      reSort(merged, sortMode);
+    }
+    if (mountedRef.current) setLoading(false);
+  }, [feedId, hasMore, loading, sortMode, reSort]);
+
+  const addComment = useCallback(async (text: string, parentId?: string | null): Promise<boolean> => {
     if (!text.trim() || submitting) return false;
     setSubmitting(true);
 
+    const displayName = isAuthenticated ? adminDisplayName : getVisitorDisplayName();
+
     try {
+      const insertPayload: Record<string, unknown> = {
+        feed_id: feedId,
+        visitor_id: visitorId,
+        display_name: displayName,
+        text: text.trim(),
+        moderation_status: 'visible',
+        parent_id: parentId ?? null,
+        is_pinned: false,
+        is_admin: isAuthenticated,
+        is_verified: false,
+        like_count: 0,
+      };
+
       const { data, error } = await supabase
         .from('feed_comments')
-        .insert({
-          feed_id: feedId,
-          visitor_id: visitorId,
-          display_name: displayName,
-          text: text.trim(),
-          moderation_status: 'visible',
-        })
+        .insert(insertPayload)
         .select()
         .single();
 
@@ -185,7 +311,8 @@ export function useFeedComments(feedId: string) {
       }
 
       if (mountedRef.current && data) {
-        setComments((prev) => [...prev, data]);
+        rawCommentsRef.current = [...rawCommentsRef.current, data];
+        reSort(rawCommentsRef.current, sortMode);
         setCommentCount((c) => c + 1);
       }
       track('feed_comment_submit', { feedId });
@@ -196,7 +323,87 @@ export function useFeedComments(feedId: string) {
     } finally {
       if (mountedRef.current) setSubmitting(false);
     }
-  }, [feedId, visitorId, displayName, submitting]);
+  }, [feedId, visitorId, isAuthenticated, adminDisplayName, submitting, sortMode, reSort]);
 
-  return { comments, loading, submitting, addComment, commentCount };
+  const deleteComment = useCallback(async (commentId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('feed_comments')
+        .delete()
+        .eq('id', commentId)
+        .eq('visitor_id', visitorId);
+
+      if (error) throw error;
+
+      if (mountedRef.current) {
+        rawCommentsRef.current = rawCommentsRef.current.filter((c) => c.id !== commentId && c.parent_id !== commentId);
+        reSort(rawCommentsRef.current, sortMode);
+        setCommentCount((c) => Math.max(0, c - 1));
+      }
+      track('feed_comment_delete', { feedId, metadata: { commentId } });
+      return true;
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('[feed_comments] delete failed:', err);
+      return false;
+    }
+  }, [feedId, visitorId, sortMode, reSort]);
+
+  const toggleCommentLike = useCallback(async (commentId: string): Promise<void> => {
+    const wasLiked = likedCommentIds.has(commentId);
+    const prevIds = new Set(likedCommentIds);
+    const prevRaw = rawCommentsRef.current;
+
+    // Optimistic update
+    if (wasLiked) {
+      setLikedCommentIds((prev) => {
+        const next = new Set(prev);
+        next.delete(commentId);
+        return next;
+      });
+    } else {
+      setLikedCommentIds((prev) => new Set(prev).add(commentId));
+    }
+    rawCommentsRef.current = rawCommentsRef.current.map((c) =>
+      c.id === commentId ? { ...c, like_count: (c.like_count ?? 0) + (wasLiked ? -1 : 1) } : c
+    );
+    reSort(rawCommentsRef.current, sortMode);
+
+    try {
+      if (wasLiked) {
+        const { error } = await supabase
+          .from('feed_comment_likes')
+          .delete()
+          .eq('comment_id', commentId)
+          .eq('visitor_id', visitorId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('feed_comment_likes')
+          .insert({ comment_id: commentId, visitor_id: visitorId });
+        if (error) throw error;
+      }
+    } catch {
+      // Rollback
+      if (mountedRef.current) {
+        setLikedCommentIds(prevIds);
+        rawCommentsRef.current = prevRaw;
+        reSort(rawCommentsRef.current, sortMode);
+      }
+    }
+  }, [likedCommentIds, visitorId, sortMode, reSort]);
+
+  return {
+    comments,
+    loading,
+    submitting,
+    addComment,
+    commentCount,
+    sortMode,
+    setSortMode,
+    hasMore,
+    loadMore,
+    likedCommentIds,
+    toggleCommentLike,
+    deleteComment,
+  };
 }

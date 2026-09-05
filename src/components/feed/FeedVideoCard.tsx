@@ -28,6 +28,7 @@ import { useFeedSave } from '../../hooks/useFeedSave';
 import { CommentsModal } from './CommentsModal';
 import { ShareModal } from '../common/ShareModal';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface FeedVideoCardProps {
   video: VideoItem;
@@ -43,6 +44,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   index,
   total,
 }) => {
+  const { t } = useI18n();
   const isCollection = video.type === 'collection' || (video.images && video.images.length > 0 && !video.videoUrl);
   const collectionImages = video.images && video.images.length > 0 ? video.images : [video.posterUrl];
 
@@ -278,7 +280,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   };
 
   const shareUrl = `${window.location.origin}/feed?v=${encodeURIComponent(video.id)}`;
-  const shareText = `${video.title} — ${storeInfo.name || "Do'konimiz"}dan ko'ring`;
+  const shareText = `${video.title} — ${storeInfo.name || t('feed', 'ourStore')}${t('feed', 'fromStore')}`;
 
   const handleSharePrimary = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -308,7 +310,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               <motion.img
                 key={currentSlideIndex}
                 src={collectionImages[currentSlideIndex]}
-                alt={`${video.title} - Rasm ${currentSlideIndex + 1}`}
+                alt={`${video.title} - ${t('feed', 'imageAlt')} ${currentSlideIndex + 1}`}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
@@ -326,7 +328,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 handlePrevSlide();
               }}
               className="absolute left-0 top-16 bottom-28 w-1/4 z-15 hover:bg-white/5 transition-colors cursor-w-resize"
-              title="Oldingi rasm"
+              title={t('feed', 'prevImage')}
             />
             <div
               onClick={(e) => {
@@ -334,7 +336,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 handleNextSlide();
               }}
               className="absolute right-0 top-16 bottom-40 w-1/4 z-15 hover:bg-white/5 transition-colors cursor-e-resize"
-              title="Keyingi rasm"
+              title={t('feed', 'nextImage')}
             />
           </div>
         ) : (
@@ -385,8 +387,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                   <AlertCircle className="w-4 h-4 text-amber-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold text-white leading-snug">Video yuklanmadi</p>
-                  <p className="text-[10px] text-zinc-400 leading-snug mt-0.5">Manzil yoki internetni tekshiring</p>
+                  <p className="text-[11px] font-bold text-white leading-snug">{t('feed', 'videoFailed')}</p>
+                  <p className="text-[10px] text-zinc-400 leading-snug mt-0.5">{t('feed', 'videoFailedDesc')}</p>
                 </div>
                 <button
                   type="button"
@@ -399,8 +401,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                     }
                   }}
                   className="shrink-0 p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors"
-                  title="Qayta urinish"
-                  aria-label="Qayta urinish"
+                  title={t('common', 'retry')}
+                  aria-label={t('common', 'retry')}
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-zinc-300" />
                 </button>
@@ -543,9 +545,9 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 to={`/products/${product.id}`}
                 onClick={(e) => e.stopPropagation()}
                 className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-[11px] sm:text-xs font-black shrink-0 transition-all active:scale-95 shadow-md uppercase tracking-wider"
-                aria-label={`${product.name} mahsulotini ko'rish`}
+                aria-label={`${product.name} ${t('common', 'viewProduct')}`}
               >
-                <span>Ko'rish</span>
+                <span>{t('common', 'view')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -558,10 +560,10 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] sm:text-xs font-bold text-zinc-200 truncate">
-                    Barcha yangi to'plamlar
+                    {t('feed', 'allCollections')}
                   </p>
                   <p className="text-[10px] text-zinc-400">
-                    Katalogda barcha kiyimlarni ko'ring
+                    {t('feed', 'browseCatalog')}
                   </p>
                 </div>
               </div>
@@ -569,9 +571,9 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                 to="/products"
                 onClick={(e) => e.stopPropagation()}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-[11px] sm:text-xs font-black shrink-0 transition-colors"
-                aria-label="Katalogga o'tish"
+                aria-label={t('feed', 'goToCatalog')}
               >
-                <span>Katalog</span>
+                <span>{t('feed', 'catalog')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -591,16 +593,16 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
         {/* Right Vertical Action Rail (like, comment, save, share, mute) */}
         <div className="absolute right-1.5 sm:right-2.5 bottom-24 sm:bottom-24 z-30 flex flex-col items-center gap-1.5 sm:gap-2 pointer-events-auto">
           {/* Like */}
-          <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col items-center gap-0.5 w-[52px] sm:w-[56px]">
             <button
               type="button"
               onClick={handleLikeClick}
-              className={`${railButtonClass} group`}
-              aria-label={isLiked ? "Yoqdi (bekor qilish)" : 'Yoqtirish'}
+              className={`${railButtonClass} group w-full`}
+              aria-label={isLiked ? t('feed', 'likes') : t('feed', 'like')}
               aria-pressed={isLiked}
-              title={isLiked ? 'Yoqmaydi' : 'Yoqadi'}
+              title={isLiked ? t('feed', 'likes') : t('feed', 'like')}
             >
-              <span className={`${railIconClass}`}>
+              <span className={`${railIconClass} group-hover:bg-rose-500/20`}>
                 <motion.span
                   key={isLiked ? 'liked' : 'unliked'}
                   initial={{ scale: 0.4 }}
@@ -615,43 +617,43 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                   />
                 </motion.span>
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                {likeCount > 0 ? likeCount.toLocaleString('uz-UZ') : '0'}
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md text-center leading-none tabular-nums">
+                {likeCount.toLocaleString('uz-UZ')}
               </span>
             </button>
           </div>
 
           {/* Comment */}
-          <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col items-center gap-0.5 w-[52px] sm:w-[56px]">
             <button
               type="button"
               onClick={handleCommentClick}
-              className={`${railButtonClass} group`}
-              aria-label="Izohlar"
-              title="Izohlar"
+              className={`${railButtonClass} group w-full`}
+              aria-label={t('feed', 'comments')}
+              title={t('feed', 'comments')}
             >
-              <span className={`${railIconClass}`}>
+              <span className={`${railIconClass} group-hover:bg-amber-400/20`}>
                 <MessageCircle
                   className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-white group-hover:text-amber-400 transition-colors`}
                 />
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                {commentCount > 0 ? commentCount.toLocaleString('uz-UZ') : '0'}
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md text-center leading-none tabular-nums">
+                {commentCount.toLocaleString('uz-UZ')}
               </span>
             </button>
           </div>
 
-{/* Save */}
-          <div className="flex flex-col items-center gap-0.5">
+          {/* Save */}
+          <div className="flex flex-col items-center gap-0.5 w-[52px] sm:w-[56px]">
             <button
               type="button"
               onClick={handleSaveClick}
-              className={`${railButtonClass} group`}
-              aria-label={isSaved ? 'Saqlanganlardan olib tashlash' : 'Saqlash'}
+              className={`${railButtonClass} group w-full`}
+              aria-label={isSaved ? t('feed', 'removeFromSaved') : t('feed', 'save')}
               aria-pressed={isSaved}
-              title={isSaved ? 'Saqlanganlar' : 'Saqlash'}
+              title={isSaved ? t('feed', 'saved') : t('feed', 'save')}
             >
-              <span className={`${railIconClass}`}>
+              <span className={`${railIconClass} group-hover:bg-amber-300/20`}>
                 <motion.span
                   key={isSaved ? 'saved' : 'unsaved'}
                   initial={{ scale: 0.4 }}
@@ -666,52 +668,51 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                   />
                 </motion.span>
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                {isSaved ? 'Saqlangan' : 'Saqlash'}
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md text-center leading-none">
+                {isSaved ? t('feed', 'saved') : (saveCount > 0 ? saveCount.toLocaleString('uz-UZ') : t('feed', 'save'))}
               </span>
             </button>
-            <span className="text-[9px] sm:text-[10px] font-semibold text-white/70 -mt-0.5">
-              {saveCount > 0 ? saveCount.toLocaleString('uz-UZ') : ''}
-            </span>
           </div>
 
           {/* Share */}
-          <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col items-center gap-0.5 w-[52px] sm:w-[56px]">
             <button
               type="button"
               onClick={handleSharePrimary}
-              className={`${railButtonClass} group`}
-              aria-label="Ulashish"
-              title="Ulashish"
+              className={`${railButtonClass} group w-full`}
+              aria-label={t('common', 'share')}
+              title={t('common', 'share')}
             >
-              <span className={`${railIconClass}`}>
+              <span className={`${railIconClass} group-hover:bg-sky-300/20`}>
                 <Share2
                   className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-white group-hover:text-sky-300 transition-colors`}
                 />
               </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">Ulashish</span>
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md text-center leading-none">
+                {t('common', 'share')}
+              </span>
             </button>
           </div>
 
           {/* Mute (videos only) */}
           {!isCollection && (
-            <div className="flex flex-col items-center gap-0.5">
+            <div className="flex flex-col items-center gap-0.5 w-[52px] sm:w-[56px]">
               <button
                 type="button"
                 onClick={handleMuteClick}
-                className={`${railButtonClass} group`}
-                aria-label={isMuted ? 'Ovozni yoqish' : "Ovozni o'chirish"}
-                title={isMuted ? 'Ovozni yoqish' : "Ovozni o'chirish"}
+                className={`${railButtonClass} group w-full`}
+                aria-label={isMuted ? t('feed', 'muteOn') : t('feed', 'muteOff')}
+                title={isMuted ? t('feed', 'muteOn') : t('feed', 'muteOff')}
               >
-                <span className={`${railIconClass}`}>
+                <span className={`${railIconClass} group-hover:bg-zinc-300/20`}>
                   {isMuted ? (
                     <VolumeX className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-zinc-200 group-hover:text-white transition-colors`} />
                   ) : (
                     <Volume2 className={`w-5.5 h-5.5 sm:w-6 sm:h-6 text-amber-400 group-hover:text-amber-300 transition-colors`} />
                   )}
                 </span>
-                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                  {isMuted ? 'Ovozsiz' : 'Ovozli'}
+                <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md text-center leading-none">
+                  {isMuted ? t('feed', 'muted') : t('feed', 'unmuted')}
                 </span>
               </button>
             </div>

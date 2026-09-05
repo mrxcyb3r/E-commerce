@@ -8,18 +8,32 @@
   # in the Netlify dashboard (Site settings → Environment variables).
   # Never commit real values here.
   NODE_VERSION = "20"
+  SITE_URL = "" # Set this to your production domain, e.g. https://mystore.uz
   # These env vars are NOT secrets — their values are public infrastructure
   # identifiers that legitimately appear in the client bundle (project URL,
   # publishable key, JWKS URL). Keep secret scanning ENABLED for everything
   # else (SUPABASE_SECRET_KEY, custom values, etc.).
   SECRETS_SCAN_OMIT_KEYS = "SUPABASE_PROJECT_ID,SUPABASE_URL,SUPABASE_JWKS_URL,SUPABASE_PUBLISHABLE_KEY"
 
-# SPA fallback: all routes served by index.html (client-side router handles 404s).
+# SPA fallback: all routes served by index.html (client-side router handles the app 404 page).
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
+# True static 404s for missing files under /assets (unknown build hashes, etc.)
+[[redirects]]
+  from = "/assets/*"
+  to = "/404.html"
+  status = 404
+  headers = { Cache-Control = "no-store" }
+
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/favicon.svg"
+  status = 301
+
+# Security + caching headers for the SPA shell.
 [[headers]]
   for = "/*"
   [headers.values]
@@ -28,3 +42,38 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.io wss://*.supabase.io; font-src 'self' data: https://fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Immutable caching for versioned build assets.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# No-cache for the SPA shell (the HTML may be updated on every deploy).
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Static SEO/error pages + PWA assets caching.
+[[headers]]
+  for = "/*.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+[[headers]]
+  for = "/icon-*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+[[headers]]
+  for = "/apple-touch-icon.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

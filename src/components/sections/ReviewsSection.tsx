@@ -1,10 +1,41 @@
-import React from 'react';
-import { Star, CheckCircle2, MessageSquareQuote } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Star, CheckCircle2, MessageSquareQuote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+
+const AUTO_ADVANCE_MS = 6000;
 
 export const ReviewsSection: React.FC = () => {
   const { publishedTestimonials, homepageCms } = useStore();
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  const reviews = publishedTestimonials;
+  const count = reviews.length;
+
+  const goTo = useCallback(
+    (next: number, dir: number) => {
+      if (count === 0) return;
+      setDirection(dir);
+      setIndex(((next % count) + count) % count);
+    },
+    [count],
+  );
+
+  const next = useCallback(() => goTo(index + 1, 1), [goTo, index]);
+  const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
+
+  useEffect(() => {
+    if (reduceMotion || paused || count <= 1) return;
+    const timer = setInterval(next, AUTO_ADVANCE_MS);
+    return () => clearInterval(timer);
+  }, [reduceMotion, paused, count, next]);
+
+  if (count === 0) return null;
+
+  const review = reviews[index];
 
   return (
     <section className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors">
@@ -28,20 +59,29 @@ export const ReviewsSection: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {publishedTestimonials.map((review, index) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xs flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                {/* Rating Stars */}
-                <div className="flex items-center gap-1">
+        <div
+          className="relative max-w-3xl mx-auto"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          <div className="relative min-h-[280px] sm:min-h-[240px]">
+            <AnimatePresence mode="wait" custom={direction} initial={false}>
+              <motion.figure
+                key={review.id}
+                custom={direction}
+                initial={{ opacity: 0, x: reduceMotion ? 0 : direction * 48 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: reduceMotion ? 0 : direction * -48 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-8 sm:p-10 flex flex-col items-center text-center"
+              >
+                <div className="flex items-center justify-center">
+                  <span className="w-12 h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center">
+                    <MessageSquareQuote className="w-5 h-5 text-amber-500" />
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1 mt-5">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
@@ -54,34 +94,77 @@ export const ReviewsSection: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Comment Text */}
-                <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+                <blockquote className="mt-4 text-base sm:text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium max-w-xl">
                   "{review.comment}"
-                </p>
-              </div>
+                </blockquote>
 
-              {/* Author & Verification */}
-              <div className="pt-6 mt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
-                {review.avatar && (
-                  <img
-                    src={review.avatar}
-                    alt={review.name}
-                    className="w-10 h-10 rounded-full object-cover shrink-0 bg-zinc-100 dark:bg-zinc-800"
-                  />
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-black text-zinc-900 dark:text-white truncate font-['Outfit',sans-serif]">
-                    {review.name}
+                <figcaption className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-3 w-full justify-center">
+                  {review.avatar && (
+                    <img
+                      src={review.avatar}
+                      alt={review.name}
+                      className="w-12 h-12 rounded-full object-cover shrink-0 bg-zinc-100 dark:bg-zinc-800"
+                    />
+                  )}
+                  <div className="text-left">
+                    <div className="text-sm font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif]">
+                      {review.name}
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                      <CheckCircle2 className="w-3 h-3 shrink-0" />
+                      <span>{review.role || review.location || "Do'konda xarid qilgan"}</span>
+                    </div>
+                    {review.purchasedProduct && (
+                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
+                        {review.purchasedProduct}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-                    <CheckCircle2 className="w-3 h-3 shrink-0" />
-                    <span>{review.role || "Do'konda xarid qilgan"}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                </figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
+
+          {count > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={prev}
+                aria-label="Avvalgi sharh"
+                className="absolute left-0 sm:-left-16 top-1/2 -translate-y-1/2 translate-x-0 w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                aria-label="Keyingi sharh"
+                className="absolute right-0 sm:-right-16 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
+
+        {count > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {reviews.map((r, i) => (
+              <button
+                key={r.id}
+                type="button"
+                aria-label={`${i + 1}-sharhni ko'rish`}
+                aria-current={i === index}
+                onClick={() => goTo(i, i > index ? 1 : -1)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === index
+                    ? 'w-8 bg-zinc-900 dark:bg-white'
+                    : 'w-2 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-600'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

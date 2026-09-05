@@ -83,6 +83,11 @@ export interface HomepageCms {
   faqSectionSubtitle?: string;
   testimonialsSectionTitle?: string;
   testimonialsSectionSubtitle?: string;
+  featuredCollectionsSectionTitle?: string;
+  featuredCollectionsSectionSubtitle?: string;
+
+  // Optional brand/partner strip — only rendered when data is provided.
+  brands?: string[];
 }
 
 export interface AboutCms {

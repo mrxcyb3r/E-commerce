@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
 import {
   Link2,
   Send,
@@ -12,9 +12,11 @@ import {
   QrCode,
   Share2,
   X,
+  Check,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useToast } from './ToastProvider';
+import { useI18n } from '../../i18n/I18nContext';
 
 export interface ShareModalProps {
   open: boolean;
@@ -32,46 +34,86 @@ interface ShareTarget {
   className: string;
 }
 
+const focusableSelector =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
 export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, onClose, onShare }) => {
   const { showToast } = useToast();
+  const { t } = useI18n();
   const [showQr, setShowQr] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [copiedQr, setCopiedQr] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const shareText = text || title || '';
   const webShareSupported = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
+  const headingId = 'share-modal-heading';
+
   useEffect(() => {
     if (open) {
+      previouslyFocusedRef.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
       closeBtnRef.current?.focus();
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose();
-      };
-      window.addEventListener('keydown', onKey);
       return () => {
         document.body.style.overflow = '';
-        window.removeEventListener('keydown', onKey);
+        previouslyFocusedRef.current?.focus();
       };
     }
-  }, [open, onClose]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
       setShowQr(false);
+      setCopied(false);
       setCopiedQr(false);
     }
   }, [open]);
 
-  const copyLink = async (openQrMessage: string) => {
+  const getFocusable = useCallback(() => {
+    if (!panelRef.current) return [];
+    return Array.from(panelRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [open, onClose, getFocusable]);
+
+  const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      showToast(openQrMessage);
+      setCopied(true);
+      showToast(t('common', 'linkCopied'));
       onShare?.('copy', url);
-      onClose();
+      setTimeout(() => setCopied(false), 2000);
     } catch {
-      showToast('Nusxalash uchun havolani belgilang', 'error');
+      showToast(t('common', 'copyError'), 'error');
     }
   };
 
@@ -85,13 +127,15 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
   const targets: ShareTarget[] = [
     {
       key: 'copy',
-      label: 'Havola',
-      icon: <Link2 className="w-5 h-5" />,
-      className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200',
+      label: t('common', 'copy'),
+      icon: copied ? <Check className="w-5 h-5" /> : <Link2 className="w-5 h-5" />,
+      className: copied
+        ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300'
+        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200',
     },
     {
       key: 'telegram',
-      label: 'Telegram',
+      label: t('common', 'telegram'),
       icon: <Send className="w-5 h-5" />,
       className: 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300',
     },
@@ -127,20 +171,40 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
     },
     {
       key: 'qr',
-      label: 'QR Kod',
+      label: 'QR',
       icon: <QrCode className="w-5 h-5" />,
       className: 'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-300',
     },
   ];
 
   const actions: Record<string, () => void> = {
-    copy: () => copyLink('Havola nusxalandi'),
-    telegram: () => popup('telegram', `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`),
-    whatsapp: () => popup('whatsapp', `https://wa.me/?text=${encodeURIComponent(shareText ? `${shareText} ` : '')}${encodeURIComponent(url)}`),
-    facebook: () => popup('facebook', `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`),
-    email: () => popup('email', `mailto:?subject=${encodeURIComponent(title || 'Ulashish')}&body=${encodeURIComponent(shareText ? `${shareText}\n` : '')}${encodeURIComponent(url)}`),
-    x: () => popup('x', `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`),
-    instagram: () => copyLink('Havola nusxalandi — Instagramda (Story/Post) joylang'),
+    copy: () => copyLink(),
+    telegram: () =>
+      popup(
+        'telegram',
+        `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`,
+      ),
+    whatsapp: () =>
+      popup(
+        'whatsapp',
+        `https://wa.me/?text=${encodeURIComponent(shareText ? `${shareText} ` : '')}${encodeURIComponent(url)}`,
+      ),
+    facebook: () =>
+      popup(
+        'facebook',
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      ),
+    email: () =>
+      popup(
+        'email',
+        `mailto:?subject=${encodeURIComponent(title || t('common', 'share'))}&body=${encodeURIComponent(shareText ? `${shareText}\n` : '')}${encodeURIComponent(url)}`,
+      ),
+    x: () =>
+      popup(
+        'x',
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
+      ),
+    instagram: () => copyLink(),
     qr: () => setShowQr((v) => !v),
   };
 
@@ -150,8 +214,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
       onShare?.('web-share', url);
       onClose();
     } catch {
-      // user cancelled — keep sheet open
+      // user cancelled
     }
+  };
+
+  const gridItemVariants: Variants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { type: 'spring', damping: 20, stiffness: 300, delay: i * 0.04 },
+    }),
   };
 
   const modal = (
@@ -167,7 +240,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Ulashish"
+        aria-labelledby={headingId}
         initial={{ y: '100%', opacity: 1 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: '100%' }}
@@ -176,7 +249,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
       >
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0">
-            <h3 className="text-base font-black text-neutral-900 dark:text-white">Ulashish</h3>
+            <h3
+              id={headingId}
+              className="text-base font-black text-neutral-900 dark:text-white"
+            >
+              {t('common', 'share')}
+            </h3>
             <p className="text-[11px] text-neutral-400 font-medium mt-0.5 line-clamp-1">
               {title || url}
             </p>
@@ -186,30 +264,42 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
             type="button"
             onClick={onClose}
             className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
-            aria-label="Yopish"
+            aria-label={t('common', 'close')}
           >
             <X className="w-4 h-4 text-neutral-500" />
           </button>
         </div>
 
         <div className="grid grid-cols-4 gap-3">
-          {targets.map((opt) => (
-            <button
+          {targets.map((opt, i) => (
+            <motion.button
               key={opt.key}
+              custom={i}
+              variants={gridItemVariants}
+              initial="hidden"
+              animate="visible"
               type="button"
               onClick={() => actions[opt.key]()}
               className="flex flex-col items-center gap-2 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none rounded-xl p-1"
               aria-label={opt.label}
+              aria-live={opt.key === 'copy' ? 'polite' : undefined}
             >
               <span
-                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-transform ${opt.className}`}
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 ${opt.className}`}
               >
-                {opt.icon}
+                <motion.span
+                  key={opt.key === 'copy' && copied ? 'check' : 'icon'}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', damping: 15, stiffness: 400 }}
+                >
+                  {opt.icon}
+                </motion.span>
               </span>
               <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 text-center leading-tight">
-                {opt.label}
+                {opt.key === 'copy' && copied ? t('common', 'copied') : opt.label}
               </span>
-            </button>
+            </motion.button>
           ))}
         </div>
 
@@ -253,18 +343,32 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
                       await navigator.clipboard.writeText(url);
                       setCopiedQr(true);
                       onShare?.('copy', url);
+                      showToast(t('common', 'linkCopied'));
                       setTimeout(() => setCopiedQr(false), 2000);
                     } catch {
-                      showToast('Nusxalashda xatolik', 'error');
+                      showToast(t('common', 'copyError'), 'error');
                     }
                   }}
-                  className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all active:scale-95 ${
+                  className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all active:scale-95 flex items-center gap-1.5 ${
                     copiedQr
                       ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300'
                       : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
                   }`}
                 >
-                  {copiedQr ? 'Nusxalandi' : 'Havolani nusxalash'}
+                  <AnimatePresence mode="wait">
+                    {copiedQr ? (
+                      <motion.span
+                        key="check"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        transition={{ type: 'spring', damping: 15, stiffness: 400 }}
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </motion.span>
+                    ) : null}
+                  </AnimatePresence>
+                  {copiedQr ? t('common', 'copied') : t('common', 'copyLink')}
                 </button>
               </div>
             </motion.div>

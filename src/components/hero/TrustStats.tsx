@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TRUST_STATS } from '../../config/business';
 import { Package, Sparkles, CheckCircle2, Store } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useStore } from '../../context/StoreContext';
+import { CountUp } from '../common/CountUp';
+import type { TrustStatItem } from '../../types/cms';
 
 export const TrustStats: React.FC = () => {
+  const { homepageCms, publishedProducts } = useStore();
   const icons = [
     <Package className="w-5 h-5 text-zinc-900 dark:text-white" />,
     <Sparkles className="w-5 h-5 text-zinc-900 dark:text-white" />,
@@ -11,11 +15,21 @@ export const TrustStats: React.FC = () => {
     <Store className="w-5 h-5 text-zinc-900 dark:text-white" />,
   ];
 
+  const stats = useMemo<TrustStatItem[]>(() => {
+    const cmsStats = homepageCms?.stats;
+    const base = Array.isArray(cmsStats) && cmsStats.length > 0 ? cmsStats : TRUST_STATS;
+    return base.map((stat) =>
+      (stat as TrustStatItem).dynamic
+        ? { ...stat, value: `${Math.max(publishedProducts.length, 100)}+` }
+        : stat,
+    );
+  }, [homepageCms, publishedProducts.length]);
+
   return (
     <section className="border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 py-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {TRUST_STATS.map((stat, index) => (
+          {stats.map((stat, index) => (
             <motion.div
               key={stat.id}
               initial={{ opacity: 0, y: 12 }}
@@ -29,9 +43,10 @@ export const TrustStats: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-                  <span className="font-black text-lg sm:text-2xl text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                    {stat.value}
-                  </span>
+                  <CountUp
+                    value={stat.value}
+                    className="font-black text-lg sm:text-2xl text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight"
+                  />
                   <span className="font-extrabold text-sm sm:text-base text-zinc-800 dark:text-zinc-200">
                     {stat.label}
                   </span>

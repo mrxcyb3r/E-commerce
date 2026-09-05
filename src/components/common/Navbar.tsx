@@ -10,12 +10,13 @@ import {
   Send,
   ArrowRight
 } from 'lucide-react';
-import { useStore } from '../../context/StoreContext';
+import { useBrand } from '../../hooks/useBrand';
 import { useFavorites } from '../../hooks/useFavorites';
 import { track } from '../../lib/analytics/client';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchModal } from './SearchModal';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface NavItem {
   id: string;
@@ -24,17 +25,18 @@ interface NavItem {
   path: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: 'hero', label: 'Asosiy', sectionId: 'hero', path: '/' },
-  { id: 'products', label: 'Mahsulotlar', sectionId: 'products', path: '/products' },
-  { id: 'feed', label: 'Videolar', sectionId: 'video-discovery', path: '/feed' },
-  { id: 'about', label: 'Biz haqimizda', sectionId: 'about', path: '/about' },
-  { id: 'location', label: 'Do\'kon manzili', sectionId: 'location', path: '/location' },
-  { id: 'contact', label: 'Bog\'lanish', sectionId: 'contact', path: '/contact' },
+const getNavItems = (t: (section: string, key: string) => string): NavItem[] => [
+  { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
+  { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
+  { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-discovery', path: '/feed' },
+  { id: 'about', label: t('nav', 'about'), sectionId: 'about', path: '/about' },
+  { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
+  { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
 ];
 
 export const Navbar: React.FC = () => {
-  const { storeInfo } = useStore();
+  const storeInfo = useBrand();
+  const { t } = useI18n();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,8 +47,8 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const isHomePage = location.pathname === '/';
+  const NAV_ITEMS = getNavItems(t);
 
-  // Track scroll position for floating navbar transformation
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -56,7 +58,6 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Global Cmd+K / Ctrl+K shortcut to open search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -68,10 +69,8 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Track active section via IntersectionObserver & scroll metrics on HomePage
   useEffect(() => {
     if (!isHomePage) {
-      // Determine active section based on route
       if (location.pathname.startsWith('/products')) {
         setActiveSection('products');
       } else if (location.pathname === '/feed' || location.pathname === '/videos') {
@@ -90,7 +89,6 @@ export const Navbar: React.FC = () => {
 
     const sectionIds = ['hero', 'products', 'video-discovery', 'about', 'location', 'contact'];
     
-    // Check elements
     const observers: IntersectionObserver[] = [];
     
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
@@ -120,7 +118,6 @@ export const Navbar: React.FC = () => {
       }
     });
 
-    // Fallback scroll listener for top and bottom edge precision
     const handleScrollPrecision = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -131,7 +128,6 @@ export const Navbar: React.FC = () => {
         return;
       }
 
-      // Check if user is near the bottom (Contact / Footer)
       if (scrollY + windowHeight >= documentHeight - 150) {
         setActiveSection('contact');
         return;
@@ -146,12 +142,10 @@ export const Navbar: React.FC = () => {
     };
   }, [isHomePage, location.pathname]);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Handle navigation item click
   const handleNavClick = useCallback((e: React.MouseEvent, item: NavItem) => {
     if (item.id === 'feed') {
       e.preventDefault();
@@ -172,12 +166,9 @@ export const Navbar: React.FC = () => {
         setActiveSection('hero');
       }
     } else {
-      // On subpage, navigate to home with hash or direct page
       if (item.id === 'hero') {
         e.preventDefault();
         navigate('/');
-      } else {
-        // Allow default link navigation to subpage
       }
     }
     setMobileMenuOpen(false);
@@ -213,17 +204,26 @@ export const Navbar: React.FC = () => {
                 }
               }}
               className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
-              aria-label={`${storeInfo.name} bosh sahifa`}
+              aria-label={`${storeInfo.name} ${t('nav', 'home')}`}
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-200 group-hover:scale-105">
-                <ShoppingBag className="w-5 h-5" />
-              </div>
+              {storeInfo.logoUrl ? (
+                <img
+                  src={storeInfo.logoUrl}
+                  referrerPolicy="no-referrer"
+                  alt=""
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl object-cover shadow-xs transition-transform duration-200 group-hover:scale-105"
+                />
+              ) : (
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-200 group-hover:scale-105">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+              )}
               <div className="flex flex-col">
                 <span className="font-black text-lg sm:text-xl tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-tight">
                   {storeInfo.name}
                 </span>
                 <span className="text-[9px] sm:text-[10px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400 hidden sm:block">
-                  {storeInfo.tagline || storeInfo.businessCategory || 'Onlayn Do\'kon'}
+                  {storeInfo.tagline || storeInfo.businessCategory || t('footer', 'tagline')}
                 </span>
               </div>
             </Link>
@@ -231,7 +231,7 @@ export const Navbar: React.FC = () => {
             {/* Desktop Navigation Links */}
             <nav 
               className="hidden md:flex items-center gap-1 p-1 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-2xl border border-zinc-200/50 dark:border-zinc-700/50"
-              aria-label="Asosiy navigatsiya"
+              aria-label={t('nav', 'mainNavigation')}
             >
               {NAV_ITEMS.map((item) => {
                 const isActive = activeSection === item.id;
@@ -263,10 +263,10 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setSearchModalOpen(true)}
                 className="flex items-center gap-2 px-3 sm:px-3.5 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100/80 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer shadow-2xs"
-                aria-label="Mahsulotlarni qidirish"
+                aria-label={t('nav', 'searchProducts')}
               >
                 <Search className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-                <span className="hidden sm:inline font-bold">Qidirish...</span>
+                <span className="hidden sm:inline font-bold">{t('common', 'search')}...</span>
               </button>
 
               {/* Favorites Link */}
@@ -274,8 +274,8 @@ export const Navbar: React.FC = () => {
                 to="/favorites"
                 id="navbar-favorites-btn"
                 className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-colors shadow-2xs"
-                aria-label="Sevimlilar ro'yxati"
-                title="Sevimlilar ro'yxati"
+                aria-label={t('nav', 'favoritesList')}
+                title={t('nav', 'favoritesList')}
               >
                 <Heart className={`w-4.5 h-4.5 ${totalFavorites > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
                 {totalFavorites > 0 && (
@@ -298,7 +298,7 @@ export const Navbar: React.FC = () => {
                 className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-xs font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-xs hover:shadow-sm"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>Telegram</span>
+                <span>{t('common', 'telegram')}</span>
               </a>
 
               {/* Mobile Menu Toggle Button */}
@@ -307,7 +307,7 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 focus:outline-none shadow-2xs"
-                aria-label={mobileMenuOpen ? "Menyuni yopish" : "Menyuni ochish"}
+                aria-label={mobileMenuOpen ? t('nav', 'closeMenu') : t('nav', 'openMenu')}
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -349,7 +349,7 @@ export const Navbar: React.FC = () => {
                 >
                   <span className="flex items-center gap-2.5">
                     <Search className="w-4 h-4 text-zinc-500" />
-                    <span>Mahsulotlarni qidirish</span>
+                    <span>{t('nav', 'searchProducts')}</span>
                   </span>
                   <ArrowRight className="w-4 h-4 text-zinc-400" />
                 </button>
@@ -357,7 +357,7 @@ export const Navbar: React.FC = () => {
                 {/* Section Links */}
                 <div className="space-y-1">
                   <div className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 px-3">
-                    Bo'limlar
+                    {t('nav', 'sections')}
                   </div>
                   {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.id;
@@ -390,7 +390,7 @@ export const Navbar: React.FC = () => {
                   >
                     <span className="flex items-center gap-2.5">
                       <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                      Sevimlilar ro'yxati
+                      {t('nav', 'favoritesList')}
                     </span>
                     <span className="px-2 py-0.5 text-xs font-black bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white rounded-full">
                       {totalFavorites}
@@ -402,7 +402,7 @@ export const Navbar: React.FC = () => {
                     onClick={() => track('phone_click')}
                     className="flex items-center gap-2 px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400"
                   >
-                    <span className="font-black text-zinc-900 dark:text-zinc-100">Telefon:</span>
+                    <span className="font-black text-zinc-900 dark:text-zinc-100">{t('nav', 'phone')}:</span>
                     <span>{storeInfo.phone}</span>
                   </a>
 
@@ -423,7 +423,7 @@ export const Navbar: React.FC = () => {
                   className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
                 >
                   <Send className="w-4 h-4" />
-                  Telegram orqali bog'lanish
+                  {t('nav', 'telegramContact')}
                 </a>
               </div>
             </motion.div>
@@ -436,4 +436,3 @@ export const Navbar: React.FC = () => {
     </>
   );
 };
-

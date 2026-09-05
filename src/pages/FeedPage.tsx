@@ -14,8 +14,10 @@ import { useVideoFeed } from '../context/VideoContext';
 import { track } from '../lib/analytics/client';
 import { FeedVideoCard } from '../components/feed/FeedVideoCard';
 import { FeedCategoryFilter } from '../types/video';
+import { useI18n } from '../i18n/I18nContext';
 
 export const FeedPage: React.FC = () => {
+  const { t } = useI18n();
   const { publishedVideos, isMuted, toggleMute, getProductForVideo } = useVideoFeed();
   const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<FeedCategoryFilter>('all');
@@ -140,10 +142,10 @@ export const FeedPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black font-['Outfit',sans-serif] tracking-tight">
-                Videolarda ko'ring
+                {t('feed', 'title')}
               </h1>
               <p className="text-xs text-zinc-400">
-                Mahsulotlarni real hayotda ko'ring va kashf eting
+                {t('feed', 'subtitle')}
               </p>
             </div>
           </div>
@@ -162,7 +164,7 @@ export const FeedPage: React.FC = () => {
                   : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Barchasi ({publishedVideos.length})
+              {t('feed', 'all')} ({publishedVideos.length})
             </button>
 
             <button
@@ -177,7 +179,7 @@ export const FeedPage: React.FC = () => {
                   : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Yangi
+              {t('feed', 'new')}
             </button>
 
             <button
@@ -192,7 +194,7 @@ export const FeedPage: React.FC = () => {
                   : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Kiyimlar
+              {t('feed', 'clothing')}
             </button>
 
             <button
@@ -207,7 +209,7 @@ export const FeedPage: React.FC = () => {
                   : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Oyoq kiyimlar
+              {t('feed', 'footwear')}
             </button>
 
             <button
@@ -222,7 +224,7 @@ export const FeedPage: React.FC = () => {
                   : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Aksessuarlar
+              {t('feed', 'accessories')}
             </button>
           </div>
         </div>
@@ -238,10 +240,10 @@ export const FeedPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h2 className="text-xl font-black font-['Outfit',sans-serif]">
-                Videolar tez orada shu yerda paydo bo'ladi
+                {t('feed', 'emptyTitle')}
               </h2>
               <p className="text-xs text-zinc-400">
-                Ushbu toifada hozircha video yuklanmagan. Barcha mahsulotlarni katalogda ko'rishingiz mumkin.
+                {t('feed', 'emptyDesc')}
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -250,13 +252,13 @@ export const FeedPage: React.FC = () => {
                 onClick={() => setSelectedCategory('all')}
                 className="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-black transition-colors"
               >
-                Barchasini ko'rish
+                {t('feed', 'viewAll')}
               </button>
               <Link
                 to="/products"
                 className="px-5 py-2.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black transition-colors"
               >
-                Katalogga o'tish
+                {t('feed', 'goToCatalog')}
               </Link>
             </div>
           </div>
@@ -272,8 +274,8 @@ export const FeedPage: React.FC = () => {
                   disabled={activeIndex === 0}
                   onClick={() => scrollToIndex(activeIndex - 1)}
                   className="w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none text-white border border-zinc-700/80 flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
-                  aria-label="Oldingi video"
-                  title="Oldingi video (↑)"
+                  aria-label={t('feed', 'prevVideo')}
+                  title={t('feed', 'prevVideoShort')}
                 >
                   <ChevronUp className="w-5 h-5" />
                 </button>
@@ -282,8 +284,8 @@ export const FeedPage: React.FC = () => {
                   disabled={activeIndex === filteredVideos.length - 1}
                   onClick={() => scrollToIndex(activeIndex + 1)}
                   className="w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none text-white border border-zinc-700/80 flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
-                  aria-label="Keyingi video"
-                  title="Keyingi video (↓)"
+                  aria-label={t('feed', 'nextVideo')}
+                  title={t('feed', 'nextVideoShort')}
                 >
                   <ChevronDown className="w-5 h-5" />
                 </button>
@@ -320,7 +322,7 @@ export const FeedPage: React.FC = () => {
                 <div className="space-y-5">
                   <div className="text-[11px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Videodagi mahsulot</span>
+                    <span>{t('feed', 'productInVideo')}</span>
                   </div>
 
                   {/* Product Image */}
@@ -346,7 +348,7 @@ export const FeedPage: React.FC = () => {
                   </div>
 
                   <div className="pt-3 border-t border-zinc-800">
-                    <div className="text-xs text-zinc-400">Narxi:</div>
+                    <div className="text-xs text-zinc-400">{t('feed', 'price')}</div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-xl font-black text-amber-400">
                         {new Intl.NumberFormat('uz-UZ').format(activeProduct.price)} so'm
@@ -364,7 +366,7 @@ export const FeedPage: React.FC = () => {
                     onClick={() => track('feed_product_click', { feedId: activeVideo?.id, productId: activeProduct.id })}
                     className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95"
                   >
-                    <span>Mahsulotni ko'rish</span>
+                    <span>{t('common', 'view')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -375,17 +377,17 @@ export const FeedPage: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-lg font-black text-white font-['Outfit',sans-serif]">
-                      Kolleksiya va Uslublar
+                      {t('feed', 'collectionsAndStyles')}
                     </h4>
                     <p className="text-xs text-zinc-400 leading-relaxed max-w-xs mx-auto">
-                      Do'konimizdagi barcha yangi kelgan kiyimlar, poyabzal va aksessuarlar katalogini ko'ring.
+                      {t('feed', 'catalogDesc')}
                     </p>
                   </div>
                   <Link
                     to="/products"
                     className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-black uppercase tracking-wider transition-colors border border-zinc-700"
                   >
-                    <span>Barcha mahsulotlar</span>
+                    <span>{t('nav', 'allProducts')}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -399,10 +401,10 @@ export const FeedPage: React.FC = () => {
                   className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors"
                 >
                   {isMuted ? <VolumeX className="w-4 h-4 text-zinc-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
-                  <span className="text-[11px] font-bold">{isMuted ? "Ovoz: O'chiq" : "Ovoz: Yoniq"}</span>
+                  <span className="text-[11px] font-bold">{isMuted ? t('feed', 'soundOff') : t('feed', 'soundOn')}</span>
                 </button>
                 <span className="text-[11px] text-zinc-500 font-medium">
-                  Do'konda mavjud
+                  {t('feed', 'productOnStore')}
                 </span>
               </div>
             </div>

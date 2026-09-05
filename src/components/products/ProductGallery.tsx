@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronLeft, ChevronRight, Play, Pause, Sparkles, Video as VideoIcon, AlertTriangle } from 'lucide-react';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface ProductGalleryProps {
   images: string[];
@@ -14,7 +15,55 @@ interface Slide {
   src: string;
 }
 
+interface ImageZoomProps {
+  src: string;
+  alt: string;
+  enabled: boolean;
+}
+
+const ImageZoom: React.FC<ImageZoomProps> = ({ src, alt, enabled }) => {
+  const { t } = useI18n();
+  const ref = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(false);
+  const [origin, setOrigin] = useState({ x: 50, y: 50 });
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
+    setOrigin({ x, y });
+    setZoom(true);
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="w-full h-full"
+      onMouseMove={enabled ? handleMove : undefined}
+      onMouseEnter={() => enabled && setZoom(true)}
+      onMouseLeave={() => setZoom(false)}
+      aria-label={enabled && zoom ? t('product', 'zoomLabel') : undefined}
+    >
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover object-center will-change-transform"
+        style={{
+          transformOrigin: `${origin.x}% ${origin.y}%`,
+          transform: enabled && zoom ? 'scale(1.8)' : 'scale(1)',
+          transition: enabled ? 'transform 0.18s ease-out' : undefined,
+        }}
+        referrerPolicy="no-referrer"
+      />
+    </div>
+  );
+};
+
 export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, videoUrl, videoPosterUrl }) => {
+  const { t } = useI18n();
   const hasVideo = Boolean(videoUrl);
   const slides: Slide[] = hasVideo
     ? [{ kind: 'video', src: videoUrl as string }, ...images.map((src) => ({ kind: 'image' as const, src }))]
@@ -26,6 +75,10 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
   const [videoError, setVideoError] = useState(false);
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const reduceMotion = useReducedMotion();
+  const [finePointer] = useState<boolean>(
+    () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
+  );
 
   const activeSlide = slides[selectedIndex] ?? slides[0];
   const nextSlide = useCallback(() => {
@@ -37,6 +90,23 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
     setSelectedIndex((prev) => (prev - 1 + slides.length) % slides.length);
     setProgress(0);
   }, [slides.length]);
+
+  const zoomEnabled = finePointer && !reduceMotion && activeSlide.kind === 'image';
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+        setVideoError(false);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextSlide();
+        setVideoError(false);
+      }
+    },
+    [nextSlide, prevSlide]
+  );
 
   const selectSlide = (index: number) => {
     setSelectedIndex(index);
@@ -80,9 +150,13 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
   return (
     <div className="space-y-4">
       <div
-        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xs group"
+        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xs group focus:outline-none"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onKeyDown={handleKeyDown}
+        tabIndex={slides.length > 1 ? 0 : -1}
+        role={slides.length > 1 ? 'group' : undefined}
+        aria-label={slides.length > 1 ? 'Mahsulot rasmlar galereyasi' : undefined}
       >
         <AnimatePresence mode="wait">
           {activeSlide.kind === 'video' ? (
@@ -115,17 +189,20 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
               )}
             </motion.div>
           ) : (
-            <motion.img
-              key={selectedIndex}
-              src={activeSlide.src}
-              alt={`${productName} - Rasm ${selectedIndex}`}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="w-full h-full object-cover object-center"
-              referrerPolicy="no-referrer"
-            />
+            <motion.div
+              key={`slide-${selectedIndex}`}
+              className="w-full h-full"
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <ImageZoom
+                src={activeSlide.src}
+                alt={`${productName} - Rasm ${selectedIndex}`}
+                enabled={zoomEnabled}
+              />
+            </motion.div>
           )}
         </AnimatePresence>
 

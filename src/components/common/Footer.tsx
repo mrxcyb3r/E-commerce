@@ -12,11 +12,15 @@ import {
   ShieldCheck,
   Sparkles
 } from 'lucide-react';
+import { useBrand } from '../../hooks/useBrand';
 import { useStore } from '../../context/StoreContext';
 import { track } from '../../lib/analytics/client';
+import { useI18n } from '../../i18n/I18nContext';
 
 export const Footer: React.FC = () => {
-  const { storeInfo, publishedCategories: categories } = useStore();
+  const storeInfo = useBrand();
+  const { publishedCategories: categories } = useStore();
+  const { t } = useI18n();
 
   return (
     <footer className="bg-zinc-100 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border-t border-zinc-200 dark:border-zinc-800 pt-16 pb-12 transition-colors">
@@ -25,15 +29,24 @@ export const Footer: React.FC = () => {
           {/* Col 1 & 2: Brand Information */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5 group inline-flex">
-              <div className="w-9 h-9 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-base shadow-xs">
-                <ShoppingBag className="w-4 h-4" />
-              </div>
+              {storeInfo.logoUrl ? (
+                <img
+                  src={storeInfo.logoUrl}
+                  referrerPolicy="no-referrer"
+                  alt=""
+                  className="w-9 h-9 rounded-xl object-cover shadow-xs"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-base shadow-xs">
+                  <ShoppingBag className="w-4 h-4" />
+                </div>
+              )}
               <span className="font-black text-2xl tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif]">
                 {storeInfo.name}
               </span>
             </Link>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm leading-relaxed font-normal">
-              {storeInfo.tagline || 'Zamonaviy kiyim-kechak va poyabzallar do\'koni'}. Onlayn ko'ring, tanlang va do'konga kelib qulay xarid qiling.
+              {storeInfo.tagline || t('footer', 'tagline')}. {t('footer', 'taglineDesc')}
             </p>
             
             <div className="pt-2 flex items-center gap-3">
@@ -74,7 +87,7 @@ export const Footer: React.FC = () => {
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 text-xs font-bold">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Haqiqiy narxlar va mahalliy do'kon kafolati</span>
+                <span>{t('footer', 'authentic')}</span>
               </div>
             </div>
           </div>
@@ -82,42 +95,42 @@ export const Footer: React.FC = () => {
           {/* Col 3: Navigation Links */}
           <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-              Bo'limlar
+              {t('footer', 'sections')}
             </h3>
             <ul className="space-y-2.5 text-sm font-medium">
               <li>
                 <Link to="/" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Asosiy sahifa
+                  {t('footer', 'homePage')}
                 </Link>
               </li>
               <li>
                 <Link to="/products" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Barcha mahsulotlar
+                  {t('footer', 'allProducts')}
                 </Link>
               </li>
               <li>
                 <Link to="/feed" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors flex items-center gap-1.5 font-bold">
-                  <span>Videolar</span>
+                  <span>{t('footer', 'videos')}</span>
                 </Link>
               </li>
               <li>
                 <Link to="/favorites" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Sevimlilar
+                  {t('footer', 'favorites')}
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Biz haqimizda
+                  {t('footer', 'about')}
                 </Link>
               </li>
               <li>
                 <Link to="/location" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Do'kon manzili
+                  {t('footer', 'location')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
-                  Bog'lanish
+                  {t('footer', 'contact')}
                 </Link>
               </li>
             </ul>
@@ -126,7 +139,7 @@ export const Footer: React.FC = () => {
           {/* Col 4: Dynamic Categories */}
           <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-              Toifalar
+              {t('footer', 'categories')}
             </h3>
             <ul className="space-y-2.5 text-sm font-medium">
               {categories.slice(0, 5).map((cat) => (
@@ -142,7 +155,7 @@ export const Footer: React.FC = () => {
           {/* Col 5: Store & Contacts */}
           <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
-              Do'kon aloqasi
+              {t('footer', 'storeContact')}
             </h3>
             <ul className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 font-medium">
               <li className="flex items-start gap-2.5">
@@ -183,12 +196,12 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-500 font-medium">
           <div>
-            © 2026 {storeInfo.name}. Barcha huquqlar himoyalangan.
+            © {new Date().getFullYear()} {storeInfo.name}. {t('footer', 'allRights')}.
           </div>
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1 font-bold">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Sifatli va qulay xarid
+              {t('footer', 'qualityPurchase')}
             </span>
             <span>•</span>
             <span>{storeInfo.city}, O'zbekiston</span>

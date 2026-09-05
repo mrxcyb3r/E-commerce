@@ -6,7 +6,7 @@ import { BusinessConfig } from '../types/business';
  * White-label workflow for a new client:
  *   1. Duplicate this project.
  *   2. Change ONLY the values in this file (businessName, contact info,
- *      colors, logo, SEO defaults …).
+ *      colors, logo, SEO defaults ...).
  *   3. Log into /admin → Do'kon → set the same contact/branding values
  *      (they get persisted to `store_settings` in Supabase and then take
  *      over from these defaults).
@@ -18,13 +18,22 @@ import { BusinessConfig } from '../types/business';
 export const BUSINESS_CONFIG: BusinessConfig = {
   businessName: 'Ecommerce',
   name: 'Ecommerce',
+  shortName: 'Ecom',
   businessDescription: "O'nline do'konimizda sifatli mahsulotlar",
   tagline: "Mahsulotlarni onlayn ko'ring, narxlarni oldindan biling va do'konimizdan qulay xarid qiling.",
+  heroTitle: 'Yangiliklar va trendlar',
+  heroSubtitle: 'Mahsulotlarni onlayn ko\'ring va do\'konimizga tashrif buyuring',
+  aboutText: "Biz mahalliy mijozlarga sifatli mahsulotlar yetkazib beradigan zamonaviy do'konmiz.",
+  mission: 'Sifatli mahsulotlarni qulay narxlarda taqdim etish',
+  vision: 'Mahalliy bozorda yetakchi sifatga ega do\'konga aylanish',
   phone: '+998 90 123 45 67',
   phoneRaw: '+998901234567',
   email: 'admin@dokon.uz',
+  adminEmail: 'admin@dokon.uz',
+  adminName: "Do'kon Administratori",
   telegram: 'https://t.me/ecommerce_uz',
   telegramUsername: '@ecommerce_uz',
+  instagramUsername: '@ecommerce_uz',
   address: 'Yangibot, Jizzax, O\'zbekiston',
   city: 'Jizzax',
   landmark: "Markaziy bozor yaqinida, Savdo majmuasi 2-qavat",
@@ -40,18 +49,26 @@ export const BUSINESS_CONFIG: BusinessConfig = {
     facebook: 'https://facebook.com/ecommerce_uz',
   },
   primaryColor: '#0f172a',
+  secondaryColor: '#f59e0b',
+  accentColor: '#ef4444',
   currency: "so'm",
   coordinates: {
     lat: 40.1158,
     lng: 67.8422,
   },
   logoUrl: '',
+  logoDarkUrl: '',
   faviconUrl: '',
   businessCategory: 'Kiyim-kechak',
   language: 'uz',
+  supportedLanguages: ['uz', 'ru', 'en'],
   defaultSeoTitle: 'Ecommerce — Zamonaviy va sifatli mahsulotlar',
   defaultSeoDescription: "Ecommerce onlayn do'koni — mahsulotlarni onlayn ko'ring, narxlarni oldindan biling va qulay xarid qiling.",
+  defaultSeoKeywords: 'do\'kon, mahsulotlar, kiyim, poyabzal, aksessuarlar, ecommerce, xarid',
   ogImageUrl: '',
+  twitterImageUrl: '',
+  copyright: '© 2026',
+  footerText: 'Barcha huquqlar himoyalangan',
 };
 
 export const TRUST_STATS = [
