@@ -2,7 +2,6 @@ import React from 'react';
 import { StoreLocation } from '../components/sections/StoreLocation';
 import { FaqSection } from '../components/sections/FaqSection';
 import { ContactSection } from '../components/sections/ContactSection';
-import { BUSINESS_CONFIG } from '../config/business';
 import { MapPin, Navigation, Clock, Phone } from 'lucide-react';
 
 export const LocationPage: React.FC = () => {

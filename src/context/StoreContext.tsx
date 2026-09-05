@@ -7,6 +7,7 @@ import { BusinessConfig } from '../types/business';
 import { HomepageCms, AboutCms, ContactCms, AdminActivityLog, HomepageSlide } from '../types/cms';
 import { supabase } from '../lib/supabase/client';
 import type { Database } from '../types/supabase-db';
+type DbStoreSettings = Database['public']['Tables']['store_settings']['Row'];
 import {
   mapDbCategoryToApp,
   mapDbProductToApp,
@@ -176,13 +177,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return [];
     }
   });
-  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => {
-    try {
-      return INITIAL_BUSINESS;
-    } catch {
-      return {} as BusinessConfig;
-    }
-  });
+  const [storeInfo, setStoreInfo] = useState<BusinessConfig>(() => INITIAL_BUSINESS);
   const [homepageCms, setHomepageCms] = useState<HomepageCms>(() => {
     try {
       return INITIAL_HOMEPAGE_CMS;
@@ -390,40 +385,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         .from('store_settings')
         .select('*')
         .single();
-      
+
       if (error) throw error;
-      return data as BusinessConfig;
+      return mapDbStoreSettingsToApp(data as DbStoreSettings);
     } catch {
-      // Return default business config
-      return {
-        businessName: 'Ecommerce',
-        businessDescription: 'Zamonaviy onlayn do\'kon — mahsulotlarni onlayn ko\'ring, narxlarni bilib oling',
-        tagline: 'Mahsulotlarni onlayn ko\'ring, narxlarni oldindanBilling va do\'konimizdan qulay xarid qiling.',
-        phone: '+998 90 123 45 67',
-        phoneRaw: '+998901234567',
-        telegram: 'https://t.me/ecommerce_uz',
-        telegramUsername: '@ecommerce_uz',
-        address: 'Yangibot, Jizzax, O\'zbekiston',
-        city: 'Jizzax',
-        landmark: 'Markaziy bozor yaqinida, Savdo majmuasi 2-qavat',
-        workingHours: 'Har kuni 09:00 — 20:00',
-        workingHoursDetail: {
-          weekdays: '09:00 — 20:00 (Dushanba - Juma)',
-          weekend: '09:00 — 21:00 (Shanba - Yakshanba)',
-          note: 'Tanaffussiz xizmat ko\'rsatamiz',
-        },
-        socialLinks: {
-          telegram: 'https://t.me/ecommerce_uz',
-          instagram: 'https://instagram.com/ecommerce_uz',
-          facebook: 'https://facebook.com/ecommerce_uz',
-        },
-        primaryColor: '#0f172a',
-        currency: 'so\'m',
-        coordinates: {
-          lat: 40.1158,
-          lng: 67.8422,
-        },
-      };
+      return INITIAL_BUSINESS;
     }
   }
 
@@ -497,7 +463,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Return default about CMS
       return {
         title: 'Zamonaviy Uslub va Sifat Markazi',
-        subtitle: 'Jizzax shahrida mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelmoqdamiz.',
+        subtitle: 'Do\'konimizda mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelamiz.',
         mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Onlayn do\'konimiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
         secondStory: 'Do\'konimizda doimiy ravishda yangi kolleksiyalar yangilanib turadi. Erkaklar, ayollar, bolalar kiyimlari va sifatli oyoq kiyimlarning keng assortimenti sizni kutmoqda.',
         mission: 'Har bir inson uchun zamonaviy kiyinishni oson, shaffof va zavqli jarayonga aylantirish.',
@@ -556,9 +522,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
-        await supabase
-          .from('store_settings')
-          .upsert(businessConfigToDb(storeInfo));
+        const payload = { id: 'default', ...businessConfigToDb(storeInfo) };
+        const { error } = await supabase.from('store_settings').upsert(payload);
+        if (error && /could not find|PGRST204|logo_url|favicon_url|og_image|seo|language|business_category/i.test(error.message ?? '')) {
+          const legacy = { ...payload };
+          delete legacy.logo_url;
+          delete legacy.favicon_url;
+          delete legacy.business_category;
+          delete legacy.language;
+          delete legacy.default_seo_title;
+          delete legacy.default_seo_description;
+          delete legacy.og_image_url;
+          await supabase.from('store_settings').upsert(legacy);
+        }
       } catch (err) {
         console.error('Error saving store info to Supabase:', err);
       }
@@ -1438,7 +1414,31 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // CMS Content
   const updateHomepageCms = (updates: Partial<HomepageCms>) => {
-    setHomepageCms((prev) => ({ ...prev, ...updates }));
+    setHomepageCms((prev) => {
+      const next = { ...prev, ...updates };
+      if (updates.hero) {
+        next.heroBadge = updates.hero.badge ?? prev.heroBadge;
+        next.heroTitle = updates.hero.title ?? prev.heroTitle;
+        next.heroHighlightedTitle = updates.hero.highlightedTitle ?? prev.heroHighlightedTitle;
+        next.heroSubtitle = updates.hero.subtitle ?? prev.heroSubtitle;
+        next.heroDescription = updates.hero.subtitle ?? prev.heroDescription;
+        next.heroPrimaryCtaText = updates.hero.primaryButtonText ?? prev.heroPrimaryCtaText;
+        next.heroPrimaryCtaLink = updates.hero.primaryButtonLink ?? prev.heroPrimaryCtaLink;
+        next.heroSecondaryCtaText = updates.hero.secondaryButtonText ?? prev.heroSecondaryCtaText;
+        next.heroSecondaryCtaLink = updates.hero.secondaryButtonLink ?? prev.heroSecondaryCtaLink;
+        next.heroImage = updates.hero.heroImage ?? prev.heroImage;
+      }
+      if (updates.promoBanner) {
+        next.promoBannerBadge = updates.promoBanner.badge ?? prev.promoBannerBadge;
+        next.promoBannerTitle = updates.promoBanner.title ?? prev.promoBannerTitle;
+        next.promoBannerSubtitle = updates.promoBanner.description ?? updates.promoBanner.subtitle ?? prev.promoBannerSubtitle;
+        next.promoBannerLink = updates.promoBanner.buttonLink ?? prev.promoBannerLink;
+        next.promoBannerButtonText = updates.promoBanner.buttonText ?? prev.promoBannerButtonText;
+        next.promoBannerImageUrl = updates.promoBanner.imageUrl ?? prev.promoBannerImageUrl;
+        next.promoBannerEnabled = updates.promoBanner.enabled ?? prev.promoBannerEnabled;
+      }
+      return next;
+    });
     logActivity('update', 'store', 'Bosh sahifa (Homepage) kontenti yangilandi');
   };
 

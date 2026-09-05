@@ -15,6 +15,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useToast } from '../../components/common/ToastProvider';
 import { ClothingPromptItem } from '../../types/prompt';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
@@ -37,6 +38,7 @@ export const PromptsAdminPage: React.FC = () => {
     togglePromptPublished,
     togglePromptFeatured,
   } = useStore();
+  const { showToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -83,9 +85,10 @@ export const PromptsAdminPage: React.FC = () => {
   }, [prompts, searchQuery, selectedCategory]);
 
   const handleCopy = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard?.writeText(text).catch(() => {});
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    showToast('Prompt nusxalandi');
   };
 
   const openCreateModal = () => {

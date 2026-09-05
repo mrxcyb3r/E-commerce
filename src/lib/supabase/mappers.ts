@@ -191,6 +191,13 @@ export function mapDbStoreSettingsToApp(row: DbStoreSettings): BusinessConfig {
       : { lat: 0, lng: 0 },
     googleMapsUrl: row.google_maps_url ?? undefined,
     yandexMapsUrl: row.yandex_maps_url ?? undefined,
+    logoUrl: row.logo_url ?? undefined,
+    faviconUrl: row.favicon_url ?? undefined,
+    businessCategory: row.business_category ?? undefined,
+    language: row.language ?? undefined,
+    defaultSeoTitle: row.default_seo_title ?? undefined,
+    defaultSeoDescription: row.default_seo_description ?? undefined,
+    ogImageUrl: row.og_image_url ?? undefined,
   };
 }
 
@@ -225,29 +232,51 @@ export function homepageSlideToDb(slide: HomepageSlide) {
 }
 
 export function mapDbHomepageCmsToApp(row: DbHomepageCms): HomepageCms {
+  const hero = {
+    badge: row.hero_badge ?? '',
+    title: row.hero_title ?? '',
+    highlightedTitle: row.hero_highlighted_title ?? '',
+    subtitle: row.hero_subtitle ?? '',
+    primaryButtonText: row.hero_primary_cta_text ?? '',
+    primaryButtonLink: row.hero_primary_cta_link ?? '',
+    secondaryButtonText: row.hero_secondary_cta_text ?? '',
+    secondaryButtonLink: row.hero_secondary_cta_link ?? '',
+    heroImage: row.hero_image_url ?? '',
+  };
+  const promoBanner = {
+    badge: row.promo_banner_badge ?? '',
+    title: row.promo_banner_title ?? '',
+    subtitle: row.promo_banner_subtitle ?? '',
+    description: row.promo_banner_description ?? '',
+    buttonText: row.promo_banner_button_text ?? '',
+    buttonLink: row.promo_banner_button_link ?? '',
+    imageUrl: row.promo_banner_image_url ?? '',
+    enabled: row.promo_banner_enabled ?? false,
+  };
   return {
-    hero: {
-      badge: row.hero_badge ?? '',
-      title: row.hero_title ?? '',
-      highlightedTitle: row.hero_highlighted_title ?? '',
-      subtitle: row.hero_subtitle ?? '',
-      primaryButtonText: row.hero_primary_cta_text ?? '',
-      primaryButtonLink: row.hero_primary_cta_link ?? '',
-      secondaryButtonText: row.hero_secondary_cta_text ?? '',
-      secondaryButtonLink: row.hero_secondary_cta_link ?? '',
-      heroImage: row.hero_image_url ?? '',
-    },
+    hero,
+    promoBanner,
+    // Flat aliases kept in sync so legacy-flat readers (HeroSection,
+    // PromoBanner) render the CMS-edited content.
+    heroBadge: hero.badge,
+    heroTitle: hero.title,
+    heroHighlightedTitle: hero.highlightedTitle,
+    heroSubtitle: hero.subtitle,
+    heroDescription: hero.subtitle,
+    heroPrimaryCtaText: hero.primaryButtonText,
+    heroPrimaryCtaLink: hero.primaryButtonLink,
+    heroSecondaryCtaText: hero.secondaryButtonText,
+    heroSecondaryCtaLink: hero.secondaryButtonLink,
+    heroImage: hero.heroImage,
+    promoBannerBadge: promoBanner.badge,
+    promoBannerTitle: promoBanner.title,
+    promoBannerSubtitle: promoBanner.description || promoBanner.subtitle,
+    promoBannerLink: promoBanner.buttonLink,
+    promoBannerButtonText: promoBanner.buttonText,
+    promoBannerImageUrl: promoBanner.imageUrl,
+    promoBannerEnabled: promoBanner.enabled,
+
     stats: [],
-    promoBanner: {
-      badge: row.promo_banner_badge ?? '',
-      title: row.promo_banner_title ?? '',
-      subtitle: row.promo_banner_subtitle ?? '',
-      description: row.promo_banner_description ?? '',
-      buttonText: row.promo_banner_button_text ?? '',
-      buttonLink: row.promo_banner_button_link ?? '',
-      imageUrl: row.promo_banner_image_url ?? '',
-      enabled: row.promo_banner_enabled ?? false,
-    },
     whyChooseUsTitle: row.why_choose_us_title ?? '',
     whyChooseUsSubtitle: row.why_choose_us_subtitle ?? '',
     features: Array.isArray(row.features)
@@ -398,6 +427,13 @@ export function businessConfigToDb(config: BusinessConfig) {
     coordinates: config.coordinates,
     google_maps_url: config.googleMapsUrl ?? null,
     yandex_maps_url: config.yandexMapsUrl ?? null,
+    logo_url: config.logoUrl ?? null,
+    favicon_url: config.faviconUrl ?? null,
+    business_category: config.businessCategory ?? null,
+    language: config.language ?? null,
+    default_seo_title: config.defaultSeoTitle ?? null,
+    default_seo_description: config.defaultSeoDescription ?? null,
+    og_image_url: config.ogImageUrl ?? null,
   };
 }
 

@@ -18,17 +18,15 @@ import {
   MessageCircle,
   Bookmark,
   Share2,
-  Link2,
-  Send,
-  AtSign,
-  X,
 } from 'lucide-react';
 import { VideoItem } from '../../types/video';
 import { useVideoFeed } from '../../context/VideoContext';
+import { useStore } from '../../context/StoreContext';
 import { track } from '../../lib/analytics/client';
 import { useFeedLikes, useFeedComments } from '../../hooks/useFeedSocial';
 import { useFeedSave } from '../../hooks/useFeedSave';
 import { CommentsModal } from './CommentsModal';
+import { ShareModal } from '../common/ShareModal';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface FeedVideoCardProps {
@@ -37,14 +35,6 @@ interface FeedVideoCardProps {
   onSelect?: () => void;
   index: number;
   total: number;
-}
-
-interface ShareOption {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-  className: string;
 }
 
 export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
@@ -68,6 +58,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const firedRetention = useRef<Set<string>>(new Set());
 
   const { isMuted, toggleMute, getProductForVideo } = useVideoFeed();
+  const { storeInfo } = useStore();
 
   // Video Player state
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -76,9 +67,8 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const [progress, setProgress] = useState<number>(0);
   const [showPlayPulse, setShowPlayPulse] = useState<boolean>(false);
 
-  // Share sheet & toast state
+  // Share sheet state
   const [shareOpen, setShareOpen] = useState<boolean>(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   // Reset error state when video source changes (new card, new URL)
   useEffect(() => {
@@ -99,11 +89,6 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   const { commentCount } = useFeedComments(video.id);
   const { saveCount, isSaved, toggleSave } = useFeedSave(video.id);
   const [showComments, setShowComments] = useState(false);
-
-  const showToast = useCallback((msg: string) => {
-    setToast(msg);
-    window.setTimeout(() => setToast(null), 2200);
-  }, []);
 
   // --- Collection 3-Second Automatic Slider Logic ---
   const handleNextSlide = useCallback(() => {
@@ -293,77 +278,16 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   };
 
   const shareUrl = `${window.location.origin}/feed?v=${encodeURIComponent(video.id)}`;
-  const shareText = `${video.title} — Do'konimizdan ko'ring`;
+  const shareText = `${video.title} — ${storeInfo.name || "Do'konimiz"}dan ko'ring`;
 
-  const handleSharePrimary = async (e: React.MouseEvent) => {
+  const handleSharePrimary = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ title: video.title, text: shareText, url: shareUrl });
-        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'web-share' } });
-        return;
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-        // Fall through to the sheet on failure
-      }
-    }
+    track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'open' } });
     setShareOpen(true);
   };
 
-  const handleCopyLink = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl).catch(() => {});
-    }
-    showToast('Havola nusxalandi');
-    setShareOpen(false);
-    track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'copy' } });
-  };
-
-  const shareOptions: ShareOption[] = [
-    {
-      key: 'copy',
-      label: 'Havolani nusxalash',
-      icon: <Link2 className="w-5 h-5" />,
-      action: handleCopyLink,
-      className: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200',
-    },
-    {
-      key: 'telegram',
-      label: 'Telegram',
-      icon: <Send className="w-5 h-5" />,
-      action: async () => {
-        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank', 'noopener');
-        setShareOpen(false);
-        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'telegram' } });
-      },
-      className: 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-300',
-    },
-    {
-      key: 'whatsapp',
-      label: 'WhatsApp',
-      icon: <MessageCircle className="w-5 h-5" />,
-      action: () => {
-        window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank', 'noopener');
-        setShareOpen(false);
-        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'whatsapp' } });
-      },
-      className: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300',
-    },
-    {
-      key: 'x',
-      label: 'X (Twitter)',
-      icon: <AtSign className="w-5 h-5" />,
-      action: () => {
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
-        setShareOpen(false);
-        track('feed_share', { feedId: video.id, metadata: { url: shareUrl, method: 'x' } });
-      },
-      className: 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100',
-    },
-  ];
-
   const railButtonClass =
-    'flex flex-col items-center gap-0.5 transition-all active:scale-90 select-none touch-manipulation';
+    'flex flex-col items-center gap-0.5 transition-all active:scale-90 select-none touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/80 rounded-xl';
   const railIconClass =
     'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/55 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/15 shadow-lg';
 
@@ -672,15 +596,24 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
               type="button"
               onClick={handleLikeClick}
               className={`${railButtonClass} group`}
-              aria-label={isLiked ? 'Yoqdi (bekor qilish)' : 'Yoqtirish'}
+              aria-label={isLiked ? "Yoqdi (bekor qilish)" : 'Yoqtirish'}
+              aria-pressed={isLiked}
               title={isLiked ? 'Yoqmaydi' : 'Yoqadi'}
             >
               <span className={`${railIconClass}`}>
-                <Heart
-                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
-                    isLiked ? 'text-rose-500 fill-rose-500' : 'text-white group-hover:text-rose-400'
-                  } transition-colors`}
-                />
+                <motion.span
+                  key={isLiked ? 'liked' : 'unliked'}
+                  initial={{ scale: 0.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  className="inline-flex"
+                >
+                  <Heart
+                    className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
+                      isLiked ? 'text-rose-500 fill-rose-500 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]' : 'text-white group-hover:text-rose-400'
+                    } transition-colors`}
+                  />
+                </motion.span>
               </span>
               <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
                 {likeCount > 0 ? likeCount.toLocaleString('uz-UZ') : '0'}
@@ -708,30 +641,39 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
             </button>
           </div>
 
-          {/* Save */}
+{/* Save */}
           <div className="flex flex-col items-center gap-0.5">
             <button
               type="button"
               onClick={handleSaveClick}
               className={`${railButtonClass} group`}
               aria-label={isSaved ? 'Saqlanganlardan olib tashlash' : 'Saqlash'}
+              aria-pressed={isSaved}
               title={isSaved ? 'Saqlanganlar' : 'Saqlash'}
             >
               <span className={`${railIconClass}`}>
-                <Bookmark
-                  className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
-                    isSaved ? 'text-amber-400 fill-amber-400' : 'text-white group-hover:text-amber-300'
-                  } transition-colors`}
-                />
+                <motion.span
+                  key={isSaved ? 'saved' : 'unsaved'}
+                  initial={{ scale: 0.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  className="inline-flex"
+                >
+                  <Bookmark
+                    className={`w-5.5 h-5.5 sm:w-6 sm:h-6 ${
+                      isSaved ? 'text-amber-400 fill-amber-400' : 'text-white group-hover:text-amber-300'
+                    } transition-colors`}
+                  />
+                </motion.span>
               </span>
-<span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
-                  {isSaved ? 'Saqlangan' : 'Saqlash'}
-                </span>
-              </button>
-              <span className="text-[9px] sm:text-[10px] font-semibold text-white/70 -mt-0.5">
-                {saveCount > 0 ? saveCount.toLocaleString('uz-UZ') : ''}
+              <span className="text-[10px] sm:text-[11px] font-bold text-white drop-shadow-md">
+                {isSaved ? 'Saqlangan' : 'Saqlash'}
               </span>
-            </div>
+            </button>
+            <span className="text-[9px] sm:text-[10px] font-semibold text-white/70 -mt-0.5">
+              {saveCount > 0 ? saveCount.toLocaleString('uz-UZ') : ''}
+            </span>
+          </div>
 
           {/* Share */}
           <div className="flex flex-col items-center gap-0.5">
@@ -777,91 +719,15 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
         </div>
       </div>
 
-      {/* Toast */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl bg-white dark:bg-zinc-800 text-xs font-bold text-zinc-900 dark:text-white shadow-2xl border border-zinc-200 dark:border-zinc-700 flex items-center gap-2"
-            role="status"
-          >
-            <Check className="w-4 h-4 text-emerald-500" />
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Share Sheet */}
-      <AnimatePresence>
-        {shareOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShareOpen(false);
-              }}
-            />
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 340 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] border-t border-neutral-200 dark:border-neutral-700 pb-6 pt-4 px-6 max-w-md mx-auto"
-            >
-              <div className="flex justify-center pb-2 pointer-events-none">
-                <div className="w-10 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-              </div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-base font-black text-neutral-900 dark:text-white">Ulashish</h3>
-                  <p className="text-[11px] text-neutral-400 font-medium mt-0.5 line-clamp-1">
-                    {video.title}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShareOpen(false);
-                  }}
-                  className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
-                  aria-label="Yopish"
-                >
-                  <X className="w-4 h-4 text-neutral-500" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-4 gap-3">
-                {shareOptions.map((opt) => (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      opt.action();
-                    }}
-                    className="flex flex-col items-center gap-2 transition-all active:scale-95"
-                    aria-label={opt.label}
-                  >
-                    <span className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm ${opt.className}`}>
-                      {opt.icon}
-                    </span>
-                    <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 text-center leading-tight">
-                      {opt.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Share Modal */}
+      <ShareModal
+        open={shareOpen}
+        url={shareUrl}
+        title={video.title}
+        text={shareText}
+        onClose={() => setShareOpen(false)}
+        onShare={(method, url) => track('feed_share', { feedId: video.id, metadata: { url, method } })}
+      />
 
       {/* Comments Drawer / Sheet */}
       <CommentsModal

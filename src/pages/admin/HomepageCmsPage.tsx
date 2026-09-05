@@ -183,7 +183,7 @@ export const HomepageCmsPage: React.FC = () => {
               type="text"
               value={heroBadge}
               onChange={(e) => setHeroBadge(e.target.value)}
-              placeholder="Jizzaxdagi zamonaviy do'kon"
+              placeholder="Zamonaviy do'kon"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
             />
           </div>

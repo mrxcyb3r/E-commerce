@@ -36,4 +36,11 @@ export interface BusinessConfig {
   };
   googleMapsUrl?: string;
   yandexMapsUrl?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  businessCategory?: string;
+  language?: string;
+  defaultSeoTitle?: string;
+  defaultSeoDescription?: string;
+  ogImageUrl?: string;
 }

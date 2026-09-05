@@ -21,6 +21,6 @@ export function generateTelegramProductLink(product: Product, selectedSize?: str
 }
 
 export function generateTelegramGeneralLink(): string {
-  const text = `Salom! Ecommerce do'koni bo'yicha savolim bor edi.`;
+  const text = `Salom! Do'kon mahsulotlari bo'yicha savolim bor edi.`;
   return `${BUSINESS_CONFIG.telegram}?text=${encodeURIComponent(text)}`;
 }

@@ -57,7 +57,7 @@ export const LoginPage: React.FC = () => {
             className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-neutral-800/80 border border-neutral-700/60 shadow-lg text-white group hover:border-amber-500/40 transition-all"
           >
             <div className="w-9 h-9 rounded-xl bg-amber-500 text-neutral-950 font-black text-base flex items-center justify-center shadow-xs">
-              E
+              {storeInfo.businessName?.charAt(0) || 'D'}
             </div>
             <div className="text-left">
               <span className="font-extrabold text-sm tracking-tight text-white block">

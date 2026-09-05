@@ -12,10 +12,12 @@ import {
   Info,
 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { useToast } from '../components/common/ToastProvider';
 import { ClothingPromptItem } from '../types/prompt';
 
 export const PromptLibraryPage: React.FC = () => {
   const { prompts } = useStore();
+  const { showToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -56,9 +58,10 @@ export const PromptLibraryPage: React.FC = () => {
   }, [prompts, searchQuery, selectedCategory, selectedDifficulty]);
 
   const handleCopy = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard?.writeText(text).catch(() => {});
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    showToast('Prompt nusxalandi');
   };
 
   return (

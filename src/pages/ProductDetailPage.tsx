@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
-import { BUSINESS_CONFIG } from '../config/business';
 import { formatPrice, generateTelegramProductLink } from '../lib/utils';
 import { useFavorites } from '../hooks/useFavorites';
 import { track } from '../lib/analytics/client';
 import { ProductGallery } from '../components/products/ProductGallery';
 import { StoreVisitModal } from '../components/products/StoreVisitModal';
 import { ProductCard } from '../components/products/ProductCard';
+import { ShareModal } from '../components/common/ShareModal';
+import { useDocumentMeta, formatSeoPrice } from '../hooks/useDocumentMeta';
 import { 
   Heart, 
   Send, 
@@ -22,13 +23,12 @@ import {
   Sparkles,
   ArrowLeft,
   Share2,
-  Check
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { products } = useStore();
+  const { products, storeInfo } = useStore();
   const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
 
@@ -37,7 +37,7 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const mountedAt = useRef<number>(0);
   const maxScroll = useRef<number>(0);
 
@@ -77,6 +77,36 @@ export const ProductDetailPage: React.FC = () => {
     };
   }, [id, product]);
 
+  useDocumentMeta({
+    title: product?.name ? product.name.replace(/^[^.]+\.\s*/, '') : 'Mahsulot',
+    description: product
+      ? `${product.name}: ${formatSeoPrice(product.price)}, ${product.categoryName || storeInfo.businessCategory || 'barcha kolleksiyalar'}. Do'konimizda mavjud.`
+      : '',
+    canonicalPath: product ? `/products/${product.slug || product.id}` : '/products',
+    type: 'product',
+    image: product?.images?.[0] || undefined,
+    jsonLd: product
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          image: product.images || [],
+          description: product.description || `${product.name} — ${storeInfo.businessName} do'konidan.`,
+          sku: product.sku,
+          brand: { '@type': 'Brand', name: product.brand || storeInfo.businessName },
+          category: product.categoryName,
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'UZS',
+            price: String(product.price),
+            availability: product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: `${window.location.origin}/products/${product.slug || product.id}`,
+            seller: { '@type': 'Store', name: storeInfo.businessName },
+          },
+        }
+      : undefined,
+  });
+
   if (!product) {
     return (
       <div className="pt-32 pb-24 max-w-2xl mx-auto px-4 text-center space-y-6">
@@ -105,14 +135,8 @@ export const ProductDetailPage: React.FC = () => {
   ).slice(0, 4);
 
   const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    }
-    if (product) {
-      track('product_share', { productId: product.id, categoryId: product.category });
-    }
+    track('product_share', { productId: product.id, categoryId: product.category });
+    setIsShareOpen(true);
   };
 
   return (
@@ -163,10 +187,11 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  title="Havolani nusxalash"
+                  className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:scale-90"
+                  title="Ulashish"
+                  aria-label="Ulashish"
                 >
-                  {copiedLink ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
+                  <Share2 className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
@@ -322,7 +347,7 @@ export const ProductDetailPage: React.FC = () => {
           <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60 space-y-2">
             <div className="flex items-center gap-2 text-xs font-black text-zinc-900 dark:text-white">
               <MapPin className="w-4 h-4 text-zinc-700 dark:text-zinc-300 shrink-0" />
-              <span>{BUSINESS_CONFIG.address}</span>
+              <span>{storeInfo.address}</span>
             </div>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
               Mahsulotni do'konimizga tashrif buyurib ko'rishingiz va o'zingizga mos o'lchamni tanlashingiz mumkin.
@@ -386,6 +411,16 @@ export const ProductDetailPage: React.FC = () => {
         product={product}
         selectedSize={selectedSize}
         selectedColor={selectedColor}
+      />
+
+      {/* Share Modal */}
+      <ShareModal
+        open={isShareOpen}
+        url={window.location.href}
+        title={product.name}
+        text={`${product.name} — ${formatPrice(product.price)} so'm`}
+        onClose={() => setIsShareOpen(false)}
+        onShare={(method) => track('product_share', { productId: product.id, categoryId: product.category, metadata: { method } })}
       />
     </div>
   );

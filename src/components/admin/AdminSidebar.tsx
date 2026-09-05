@@ -207,7 +207,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         <div className="h-16 px-6 flex items-center justify-between border-b border-neutral-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-amber-500 text-neutral-950 font-black text-sm flex items-center justify-center shadow-sm">
-              E
+              {storeInfo.businessName?.charAt(0) || 'D'}
             </div>
             <div>
               <div className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1.5">

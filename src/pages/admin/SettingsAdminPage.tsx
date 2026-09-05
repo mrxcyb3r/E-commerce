@@ -17,7 +17,7 @@ import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 
 export const SettingsAdminPage: React.FC = () => {
   const { adminUsername, changeCredentials } = useAuth();
-  const { exportDataJSON, importDataJSON, resetAllToDefaults } = useStore();
+  const { exportDataJSON, importDataJSON, resetAllToDefaults, storeInfo } = useStore();
 
   // Change Password state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -60,7 +60,7 @@ export const SettingsAdminPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `jizzax-store-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `${(storeInfo?.businessName || 'store').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-backup-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

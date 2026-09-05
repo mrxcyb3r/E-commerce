@@ -4,7 +4,7 @@ export const REVIEWS: Review[] = [
   {
     id: 'rev-1',
     name: 'Sardorbek Rahmatov',
-    location: 'Jizzax shahar',
+    location: 'Mahalliy xaridor',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     rating: 5,
     comment: 'Mahsulotlarni oldindan ko\'rib kelish juda qulay ekan. Saytdan o\'zimga yoqqan krossovkani tanlab, do\'konga borib 5 daqiqada kiyib ko\'rib oldim.',
@@ -15,7 +15,7 @@ export const REVIEWS: Review[] = [
   {
     id: 'rev-2',
     name: 'Nilufar Karimova',
-    location: 'Yangibot',
+    location: 'Shahar markazi',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
     rating: 5,
     comment: 'Narxlarni oldindan bilganim uchun tanlash oson bo\'ldi. Do\'konda kutilmagan narxlar bo\'lmadi, hamma ma\'lumotlar saytda qanday bo\'lsa aynan shunday.',
@@ -26,7 +26,7 @@ export const REVIEWS: Review[] = [
   {
     id: 'rev-3',
     name: 'Jasurbek Oripov',
-    location: 'Jizzax viloyati',
+    location: 'Onlayn xaridor',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     rating: 5,
     comment: 'Mahsulotlar haqida ma\'lumotlarni bir joyda ko\'rish juda yaxshi. O\'lchamlar va ranglar aniq ko\'rsatilgan, vaqtimiz ancha tejaldi.',

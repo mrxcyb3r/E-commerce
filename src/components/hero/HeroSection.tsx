@@ -91,7 +91,7 @@ export const HeroSection: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-zinc-800 dark:text-zinc-200 shrink-0" />
-                  <span>{storeInfo.city || 'Jizzax'}</span>
+                  <span>{storeInfo.city}</span>
                 </div>
               </div>
             </motion.div>

@@ -338,6 +338,13 @@ type StoreSettings = {
   };
   google_maps_url: string | null;
   yandex_maps_url: string | null;
+  logo_url?: string | null;
+  favicon_url?: string | null;
+  business_category?: string | null;
+  language?: string | null;
+  default_seo_title?: string | null;
+  default_seo_description?: string | null;
+  og_image_url?: string | null;
   updated_at: string;
 };
 

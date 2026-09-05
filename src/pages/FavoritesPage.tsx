@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../hooks/useFavorites';
+import { useStore } from '../context/StoreContext';
 import { ProductCard } from '../components/products/ProductCard';
 import { Heart, Trash2, ArrowRight, Store, ShoppingBag } from 'lucide-react';
 import { motion } from 'motion/react';
-import { BUSINESS_CONFIG } from '../config/business';
 
 export const FavoritesPage: React.FC = () => {
   const { favoriteProducts, totalFavorites, clearFavorites } = useFavorites();
+  const { storeInfo } = useStore();
 
   return (
     <div className="pt-28 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh]">
@@ -86,7 +87,7 @@ export const FavoritesPage: React.FC = () => {
             </div>
 
             <a
-              href={BUSINESS_CONFIG.telegram}
+              href={storeInfo.telegram}
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-3 text-xs font-black rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 shrink-0 transition-colors shadow-xs"

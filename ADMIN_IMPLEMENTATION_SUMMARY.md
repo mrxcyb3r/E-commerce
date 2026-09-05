@@ -255,3 +255,44 @@ CUSTOMER WEBSITE (React components use useStore())
 ```
 
 > **The admin panel is the single source of truth. The customer website auto-updates. No code changes needed on the public site.**
+---
+
+## Production-Readiness Pass (Share Modal → White-Label → SEO)
+
+### Part 1–3: In-app Share + Toast
+- **ShareModal** (`src/components/common/ShareModal.tsx`): opens in-app always — never calls `navigator.share`/`window.open` immediately. Targets: Copy link, Telegram, WhatsApp, Facebook, Instagram (copy instructions), Email, X, **QR code** (rendered via `qrcode.react`); "Share using device" (`navigator.share`) only behind an explicit button. ESC/backdrop close, body scroll lock, `role="dialog" aria-modal`, exit animation.
+- **ToastProvider** (`src/components/common/ToastProvider.tsx`): global stacked toasts; mounted in `src/main.tsx`. Copy actions → "Havola nusxalandi" toast (no `alert()`).
+- Wired into `FeedVideoCard` (rail button opens modal; Like/Save `aria-pressed` + spring pulse + focus-visible rings) and `ProductDetailPage` (replaced `copiedLink` clipboard button).
+
+### Part 6–9: White-Label Branding (no code changes to rebrand)
+- `src/config/business.ts` = **single branding defaults file** (documented workflow). Everything brand-specific reads `useStore().storeInfo` (hydrated from `store_settings`) with this file as fallback.
+- Monograms now derive from `businessName` (LoginPage, AdminSidebar); Navbar subtitle = `tagline`/category; footer/address/telegram consumers (StoreVisitModal, ProductDetailPage, FavoritesPage, LocationPage, utils.ts) all read `storeInfo` — removed hardcoded "Ecommerce"/"Jizzax Style" strings.
+- `StoreAdminPage` gained **Brend Identiteti va SEO** section: logo URL, favicon, accent colour, category, language, default SEO title/description, OG image, email.
+- **Migration** `20260905130000_branding_rls_hardening.sql`: adds branding columns to `store_settings` **and enables RLS** (was never enabled!) on `store_settings/homepage_cms/about_cms/contact_cms` with anon-read + authenticated-write policies. Save path is downgrade-safe: retries without new columns until migration is applied.
+- **Bug fixed:** `fetchStoreInfoFromSupabase` cast the raw snake_case row to `BusinessConfig` → hydrated config was empty; now uses `mapDbStoreSettingsToApp`. Upsert is now a stable single row (`id='default'`).
+
+### Part 7: Landing CMS aliases
+- `mapDbHomepageCmsToApp` + `updateHomepageCms` now sync the **flat aliases** (HeroSection/PromoBanner read flat keys), so CMS hero/promo edits actually render.
+
+### Part 13–14: SEO + Performance
+- `useDocumentMeta` hook: per-page title/description/canonical/OG/Twitter/JSON-LD, brand-aware defaults. Applied at App level (Store/Organization schema) and ProductDetailPage (Product schema, `priceCurrency UZS`).
+- `public/robots.txt` (blocks /admin, /login) + `public/sitemap.xml` (replace domain placeholder) added.
+- **Route-level code splitting**: all pages lazily loaded + Suspense loaders → main bundle ~1.33MB → **786KB**, per-route chunks.
+
+### Part 15–16: Deployment & Security
+- `netlify.toml` already production-grade: SPA redirects, CSP, security headers, secrets guidance. `public/_redirects` present.
+
+### Verified (Playwright, preview :4178) — 21/21 PASS
+- Home renders + Store JSON-LD; product share modal opens in-app, targets present, copy→toast, QR canvas renders; product SEO title + Product JSON-LD; feed cards + rail share modal + `aria-pressed`; admin login → Store page renders Brand Identity + email fields + save; `<main>` landmark present.
+- Mobile scan (390px): **0 px page-level horizontal scroll** on `/`, `/products`, `/feed`, `/favorites`, `/about`, `/location`, `/contact`, `/prompts`.
+
+### Remaining recommendations
+- Run migration `supabase db push` (or MCP `supabase_execute_sql`) to add branding columns + RLS hardening.
+- Replace `example.com` in `public/sitemap.xml` with the real domain.
+- Hard-nav (full reload) into deep admin links normalizes to `/admin` (pre-existing router quirk; sidebar SPA navigation is unaffected).
+
+### Share-flow hardening (native-share complaint investigation)
+- **Instrumented mobile test (iPhone 13 emulation, `navigator.share` spied):** pressing Share opens the **in-app modal**; `navigator.share` is **NOT called** on press; no `window.open` on press; Copy does not trigger native share. `navigator.share` fires **only** after an explicit tap on "Boshqa qurilma bilan ulashish" (per spec).
+- The reported screenshot (iOS sheet: Copy / QR Code / Mail) matches either a **pre-refactor build** or an explicit tap on that button.
+- "Share using device" button was visually de-emphasized (bordered secondary style below a "yoki" divider) so the in-app targets (Copy/Telegram/WhatsApp/Facebook/Instagram/Email/QR) are clearly the primary path.
+- Regression: smoke **10/10** + share-compliance assertions pass; `tsc` + build clean.

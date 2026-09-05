@@ -24,7 +24,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: 'faq-5',
     question: 'Do\'kon qayerda joylashgan va ish vaqti qanday?',
-    answer: 'Do\'konimiz Yangibot, Jizzax manzilida (Markaziy bozor yaqinida) joylashgan. Biz har kuni soat 09:00 dan 20:00 gacha dam olish kunlarisiz xizmatingizdamiz.',
+    answer: 'Do\'konimiz shahar markaziy bozori yaqinida joylashgan. Har kuni soat 09:00 dan 20:00 gacha xizmatingizdamiz.',
   },
   {
     id: 'faq-6',

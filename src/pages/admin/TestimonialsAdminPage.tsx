@@ -30,7 +30,7 @@ export const TestimonialsAdminPage: React.FC = () => {
 
   const openCreateModal = () => {
     setName('');
-    setRole('Mijoz (Jizzax)');
+    setRole('Mijoz');
     setComment('');
     setRating(5);
     setAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80');
@@ -243,7 +243,7 @@ export const TestimonialsAdminPage: React.FC = () => {
                     type="text"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    placeholder="Mijoz (Jizzax)"
+                    placeholder="Mijoz"
                     className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
                   />
                 </div>

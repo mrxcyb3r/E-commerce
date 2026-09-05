@@ -1,6 +1,6 @@
 import React from 'react';
 import { Product } from '../../types/product';
-import { BUSINESS_CONFIG } from '../../config/business';
+import { useStore } from '../../context/StoreContext';
 import { formatPrice, generateTelegramProductLink } from '../../lib/utils';
 import { 
   X, 
@@ -28,11 +28,12 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
   selectedSize,
   selectedColor,
 }) => {
+  const { storeInfo } = useStore();
   if (!isOpen) return null;
 
   const telegramLink = generateTelegramProductLink(product, selectedSize, selectedColor);
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    BUSINESS_CONFIG.address
+    storeInfo.address
   )}`;
 
   return (
@@ -103,11 +104,11 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400 font-medium">
             <div className="flex items-start gap-2.5">
               <MapPin className="w-4 h-4 text-zinc-900 dark:text-white shrink-0 mt-0.5" />
-              <span><strong className="text-zinc-900 dark:text-white font-bold">Manzil:</strong> {BUSINESS_CONFIG.address} ({BUSINESS_CONFIG.landmark})</span>
+              <span><strong className="text-zinc-900 dark:text-white font-bold">Manzil:</strong> {storeInfo.address} ({storeInfo.landmark})</span>
             </div>
             <div className="flex items-center gap-2.5">
               <Clock className="w-4 h-4 text-zinc-900 dark:text-white shrink-0" />
-              <span><strong className="text-zinc-900 dark:text-white font-bold">Ish vaqti:</strong> {BUSINESS_CONFIG.workingHours}</span>
+              <span><strong className="text-zinc-900 dark:text-white font-bold">Ish vaqti:</strong> {storeInfo.workingHours}</span>
             </div>
           </div>
 
@@ -125,7 +126,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
 
             <div className="grid grid-cols-2 gap-2.5">
               <a
-                href={`tel:${BUSINESS_CONFIG.phoneRaw}`}
+                href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
                 className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
