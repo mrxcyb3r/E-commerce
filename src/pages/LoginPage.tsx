@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Lock, User, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, Store } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
+import { useI18n } from '../i18n/I18nContext';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -13,6 +14,7 @@ export const LoginPage: React.FC = () => {
 
   const { login, isAuthenticated } = useAuth();
   const { storeInfo } = useStore();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,7 +29,7 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) {
-      setErrorMessage("Iltimos, login va parolni to'liq kiriting.");
+      setErrorMessage(t('pages', 'login.errorFill'));
       return;
     }
 
@@ -40,7 +42,7 @@ export const LoginPage: React.FC = () => {
     if (result.success) {
       navigate(from, { replace: true });
     } else {
-      setErrorMessage(result.error || "Login yoki parol noto'g'ri.");
+      setErrorMessage(result.error || t('pages', 'login.errorInvalid'));
     }
   };
 
@@ -64,16 +66,16 @@ export const LoginPage: React.FC = () => {
                 {storeInfo.businessName}
               </span>
               <span className="text-[10px] text-amber-400 font-bold block">
-                Admin Boshqaruv Markazi
+                {t('pages', 'login.brand')}
               </span>
             </div>
           </Link>
 
           <h2 className="mt-6 text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Tizimga kirish
+            {t('pages', 'login.title')}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-neutral-400">
-            Do'kon, mahsulotlar va kontentni boshqarish uchun tizimga kiring
+            {t('pages', 'login.subtitle')}
           </p>
         </div>
 
@@ -90,7 +92,7 @@ export const LoginPage: React.FC = () => {
             {/* Username Field */}
             <div>
               <label className="block text-xs font-bold text-neutral-300 mb-1.5 uppercase tracking-wider">
-                Foydalanuvchi nomi (Login)
+                {t('pages', 'login.username')}
               </label>
               <div className="relative rounded-2xl shadow-xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
@@ -114,7 +116,7 @@ export const LoginPage: React.FC = () => {
             {/* Password Field */}
             <div>
               <label className="block text-xs font-bold text-neutral-300 mb-1.5 uppercase tracking-wider">
-                Maxfiy parol
+                {t('pages', 'login.password')}
               </label>
               <div className="relative rounded-2xl shadow-xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
@@ -155,7 +157,7 @@ export const LoginPage: React.FC = () => {
                 <div className="w-5 h-5 border-2 border-neutral-950 border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Boshqaruv paneliga kirish</span>
+                  <span>{t('pages', 'login.submit')}</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                 </>
               )}
@@ -166,7 +168,7 @@ export const LoginPage: React.FC = () => {
           <div className="mt-6 pt-6 border-t border-neutral-700/60 text-center">
             <div className="inline-flex items-center gap-1.5 text-xs text-neutral-400">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Xavfsiz va himoyalangan admin sessiyasi</span>
+              <span>{t('pages', 'login.secure')}</span>
             </div>
           </div>
         </div>
@@ -178,7 +180,7 @@ export const LoginPage: React.FC = () => {
             className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
           >
             <Store className="w-4 h-4" />
-            <span>Do'konga qaytish</span>
+            <span>{t('pages', 'login.backToStore')}</span>
           </Link>
         </div>
       </div>

@@ -127,9 +127,9 @@ export const ProductDetailPage: React.FC = () => {
   }, [product]);
 
   useDocumentMeta({
-    title: product?.name ? product.name.replace(/^[^.]+\.\s*/, '') : 'Mahsulot',
+    title: product?.name ? product.name.replace(/^[^.]+\.\s*/, '') : t('pages', 'productDetail.metaTitle'),
     description: product
-      ? `${product.name}: ${formatSeoPrice(product.price)}, ${product.categoryName || storeInfo.businessCategory || 'barcha kolleksiyalar'}. Do'konimizda mavjud.`
+      ? t('pages', 'productDetail.metaDesc', product.name, formatSeoPrice(product.price), product.categoryName || storeInfo.businessCategory || 'barcha kolleksiyalar')
       : '',
     canonicalPath: product ? `/products/${product.slug || product.id}` : '/products',
     type: 'product',
@@ -140,7 +140,7 @@ export const ProductDetailPage: React.FC = () => {
           '@type': 'Product',
           name: product.name,
           image: product.images || [],
-          description: product.description || `${product.name} — ${storeInfo.businessName} do'konidan.`,
+          description: product.description || t('pages', 'productDetail.jsonldDesc', product.name, storeInfo.businessName),
           sku: product.sku,
           brand: { '@type': 'Brand', name: product.brand || storeInfo.businessName },
           category: product.categoryName,
@@ -160,17 +160,17 @@ export const ProductDetailPage: React.FC = () => {
     return (
       <div className="pt-32 pb-24 max-w-2xl mx-auto px-4 text-center space-y-6">
         <h2 className="text-3xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-          Mahsulot topilmadi
+          {t('pages', 'productNotFound.heading')}
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Ushbu mahsulot mavjud emas yoki o'chirilgan bo'lishi mumkin.
+          {t('pages', 'productNotFound.desc')}
         </p>
         <Link
           to="/products"
           className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black text-sm shadow-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Katalogga qaytish
+          {t('pages', 'productNotFound.backToCatalog')}
         </Link>
       </div>
     );
@@ -438,7 +438,7 @@ export const ProductDetailPage: React.FC = () => {
               <span>{storeInfo.address}</span>
             </div>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
-              Mahsulotni do'konimizga tashrif buyurib ko'rishingiz va o'zingizga mos o'lchamni tanlashingiz mumkin.
+              {t('pages', 'productDetail.storeNote')}
             </p>
           </div>
 

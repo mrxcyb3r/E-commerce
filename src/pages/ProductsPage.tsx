@@ -4,11 +4,13 @@ import { useStore } from '../context/StoreContext';
 import { ProductFiltersState, SortOption } from '../types/product';
 import { ProductCard } from '../components/products/ProductCard';
 import { ProductFilters } from '../components/products/ProductFilters';
-import { Search, SlidersHorizontal, ArrowUpDown, X, Tag } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { Search, SlidersHorizontal, ArrowUpDown, X } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useI18n } from '../i18n/I18nContext';
 
 export const ProductsPage: React.FC = () => {
   const { publishedProducts: products } = useStore();
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -136,10 +138,10 @@ export const ProductsPage: React.FC = () => {
       <div className="mb-8 space-y-4">
         <div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            Mahsulotlar katalogi
+            {t('pages', 'catalog.title')}
           </h1>
           <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 mt-1">
-            Do'konimizda mavjud barcha sifatli mahsulotlarni qidiring, filtrlang va tanlang.
+            {t('pages', 'catalog.subtitle')}
           </p>
         </div>
 
@@ -153,7 +155,7 @@ export const ProductsPage: React.FC = () => {
               type="text"
               value={filters.searchQuery}
               onChange={(e) => handleFilterChange({ ...filters, searchQuery: e.target.value })}
-              placeholder="Mahsulot nomi, toifa yoki brend..."
+              placeholder={t('pages', 'catalog.searchPlaceholder')}
               className="w-full pl-11 pr-10 py-2.5 rounded-2xl text-sm bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all"
             />
             {filters.searchQuery && (
@@ -175,7 +177,7 @@ export const ProductsPage: React.FC = () => {
               className="lg:hidden flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filtrlar</span>
+              <span>{t('pages', 'catalog.filters')}</span>
               {activeFilterCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 text-[10px] flex items-center justify-center font-black">
                   {activeFilterCount}
@@ -192,10 +194,10 @@ export const ProductsPage: React.FC = () => {
                 onChange={(e) => handleFilterChange({ ...filters, sortBy: e.target.value as SortOption })}
                 className="pl-9 pr-9 py-2.5 rounded-2xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-none appearance-none focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white cursor-pointer"
               >
-                <option value="featured">Tavsiya etilgan</option>
-                <option value="price-asc">Eng arzon</option>
-                <option value="price-desc">Eng qimmat</option>
-                <option value="newest">Yangi mahsulotlar</option>
+                <option value="featured">{t('pages', 'catalog.sortFeatured')}</option>
+                <option value="price-asc">{t('pages', 'catalog.sortCheap')}</option>
+                <option value="price-desc">{t('pages', 'catalog.sortExpensive')}</option>
+                <option value="newest">{t('pages', 'catalog.sortNewest')}</option>
               </select>
             </div>
           </div>
@@ -204,10 +206,10 @@ export const ProductsPage: React.FC = () => {
         {/* Active Filter Chips */}
         {activeFilterCount > 0 && (
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="text-xs text-zinc-400 font-bold">Faol filtrlar:</span>
+            <span className="text-xs text-zinc-400 font-bold">{t('pages', 'catalog.activeFilters')}</span>
             {filters.category && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
-                Toifa: {filters.category}
+                {t('pages', 'catalog.chipCategory', filters.category)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, category: '' })}>
                   <X className="w-3 h-3" />
                 </button>
@@ -215,7 +217,7 @@ export const ProductsPage: React.FC = () => {
             )}
             {filters.size && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
-                O'lcham: {filters.size}
+                {t('pages', 'catalog.chipSize', filters.size)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, size: '' })}>
                   <X className="w-3 h-3" />
                 </button>
@@ -223,7 +225,7 @@ export const ProductsPage: React.FC = () => {
             )}
             {filters.color && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
-                Rang: {filters.color}
+                {t('pages', 'catalog.chipColor', filters.color)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, color: '' })}>
                   <X className="w-3 h-3" />
                 </button>
@@ -231,7 +233,7 @@ export const ProductsPage: React.FC = () => {
             )}
             {filters.maxPrice && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
-                Maks: {new Intl.NumberFormat('uz-UZ').format(filters.maxPrice)} so'm
+                {t('pages', 'catalog.chipMax', `${new Intl.NumberFormat('uz-UZ').format(filters.maxPrice)} so'm`)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, maxPrice: null })}>
                   <X className="w-3 h-3" />
                 </button>
@@ -242,7 +244,7 @@ export const ProductsPage: React.FC = () => {
               onClick={handleResetFilters}
               className="text-xs text-rose-500 hover:underline font-bold ml-2"
             >
-              Hammasini tozalash
+              {t('pages', 'catalog.clearAll')}
             </button>
           </div>
         )}
@@ -264,7 +266,7 @@ export const ProductsPage: React.FC = () => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-4 text-xs text-zinc-500 dark:text-zinc-400 font-medium">
             <span>
-              Topildi: <strong className="text-zinc-900 dark:text-white font-bold">{filteredProducts.length}</strong> ta mahsulot
+              {t('pages', 'catalog.found', filteredProducts.length)}
             </span>
           </div>
 
@@ -279,10 +281,10 @@ export const ProductsPage: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                  Hech qanday mahsulot topilmadi.
+                  {t('pages', 'catalog.emptyTitle')}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
-                  Qidiruvni o'zgartirib ko'ring yoki filtrlarni tozalab qayta izlang.
+                  {t('pages', 'catalog.emptyDesc')}
                 </p>
               </div>
               <div>
@@ -291,7 +293,7 @@ export const ProductsPage: React.FC = () => {
                   onClick={handleResetFilters}
                   className="px-6 py-3 rounded-xl text-xs font-black bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs uppercase tracking-wider"
                 >
-                  Filtrlarni tozalash
+                  {t('pages', 'catalog.clearFilters')}
                 </button>
               </div>
             </motion.div>

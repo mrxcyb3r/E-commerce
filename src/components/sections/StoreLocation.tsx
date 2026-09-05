@@ -12,9 +12,11 @@ import {
 import { useStore } from '../../context/StoreContext';
 import { track } from '../../lib/analytics/client';
 import { motion } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 export const StoreLocation: React.FC = () => {
   const { storeInfo } = useStore();
+  const { t } = useI18n();
 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${storeInfo.address}`
@@ -37,13 +39,13 @@ export const StoreLocation: React.FC = () => {
         >
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <Store className="w-3.5 h-3.5" />
-            <span>Tashrif buyuring</span>
+            <span>{t('pages', 'sections.locationEyebrow')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            Bizning do'konimiz
+            {t('pages', 'sections.locationTitle')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            Sizni do'konimizda kutib olishdan mamnunmiz. Mahsulotlarni bevosita ko'ring, kiyib ko'ring va xarid qiling.
+            {t('pages', 'sections.locationSubtitle')}
           </p>
         </motion.div>
 
@@ -60,7 +62,7 @@ export const StoreLocation: React.FC = () => {
             <div className="space-y-6">
               <div>
                 <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-400">
-                  Manzil
+                  {t('pages', 'sections.locationAddress')}
                 </span>
                 <div className="flex items-start gap-3 mt-2">
                   <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
@@ -79,7 +81,7 @@ export const StoreLocation: React.FC = () => {
 
               <div>
                 <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-400">
-                  Ish vaqti
+                  {t('pages', 'sections.locationHours')}
                 </span>
                 <div className="flex items-start gap-3 mt-2">
                   <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
@@ -90,10 +92,10 @@ export const StoreLocation: React.FC = () => {
                       {storeInfo.workingHours}
                     </div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 space-y-0.5 font-medium">
-                      <div>{storeInfo.workingHoursDetail?.weekdays || 'Har kuni 08:30 - 20:30'}</div>
-                      <div>{storeInfo.workingHoursDetail?.weekend || 'Shanba - Yakshanba: 08:30 - 21:00'}</div>
+                      <div>{storeInfo.workingHoursDetail?.weekdays || t('pages', 'sections.locationDays')}</div>
+                      <div>{storeInfo.workingHoursDetail?.weekend || t('pages', 'sections.locationWeekend')}</div>
                       <div className="text-emerald-600 dark:text-emerald-400 font-bold">
-                        ✓ {storeInfo.workingHoursDetail?.note || 'Dam olish kunlarisiz xizmatingizdamiz'}
+                        ✓ {storeInfo.workingHoursDetail?.note || t('pages', 'sections.locationNote')}
                       </div>
                     </div>
                   </div>
@@ -102,7 +104,7 @@ export const StoreLocation: React.FC = () => {
 
               <div>
                 <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-400">
-                  Tezkor aloqa
+                  {t('pages', 'sections.locationQuickContact')}
                 </span>
                 <div className="flex items-center gap-3 mt-2">
                   <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-zinc-900 dark:text-white shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
@@ -117,7 +119,7 @@ export const StoreLocation: React.FC = () => {
                       {storeInfo.phone}
                     </a>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                      Savollar va mahsulot zaxirasini bilish uchun
+                      {t('pages', 'sections.locationPhoneHint')}
                     </div>
                   </div>
                 </div>
@@ -134,7 +136,7 @@ export const StoreLocation: React.FC = () => {
                 className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm"
               >
                 <Navigation className="w-4 h-4" />
-                <span>Xaritada ko'rish</span>
+                <span>{t('pages', 'sections.locationMap')}</span>
               </a>
 
               <div className="grid grid-cols-2 gap-2.5">
@@ -146,7 +148,7 @@ export const StoreLocation: React.FC = () => {
                   className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Telegram</span>
+                  <span>{t('pages', 'sections.locationTelegram')}</span>
                 </a>
                 <a
                   href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
@@ -154,7 +156,7 @@ export const StoreLocation: React.FC = () => {
                   className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  <span>Qo'ng'iroq</span>
+                  <span>{t('pages', 'sections.locationCall')}</span>
                 </a>
               </div>
             </div>
@@ -197,7 +199,7 @@ export const StoreLocation: React.FC = () => {
                 {/* Pin Tooltip */}
                 <div className="mt-3 px-4 py-2 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-700 text-center whitespace-nowrap">
                   <div className="text-xs font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif]">
-                    {storeInfo.name} Do'koni
+                    {t('pages', 'sections.locationStorePin', storeInfo.name)}
                   </div>
                   <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
                     {storeInfo.city}
@@ -209,7 +211,7 @@ export const StoreLocation: React.FC = () => {
             {/* Overlaid Map Controls */}
             <div className="relative z-10 mt-auto p-4 sm:p-6 bg-gradient-to-t from-white/95 dark:from-zinc-900/95 via-white/80 dark:via-zinc-900/80 to-transparent flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-xs text-zinc-600 dark:text-zinc-300 text-center sm:text-left">
-                <span className="font-bold text-zinc-900 dark:text-white">Mo'ljal:</span> {storeInfo.landmark}
+                <span className="font-bold text-zinc-900 dark:text-white">{t('pages', 'sections.locationLandmark')}</span> {storeInfo.landmark}
               </div>
 
               <div className="flex items-center gap-2">
@@ -220,7 +222,7 @@ export const StoreLocation: React.FC = () => {
                   onClick={() => track('directions_click', { metadata: { via: 'google-maps' } })}
                   className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center gap-1 shadow-xs"
                 >
-                  <span>Google Maps</span>
+                  <span>{t('pages', 'sections.locationGoogle')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
                 <a
@@ -230,7 +232,7 @@ export const StoreLocation: React.FC = () => {
                   onClick={() => track('directions_click', { metadata: { via: 'yandex-maps' } })}
                   className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center gap-1 shadow-xs"
                 >
-                  <span>Yandex Xarita</span>
+                  <span>{t('pages', 'sections.locationYandex')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>

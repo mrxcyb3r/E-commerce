@@ -1,28 +1,30 @@
 import React from 'react';
 import { Clock, Tag, Layers, ThumbsUp, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 export const WhyChooseUs: React.FC = () => {
+  const { t } = useI18n();
   const features = [
     {
       icon: <Clock className="w-6 h-6 text-zinc-900 dark:text-white" />,
-      title: 'Vaqtingizni tejang',
-      description: 'Mahsulotlarni uydan chiqmasdan onlayn ko\'rib chiqing va do\'konga kelganingizda qidirishga vaqt sarflamang.',
+      title: t('pages', 'sections.why1Title'),
+      description: t('pages', 'sections.why1Desc'),
     },
     {
       icon: <Tag className="w-6 h-6 text-zinc-900 dark:text-white" />,
-      title: 'Narxlarni oldindan ko\'ring',
-      description: 'Barcha narxlar 100% shaffof va ochiq. Do\'konga kelganda narxlar bo\'yicha noaniqliklar bo\'lmaydi.',
+      title: t('pages', 'sections.why2Title'),
+      description: t('pages', 'sections.why2Desc'),
     },
     {
       icon: <Layers className="w-6 h-6 text-zinc-900 dark:text-white" />,
-      title: 'Ko\'proq tanlov',
-      description: 'Barcha toifalar, o\'lchamlar va rang variantlarini bitta qulay platformada taqqoslang va tanlang.',
+      title: t('pages', 'sections.why3Title'),
+      description: t('pages', 'sections.why3Desc'),
     },
     {
       icon: <ThumbsUp className="w-6 h-6 text-zinc-900 dark:text-white" />,
-      title: 'Qulay xarid tajribasi',
-      description: 'Mahalliy do\'konimizga tashrif buyurib, mahsulotni qo\'l bilan ushlab, kiyib ko\'rib ishonch bilan xarid qiling.',
+      title: t('pages', 'sections.why4Title'),
+      description: t('pages', 'sections.why4Desc'),
     },
   ];
 
@@ -38,13 +40,13 @@ export const WhyChooseUs: React.FC = () => {
         >
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Afzalliklarimiz</span>
+            <span>{t('pages', 'sections.whyEyebrow')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            Nega bizni tanlashadi?
+            {t('pages', 'sections.whyTitle')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            Do'kondagi sifatli mahsulotlarni onlayn ko'rib, o'zingizga mosini tanlang.
+            {t('pages', 'sections.whySubtitle')}
           </p>
         </motion.div>
 

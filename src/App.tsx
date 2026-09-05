@@ -33,6 +33,7 @@ const DashboardPage = lazyNamed(() => import('./pages/admin/DashboardPage'), 'Da
 const ProductsListPage = lazyNamed(() => import('./pages/admin/ProductsListPage'), 'ProductsListPage');
 const ProductEditPage = lazyNamed(() => import('./pages/admin/ProductEditPage'), 'ProductEditPage');
 const BulkCreatePage = lazyNamed(() => import('./pages/admin/BulkCreatePage'), 'BulkCreatePage');
+const ProductImportPage = lazyNamed(() => import('./pages/admin/ProductImportPage'), 'ProductImportPage');
 const CategoriesPage = lazyNamed(() => import('./pages/admin/CategoriesPage'), 'CategoriesPage');
 const InventoryPage = lazyNamed(() => import('./pages/admin/InventoryPage'), 'InventoryPage');
 const FeedAdminPage = lazyNamed(() => import('./pages/admin/FeedAdminPage'), 'FeedAdminPage');
@@ -148,6 +149,7 @@ export default function App() {
                     <Route path="products" element={<ProductsListPage />} />
                     <Route path="products/new" element={<ProductEditPage />} />
                     <Route path="products/bulk-create" element={<BulkCreatePage />} />
+                    <Route path="products/import" element={<ProductImportPage />} />
                     <Route path="products/:id" element={<ProductEditPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
                     <Route path="inventory" element={<InventoryPage />} />

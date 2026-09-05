@@ -16,6 +16,7 @@ import {
   Layers,
   Tag,
   CheckCircle2,
+  UploadCloud,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
@@ -37,6 +38,7 @@ export const ProductsListPage: React.FC = () => {
     categories,
     deleteProduct,
     duplicateProduct,
+    duplicateProducts,
     toggleProductFeatured,
     toggleProductNew,
     toggleProductPublished,
@@ -61,6 +63,8 @@ export const ProductsListPage: React.FC = () => {
   const [bulkConfirm, setBulkConfirm] = useState<BulkAction | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkCategoryMenu, setBulkCategoryMenu] = useState(false);
+  const [bulkDupeMenu, setBulkDupeMenu] = useState(false);
+  const [bulkDupeCount, setBulkDupeCount] = useState(2);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [batchStatus, setBatchStatus] = useState<{ ok: boolean; text: string } | null>(null);
   const statusTimer = useRef<number | null>(null);
@@ -181,6 +185,18 @@ export const ProductsListPage: React.FC = () => {
     setBulkCategoryMenu(false);
   };
 
+  const runBulkDuplicate = () => {
+    if (selectedIds.length === 0) return;
+    setBulkBusy(true);
+    setBulkDupeMenu(false);
+    const perProduct = bulkDupeCount;
+    const n = selectedIds.length;
+    const created = duplicateProducts(selectedIds, perProduct);
+    notify(true, `${n} ta mahsulotdan ${created} ta nusxa yaratildi`);
+    setSelectedIds([]);
+    setBulkBusy(false);
+  };
+
   const handleDeleteConfirm = () => {
     if (productToDelete) {
       deleteProduct(productToDelete.id);
@@ -226,6 +242,13 @@ export const ProductsListPage: React.FC = () => {
           >
             <Layers className="w-4 h-4" />
             <span>Ommaviy yaratish</span>
+          </Link>
+          <Link
+            to="/admin/products/import"
+            className="px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors flex items-center gap-1.5"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Import</span>
           </Link>
           <Link
             to="/admin/products/new"
@@ -446,6 +469,44 @@ export const ProductsListPage: React.FC = () => {
           <button type="button" onClick={() => setBulkConfirm('stock-off')} className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors">
             Tugadi
           </button>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setBulkDupeMenu((v) => !v)}
+              className="px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-900 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-neutral-50 transition-colors flex items-center gap-1"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              Nusxa
+            </button>
+            {bulkDupeMenu && (
+              <div className="absolute left-0 top-full mt-1.5 z-30 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-lg p-3 min-w-44">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-200">
+                    {selectedIds.length} ta mahsulot
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={bulkDupeCount}
+                    onChange={(e) => setBulkDupeCount(Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
+                    className="w-20 px-2.5 py-1.5 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500"
+                  />
+                  <span className="text-[11px] text-neutral-500">tadan</span>
+                  <button
+                    type="button"
+                    onClick={runBulkDuplicate}
+                    className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-[11px] font-black"
+                  >
+                    Nusxalash
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="w-px h-5 bg-amber-300/70 dark:bg-amber-900/60 mx-1" />
 

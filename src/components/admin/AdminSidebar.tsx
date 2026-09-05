@@ -24,6 +24,7 @@ import {
   TrendingUp,
   ShoppingBag,
   Layers,
+  Import as ImportIcon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -80,6 +81,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           label: 'Ommaviy yaratish',
           path: '/admin/products/bulk-create',
           icon: Layers,
+        },
+        {
+          label: 'Import / Eksport',
+          path: '/admin/products/import',
+          icon: ImportIcon,
         },
         {
           label: 'Kategoriyalar',

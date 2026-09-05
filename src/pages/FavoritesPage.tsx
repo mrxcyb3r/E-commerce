@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { useFavorites } from '../hooks/useFavorites';
 import { useStore } from '../context/StoreContext';
 import { ProductCard } from '../components/products/ProductCard';
-import { Heart, Trash2, ArrowRight, Store, ShoppingBag } from 'lucide-react';
+import { Heart, Trash2, Store, ShoppingBag } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useI18n } from '../i18n/I18nContext';
 
 export const FavoritesPage: React.FC = () => {
   const { favoriteProducts, totalFavorites, clearFavorites } = useFavorites();
   const { storeInfo } = useStore();
+  const { t } = useI18n();
 
   return (
     <div className="pt-28 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh]">
@@ -17,15 +19,15 @@ export const FavoritesPage: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-rose-500 mb-1">
             <Heart className="w-3.5 h-3.5 fill-rose-500" />
-            <span>Saqlanganlar</span>
+            <span>{t('pages', 'favorites.eyebrow')}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            Sevimlilar ro'yxati
+            {t('pages', 'favorites.title')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal">
             {totalFavorites > 0
-              ? `Siz ${totalFavorites} ta mahsulotni saqlab qo'ydingiz.`
-              : "Do'konga borishdan oldin yoqtirgan mahsulotlaringizni shu yerga saqlang."}
+              ? t('pages', 'favorites.count', totalFavorites)
+              : t('pages', 'favorites.emptyDesc')}
           </p>
         </div>
 
@@ -36,7 +38,7 @@ export const FavoritesPage: React.FC = () => {
             className="self-start sm:self-auto inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-colors uppercase tracking-wider"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Ro'yxatni tozalash</span>
+            <span>{t('pages', 'favorites.clear')}</span>
           </button>
         )}
       </div>
@@ -53,10 +55,10 @@ export const FavoritesPage: React.FC = () => {
 
           <div className="space-y-1.5">
             <h2 className="text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-              Sevimli mahsulotlaringiz shu yerda ko'rinadi.
+              {t('pages', 'favorites.emptyTitle')}
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-              Katalogdagi yurakcha tugmasini bosib, o'zingizga yoqqan kiyim va oyoq kiyimlarni saqlab qo'ying.
+              {t('pages', 'favorites.emptyHint')}
             </p>
           </div>
 
@@ -65,7 +67,7 @@ export const FavoritesPage: React.FC = () => {
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-black text-sm bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm tracking-wide"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Mahsulotlarni ko'rish</span>
+            <span>{t('pages', 'favorites.browse')}</span>
           </Link>
         </motion.div>
       ) : (
@@ -78,10 +80,10 @@ export const FavoritesPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-sm sm:text-base font-black text-zinc-900 dark:text-white">
-                  Do'konga tashrif buyurganingizda:
+                  {t('pages', 'favorites.visitTip')}
                 </div>
                 <div className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-medium">
-                  Ushbu sahifani sotuvchiga ko'rsatsangiz, tanlangan mahsulotlarni kiyib ko'rish uchun tezda olib berishadi.
+                  {t('pages', 'favorites.visitTipDesc')}
                 </div>
               </div>
             </div>
@@ -92,7 +94,7 @@ export const FavoritesPage: React.FC = () => {
               rel="noopener noreferrer"
               className="px-5 py-3 text-xs font-black rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 shrink-0 transition-colors shadow-xs"
             >
-              Telegramda yuborish
+              {t('pages', 'favorites.sendTelegram')}
             </a>
           </div>
 

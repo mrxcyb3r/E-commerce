@@ -1,31 +1,33 @@
 import React from 'react';
 import { Smartphone, CheckSquare, Heart, Store, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 export const HowItWorks: React.FC = () => {
+  const { t } = useI18n();
   const steps = [
     {
       step: '01',
-      title: 'Onlayn ko\'ring',
-      description: 'Mahsulotlarni istalgan vaqtda uyingizdan yoki yo\'lda bemalol ko\'rib chiqing.',
+      title: t('pages', 'sections.how1Title'),
+      description: t('pages', 'sections.how1Desc'),
       icon: <Smartphone className="w-5 h-5" />,
     },
     {
       step: '02',
-      title: 'Tanlang',
-      description: 'Narx, o\'lcham va rang bo\'yicha o\'zingizga mos tanlovni aniqlang.',
+      title: t('pages', 'sections.how2Title'),
+      description: t('pages', 'sections.how2Desc'),
       icon: <CheckSquare className="w-5 h-5" />,
     },
     {
       step: '03',
-      title: 'Saqlang',
-      description: 'Yoqtirgan mahsulotlaringizni sevimlilarga qo\'shib, ro\'yxat tuzing.',
+      title: t('pages', 'sections.how3Title'),
+      description: t('pages', 'sections.how3Desc'),
       icon: <Heart className="w-5 h-5" />,
     },
     {
       step: '04',
-      title: 'Do\'konga tashrif buyuring',
-      description: 'Mahsulotni ko\'ring, sinab ko\'ring va ishonch bilan xarid qiling.',
+      title: t('pages', 'sections.how4Title'),
+      description: t('pages', 'sections.how4Desc'),
       icon: <Store className="w-5 h-5" />,
     },
   ];
@@ -42,13 +44,13 @@ export const HowItWorks: React.FC = () => {
           className="text-center max-w-2xl mx-auto mb-14 space-y-2"
         >
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            <span>Oddiy va tushunarli</span>
+            <span>{t('pages', 'sections.howEyebrow')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            Qanday ishlaydi?
+            {t('pages', 'sections.howTitle')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            Ortiqcha vaqt yo'qotmasdan, o'zingizga ma'qul xaridni 4 ta oddiy qadamda amalga oshiring.
+            {t('pages', 'sections.howSubtitle')}
           </p>
         </motion.div>
 

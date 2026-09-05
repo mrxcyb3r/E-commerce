@@ -1,154 +1,103 @@
-# E-Commerce App
+# E-Commerce App — White-Label Commerce Platform
 
-A modern, responsive e-commerce web application for browsing products, discovering new items, and managing an online store through an admin dashboard.
+A production-ready, fully white-label e-commerce platform: React 19 + TypeScript + Vite + Supabase.
+Every store is configured through the **database + env** (no code changes per client), so a new shop
+can be onboarded live in ~15–30 minutes — see **[`ONBOARDING.md`](./ONBOARDING.md)**.
 
 ## ✨ Features
 
-### 🛍️ Shopping Experience
-
-* Browse products
-* Search products
-* Filter and sort products
-* Browse product categories
-* View product details
-* View product images, prices, and descriptions
-* Save favorite products
-* Responsive shopping experience
+### 🛍️ Customer Storefront
+* Product catalog with search, sort, filters (category / size / color / max price / in-stock)
+* Product detail pages with gallery, sizes/colors, stock status, SEO meta + JSON-LD
+* Favorites list with a "show in store / send via Telegram" workflow
+* Short-form video feed (reels) with product cards
+* Homepage, About, Store Location (Google/Yandex maps), Contact (form + Telegram), FAQ, newsletter
+* **Tri-lingual UI** (Uzbek / Russian / English) — retailer switch via `src/i18n` locales
+* Light/dark mode, fully responsive, PWA + offline pages
+* Anonymous engagement: favorites, feed saves, comments, likes — zero sign-up friction
 
 ### 🎥 Product Feed
-
-A short-form video feed for discovering products through engaging content.
-
-* Browse product videos
-* Discover new products
-* View product information from feed content
-* Scroll through videos in a reels-style experience
+A reels-style video feed to discover products through engaging content. Likes, saves, and comments
+are stored per visitor (admin-authenticated comments are flagged `is_admin`).
 
 ### 🧠 Prompt Library
+Goes offline-first (optional). Prompts are organized into categories and managed through the admin
+dashboard. **AI generation itself is intentionally deferred** ("no ai yet").
 
-A built-in collection of AI prompts that can help create better product images and marketing content.
+### 🔐 Admin Dashboard (`/admin`)
+Everything customer-facing is manageable here — no hardcoded content:
+* **Products** — create/edit, bulk create, bulk duplicate, **CSV/JSON import & CSV export**
+* **Categories**, **Feed** (videos/likes/comments analytics), **Testimonials**, **Prompts**
+* **Store settings** — branding (name, logo, colors, hero, about/mission/vision, SEO, contact,
+  working hours, maps) — drives the entire storefront via `store_settings`
+* **Analytics** — events, feed/product performance, storage & health
 
-Prompts can be organized into categories and managed through the admin dashboard.
-
-### 🔐 Admin Dashboard
-
-The admin dashboard provides control over the application's content and products.
-
-Administrators can manage:
-
-* Products
-* Categories
-* Product images
-* Prices
-* Availability
-* Feed posts
-* Videos
-* Prompt Library
-* Store content
-
-The goal is for the application to be **fully manageable through the admin dashboard instead of relying on hardcoded content.**
+### 🌍 White-Label Branding
+Store identity (name, address, phone, Telegram, colors, hero copy, SEO defaults, admin credentials)
+comes from `store_settings` in the database with sensible fallbacks in
+`src/config/business.ts`. Navbar, footer, pages, and SEO all read from the same source.
 
 ---
 
 ## 🏗️ Tech Stack
 
-* **React**
-* **TypeScript**
-* **Supabase**
-* **PostgreSQL**
-* **Supabase Auth**
-* **Supabase Storage**
-* **Tailwind CSS**
+React 19 | TypeScript | Vite | Tailwind CSS | Supabase (Postgres, Auth, Storage) | motion | lucide-react
+
+> No new runtime dependencies are added for features; the platform is intentionally dependency-light.
 
 ---
 
-## 📁 Main Features
+## 🚀 Local Development
 
-```text
-E-Commerce App
-│
-├── 🏠 Home
-├── 🛍️ Products
-├── 🔎 Search
-├── 🗂️ Categories
-├── ❤️ Favorites
-├── 🎥 Feed
-├── 🧠 Prompt Library
-├── 📦 Product Details
-└── ⚙️ Admin
-    ├── Products
-    ├── Categories
-    ├── Feed
-    ├── Prompt Library
-    └── Store Management
+```bash
+npx pnpm install   # or npm install
+cp .env.example .env   # fill in VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY
+npm run dev
 ```
 
----
+### Scripts
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npx tsc --noEmit` | Type check (`npm run lint`) |
+| `npm run build` | Generate icons + SEO files, then production build |
+| `npm run preview` | Preview the production build |
 
-## 🔑 Admin
-
-The admin panel is accessible through:
-
-```text
-/login
-```
-
-The admin dashboard is used to manage the application's products and content.
-
-All important customer-facing data should ultimately come from the database so that administrators can update the storefront without modifying the source code.
+### Environment variables (see `.env.example`)
+* `VITE_SUPABASE_URL` — Supabase project URL (client-safe)
+* `VITE_SUPABASE_PUBLISHABLE_KEY` — publishable key (client-safe)
+* `SITE_URL` / `VITE_SITE_URL` / `URL` — used by `scripts/generate-seo.mjs`
+  (sitemap.xml / robots.txt); falls back to `https://example.com` and warns.
+* Server-only keys (migrations / edge functions) must **not** be prefixed `VITE_`.
 
 ---
 
 ## 🗄️ Database
 
-Supabase is used as the application's backend and database.
+Supabase provides the backend. Apply migrations in order — each new shop needs **every** file in
+[`supabase/migrations/`](./supabase/migrations/), especially:
 
-The database stores application data such as:
+* `20260905140000_feed_comments_upgrade.sql` — feed comments + likes upgrade
+* `20260905150000_store_branding_expansion.sql` — white-label `store_settings` columns
+  (short_name, colors, hero, about, mission/vision, SEO, admin email, copyright/footer)
 
-* Products
-* Categories
-* Feed posts
-* Prompt Library content
-* Store information
-* User and authentication data
+Row Level Security (RLS) protects admin data; storefront reads are public/anon.
 
-Row Level Security (RLS) is used to protect sensitive operations and administrative data.
+### Onboarding a new shop (15–30 min)
+> Full step-by-step guide: **[`ONBOARDING.md`](./ONBOARDING.md)**
 
----
-
-## 📱 Responsive Design
-
-The application is designed to work across:
-
-* Mobile
-* Tablet
-* Desktop
-
-The interface focuses on a clean, modern shopping experience with fast product discovery and intuitive navigation.
+1. Create a fresh Supabase project.
+2. Apply all migrations in `supabase/migrations/`.
+3. Import the client's product catalog via **Admin → Products → Import / Eksport**
+   (CSV or JSON, Uzbek/Russian/English headers supported).
+4. Configure **Admin → Store settings** (brand, contact, SEO) or seed defaults.
+5. Deploy to Netlify with the two `VITE_*` env vars + site URL.
+6. Sign in at `/admin` with the admin credentials.
 
 ---
 
-## 🚧 Project Status
-
-The application is currently under active development.
-
-Current development focuses on:
-
-* Completing the e-commerce experience
-* Connecting all features to Supabase
-* Improving the admin dashboard
-* Making all storefront content manageable from the admin panel
-* Polishing the UI and responsive experience
-* Improving product discovery and the video feed
-
----
-
-## 🎯 Goal
-
-Build a modern, simple, and engaging e-commerce experience where customers can easily discover products and administrators can manage the entire store from one place.
-
----
+## 📱 Support
+Works on mobile, tablet, and desktop.
 
 ## 📄 License
-
-This project is currently private and under development.
+Private project under active development.

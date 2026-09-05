@@ -54,6 +54,7 @@ interface StoreContextType {
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   duplicateProduct: (id: string) => Product | undefined;
+  duplicateProducts: (ids: string[], copies: number) => number;
   toggleProductFeatured: (id: string) => void;
   toggleProductNew: (id: string) => void;
   toggleProductPublished: (id: string) => void;
@@ -1038,6 +1039,36 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return copy;
   };
 
+  // Duplicate a set of products N times each, keeping sku/slug unique.
+  const duplicateProducts = (ids: string[], copies: number): number => {
+    let created = 0;
+    const copiesBounded = Math.max(1, Math.min(100, Math.floor(copies)));
+    const batch: Product[] = [];
+    for (const id of ids) {
+      const target = products.find((p) => p.id === id);
+      if (!target) continue;
+      for (let i = 2; i <= copiesBounded + 1; i++) {
+        const newId = `prod-${Date.now()}-${created}-${i}`;
+        batch.push({
+          ...target,
+          id: newId,
+          name: `${target.name} (Nusxa ${i})`,
+          slug: `${target.slug}-copy-${i}-${Date.now().toString().slice(-5)}`,
+          sku: `${target.sku}-COPY${i}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+      created += copiesBounded;
+    }
+    if (batch.length > 0) {
+      setProducts((prev) => [...batch, ...prev]);
+      batch.forEach((p) => persistProduct(p));
+      logActivity('create', 'product', `Ommaviy nusxalash: ${batch.length} ta yangi mahsulot yaratildi`);
+    }
+    return batch.length;
+  };
+
   const toggleProductFeatured = (id: string) => {
     let updatedRef: Product | undefined;
     setProducts((prev) =>
@@ -1520,6 +1551,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         updateProduct,
         deleteProduct,
         duplicateProduct,
+        duplicateProducts,
         toggleProductFeatured,
         toggleProductNew,
         toggleProductPublished,

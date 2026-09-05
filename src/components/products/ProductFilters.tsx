@@ -3,6 +3,7 @@ import { CATEGORIES } from '../../data/categories';
 import { ProductFiltersState, SortOption } from '../../types/product';
 import { RotateCcw, X, SlidersHorizontal, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 interface ProductFiltersProps {
   filters: ProductFiltersState;
@@ -32,6 +33,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   onMobileClose,
   totalResults,
 }) => {
+  const { t } = useI18n();
+
   const handleCategoryChange = (slug: string) => {
     onChange({
       ...filters,
@@ -74,7 +77,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-zinc-900 dark:text-white" />
-          <span className="font-black text-sm text-zinc-900 dark:text-white font-['Outfit',sans-serif]">Filtrlar</span>
+          <span className="font-black text-sm text-zinc-900 dark:text-white font-['Outfit',sans-serif]">{t('pages', 'catalog.filters')}</span>
         </div>
         {hasActiveFilters && (
           <button
@@ -83,7 +86,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 font-bold transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
-            Tozalash
+            {t('pages', 'catalog.filtersReset')}
           </button>
         )}
       </div>
@@ -91,7 +94,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Categories */}
       <div className="space-y-2.5">
         <label className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Toifa
+          {t('pages', 'catalog.categoryLabel')}
         </label>
         <div className="space-y-1">
           <button
@@ -103,7 +106,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium'
             }`}
           >
-            <span>Barcha toifalar</span>
+            <span>{t('pages', 'catalog.allCategories')}</span>
           </button>
 
           {CATEGORIES.map((cat) => (
@@ -127,7 +130,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Sizes */}
       <div className="space-y-2.5">
         <label className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          O'lcham
+          {t('pages', 'catalog.sizeLabel')}
         </label>
         <div className="flex flex-wrap gap-1.5">
           {AVAILABLE_SIZES.map((s) => (
@@ -150,7 +153,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Colors */}
       <div className="space-y-2.5">
         <label className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Rang
+          {t('pages', 'catalog.colorLabel')}
         </label>
         <div className="flex flex-wrap gap-2">
           {AVAILABLE_COLORS.map((c) => {
@@ -185,7 +188,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Price Range Filter */}
       <div className="space-y-2.5">
         <label className="text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-          Maksimal narx
+          {t('pages', 'catalog.maxPriceLabel')}
         </label>
         <div className="space-y-2">
           <input
@@ -204,7 +207,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           />
           <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 font-mono font-bold">
             <span>100 000 so'm</span>
-            <span>{filters.maxPrice ? `${new Intl.NumberFormat('uz-UZ').format(filters.maxPrice)} so'm` : 'Barchasi'}</span>
+            <span>{filters.maxPrice ? `${new Intl.NumberFormat('uz-UZ').format(filters.maxPrice)} so'm` : t('pages', 'catalog.priceAll')}</span>
           </div>
         </div>
       </div>
@@ -218,7 +221,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             onChange={(e) => onChange({ ...filters, onlyInStock: e.target.checked })}
             className="w-4 h-4 rounded text-zinc-900 dark:text-white accent-zinc-900 dark:accent-white"
           />
-          <span>Faqat do'konda mavjudlar</span>
+          <span>{t('pages', 'catalog.onlyInStock')}</span>
         </label>
       </div>
     </div>
@@ -253,7 +256,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             >
               <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
                 <h3 className="font-black text-lg text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                  Filtrlar
+                  {t('pages', 'catalog.filters')}
                 </h3>
                 <button
                   type="button"
@@ -274,7 +277,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                   onClick={onMobileClose}
                   className="w-full py-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black text-sm shadow-sm tracking-wide"
                 >
-                  Natijalarni ko'rish ({totalResults})
+                  {t('pages', 'catalog.showResults', totalResults)}
                 </button>
               </div>
             </motion.div>

@@ -3,9 +3,11 @@ import { Send, Phone, MapPin, CheckCircle2, MessageSquare, AlertCircle } from 'l
 import { useStore } from '../../context/StoreContext';
 import { track } from '../../lib/analytics/client';
 import { motion } from 'motion/react';
+import { useI18n } from '../../i18n/I18nContext';
 
 export const ContactSection: React.FC = () => {
   const { storeInfo, contactCms } = useStore();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -18,15 +20,15 @@ export const ContactSection: React.FC = () => {
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Iltimos, ismingizni kiriting';
+      newErrors.name = t('pages', 'sections.contactErrName');
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Iltimos, telefon raqamingizni kiriting';
+      newErrors.phone = t('pages', 'sections.contactErrPhone');
     } else if (formData.phone.replace(/\D/g, '').length < 9) {
-      newErrors.phone = 'Telefon raqamini to\'liq kiriting (masalan: 90 123 45 67)';
+      newErrors.phone = t('pages', 'sections.contactErrPhoneFull');
     }
     if (!formData.message.trim()) {
-      newErrors.message = 'Iltimos, xabaringizni yozing';
+      newErrors.message = t('pages', 'sections.contactErrMessage');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -45,10 +47,10 @@ export const ContactSection: React.FC = () => {
   };
 
   const handleSendTelegram = () => {
-    const text = `Salom! Men yangi xabar qoldirdim:%0A%0A` +
-      `👤 Ism: ${formData.name}%0A` +
-      `📞 Tel: ${formData.phone}%0A` +
-      `💬 Xabar: ${formData.message}`;
+    const text = `${t('pages', 'sections.contactTgHello')}%0A%0A` +
+      `${t('pages', 'sections.contactTgName')}${formData.name}%0A` +
+      `${t('pages', 'sections.contactTgPhone')}${formData.phone}%0A` +
+      `${t('pages', 'sections.contactTgMessage')}${formData.message}`;
     track('contact_click', { metadata: { via: 'telegram-form' } });
     window.open(`${storeInfo.telegram}?text=${text}`, '_blank');
   };
@@ -65,13 +67,13 @@ export const ContactSection: React.FC = () => {
         >
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Aloqa</span>
+            <span>{t('pages', 'sections.contactEyebrow')}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
-            {contactCms.title || 'Savollaringiz bormi?'}
+            {contactCms.title || t('pages', 'sections.contactHeading')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
-            {contactCms.subtitle || 'Mahsulotlar yoki do\'kon haqida savollaringiz bo\'lsa, biz bilan bog\'laning.'}
+            {contactCms.subtitle || t('pages', 'sections.contactSubtitleFallback')}
           </p>
         </motion.div>
 
@@ -86,7 +88,7 @@ export const ContactSection: React.FC = () => {
           >
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6">
               <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                To'g'ridan-to'g'ri bog'lanish
+                {t('pages', 'sections.contactDirect')}
               </h3>
 
               <div className="space-y-4">
@@ -101,7 +103,7 @@ export const ContactSection: React.FC = () => {
                     <Send className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Telegram orqali</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactViaTelegram')}</div>
                     <div className="text-sm font-black text-zinc-900 dark:text-white group-hover:underline">
                       {storeInfo.telegramUsername}
                     </div>
@@ -117,7 +119,7 @@ export const ContactSection: React.FC = () => {
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Telefon raqam</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactPhone')}</div>
                     <div className="text-sm font-black text-zinc-900 dark:text-white group-hover:underline">
                       {storeInfo.phone}
                     </div>
@@ -129,7 +131,7 @@ export const ContactSection: React.FC = () => {
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Do'kon manzili</div>
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactAddress')}</div>
                     <div className="text-sm font-bold text-zinc-900 dark:text-white">
                       {storeInfo.address}
                     </div>
@@ -140,10 +142,10 @@ export const ContactSection: React.FC = () => {
 
             <div className="bg-zinc-900 dark:bg-zinc-800 text-white p-6 rounded-2xl space-y-2 border border-zinc-800">
               <div className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                Tezkor javob
+                {t('pages', 'sections.contactQuick')}
               </div>
               <p className="text-sm text-zinc-300 leading-relaxed font-medium">
-                {contactCms.supportNote || 'Telegram orqali yozsangiz, mutaxassislarimiz bir necha daqiqa ichida javob qaytarishadi.'}
+                {contactCms.supportNote || t('pages', 'sections.contactSupport')}
               </p>
             </div>
           </motion.div>
@@ -162,10 +164,10 @@ export const ContactSection: React.FC = () => {
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <h3 className="text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                  Xabaringiz qabul qilindi!
+                  {t('pages', 'sections.contactReceived')}
                 </h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto font-medium">
-                  Rahmat, <strong>{formData.name}</strong>! Xabaringizni tez fursatda ko'rib chiqib, ko'rsatilgan telefon raqamingiz orqali aloqaga chiqamiz.
+                  {t('pages', 'sections.contactThanks', formData.name)}
                 </p>
 
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -175,7 +177,7 @@ export const ContactSection: React.FC = () => {
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-black bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-xs"
                   >
                     <Send className="w-4 h-4" />
-                    Telegram orqali ham yuborish
+                    {t('pages', 'sections.contactSendViaTelegram')}
                   </button>
 
                   <button
@@ -186,14 +188,14 @@ export const ContactSection: React.FC = () => {
                     }}
                     className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                   >
-                    Yangi xabar yozish
+                    {t('pages', 'sections.contactNewMessage')}
                   </button>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
-                  Xabar qoldiring
+                  {t('pages', 'sections.contactLeave')}
                 </h3>
 
                 {/* Name */}
@@ -202,7 +204,7 @@ export const ContactSection: React.FC = () => {
                     htmlFor="contact-name"
                     className="block text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-1.5"
                   >
-                    Ismingiz <span className="text-rose-500">*</span>
+                    {t('pages', 'sections.contactName')} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     id="contact-name"
@@ -212,7 +214,7 @@ export const ContactSection: React.FC = () => {
                       setFormData({ ...formData, name: e.target.value });
                       if (errors.name) setErrors({ ...errors, name: '' });
                     }}
-                    placeholder="Masalan: Sardorbek"
+                    placeholder={t('pages', 'sections.contactNamePlaceholder')}
                     className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 ${
                       errors.name
                         ? 'border-rose-500 focus:ring-rose-500'
@@ -233,7 +235,7 @@ export const ContactSection: React.FC = () => {
                     htmlFor="contact-phone"
                     className="block text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-1.5"
                   >
-                    Telefon raqami <span className="text-rose-500">*</span>
+                    {t('pages', 'sections.contactPhoneLabel')} <span className="text-rose-500">*</span>
                   </label>
                   <input
                     id="contact-phone"
@@ -264,7 +266,7 @@ export const ContactSection: React.FC = () => {
                     htmlFor="contact-message"
                     className="block text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-1.5"
                   >
-                    Xabaringiz <span className="text-rose-500">*</span>
+                    {t('pages', 'sections.contactMessage')} <span className="text-rose-500">*</span>
                   </label>
                   <textarea
                     id="contact-message"
@@ -274,7 +276,7 @@ export const ContactSection: React.FC = () => {
                       setFormData({ ...formData, message: e.target.value });
                       if (errors.message) setErrors({ ...errors, message: '' });
                     }}
-                    placeholder="Mahsulot haqida savolingiz yoki taklifingiz..."
+                    placeholder={t('pages', 'sections.contactMessagePlaceholder')}
                     className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 resize-none ${
                       errors.message
                         ? 'border-rose-500 focus:ring-rose-500'
@@ -297,11 +299,11 @@ export const ContactSection: React.FC = () => {
                   className="w-full py-4 px-6 rounded-xl font-black text-sm tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
-                    <span>Yuborilmoqda...</span>
+                    <span>{t('pages', 'sections.contactSending')}</span>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Xabar yuborish</span>
+                      <span>{t('pages', 'sections.contactSend')}</span>
                     </>
                   )}
                 </button>
