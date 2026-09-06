@@ -2,54 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Package,
-  ShoppingCart,
-  TrendingUp,
-  Users,
-  Clock,
-  ArrowRight,
+  FolderTree,
   AlertTriangle,
   Plus,
   ExternalLink,
   CheckCircle2,
-  Truck,
-  CreditCard,
-  Boxes,
+  XCircle,
+  ShoppingCart,
+  Film,
+  Store,
+  ArrowRight,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { useI18n } from '../../i18n/I18nContext';
 import { useBrand } from '../../hooks/useBrand';
 import { supabase } from '../../lib/supabase/client';
 import { fetchOrders, fetchOrderStats } from '../../lib/supabase/orders';
 import type { Order } from '../../types/order';
-import {
-  ORDER_STATUS_LABELS,
-  PAYMENT_STATUS_LABELS,
-  ORDER_STATUS_COLORS,
-  PAYMENT_STATUS_COLORS,
-} from '../../types/order';
+import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '../../types/order';
 import { formatPrice } from '../../lib/utils';
-import { motion } from 'motion/react';
 
 export const DashboardPage: React.FC = () => {
   const { products, categories, storeInfo } = useStore();
-  const { t } = useI18n();
   const brand = useBrand();
 
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    revenue: 0,
-    pendingOrders: 0,
-    pendingPayment: 0,
-    deliveredOrders: 0,
-    avgOrderValue: 0,
-    ordersToday: 0,
-    revenueToday: 0,
-  });
+  const [orderCount, setOrderCount] = useState(0);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const outOfStockCount = products.filter((p) => !p.inStock || (p.stockCount !== undefined && p.stockCount <= 0)).length;
-  const lowStockCount = products.filter((p) => p.inStock && p.stockCount !== undefined && p.stockCount > 0 && p.stockCount <= 3).length;
 
   useEffect(() => {
     let active = true;
@@ -57,10 +35,10 @@ export const DashboardPage: React.FC = () => {
       try {
         const [statsResult, ordersResult] = await Promise.all([
           fetchOrderStats(),
-          fetchOrders({ limit: 5 }),
+          fetchOrders({ limit: 3 }),
         ]);
         if (!active) return;
-        setStats(statsResult);
+        setOrderCount(statsResult.totalOrders);
         setRecentOrders(ordersResult.orders);
       } catch {
         // Orders may not exist yet
@@ -71,19 +49,40 @@ export const DashboardPage: React.FC = () => {
     return () => { active = false; };
   }, []);
 
-  const stockAlerts = outOfStockCount + lowStockCount;
-  const hasOrders = stats.totalOrders > 0;
+  const publishedProducts = products.filter(p => p.published !== false);
+  const unpublishedProducts = products.filter(p => p.published === false);
+  const featuredProducts = products.filter(p => p.isFeatured);
+  const outOfStock = products.filter(p => !p.inStock || (p.stockCount !== undefined && p.stockCount <= 0));
+  const missingImages = products.filter(p => !p.images || p.images.length === 0);
+  const missingCategory = products.filter(p => !p.category);
+  const missingPrice = products.filter(p => !p.price || p.price <= 0);
+
+  const issues = [
+    ...missingImages.map(p => ({ product: p, issue: 'Rasm yo\'q', path: `/admin/products/${p.id}` })),
+    ...missingCategory.map(p => ({ product: p, issue: 'Kategoriya tanlanmagan', path: `/admin/products/${p.id}` })),
+    ...missingPrice.map(p => ({ product: p, issue: 'Narx kiritilmagan', path: `/admin/products/${p.id}` })),
+    ...outOfStock.map(p => ({ product: p, issue: 'Zaxirada yo\'q', path: `/admin/products/${p.id}` })),
+  ];
+
+  const storeFields = [
+    { label: 'Do\'kon nomi', ok: !!storeInfo.businessName },
+    { label: 'Telefon', ok: !!storeInfo.phone },
+    { label: 'Manzil', ok: !!storeInfo.address },
+    { label: 'Ish vaqti', ok: !!storeInfo.workingHours },
+    { label: 'Logo', ok: !!storeInfo.logoUrl },
+  ];
+  const storeHealth = storeFields.filter(f => f.ok).length;
+  const storeTotal = storeFields.length;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
             Boshqaruv markazi
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {brand.displayName} — {storeInfo.city || "O'zbekiston"}
+            {brand.displayName}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -106,80 +105,58 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Primary KPIs — Commerce First */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
-      >
-        {[
-          {
-            label: 'Savdo',
-            value: hasOrders ? formatPrice(stats.revenue) : '—',
-            sub: hasOrders ? `${stats.ordersToday > 0 ? `Bugun: ${formatPrice(stats.revenueToday)}` : 'Hali savdo yo\'q'}` : 'Buyurtmalar paydo bo\'lganda ko\'rinadi',
-            icon: TrendingUp,
-            color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-          },
-          {
-            label: 'Buyurtmalar',
-            value: stats.totalOrders.toString(),
-            sub: stats.pendingOrders > 0 ? `${stats.pendingOrders} ta kutilmoqda` : 'Yangi buyurtmalar yo\'q',
-            icon: ShoppingCart,
-            color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-            href: '/admin/orders',
-          },
-          {
-            label: 'O\'rtacha summa',
-            value: stats.avgOrderValue > 0 ? formatPrice(stats.avgOrderValue) : '—',
-            sub: stats.totalOrders > 0 ? `${stats.totalOrders} ta buyurtma asosida` : 'Buyurtmalar asosida',
-            icon: CreditCard,
-            color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-          },
-          {
-            label: 'Yetkazilgan',
-            value: stats.deliveredOrders.toString(),
-            sub: stats.deliveredOrders > 0 ? 'Muvaffaqiyatli' : 'Hali yetkazilmagan',
-            icon: Truck,
-            color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-          },
-        ].map((item, idx) => {
-          const Icon = item.icon;
-          const Wrapper = item.href ? Link : 'div';
-          return (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.03, duration: 0.25 }}
-            >
-              <Wrapper
-                to={item.href || ''}
-                className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${item.color}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  {item.href && <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />}
-                </div>
-                <div className="text-xl font-bold text-foreground tabular-nums">{item.value}</div>
-                <div className="text-[11px] text-muted-foreground font-medium mt-0.5">{item.label}</div>
-                <div className="text-[10px] text-muted-foreground/60 mt-0.5">{item.sub}</div>
-              </Wrapper>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+      {/* Katalog — Primary KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Link to="/admin/products" className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <Package className="w-4 h-4" />
+            </div>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
+          </div>
+          <div className="text-xl font-bold text-foreground tabular-nums">{products.length}</div>
+          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">Mahsulotlar</div>
+          <div className="text-[10px] text-muted-foreground/60 mt-0.5">{publishedProducts.length} ta nashr etilgan</div>
+        </Link>
+
+        <Link to="/admin/categories" className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <FolderTree className="w-4 h-4" />
+            </div>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
+          </div>
+          <div className="text-xl font-bold text-foreground tabular-nums">{categories.length}</div>
+          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">Kategoriyalar</div>
+        </Link>
+
+        <Link to="/admin/feed" className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Film className="w-4 h-4" />
+            </div>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
+          </div>
+          <div className="text-xl font-bold text-foreground tabular-nums">{featuredProducts.length}</div>
+          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">Mashhur mahsulotlar</div>
+        </Link>
+
+        <Link to="/admin/orders" className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <ShoppingCart className="w-4 h-4" />
+            </div>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
+          </div>
+          <div className="text-xl font-bold text-foreground tabular-nums">{orderCount}</div>
+          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">Buyurtmalar</div>
+          <div className="text-[10px] text-muted-foreground/60 mt-0.5">Telegram/telefon orqali</div>
+        </Link>
+      </div>
 
       {/* Attention Required */}
-      {(stockAlerts > 0 || stats.pendingPayment > 0) && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="p-4 rounded-xl bg-accent/5 border border-accent/20"
-        >
+      {issues.length > 0 && (
+        <div className="p-4 rounded-xl bg-accent/5 border border-accent/20">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-4 h-4 text-accent" />
@@ -187,42 +164,39 @@ export const DashboardPage: React.FC = () => {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-foreground">Diqqat talab qiladi</p>
               <p className="text-[11px] text-muted-foreground">
-                {stockAlerts > 0 && `${stockAlerts} ta mahsulotga e'tibor kerak`}
-                {stockAlerts > 0 && stats.pendingPayment > 0 && ' · '}
-                {stats.pendingPayment > 0 && `${stats.pendingPayment} ta to'lov kutilmoqda`}
+                {issues.length} ta mahsulotga e'tibor kerak
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              {stats.pendingPayment > 0 && (
-                <Link
-                  to="/admin/orders?payment=pending"
-                  className="px-3 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:bg-foreground/90 transition-colors"
-                >
-                  Buyurtmalar
-                </Link>
-              )}
-              {stockAlerts > 0 && (
-                <Link
-                  to="/admin/categories"
-                  className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-[11px] font-semibold hover:bg-muted/80 transition-colors"
-                >
-                  Zaxira
-                </Link>
-              )}
-            </div>
+            <Link
+              to={`/admin/products?issue=true`}
+              className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-[11px] font-semibold hover:bg-muted/80 transition-colors shrink-0"
+            >
+              Ko'rish
+            </Link>
           </div>
-        </motion.div>
+          <div className="mt-3 space-y-1.5">
+            {issues.slice(0, 3).map((item, i) => (
+              <Link
+                key={i}
+                to={item.path}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border hover:border-muted-foreground/20 text-[11px] text-muted-foreground hover:text-foreground transition-all"
+              >
+                <XCircle className="w-3 h-3 text-destructive shrink-0" />
+                <span className="truncate">{item.product.name}</span>
+                <span className="text-destructive shrink-0">→ {item.issue}</span>
+              </Link>
+            ))}
+            {issues.length > 3 && (
+              <p className="text-[10px] text-muted-foreground/60 px-3">+{issues.length - 3} ta boshqa</p>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Orders — 2 cols */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-          className="lg:col-span-2"
-        >
+        {/* Recent Orders */}
+        <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-foreground">So'nggi buyurtmalar</h2>
             <Link
@@ -235,7 +209,7 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="bg-card border border-border rounded-xl overflow-hidden">
-            {recentOrders.length > 0 ? (
+            {!loading && recentOrders.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
@@ -284,24 +258,50 @@ export const DashboardPage: React.FC = () => {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Quick Actions + Secondary — 1 col */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className="space-y-6"
-        >
-          {/* Tezkor amallar */}
+        {/* Store Health + Quick Actions */}
+        <div className="space-y-6">
+          {/* Store Health */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-foreground">Do'kon holati</h2>
+              <Link
+                to="/admin/store"
+                className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              >
+                Sozlash
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4 space-y-2">
+              {storeFields.map((field) => (
+                <div key={field.label} className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{field.label}</span>
+                  {field.ok ? (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  ) : (
+                    <XCircle className="w-3.5 h-3.5 text-destructive" />
+                  )}
+                </div>
+              ))}
+              <div className="pt-2 border-t border-border">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-medium text-foreground">Umumiy holat</span>
+                  <span className="font-semibold text-foreground">{storeHealth}/{storeTotal}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
           <div>
             <h2 className="text-sm font-semibold text-foreground mb-3">Tezkor amallar</h2>
             <div className="space-y-2">
               {[
                 { label: 'Mahsulot qo\'shish', path: '/admin/products/new', icon: Package },
-                { label: 'Buyurtmalarni ko\'rish', path: '/admin/orders', icon: ShoppingCart },
-                { label: 'Kategoriyalar', path: '/admin/categories', icon: Boxes },
-                { label: 'Do\'konni sozlash', path: '/admin/store', icon: ExternalLink },
+                { label: 'Kategoriyalar', path: '/admin/categories', icon: FolderTree },
+                { label: "Do'konni sozlash", path: '/admin/store', icon: Store },
               ].map((action) => {
                 const Icon = action.icon;
                 return (
@@ -320,22 +320,7 @@ export const DashboardPage: React.FC = () => {
               })}
             </div>
           </div>
-
-          {/* Catalog Summary */}
-          <div>
-            <h2 className="text-sm font-semibold text-foreground mb-3">Katalog</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <Link to="/admin/products" className="p-3 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
-                <div className="text-lg font-bold text-foreground tabular-nums">{products.length}</div>
-                <div className="text-[11px] text-muted-foreground">Mahsulotlar</div>
-              </Link>
-              <Link to="/admin/categories" className="p-3 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
-                <div className="text-lg font-bold text-foreground tabular-nums">{categories.length}</div>
-                <div className="text-[11px] text-muted-foreground">Kategoriyalar</div>
-              </Link>
-            </div>
-          </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

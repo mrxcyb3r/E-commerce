@@ -2,24 +2,16 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  ShoppingCart,
   Package,
   FolderTree,
-  Users,
+  Film,
   BarChart3,
   Store,
   Settings,
   LogOut,
   ExternalLink,
   X,
-  Film,
-  MessageCircle,
   Sparkles,
-  Home,
-  Info,
-  PhoneCall,
-  HelpCircle,
-  Star,
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
@@ -36,7 +28,6 @@ interface NavItem {
   path: string;
   icon: React.ComponentType<{ className?: string }>;
   end?: boolean;
-  badge?: string;
 }
 
 interface NavSection {
@@ -50,8 +41,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const { storeInfo } = useStore();
   const navigate = useNavigate();
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({
-    'SALES': true,
-    'CATALOG': true,
+    'KATALOG': true,
   });
 
   const handleLogout = () => {
@@ -71,14 +61,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       ],
     },
     {
-      title: 'SALES',
-      defaultOpen: true,
-      items: [
-        { label: 'Buyurtmalar', path: '/admin/orders', icon: ShoppingCart },
-      ],
-    },
-    {
-      title: 'CATALOG',
+      title: 'KATALOG',
       defaultOpen: true,
       items: [
         { label: 'Mahsulotlar', path: '/admin/products', icon: Package },
@@ -86,15 +69,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       ],
     },
     {
-      title: 'CONTENT',
+      title: 'KONTENT',
       items: [
-        { label: 'Videolar / Feed', path: '/admin/feed', icon: Film },
-        { label: 'Sharhlar', path: '/admin/testimonials', icon: Star },
-        { label: 'Savol-Javoblar', path: '/admin/faq', icon: HelpCircle },
+        { label: 'Video / Feed', path: '/admin/feed', icon: Film },
       ],
     },
     {
-      title: 'INSIGHTS',
+      title: 'ANALITIKA',
       items: [
         { label: 'Tahlil', path: '/admin/analytics', icon: BarChart3 },
       ],
@@ -102,17 +83,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     {
       title: "DO'KON",
       items: [
-        { label: "Do'kon ma'lumotlari", path: '/admin/store', icon: Store },
-        { label: 'Bosh sahifa', path: '/admin/homepage', icon: Home },
-        { label: 'Biz haqimizda', path: '/admin/about', icon: Info },
-        { label: 'Aloqa', path: '/admin/contact', icon: PhoneCall },
+        { label: "Do'kon sozlamalari", path: '/admin/store', icon: Store },
       ],
     },
     {
-      title: 'TOOLS',
+      title: 'VOSITALAR',
       items: [
         { label: 'AI Promptlar', path: '/admin/prompts', icon: Sparkles },
-        { label: 'Izohlar', path: '/admin/comments', icon: MessageCircle },
       ],
     },
     {
@@ -125,7 +102,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
 
   return (
     <>
-      {/* Mobile Backdrop */}
       {isOpen && (
         <div
           onClick={onClose}
@@ -133,13 +109,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         />
       )}
 
-      {/* Sidebar Container */}
       <aside
         className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-card border-r border-border flex flex-col transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Brand Header */}
         <div className="h-14 px-5 flex items-center justify-between border-b border-border shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-foreground text-background font-bold text-xs flex items-center justify-center">
@@ -162,7 +136,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           </button>
         </div>
 
-        {/* Store Live Link */}
         <div className="px-3 pt-3 pb-1">
           <a
             href="/"
@@ -178,7 +151,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           </a>
         </div>
 
-        {/* Nav Links */}
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin" aria-label="Admin navigation">
           {navSections.map((section) => {
             const isOpen = openSections[section.title] ?? section.defaultOpen ?? false;
@@ -214,11 +186,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                         >
                           <Icon className="w-4 h-4 shrink-0 opacity-70" />
                           <span className="flex-1 truncate">{item.label}</span>
-                          {item.badge && (
-                            <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
-                              {item.badge}
-                            </span>
-                          )}
                         </NavLink>
                       );
                     })}
@@ -229,7 +196,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           })}
         </nav>
 
-        {/* User Footer & Logout */}
         <div className="px-3 py-3 border-t border-border shrink-0">
           <div className="flex items-center justify-between px-2 py-1.5">
             <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
