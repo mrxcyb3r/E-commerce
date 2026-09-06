@@ -594,7 +594,7 @@ export const StoreAdminPage: React.FC = () => {
               type="text"
               value={defaultSeoKeywords}
               onChange={(e) => setDefaultSeoKeywords(e.target.value)}
-              placeholder="kiyim, poyabzal, Jizzax do'kon"
+              placeholder="kiyim, poyabzal, konsept do'kon"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>

@@ -22,7 +22,7 @@ export const ShoppingJourneySection: React.FC = () => {
     {
       number: '04',
       title: "Do'konga keling",
-      description: 'Mahsulotni ko\'rib, kiyib ko\'ring va xarid qiling.',
+      description: 'Mahsulotlarni ko\'ring, sotuvchiga so\'rov bering.',
     },
   ];
 
@@ -32,7 +32,7 @@ export const ShoppingJourneySection: React.FC = () => {
         <div className="space-y-4">
           <div className="text-center mb-6">
             <h2 className="text-2xl sm:text-3xl font-black text-foreground font-display tracking-tighter">
-              Qanday xarid qilinadi
+              Qanday tanlanadi
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 text-sm font-normal">
               Qarindoshi do\'konga tashrif buyurish uchun oddiy, practical 4 qadam.

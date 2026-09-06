@@ -5,7 +5,7 @@ export const INITIAL_HOMEPAGE_CMS: HomepageCms = {
     badge: 'O\'lningizdagi mahsulotlar',
     title: 'Sifatli Kiyimlar va Oyoq Kiyimlar',
     highlightedTitle: 'Mahsulotlar',
-    subtitle: 'Mahsulotlarimizni uydan chiqmasdan ko\'ring, narxlarini va mavjudligini aniqlang hamda do\'konimizdan qulay xarid qiling.',
+    subtitle: 'Mahsulotlarimizni uydan chiqmasdan ko\'ring, narxlarini va mavjudligini aniqlang hamda do\'konimizga murojaat qilng.',
     primaryButtonText: 'Katalogga o\'tish',
     primaryButtonLink: '/products',
     secondaryButtonText: 'Do\'kon manzili',
@@ -89,7 +89,7 @@ export const INITIAL_HOMEPAGE_CMS: HomepageCms = {
 export const INITIAL_ABOUT_CMS: AboutCms = {
   title: 'Zamonaviy Uslub va Sifat Markazi',
   subtitle: 'Do\'konimizda mijozlarimizga eng sara kiyim-kechak va poyabzallarni taqdim etib kelamiz.',
-  mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Onlayn do\'konimiz orqali siz uydan chiqmasdan xaridni rejalashtirishingiz mumkin.',
+  mainStory: 'Bizning maqsadimiz — har bir mijozga o\'z uslubiga mos, qulay va uzoq vaqt xizmat qiladigan kiyimlarni qulay narxlarda topishiga yordam berishdir. Onlayn do\'konimiz orqali siz uydan chiqmasdan savol berishingiz mumkin.',
   secondStory: 'Do\'konimizda doimiy ravishda yangi kolleksiyalar yangilanib turadi. Erkaklar, ayollar, bolalar kiyimlari va sifatli oyoq kiyimlarining keng assortimenti sizni kutmoqda.',
   mission: 'Har bir inson uchun zamonaviy kiyinishni oson, shaffof va zavqli jarayonga aylantirish.',
   vision: 'Mintaqadagi eng ishonchli va sevimli mahalliy brendga aylanish.',
