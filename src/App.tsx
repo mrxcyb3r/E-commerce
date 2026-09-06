@@ -29,6 +29,7 @@ const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPa
 import { LoginPage } from './pages/LoginPage';
 import { AdminRoute } from './components/admin/AdminRoute';
 import { AdminLayout } from './components/admin/AdminLayout';
+import { ToastProvider } from './components/common/ToastProvider';
 const DashboardPage = lazyNamed(() => import('./pages/admin/DashboardPage'), 'DashboardPage');
 const ProductsListPage = lazyNamed(() => import('./pages/admin/ProductsListPage'), 'ProductsListPage');
 const ProductEditPage = lazyNamed(() => import('./pages/admin/ProductEditPage'), 'ProductEditPage');
@@ -140,7 +141,9 @@ export default function App() {
                     element={
                       <Suspense fallback={<PageLoader />}>
                         <AdminRoute>
-                          <AdminLayout />
+                          <ToastProvider>
+                            <AdminLayout />
+                          </ToastProvider>
                         </AdminRoute>
                       </Suspense>
                     }

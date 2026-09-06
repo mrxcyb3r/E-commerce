@@ -29,39 +29,28 @@ import { useI18n } from '../../i18n/I18nContext';
 import { useBrand } from '../../hooks/useBrand';
 import { supabase } from '../../lib/supabase/client';
 import type { AdminActivityLog } from '../../types/cms';
+import { motion } from 'motion/react';
+import {
+  AdminPageLayout,
+  StatCard,
+  StatCardGrid,
+  ActionButton,
+  LoadingSkeleton,
+  EmptyState,
+  PageHeader,
+} from '../../components/admin/ui';
 
 const entityMeta: Record<
   AdminActivityLog['entity'],
-  { icon: typeof Package; color: string }
+  { icon: typeof Package }
 > = {
-  product: {
-    icon: Package,
-    color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  },
-  category: {
-    icon: FolderTree,
-    color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  },
-  video: {
-    icon: Film,
-    color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-  },
-  prompt: {
-    icon: Sparkles,
-    color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  },
-  testimonial: {
-    icon: Star,
-    color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
-  },
-  faq: {
-    icon: HelpCircle,
-    color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
-  },
-  store: {
-    icon: Store,
-    color: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
-  },
+  product: { icon: Package },
+  category: { icon: FolderTree },
+  video: { icon: Film },
+  prompt: { icon: Sparkles },
+  testimonial: { icon: Star },
+  faq: { icon: HelpCircle },
+  store: { icon: Store },
 };
 
 export const DashboardPage: React.FC = () => {
@@ -124,66 +113,66 @@ export const DashboardPage: React.FC = () => {
     {
       title: t('admin', 'totalProducts'),
       value: products.length,
-      subtext: `${products.filter((p) => p.published !== false).length} ${t('admin', 'totalProductsSub')}`,
-      icon: Package,
-      color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/50',
-      link: '/admin/products',
+      subtitle: `${products.filter((p) => p.published !== false).length} ${t('admin', 'totalProductsSub')}`,
+      icon: <Package className="w-5 h-5" />,
+      iconBg: 'bg-primary/10',
+      href: '/admin/products',
     },
     {
       title: t('admin', 'categories'),
       value: categories.length,
-      subtext: t('admin', 'categoriesSub'),
-      icon: FolderTree,
-      color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
-      link: '/admin/categories',
+      subtitle: t('admin', 'categoriesSub'),
+      icon: <FolderTree className="w-5 h-5" />,
+      iconBg: 'bg-emerald-500/10',
+      href: '/admin/categories',
     },
     {
       title: t('admin', 'liveFeed'),
       value: (publishedVideos?.length ?? 0),
-      subtext: t('admin', 'liveFeedSub'),
-      icon: Film,
-      color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-900/50',
-      link: '/admin/feed',
+      subtitle: t('admin', 'liveFeedSub'),
+      icon: <Film className="w-5 h-5" />,
+      iconBg: 'bg-purple-500/10',
+      href: '/admin/feed',
     },
     {
       title: t('admin', 'aiPrompts'),
       value: prompts.length,
-      subtext: t('admin', 'aiPromptsSub'),
-      icon: Sparkles,
-      color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-      link: '/admin/prompts',
+      subtitle: t('admin', 'aiPromptsSub'),
+      icon: <Sparkles className="w-5 h-5" />,
+      iconBg: 'bg-amber-500/10',
+      href: '/admin/prompts',
     },
     {
       title: t('admin', 'featuredProducts'),
       value: featuredProducts.length,
-      subtext: t('admin', 'featuredProductsSub'),
-      icon: Star,
-      color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-      link: '/admin/products?filter=featured',
+      subtitle: t('admin', 'featuredProductsSub'),
+      icon: <Star className="w-5 h-5" />,
+      iconBg: 'bg-amber-500/10',
+      href: '/admin/products?filter=featured',
     },
     {
       title: t('admin', 'newArrivals'),
       value: newProducts.length,
-      subtext: t('admin', 'newArrivalsSub'),
-      icon: Sparkle,
-      color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/50',
-      link: '/admin/products?filter=new',
+      subtitle: t('admin', 'newArrivalsSub'),
+      icon: <Sparkle className="w-5 h-5" />,
+      iconBg: 'bg-rose-500/10',
+      href: '/admin/products?filter=new',
     },
     {
       title: t('admin', 'discounted'),
       value: discountedProducts.length,
-      subtext: t('admin', 'discountedSub'),
-      icon: Percent,
-      color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-900/50',
-      link: '/admin/products?filter=discount',
+      subtitle: t('admin', 'discountedSub'),
+      icon: <Percent className="w-5 h-5" />,
+      iconBg: 'bg-teal-500/10',
+      href: '/admin/products?filter=discount',
     },
     {
       title: t('admin', 'stockAlerts'),
       value: outOfStockCount + lowStockCount,
-      subtext: t('admin', 'stockAlertsSub', outOfStockCount, lowStockCount),
-      icon: AlertTriangle,
-      color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50',
-      link: '/admin/inventory',
+      subtitle: t('admin', 'stockAlertsSub', outOfStockCount, lowStockCount),
+      icon: <AlertTriangle className="w-5 h-5" />,
+      iconBg: 'bg-red-500/10',
+      href: '/admin/inventory',
     },
   ];
 
@@ -192,29 +181,25 @@ export const DashboardPage: React.FC = () => {
       title: t('admin', 'addProduct'),
       desc: t('admin', 'addProductDesc'),
       link: '/admin/products/new',
-      icon: Plus,
-      color: 'bg-amber-500 text-neutral-950 hover:bg-amber-400',
+      icon: <Plus className="w-4 h-4" />,
     },
     {
       title: t('admin', 'addVideo'),
       desc: t('admin', 'addVideoDesc'),
       link: '/admin/feed',
-      icon: Film,
-      color: 'bg-neutral-900 text-white dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700',
+      icon: <Film className="w-4 h-4" />,
     },
     {
       title: t('admin', 'addPrompt'),
       desc: t('admin', 'addPromptDesc'),
       link: '/admin/prompts',
-      icon: Sparkles,
-      color: 'bg-neutral-900 text-white dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700',
+      icon: <Sparkles className="w-4 h-4" />,
     },
     {
       title: t('admin', 'addCategory'),
       desc: t('admin', 'addCategoryDesc'),
       link: '/admin/categories',
-      icon: FolderTree,
-      color: 'bg-neutral-900 text-white dark:bg-neutral-800 hover:bg-neutral-800 dark:hover:bg-neutral-700',
+      icon: <FolderTree className="w-4 h-4" />,
     },
   ];
 
@@ -223,65 +208,75 @@ export const DashboardPage: React.FC = () => {
       label: 'Rasmlar fayllari',
       value: `${imageFileCount} fayl`,
       detail: `${storageUsedMb.toFixed(1)} MB taxminiy`,
-      icon: HardDrive,
-      color: 'text-blue-500',
-      child: (
-        <div className="w-full h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden mt-2">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
-            style={{ width: `${storagePct}%` }}
-          />
-        </div>
-      ),
+      icon: <HardDrive className="w-5 h-5" />,
+      iconBg: 'bg-primary/10',
+      progress: storagePct,
     },
     {
       label: 'Ma\'lumotlar bazasi',
       value: dbOnline ? 'Online' : 'Cheklangan',
-      icon: Database,
-      color: dbOnline ? 'text-emerald-500' : 'text-amber-500',
-      pill: (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-900/50">
-          <span className="relative flex w-2 h-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-            <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-500" />
-          </span>
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          Online
-        </span>
-      ),
-      progress: null,
+      icon: <Database className="w-5 h-5" />,
+      iconBg: dbOnline ? 'bg-emerald-500/10' : 'bg-amber-500/10',
+      status: dbOnline ? 'online' : 'limited',
     },
     {
       label: 'Umumiy izohlar',
       value: commentCount,
-      icon: MessageSquare,
-      color: 'text-purple-500',
-      displayValueOnly: true,
+      icon: <MessageSquare className="w-5 h-5" />,
+      iconBg: 'bg-purple-500/10',
     },
     {
       label: 'Jami yoqtirishlar',
       value: likeCount,
-      icon: ThumbsUp,
-      color: 'text-rose-500',
-      displayValueOnly: true,
+      icon: <ThumbsUp className="w-5 h-5" />,
+      iconBg: 'bg-rose-500/10',
     },
   ];
 
   return (
-    <div className="space-y-8">
+    <AdminPageLayout
+      header={{
+        title: t('admin', 'dashboard'),
+        subtitle: t('admin', 'dashboardDesc'),
+        description: t('admin', 'dashboardDesc2'),
+        action: (
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all shadow-sm"
+            >
+              <span>{t('admin', 'viewStore')}</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        ),
+        breadcrumb: [
+          { label: 'Admin' },
+          { label: t('admin', 'dashboard') },
+        ],
+      }}
+    >
       {/* Welcome Banner */}
-      <div className="relative rounded-3xl bg-neutral-900 text-white p-6 sm:p-8 overflow-hidden shadow-xl border border-neutral-800">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="relative rounded-3xl bg-primary text-primary-foreground p-6 sm:p-8 overflow-hidden shadow-xl border border-border"
+      >
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-bold">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>{brand.displayName} — {t('admin', 'dashboard')}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="font-display font-black tracking-tight text-primary-foreground"
+              style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', lineHeight: '1.1' }}>
               {t('admin', 'dashboardDesc')}
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
+            <p className="text-sm text-primary-foreground/70 leading-relaxed">
               {t('admin', 'dashboardDesc2')}
             </p>
           </div>
@@ -290,27 +285,30 @@ export const DashboardPage: React.FC = () => {
             <a
               href="/"
               target="_blank"
-              rel="noreferrer"
-              aria-label={t('admin', 'viewStore')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-all shadow-md active:scale-95"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary-foreground text-primary font-bold text-xs hover:opacity-90 transition-all shadow-md"
             >
               <span>{t('admin', 'viewStore')}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
-            <span className="text-[11px] text-neutral-400 font-medium">
+            <span className="text-[11px] text-muted-foreground font-medium">
               {t('admin', 'location')} {storeInfo.city}
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Quick Action Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
-            {t('admin', 'quickActions')}
-          </h3>
-        </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
+        <PageHeader
+          title={t('admin', 'quickActions')}
+          subtitle={`${quickActions.length} actions available`}
+        />
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
@@ -318,141 +316,152 @@ export const DashboardPage: React.FC = () => {
               <Link
                 key={idx}
                 to={action.link}
-                aria-label={action.title}
-                className={`p-4 rounded-2xl transition-all shadow-xs border border-transparent hover:shadow-md active:scale-[0.98] flex items-start justify-between group ${action.color}`}
+                className="p-4 rounded-2xl transition-all shadow-sm border border-border hover:shadow-md hover:border-muted-foreground/20 group flex items-start justify-between"
               >
                 <div className="space-y-1">
-                  <h4 className="text-sm font-extrabold flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground flex items-center gap-2">
                     <span>{action.title}</span>
                   </h4>
-                  <p className="text-[11px] opacity-80">{action.desc}</p>
+                  <p className="text-sm text-muted-foreground">{action.desc}</p>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-black/10 dark:bg-white/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <Icon className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  {action.icon}
                 </div>
               </Link>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Real Stats Grid */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
-            {t('admin', 'todayStats')}
-          </h3>
-          <span className="text-xs text-neutral-500 dark:text-neutral-400">
-            {t('admin', 'statsNote')}
-          </span>
-        </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
+        <PageHeader
+          title={t('admin', 'todayStats')}
+          subtitle={t('admin', 'statsNote')}
+        />
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <Link
-                key={idx}
-                to={stat.link}
-                aria-label={stat.title}
-                className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
-                    {stat.title}
-                  </span>
-                  <div className={`p-2 rounded-xl border ${stat.color}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
-                    {stat.value}
-                  </div>
-                  <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 mt-1 truncate">
-                    {stat.subtext}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+        <StatCardGrid stats={stats} />
+      </motion.div>
 
       {/* Storage & Health Panel */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-amber-500" />
-            <span>Saqlash va Sog'liq</span>
-          </h3>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
+        <PageHeader
+          title="Saqlash va Sog'liq"
+          subtitle="Storage usage and system health"
+          action={
+            <TrendingUp className="w-4 h-4 text-accent" />
+          }
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {healthCards.map((card, idx) => {
             const Icon = card.icon;
             return (
-              <div
+              <motion.div
                 key={idx}
-                className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs flex flex-col justify-between"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="p-5 rounded-2xl card flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {card.label}
                   </span>
-                  <div className={`p-2 rounded-xl ${card.color} bg-neutral-50 dark:bg-neutral-800`}>
-                    <Icon className="w-4 h-4" />
+                  <div className={`p-2 rounded-xl ${card.iconBg}`}>
+                    {card.icon}
                   </div>
                 </div>
                 <div>
-                  {card.pill ? (
-                    card.pill
-                  ) : (
-                    <div className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
+                  {card.progress !== undefined && (
+                    <>
+                      <div className="text-2xl font-black text-foreground tracking-tight mb-1">
+                        {card.value}
+                      </div>
+                      <p className="text-xs font-medium text-muted-foreground mb-2 truncate">
+                        {card.detail}
+                      </p>
+                      <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden mt-2">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${card.progress}%` }}
+                          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                          className="h-full rounded-full bg-gradient-to-r from-accent to-primary"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {card.status && (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-black text-foreground tracking-tight">
+                          {card.value}
+                        </span>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                          card.status === 'online'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50'
+                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50'
+                        }`}>
+                          <span className="relative flex w-2 h-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75" />
+                            <span className="relative inline-flex rounded-full w-2 h-2 bg-current" />
+                          </span>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {card.status === 'online' ? 'Online' : 'Limited'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {!card.progress && !card.status && (
+                    <div className="text-2xl font-black text-foreground tracking-tight">
                       {card.value}
                     </div>
                   )}
-                  {card.detail && (
-                    <p className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 mt-1 truncate">
-                      {card.detail}
-                    </p>
-                  )}
-                  {card.child}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Two Columns: Recent Products & Activity Log */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         {/* Recent Products (2 cols) */}
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
-                {t('admin', 'recentProducts')}
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                {t('admin', 'recentProductsDesc')}
-              </p>
-            </div>
-            <Link
-              to="/admin/products"
-              aria-label={`${t('admin', 'recentProducts')} ›`}
-              className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline"
-            >
-              <span>{`Barchasini ko'rish (${products.length})`}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+        <div className="lg:col-span-2 card p-6">
+          <PageHeader
+            title={t('admin', 'recentProducts')}
+            subtitle={t('admin', 'recentProductsDesc')}
+            action={
+              <Link
+                to="/admin/products"
+                className="inline-flex items-center gap-1 text-sm font-bold text-accent hover:underline"
+              >
+                Barchasini ko'rish ({products.length})
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            }
+          />
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-sm" role="grid">
               <thead>
-                <tr className="border-b border-neutral-100 dark:border-neutral-800 text-neutral-400 font-bold uppercase text-[10px]">
-                  <th className="pb-3 pl-1">{t('admin', 'product')}</th>
+                <tr className="border-b border-border text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <th className="pb-3 pl-1 text-left">{t('admin', 'product')}</th>
                   <th className="pb-3">{t('admin', 'category')}</th>
                   <th className="pb-3">{t('admin', 'price')}</th>
                   <th className="pb-3">{t('admin', 'stock')}</th>
@@ -460,46 +469,46 @@ export const DashboardPage: React.FC = () => {
                   <th className="pb-3 text-right pr-1">{t('admin', 'action')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              <tbody className="divide-y divide-border/50">
                 {products.slice(0, 6).map((p) => (
-                  <tr key={p.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+                  <tr key={p.id} className="hover:bg-muted/50 transition-colors">
                     <td className="py-3 pl-1">
                       <div className="flex items-center gap-3">
                         <img
                           src={p.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}
                           alt=""
-                          className="w-10 h-10 rounded-xl object-cover border border-neutral-200 dark:border-neutral-700 shrink-0"
+                          className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
                           referrerPolicy="no-referrer"
                         />
                         <div className="min-w-0">
-                          <p className="font-bold text-neutral-900 dark:text-white truncate max-w-[160px] sm:max-w-xs">
+                          <p className="font-semibold text-foreground truncate max-w-[160px] sm:max-w-xs">
                             {p.name}
                           </p>
-                          <span className="text-[10px] text-neutral-400">{p.sku}</span>
+                          <span className="text-xs text-muted-foreground">{p.sku}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 font-medium text-neutral-600 dark:text-neutral-300">
+                    <td className="py-3 font-medium text-muted-foreground">
                       {p.categoryName || p.category}
                     </td>
                     <td className="py-3">
-                      <span className="font-bold text-neutral-900 dark:text-white">
+                      <span className="font-semibold text-foreground">
                         {p.price.toLocaleString('uz-UZ')} so'm
                       </span>
                       {p.originalPrice && p.originalPrice > p.price && (
-                        <span className="block text-[10px] text-neutral-400 line-through">
+                        <span className="block text-xs text-muted-foreground line-through">
                           {p.originalPrice.toLocaleString('uz-UZ')} so'm
                         </span>
                       )}
                     </td>
                     <td className="py-3">
                       {p.inStock ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           <span>{p.stockCount ?? 1} dona</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 dark:text-red-400">
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
                           <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                           <span>{t('admin', 'outOfStock')}</span>
                         </span>
@@ -508,12 +517,12 @@ export const DashboardPage: React.FC = () => {
                     <td className="py-3">
                       <div className="flex items-center gap-1">
                         {p.isFeatured && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[10px] font-bold">
+                          <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-900/50">
                             {t('admin', 'featured')}
                           </span>
                         )}
                         {p.isNew && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold">
+                          <span className="px-1.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-200 dark:border-rose-900/50">
                             {t('admin', 'new')}
                           </span>
                         )}
@@ -522,8 +531,7 @@ export const DashboardPage: React.FC = () => {
                     <td className="py-3 text-right pr-1">
                       <Link
                         to={`/admin/products/${p.id}`}
-                        aria-label={t('admin', 'edit')}
-                        className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-[11px] font-bold text-neutral-900 dark:text-white transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/80 text-xs font-semibold text-foreground transition-colors"
                       >
                         {t('admin', 'edit')}
                       </Link>
@@ -536,16 +544,14 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Real Activity Logs (1 col) */}
-        <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-extrabold text-neutral-900 dark:text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <span>{t('admin', 'recentActivity')}</span>
-            </h3>
-            <span className="text-[11px] font-bold text-neutral-400">
-              {activityLogs.length} {t('admin', 'records')}
-            </span>
-          </div>
+        <div className="card p-6 flex flex-col">
+          <PageHeader
+            title={t('admin', 'recentActivity')}
+            subtitle={`${activityLogs.length} ${t('admin', 'records')}`}
+            action={
+              <Clock className="w-4 h-4 text-accent" />
+            }
+          />
 
           <div className="flex-1 space-y-3 overflow-y-auto max-h-[380px] pr-1 scrollbar-thin">
             {activityLogs.length > 0 ? (
@@ -553,16 +559,17 @@ export const DashboardPage: React.FC = () => {
                 const meta = entityMeta[log.entity] ?? entityMeta.store;
                 const EntityIcon = meta.icon;
                 return (
-                  <div
+                  <motion.div
                     key={log.id}
-                    className="p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-100 dark:border-neutral-800 space-y-1 text-xs"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="p-3 rounded-2xl bg-muted/50 border border-border space-y-1 text-sm"
                   >
-                    <div className="flex items-center justify-between text-[10px] text-neutral-400">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
-                        <span className={`p-1 rounded-lg ${meta.color}`}>
-                          <EntityIcon className="w-3 h-3" />
-                        </span>
-                        <span className="text-amber-600 dark:text-amber-400">
+                        <EntityIcon className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-accent">
                           {log.entity} • {log.action}
                         </span>
                       </span>
@@ -573,20 +580,24 @@ export const DashboardPage: React.FC = () => {
                         })}
                       </span>
                     </div>
-                    <p className="font-medium text-neutral-800 dark:text-neutral-200 text-xs leading-snug">
+                    <p className="font-medium text-foreground text-sm leading-snug">
                       {log.description}
                     </p>
-                  </div>
+                  </motion.div>
                 );
               })
             ) : (
-              <p className="text-xs text-neutral-400 text-center py-8">
-                {t('admin', 'noActivity')}
-              </p>
+              <EmptyState
+                illustration="document"
+                title={t('admin', 'noActivity')}
+                description="No recent activity recorded"
+              />
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </AdminPageLayout>
   );
 };
+
+export default DashboardPage;

@@ -199,63 +199,63 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-xs lg:hidden"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-neutral-900 text-white flex flex-col border-r border-neutral-800 transition-transform duration-200 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-card text-card-foreground flex flex-col border-r border-border transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-neutral-800 shrink-0">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-border shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-amber-500 text-neutral-950 font-black text-sm flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-accent text-accent-foreground font-black text-sm flex items-center justify-center shadow-sm">
               {storeInfo.businessName?.charAt(0) || 'D'}
             </div>
             <div>
-              <div className="font-extrabold text-sm tracking-tight text-white flex items-center gap-1.5">
+              <div className="font-extrabold text-sm tracking-tight text-foreground flex items-center gap-1.5">
                 <span>{storeInfo.businessName}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-400/20 text-amber-300">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-accent/20 text-accent">
                   CMS
                 </span>
               </div>
-              <p className="text-[11px] text-neutral-400">Boshqaruv markazi</p>
+              <p className="text-[11px] text-muted-foreground">Boshqaruv markazi</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-neutral-400 hover:text-white lg:hidden"
+            className="p-1 rounded-lg text-muted-foreground hover:text-foreground lg:hidden"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Store Live Link */}
-        <div className="p-3 border-b border-neutral-800 bg-neutral-950/40">
+        <div className="p-3 border-b border-border bg-muted/40">
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-between px-3 py-2 rounded-xl bg-neutral-800/80 hover:bg-neutral-800 text-xs font-semibold text-neutral-300 hover:text-white transition-all group"
+            className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted hover:bg-muted/80 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all group"
           >
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
               <span>Saytni jonli ko'rish</span>
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-neutral-400 group-hover:text-white" />
+            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground" />
           </a>
         </div>
 
         {/* Nav Links */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-neutral-800">
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin">
           {navSections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
-              <div className="px-3 text-[10px] font-bold tracking-wider text-neutral-500 uppercase">
+              <div className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                 {section.title}
               </div>
               <div className="space-y-0.5 mt-1">
@@ -270,8 +270,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                       className={({ isActive }) =>
                         `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                           isActive
-                            ? 'bg-amber-500 text-neutral-950 font-bold shadow-sm'
-                            : 'text-neutral-300 hover:text-white hover:bg-neutral-800/60'
+                            ? 'bg-accent text-accent-foreground font-bold shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                         }`
                       }
                     >
@@ -280,7 +280,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-neutral-800 text-neutral-300 group-hover:bg-neutral-700">
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-muted text-muted-foreground group-hover:bg-muted/80">
                           {item.badge}
                         </span>
                       )}
@@ -293,17 +293,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         </div>
 
         {/* User Footer & Logout */}
-        <div className="p-3 border-t border-neutral-800 bg-neutral-950/60 shrink-0">
-          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-neutral-800/40">
+        <div className="p-3 border-t border-border bg-muted/40 shrink-0">
+          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted/40">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-full bg-neutral-700 text-white font-bold text-xs flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-full bg-muted text-foreground font-bold text-xs flex items-center justify-center shrink-0">
                 {user?.username?.charAt(0).toUpperCase() || 'A'}
               </div>
               <div className="truncate">
-                <p className="text-xs font-bold text-white truncate">
+                <p className="text-xs font-bold text-foreground truncate">
                   {user?.username || 'admin'}
                 </p>
-                <p className="text-[10px] text-neutral-400 truncate">Administrator</p>
+                <p className="text-[10px] text-muted-foreground truncate">Administrator</p>
               </div>
             </div>
 
@@ -311,7 +311,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={handleLogout}
               title="Chiqish"
-              className="p-2 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-950/30 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -321,3 +321,5 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     </>
   );
 };
+
+export default AdminSidebar;
