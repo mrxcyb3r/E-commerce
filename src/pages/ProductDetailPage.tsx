@@ -159,7 +159,7 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="pt-32 pb-24 max-w-2xl mx-auto px-4 text-center space-y-6">
-        <h2 className="text-3xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+        <h2 className="text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
           {t('pages', 'productNotFound.heading')}
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -167,7 +167,7 @@ export const ProductDetailPage: React.FC = () => {
         </p>
         <Link
           to="/products"
-          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black text-sm shadow-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground font-black text-sm shadow-sm hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           {t('pages', 'productNotFound.backToCatalog')}
@@ -205,22 +205,22 @@ export const ProductDetailPage: React.FC = () => {
     <div className="pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Breadcrumb navigation */}
       <nav className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-8 overflow-x-auto whitespace-nowrap font-medium">
-        <Link to="/" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+        <Link to="/" className="hover:text-foreground transition-colors">
           Asosiy
         </Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <Link to="/products" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+        <Link to="/products" className="hover:text-foreground transition-colors">
           Mahsulotlar
         </Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <Link
           to={`/products?category=${product.category}`}
-          className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+          className="hover:text-foreground transition-colors"
         >
           {product.categoryName}
         </Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="font-bold text-zinc-900 dark:text-white truncate">
+        <span className="font-bold text-foreground truncate">
           {product.name}
         </span>
       </nav>
@@ -249,7 +249,7 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:scale-90"
+                  className="p-2.5 rounded-xl border border-border text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:scale-90"
                   title={t('common', 'share')}
                   aria-label={t('common', 'share')}
                 >
@@ -261,7 +261,7 @@ export const ProductDetailPage: React.FC = () => {
                   className={`p-2.5 rounded-xl border transition-colors ${
                     favorite
                       ? 'bg-rose-50 border-rose-200 text-rose-500 dark:bg-rose-950/40 dark:border-rose-800'
-                      : 'border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      : 'border-border text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                   }`}
                   title={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
                   aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
@@ -271,13 +271,13 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
               {product.name}
             </h1>
 
             {/* Price Box */}
             <div className="flex items-baseline gap-3 pt-1">
-              <span className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+              <span className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                 {formatPrice(product.price)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
@@ -311,14 +311,14 @@ export const ProductDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <hr className="border-zinc-200 dark:border-zinc-800" />
+          <hr className="border-border" />
 
           {/* Color Selection */}
           {product.colors.length > 0 && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-black uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
-                  {t('product', 'color')} <strong className="text-zinc-900 dark:text-white font-black">{selectedColor}</strong>
+                  {t('product', 'color')} <strong className="text-foreground font-black">{selectedColor}</strong>
                 </span>
               </div>
               <div className="flex flex-wrap gap-2.5">
@@ -331,8 +331,8 @@ export const ProductDetailPage: React.FC = () => {
                       onClick={() => setSelectedColor(c.name)}
                       className={`group flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all ${
                         isSelected
-                          ? 'border-zinc-900 dark:border-white bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs'
-                          : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400'
+                          ? 'border-zinc-900 dark:border-white bg-zinc-100 dark:bg-zinc-800 text-foreground shadow-xs'
+                          : 'border-border text-zinc-600 dark:text-zinc-400 hover:border-zinc-400'
                       }`}
                     >
                       <span
@@ -352,7 +352,7 @@ export const ProductDetailPage: React.FC = () => {
             <div className="space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-black uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
-                  {t('product', 'size')} <strong className="text-zinc-900 dark:text-white font-black">{selectedSize}</strong>
+                  {t('product', 'size')} <strong className="text-foreground font-black">{selectedSize}</strong>
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -365,8 +365,8 @@ export const ProductDetailPage: React.FC = () => {
                       onClick={() => setSelectedSize(sz)}
                       className={`px-4 py-2 rounded-xl text-xs font-mono font-black border transition-all ${
                         isSelected
-                          ? 'bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-950 dark:border-white shadow-xs'
-                          : 'bg-white dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
+                          ? 'bg-foreground text-background border-foreground dark:bg-card dark:text-card-foreground dark:border-card shadow-xs'
+                          : 'bg-card/80 border-border text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
                       }`}
                     >
                       {sz}
@@ -386,7 +386,7 @@ export const ProductDetailPage: React.FC = () => {
               disabled={!product.inStock}
               className={`w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl font-black text-base tracking-wide transition-all ${
                 product.inStock
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-md hover:shadow-lg'
+                  ? 'bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-md hover:shadow-lg'
                   : 'bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed shadow-none'
               }`}
             >
@@ -399,7 +399,7 @@ export const ProductDetailPage: React.FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => track('telegram_click', { productId: product.id })}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
             >
               <Send className="w-4 h-4 text-blue-500" />
               <span>{t('product', 'askTelegram')}</span>
@@ -408,32 +408,32 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* Trust badges + delivery info */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60">
+            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-border/60">
               <BadgeCheck className="w-5 h-5 text-zinc-700 dark:text-zinc-300 shrink-0" />
               <div>
-                <div className="text-xs font-black text-zinc-900 dark:text-white">{t('product', 'trustAuthentic')}</div>
+                <div className="text-xs font-black text-foreground">{t('product', 'trustAuthentic')}</div>
                 <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">{t('product', 'inStock')}</div>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60">
+            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-border/60">
               <Store className="w-5 h-5 text-zinc-700 dark:text-zinc-300 shrink-0" />
               <div>
-                <div className="text-xs font-black text-zinc-900 dark:text-white">{t('product', 'trustVisitStore')}</div>
+                <div className="text-xs font-black text-foreground">{t('product', 'trustVisitStore')}</div>
                 <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">{storeInfo.address}</div>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60">
+            <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-border/60">
               <Truck className="w-5 h-5 text-zinc-700 dark:text-zinc-300 shrink-0" />
               <div>
-                <div className="text-xs font-black text-zinc-900 dark:text-white">{t('product', 'trustDelivery')}</div>
+                <div className="text-xs font-black text-foreground">{t('product', 'trustDelivery')}</div>
                 <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">{t('product', 'localDelivery', storeInfo.city)}</div>
               </div>
             </div>
           </div>
 
           {/* Visit notice banner */}
-          <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-black text-zinc-900 dark:text-white">
+          <div className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-border/60 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-black text-foreground">
               <MapPin className="w-4 h-4 text-zinc-700 dark:text-zinc-300 shrink-0" />
               <span>{storeInfo.address}</span>
             </div>
@@ -444,7 +444,7 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* Description & Features */}
           <div className="space-y-3 pt-2">
-            <h3 className="text-sm font-black uppercase tracking-wider text-zinc-900 dark:text-white font-['Outfit',sans-serif]">
+            <h3 className="text-sm font-black uppercase tracking-wider text-foreground font-['Outfit',sans-serif]">
               {t('product', 'description')}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
@@ -466,10 +466,10 @@ export const ProductDetailPage: React.FC = () => {
 
       {/* Related Products Carousel */}
       {relatedProducts.length > 0 && (
-        <div className="mt-24 pt-12 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="mt-24 pt-12 border-t border-border">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                 {t('product', 'similar')}
               </h2>
               <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
@@ -478,7 +478,7 @@ export const ProductDetailPage: React.FC = () => {
             </div>
             <Link
               to={`/products?category=${product.category}`}
-              className="text-xs font-black text-zinc-900 dark:text-white hover:underline uppercase tracking-wider"
+              className="text-xs font-black text-foreground hover:underline uppercase tracking-wider"
             >
               {t('common', 'viewAllRight')}
             </Link>
@@ -494,8 +494,8 @@ export const ProductDetailPage: React.FC = () => {
 
       {/* Recently Viewed strip */}
       {viewedProducts.length > 0 && (
-        <section className="mt-20 pt-12 border-t border-zinc-200 dark:border-zinc-800">
-          <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
+        <section className="mt-20 pt-12 border-t border-border">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
             <History className="w-5 h-5 text-zinc-400 shrink-0" />
             {t('product', 'recentlyViewed')}
           </h2>
@@ -516,9 +516,9 @@ export const ProductDetailPage: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}
-          className="mt-20 pt-12 border-t border-zinc-200 dark:border-zinc-800"
+          className="mt-20 pt-12 border-t border-border"
         >
-          <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-zinc-400" />
             {t('product', 'frequentlyBought')}
           </h2>
@@ -557,7 +557,7 @@ export const ProductDetailPage: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 120, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="md:hidden fixed left-0 right-0 bottom-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]"
+            className="md:hidden fixed left-0 right-0 bottom-0 z-40 bg-card/90 backdrop-blur-xl border-t border-border shadow-[0_-8px_30px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]"
             role="region"
             aria-label={t('product', 'visitStore')}
           >
@@ -566,17 +566,17 @@ export const ProductDetailPage: React.FC = () => {
                 <img
                   src={product.images[0]}
                   alt={product.name}
-                  className="w-11 h-11 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shrink-0"
+                  className="w-11 h-11 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-800 border border-border shrink-0"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-11 h-11 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shrink-0 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-border shrink-0 flex items-center justify-center">
                   <PackageX className="w-5 h-5 text-zinc-400" />
                 </div>
               )}
               <div className="min-w-0 flex-1">
                 <div className="truncate text-xs font-bold text-zinc-700 dark:text-zinc-300">{product.name}</div>
-                <div className="text-base font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+                <div className="text-base font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                   {formatPrice(product.price)}
                 </div>
               </div>
@@ -586,7 +586,7 @@ export const ProductDetailPage: React.FC = () => {
                   onClick={() => setIsVisitModalOpen(true)}
                   disabled={!product.inStock}
                   aria-label={t('product', 'visitStore')}
-                  className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors active:scale-95"
+                  className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors active:scale-95"
                 >
                   <Store className="w-4 h-4" />
                   <span className="hidden [@media(min-width:360px)]:inline">{t('product', 'visitStore')}</span>

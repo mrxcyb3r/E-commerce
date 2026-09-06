@@ -69,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       );
     }
     return (
-      <div className="w-full h-full flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500">
+      <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
         <Package className="w-16 h-16 opacity-50" />
       </div>
     );
@@ -83,8 +83,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         onClick={handleFavorite}
         className={`p-2.5 rounded-full backdrop-blur-sm shadow-lg transition-all ${
           favorite
-            ? 'bg-rose-500 text-white shadow-rose-500/40'
-            : 'bg-white/90 text-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800'
+            ? 'bg-destructive text-destructive-foreground shadow-destructive/40'
+            : 'bg-card/90 text-foreground hover:bg-card border border-border'
         }`}
         aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
       >
@@ -95,7 +95,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={handleQuickView}
-        className="p-2.5 rounded-full bg-white/90 backdrop-blur-sm text-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-lg transition-all"
+        className="p-2.5 rounded-full bg-card/90 backdrop-blur-sm text-foreground hover:bg-card border border-border shadow-lg transition-all"
         aria-label="Quick view"
       >
         <Eye className="w-5 h-5" />
@@ -105,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={handleAddToCart}
-        className="p-2.5 rounded-full bg-zinc-950 text-white hover:bg-zinc-800 shadow-lg transition-all"
+        className="p-2.5 rounded-full bg-foreground text-background hover:opacity-90 shadow-lg transition-all"
         aria-label="Add to cart"
       >
         <ShoppingBag className="w-5 h-5" />
@@ -122,7 +122,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         className="pointer-events-auto"
       >
         {isOnSale && (
-          <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest bg-amber-500 text-zinc-950 rounded-full shadow-md">
+          <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full shadow-md">
             Sale
           </span>
         )}
@@ -140,8 +140,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           onClick={handleFavorite}
           className={`p-2 rounded-full backdrop-blur-sm shadow-md transition-all ${
             favorite
-              ? 'bg-rose-500 text-white shadow-rose-500/30'
-              : 'bg-white/90 text-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800'
+              ? 'bg-destructive text-destructive-foreground shadow-destructive/30'
+              : 'bg-card/90 text-foreground hover:bg-card border border-border'
           }`}
           aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
         >
@@ -168,7 +168,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             className="block relative overflow-hidden rounded-2xl"
             aria-label={`View ${product.name}`}
           >
-            <div className={`relative ${aspectRatio} overflow-hidden bg-zinc-100 dark:bg-zinc-900`}>
+            <div className={`relative ${aspectRatio} overflow-hidden bg-muted`}>
               {renderImage()}
 
               <div
@@ -183,7 +183,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                       {product.categoryName}
                     </span>
                     {isOnSale && (
-                      <span className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-500 text-zinc-950 rounded-full">
+                      <span className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
                         Sale
                       </span>
                     )}
@@ -196,7 +196,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                       onClick={handleFavorite}
                       className={`p-2.5 rounded-full backdrop-blur-sm transition-all ${
                         favorite
-                          ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                          ? 'bg-destructive text-destructive-foreground shadow-lg shadow-destructive/30'
                           : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                       }`}
                       aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -218,7 +218,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleAddToCart}
-                      className="p-2.5 rounded-full bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all"
+                      className="p-2.5 rounded-full bg-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/30 transition-all"
                       aria-label="Add to cart"
                     >
                       <ShoppingBag className="w-5 h-5" />
@@ -236,7 +236,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 className="pointer-events-auto"
               >
                 {isOnSale && (
-                  <span className="inline-block px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-amber-500 text-zinc-950 rounded-full shadow-lg">
+                  <span className="inline-block px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full shadow-lg">
                     -{Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}%
                   </span>
                 )}
@@ -254,7 +254,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   onClick={handleFavorite}
                   className={`p-2.5 rounded-full backdrop-blur-sm transition-all shadow-lg ${
                     favorite
-                      ? 'bg-rose-500 text-white shadow-rose-500/40'
+                      ? 'bg-destructive text-destructive-foreground shadow-destructive/40'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                   }`}
                   aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -268,29 +268,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="mt-5 text-center">
             <Link
               to={`/products/${product.id}`}
-              className="font-display font-black text-zinc-950 dark:text-white hover:text-amber-500 transition-colors line-clamp-1 group-hover:text-amber-500"
+              className="font-display font-black text-foreground hover:text-accent transition-colors line-clamp-1 group-hover:text-accent"
               style={{ fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', letterSpacing: '-0.02em' }}
             >
               {product.name}
             </Link>
 
             <div className="mt-2 flex items-center justify-center gap-3">
-              <div className="font-display font-black text-zinc-950 dark:text-white"
+              <div className="font-display font-black text-foreground"
                 style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)' }}>
                 {formatPrice(product.price)}
               </div>
               {isOnSale && (
-                <div className="font-display font-medium text-zinc-400 line-through"
+                <div className="font-display font-medium text-muted-foreground line-through"
                   style={{ fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
                   {formatPrice(product.originalPrice!)}
                 </div>
               )}
             </div>
 
-            <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold"
-              style={{ color: product.inStock ? '#059669' : '#dc2626' }}>
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-full"
-                style={{ background: product.inStock ? '#d1fae5' : '#fee2e2', color: product.inStock ? '#059669' : '#dc2626' }}>
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-semibold">
+              <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full ${product.inStock ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
                 {product.inStock ? (
                   <>
                     <Check className="w-3 h-3" />
@@ -322,7 +320,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Link
         to={`/products/${product.id}`}
-        className="block relative overflow-hidden rounded-xl bg-zinc-50 dark:bg-zinc-950"
+        className="block relative overflow-hidden rounded-xl bg-card"
         aria-label={`View ${product.name}`}
       >
         <div className={`relative ${aspectRatio} overflow-hidden`}>
@@ -340,14 +338,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         <div className="mt-4 px-1">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               {product.categoryName}
             </span>
           </div>
 
           <Link
             to={`/products/${product.id}`}
-            className="font-display font-black text-zinc-950 dark:text-white hover:text-amber-500 transition-colors line-clamp-1 group-hover:text-amber-500 mb-3 block"
+            className="font-display font-black text-foreground hover:text-accent transition-colors line-clamp-1 group-hover:text-accent mb-3 block"
             style={{ fontSize: '1.0625rem', letterSpacing: '-0.015em' }}
           >
             {product.name}
@@ -355,22 +353,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           <div className="flex items-end justify-between">
             <div className="flex items-baseline gap-2">
-              <div className="font-display font-black text-zinc-950 dark:text-white"
+              <div className="font-display font-black text-foreground"
                 style={{ fontSize: '1.125rem' }}>
                 {formatPrice(product.price)}
               </div>
               {isOnSale && (
-                <div className="font-display font-medium text-zinc-400 line-through"
+                <div className="font-display font-medium text-muted-foreground line-through"
                   style={{ fontSize: '0.875rem' }}>
                   {formatPrice(product.originalPrice!)}
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-1 text-[10px] font-semibold"
-              style={{ color: product.inStock ? '#059669' : '#dc2626' }}>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{ background: product.inStock ? '#d1fae5' : '#fee2e2' }}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold">
+              <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${product.inStock ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
                 {product.inStock ? (
                   <>
                     <Check className="w-3 h-3" />

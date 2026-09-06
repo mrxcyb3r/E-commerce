@@ -36,7 +36,7 @@ export const AnnouncementBar: React.FC = () => {
 
   return (
     <div
-      className="border-y border-zinc-200/20 bg-zinc-950 text-zinc-400 px-4 sm:px-6 lg:px-8 py-2.5 text-sm font-medium transition-colors dark:bg-zinc-950/80 dark:text-zinc-400"
+      className="border-y border-border/20 bg-background text-zinc-400 px-4 sm:px-6 lg:px-8 py-2.5 text-sm font-medium transition-colors dark:bg-zinc-950/80 dark:text-zinc-400"
     >
       <div className="flex items-center gap-3 w-full">
         <span>{announcement}</span>

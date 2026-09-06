@@ -38,7 +38,7 @@ export const ReviewsSection: React.FC = () => {
   const review = reviews[index];
 
   return (
-    <section className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors">
+    <section className="py-16 md:py-24 bg-zinc-50/50 dark:bg-background transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -51,7 +51,7 @@ export const ReviewsSection: React.FC = () => {
             <MessageSquareQuote className="w-3.5 h-3.5" />
             <span>Mijozlarimiz fikrlari</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {homepageCms.testimonialsSectionTitle || 'Xaridorlar nima deydi?'}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -73,7 +73,7 @@ export const ReviewsSection: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: reduceMotion ? 0 : direction * -48 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-8 sm:p-10 flex flex-col items-center text-center"
+                className="bg-card rounded-3xl border border-border shadow-sm p-8 sm:p-10 flex flex-col items-center text-center"
               >
                 <div className="flex items-center justify-center">
                   <span className="w-12 h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center">
@@ -98,7 +98,7 @@ export const ReviewsSection: React.FC = () => {
                   "{review.comment}"
                 </blockquote>
 
-                <figcaption className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-3 w-full justify-center">
+                <figcaption className="mt-6 pt-6 border-t border-zinc-100 dark:border-border flex items-center gap-3 w-full justify-center">
                   {review.avatar && (
                     <img
                       src={review.avatar}
@@ -107,7 +107,7 @@ export const ReviewsSection: React.FC = () => {
                     />
                   )}
                   <div className="text-left">
-                    <div className="text-sm font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif]">
+                    <div className="text-sm font-black text-foreground font-['Outfit',sans-serif]">
                       {review.name}
                     </div>
                     <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
@@ -131,7 +131,7 @@ export const ReviewsSection: React.FC = () => {
                 type="button"
                 onClick={prev}
                 aria-label="Avvalgi sharh"
-                className="absolute left-0 sm:-left-16 top-1/2 -translate-y-1/2 translate-x-0 w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
+                className="absolute left-0 sm:-left-16 top-1/2 -translate-y-1/2 translate-x-0 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -139,7 +139,7 @@ export const ReviewsSection: React.FC = () => {
                 type="button"
                 onClick={next}
                 aria-label="Keyingi sharh"
-                className="absolute right-0 sm:-right-16 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
+                className="absolute right-0 sm:-right-16 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-300 hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-zinc-950 transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

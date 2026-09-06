@@ -60,7 +60,7 @@ import { useStore } from './context/StoreContext';
 
 const PageLoader: React.FC = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="w-8 h-8 rounded-full border-2 border-zinc-200 dark:border-zinc-700 border-t-amber-500 animate-spin" />
+    <div className="w-8 h-8 rounded-full border-2 border-border border-t-accent animate-spin" />
   </div>
 );
 
@@ -135,7 +135,7 @@ export default function App() {
                   <Route
                     path="/*"
                     element={
-                      <div className="min-h-screen bg-[#fafafa] dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 flex flex-col font-sans transition-colors duration-200 selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-950">
+                      <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200 selection:bg-foreground selection:text-background">
                         <a href="#main-content" className="skip-link" aria-label="Asosiy kontentga o'tish">
                           Kontentga o'tish
                         </a>

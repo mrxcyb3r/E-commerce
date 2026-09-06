@@ -9,10 +9,10 @@ import type { TrustStatItem } from '../../types/cms';
 export const TrustStats: React.FC = () => {
   const { homepageCms, publishedProducts } = useStore();
   const icons = [
-    <Package className="w-5 h-5 text-zinc-900 dark:text-white" />,
-    <Sparkles className="w-5 h-5 text-zinc-900 dark:text-white" />,
-    <CheckCircle2 className="w-5 h-5 text-zinc-900 dark:text-white" />,
-    <Store className="w-5 h-5 text-zinc-900 dark:text-white" />,
+    <Package className="w-5 h-5 text-foreground" />,
+    <Sparkles className="w-5 h-5 text-foreground" />,
+    <CheckCircle2 className="w-5 h-5 text-foreground" />,
+    <Store className="w-5 h-5 text-foreground" />,
   ];
 
   const stats = useMemo<TrustStatItem[]>(() => {
@@ -26,7 +26,7 @@ export const TrustStats: React.FC = () => {
   }, [homepageCms, publishedProducts.length]);
 
   return (
-    <section className="border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 py-8 transition-colors">
+    <section className="border-y border-border bg-card/50 py-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {stats.map((stat, index) => (
@@ -38,14 +38,14 @@ export const TrustStats: React.FC = () => {
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="flex items-start gap-3.5 min-w-0"
             >
-              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700">
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-border">
                 {icons[index % icons.length]}
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                   <CountUp
                     value={stat.value}
-                    className="font-black text-lg sm:text-2xl text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight"
+                    className="font-black text-lg sm:text-2xl text-foreground font-['Outfit',sans-serif] tracking-tight"
                   />
                   <span className="font-extrabold text-sm sm:text-base text-zinc-800 dark:text-zinc-200">
                     {stat.label}

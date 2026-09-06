@@ -21,7 +21,7 @@ export const NewsletterBand: React.FC = () => {
   };
 
   return (
-    <section id="newsletter" className="bg-zinc-900 dark:bg-zinc-950 border-b border-zinc-800 dark:border-zinc-900 py-12 transition-colors">
+    <section id="newsletter" className="bg-foreground dark:bg-background border-b border-border dark:border-zinc-900 py-12 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5">
@@ -29,7 +29,7 @@ export const NewsletterBand: React.FC = () => {
               <Mail className="w-4 h-4" />
               <span>{t('pages', 'sections.newsletterEyebrow')}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white font-['Outfit',sans-serif] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-background font-['Outfit',sans-serif] tracking-tight">
               {t('pages', 'sections.newsletterTitle')}
             </h2>
             <p className="text-sm text-zinc-400 font-normal">
@@ -47,13 +47,13 @@ export const NewsletterBand: React.FC = () => {
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('pages', 'sections.newsletterPlaceholder')}
+               placeholder={t('pages', 'sections.newsletterPlaceholder')}
               autoComplete="email"
-              className="flex-1 px-4 py-3 rounded-xl bg-zinc-800/80 dark:bg-zinc-900 border border-zinc-700 dark:border-zinc-800 text-sm text-white placeholder:text-zinc-500 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/70"
+              className="flex-1 px-4 py-3 rounded-xl bg-zinc-800/80 dark:bg-card border border-zinc-700 dark:border-border text-sm text-white placeholder:text-zinc-500 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/70"
             />
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-zinc-900 text-sm font-black hover:bg-zinc-200 transition-colors shadow-sm"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-card text-foreground text-sm font-black hover:bg-zinc-200 transition-colors shadow-sm"
               aria-label={t('pages', 'sections.newsletterButtonAria')}
             >
               <Send className="w-4 h-4" />

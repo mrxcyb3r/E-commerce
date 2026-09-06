@@ -13,14 +13,14 @@ export const FaqSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-zinc-900 transition-colors">
+    <section className="py-16 md:py-24 bg-card transition-colors">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center mb-12 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Savol-javoblar</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {homepageCms.faqSectionTitle || "Umumiy savollar"}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto font-normal">
@@ -35,7 +35,7 @@ export const FaqSection: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 overflow-hidden transition-colors"
+                className="rounded-2xl border border-border bg-zinc-50/50 dark:bg-zinc-800/40 overflow-hidden transition-colors"
               >
                 <button
                   type="button"
@@ -43,12 +43,12 @@ export const FaqSection: React.FC = () => {
                   aria-expanded={isOpen}
                   className="w-full px-6 py-5 flex items-center justify-between gap-4 text-left transition-colors hover:bg-zinc-100/60 dark:hover:bg-zinc-800/80 focus:outline-none"
                 >
-                  <span className="text-sm sm:text-base font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+                  <span className="text-sm sm:text-base font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                     {item.question}
                   </span>
                   <div
-                    className={`w-7 h-7 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-zinc-200 dark:border-zinc-700 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'text-zinc-600 dark:text-zinc-400'
+                    className={`w-7 h-7 rounded-full bg-card flex items-center justify-center shrink-0 border border-border transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 bg-foreground text-background dark:bg-card dark:text-card-foreground' : 'text-zinc-600 dark:text-zinc-400'
                     }`}
                   >
                     <ChevronDown className="w-4 h-4" />

@@ -137,7 +137,7 @@ export const ProductsPage: React.FC = () => {
       {/* Page Header */}
       <div className="mb-8 space-y-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {t('pages', 'catalog.title')}
           </h1>
           <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 mt-1">
@@ -146,7 +146,7 @@ export const ProductsPage: React.FC = () => {
         </div>
 
         {/* Search & Sort Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-3 sm:p-4 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3 sm:p-4 rounded-3xl border border-border shadow-xs">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -156,7 +156,7 @@ export const ProductsPage: React.FC = () => {
               value={filters.searchQuery}
               onChange={(e) => handleFilterChange({ ...filters, searchQuery: e.target.value })}
               placeholder={t('pages', 'catalog.searchPlaceholder')}
-              className="w-full pl-11 pr-10 py-2.5 rounded-2xl text-sm bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all"
+              className="w-full pl-11 pr-10 py-2.5 rounded-2xl text-sm bg-zinc-100 dark:bg-zinc-800/80 text-foreground placeholder-zinc-400 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all"
             />
             {filters.searchQuery && (
               <button
@@ -179,7 +179,7 @@ export const ProductsPage: React.FC = () => {
               <SlidersHorizontal className="w-3.5 h-3.5" />
               <span>{t('pages', 'catalog.filters')}</span>
               {activeFilterCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 text-[10px] flex items-center justify-center font-black">
+                <span className="w-4 h-4 rounded-full bg-foreground text-background dark:bg-card dark:text-card-foreground text-[10px] flex items-center justify-center font-black">
                   {activeFilterCount}
                 </span>
               )}
@@ -208,7 +208,7 @@ export const ProductsPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <span className="text-xs text-zinc-400 font-bold">{t('pages', 'catalog.activeFilters')}</span>
             {filters.category && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-foreground text-background dark:bg-card dark:text-card-foreground font-bold">
                 {t('pages', 'catalog.chipCategory', filters.category)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, category: '' })}>
                   <X className="w-3 h-3" />
@@ -216,7 +216,7 @@ export const ProductsPage: React.FC = () => {
               </span>
             )}
             {filters.size && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-foreground text-background dark:bg-card dark:text-card-foreground font-bold">
                 {t('pages', 'catalog.chipSize', filters.size)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, size: '' })}>
                   <X className="w-3 h-3" />
@@ -224,7 +224,7 @@ export const ProductsPage: React.FC = () => {
               </span>
             )}
             {filters.color && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-foreground text-background dark:bg-card dark:text-card-foreground font-bold">
                 {t('pages', 'catalog.chipColor', filters.color)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, color: '' })}>
                   <X className="w-3 h-3" />
@@ -232,7 +232,7 @@ export const ProductsPage: React.FC = () => {
               </span>
             )}
             {filters.maxPrice && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs bg-foreground text-background dark:bg-card dark:text-card-foreground font-bold">
                 {t('pages', 'catalog.chipMax', `${new Intl.NumberFormat('uz-UZ').format(filters.maxPrice)} so'm`)}
                 <button type="button" onClick={() => handleFilterChange({ ...filters, maxPrice: null })}>
                   <X className="w-3 h-3" />
@@ -274,13 +274,13 @@ export const ProductsPage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-zinc-900 rounded-3xl p-12 text-center border border-zinc-200 dark:border-zinc-800 space-y-4"
+              className="bg-card rounded-3xl p-12 text-center border border-border space-y-4"
             >
               <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
                 <Search className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                   {t('pages', 'catalog.emptyTitle')}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
@@ -291,7 +291,7 @@ export const ProductsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="px-6 py-3 rounded-xl text-xs font-black bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs uppercase tracking-wider"
+                  className="px-6 py-3 rounded-xl text-xs font-black bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs uppercase tracking-wider"
                 >
                   {t('pages', 'catalog.clearFilters')}
                 </button>

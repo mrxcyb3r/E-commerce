@@ -54,7 +54,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 z-10 space-y-6 overflow-hidden"
+          className="relative w-full max-w-lg bg-card rounded-3xl shadow-2xl border border-border p-6 sm:p-8 z-10 space-y-6 overflow-hidden"
         >
           {/* Close button */}
           <button
@@ -71,7 +71,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Do'konda mavjud</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
               Do'konda ko'rish & Band qilish
             </h3>
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-normal">
@@ -80,17 +80,17 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           </div>
 
           {/* Product Summary Mini Card */}
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-border/60">
             <img
               src={product.images?.[0]}
               alt={product.name}
               className="w-16 h-16 rounded-xl object-cover bg-zinc-200 shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-black text-zinc-900 dark:text-white truncate">
+              <div className="text-sm font-black text-foreground truncate">
                 {product.name}
               </div>
-              <div className="text-base font-black text-zinc-900 dark:text-white">
+              <div className="text-base font-black text-foreground">
                 {formatPrice(product.price)}
               </div>
               <div className="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-medium">
@@ -103,12 +103,12 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           {/* Store info snapshot */}
           <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400 font-medium">
             <div className="flex items-start gap-2.5">
-              <MapPin className="w-4 h-4 text-zinc-900 dark:text-white shrink-0 mt-0.5" />
-              <span><strong className="text-zinc-900 dark:text-white font-bold">Manzil:</strong> {storeInfo.address} ({storeInfo.landmark})</span>
+              <MapPin className="w-4 h-4 text-foreground shrink-0 mt-0.5" />
+              <span><strong className="text-foreground font-bold">Manzil:</strong> {storeInfo.address} ({storeInfo.landmark})</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-zinc-900 dark:text-white shrink-0" />
-              <span><strong className="text-zinc-900 dark:text-white font-bold">Ish vaqti:</strong> {storeInfo.workingHours}</span>
+              <Clock className="w-4 h-4 text-foreground shrink-0" />
+              <span><strong className="text-foreground font-bold">Ish vaqti:</strong> {storeInfo.workingHours}</span>
             </div>
           </div>
 
@@ -118,7 +118,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
               href={telegramLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-xl text-sm font-black bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs"
+              className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-xl text-sm font-black bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-xs"
             >
               <Send className="w-4 h-4" />
               <span>Telegram orqali sotuvchiga yozish</span>
@@ -127,7 +127,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
             <div className="grid grid-cols-2 gap-2.5">
               <a
                 href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
-                className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>Qo'ng'iroq qilish</span>
@@ -137,7 +137,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
                 href={googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black bg-zinc-100 dark:bg-zinc-800 text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Xaritada ochish</span>

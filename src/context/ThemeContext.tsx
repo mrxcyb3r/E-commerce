@@ -41,7 +41,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [theme]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
+    document.documentElement.classList.add('theme-transitioning');
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem('ecommerce_theme', newTheme);
+    } catch {
+      // ignore
+    }
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 350);
   };
 
   const setTheme = (newTheme: Theme) => {

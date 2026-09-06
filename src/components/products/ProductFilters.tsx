@@ -74,10 +74,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   const FilterContent = (
     <div className="space-y-6">
       {/* Header / Reset */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center justify-between pb-3 border-b border-border">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-zinc-900 dark:text-white" />
-          <span className="font-black text-sm text-zinc-900 dark:text-white font-['Outfit',sans-serif]">{t('pages', 'catalog.filters')}</span>
+          <SlidersHorizontal className="w-4 h-4 text-foreground" />
+          <span className="font-black text-sm text-foreground font-['Outfit',sans-serif]">{t('pages', 'catalog.filters')}</span>
         </div>
         {hasActiveFilters && (
           <button
@@ -102,7 +102,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             onClick={() => onChange({ ...filters, category: '' })}
             className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors flex items-center justify-between ${
               filters.category === ''
-                ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black'
+                ? 'bg-foreground text-background dark:bg-card dark:text-card-foreground font-black'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium'
             }`}
           >
@@ -116,7 +116,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               onClick={() => handleCategoryChange(cat.slug)}
               className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-colors flex items-center justify-between ${
                 filters.category === cat.slug
-                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black'
+                  ? 'bg-foreground text-background dark:bg-card dark:text-card-foreground font-black'
                   : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium'
               }`}
             >
@@ -141,7 +141,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-black border transition-all ${
                 filters.size === s
                   ? 'bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-950 dark:border-white shadow-xs'
-                  : 'bg-white dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
+                  : 'bg-card/80 border-border text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
               }`}
             >
               {s}
@@ -219,7 +219,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             type="checkbox"
             checked={filters.onlyInStock}
             onChange={(e) => onChange({ ...filters, onlyInStock: e.target.checked })}
-            className="w-4 h-4 rounded text-zinc-900 dark:text-white accent-zinc-900 dark:accent-white"
+            className="w-4 h-4 rounded text-foreground accent-zinc-900 dark:accent-white"
           />
           <span>{t('pages', 'catalog.onlyInStock')}</span>
         </label>
@@ -231,7 +231,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     <>
       {/* Desktop Sidebar Filters */}
       <aside className="hidden lg:block w-64 shrink-0">
-        <div className="sticky top-24 bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+        <div className="sticky top-24 bg-card p-6 rounded-3xl border border-border shadow-xs">
           {FilterContent}
         </div>
       </aside>
@@ -252,10 +252,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-x-0 bottom-0 max-h-[85vh] bg-white dark:bg-zinc-900 rounded-t-3xl p-6 shadow-2xl flex flex-col justify-between overflow-hidden"
+              className="fixed inset-x-0 bottom-0 max-h-[85vh] bg-card rounded-t-3xl p-6 shadow-2xl flex flex-col justify-between overflow-hidden"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                <h3 className="font-black text-lg text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
+                <h3 className="font-black text-lg text-foreground font-['Outfit',sans-serif] tracking-tight">
                   {t('pages', 'catalog.filters')}
                 </h3>
                 <button
@@ -271,11 +271,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 {FilterContent}
               </div>
 
-              <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={onMobileClose}
-                  className="w-full py-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black text-sm shadow-sm tracking-wide"
+                  className="w-full py-4 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground font-black text-sm shadow-sm tracking-wide"
                 >
                   {t('pages', 'catalog.showResults', totalResults)}
                 </button>

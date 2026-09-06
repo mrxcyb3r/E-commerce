@@ -69,13 +69,13 @@ export const NewArrivals: React.FC = () => {
           className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
         >
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>New Arrivals</span>
             </div>
             <h2
               id="new-arrivals-heading"
-              className="font-display font-black tracking-tightest text-zinc-950 dark:text-white"
+              className="font-display font-black tracking-tightest text-foreground"
               style={{
                 fontSize: 'clamp(2.25rem, 5vw, 4rem)',
                 lineHeight: '1.02',
@@ -90,7 +90,7 @@ export const NewArrivals: React.FC = () => {
 
           <Link
             to="/products?sort=newest"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-zinc-950 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-all group self-end"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
           >
             View All New
             <motion.div
@@ -133,7 +133,7 @@ export const NewArrivals: React.FC = () => {
               <button
                 onClick={goPrev}
                 disabled={currentIndex === 0}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 z-10 p-3 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 shadow-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-all"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 z-10 p-3 rounded-full bg-card border border-border text-zinc-700 dark:text-zinc-300 shadow-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-all"
                 aria-label="Previous products"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -142,7 +142,7 @@ export const NewArrivals: React.FC = () => {
               <button
                 onClick={goNext}
                 disabled={currentIndex >= maxIndex}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 z-10 p-3 rounded-full bg-zinc-950 dark:bg-white border border-zinc-200 dark:border-zinc-800 text-white dark:text-zinc-950 shadow-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none transition-all"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 z-10 p-3 rounded-full bg-background dark:bg-white border border-border text-white dark:text-zinc-950 shadow-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 disabled:opacity-30 disabled:pointer-events-none transition-all"
                 aria-label="Next products"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -163,7 +163,7 @@ export const NewArrivals: React.FC = () => {
                 transition={{ delay: i * 0.03, duration: 0.3 }}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   i === currentIndex
-                    ? 'w-8 bg-zinc-950 dark:bg-white'
+                    ? 'w-8 bg-background dark:bg-white'
                     : 'w-2 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-600'
                 }`}
               />

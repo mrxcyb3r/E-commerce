@@ -25,7 +25,7 @@ export const EditorialCampaign: React.FC = () => {
   }
 
   return (
-    <section id="campaign" className="py-10 md:py-16 bg-white dark:bg-zinc-900 transition-colors scroll-mt-6">
+    <section id="campaign" className="py-10 md:py-16 bg-card transition-colors scroll-mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-6 items-center">
           <Reveal className="space-y-3">
@@ -34,7 +34,7 @@ export const EditorialCampaign: React.FC = () => {
               <span>{eyebrow}</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
               {heading}
             </h2>
 

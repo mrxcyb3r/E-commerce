@@ -59,7 +59,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               exit={{ opacity: 0, y: 8, scale: 0.95 }}
               transition={{ type: 'spring', damping: 26, stiffness: 400 }}
               onClick={() => dismiss(t.id)}
-              className="pointer-events-auto px-4 py-2.5 rounded-2xl bg-white dark:bg-zinc-800 text-xs font-bold text-zinc-900 dark:text-white shadow-2xl border border-zinc-200 dark:border-zinc-700 flex items-center gap-2 max-w-[90vw] cursor-pointer"
+              className="pointer-events-auto px-4 py-2.5 rounded-2xl bg-card text-xs font-bold text-foreground shadow-2xl border border-border flex items-center gap-2 max-w-[90vw] cursor-pointer"
               role="status"
             >
               {icons[t.type]}

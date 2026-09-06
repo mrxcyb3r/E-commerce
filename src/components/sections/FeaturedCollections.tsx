@@ -18,7 +18,7 @@ export const FeaturedCollections: React.FC = () => {
   if (featured.length < 2) return null;
 
   return (
-    <section id="featured-collections" className="py-16 md:py-24 bg-white dark:bg-zinc-900 transition-colors scroll-mt-28">
+    <section id="featured-collections" className="py-16 md:py-24 bg-card transition-colors scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <Reveal className="space-y-2">
@@ -26,7 +26,7 @@ export const FeaturedCollections: React.FC = () => {
               <Layers className="w-3.5 h-3.5 text-amber-500" />
               <span>Tanlangan kolleksiyalar</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
               {homepageCms.featuredCollectionsSectionTitle || "Tayyor to'plamlar"}
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">
@@ -38,7 +38,7 @@ export const FeaturedCollections: React.FC = () => {
           <Reveal transition={{ duration: 0.4, delay: 0.1 }}>
             <Link
               to="/products"
-              className="inline-flex items-center gap-1.5 text-sm font-black text-zinc-900 dark:text-white hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors group"
+              className="inline-flex items-center gap-1.5 text-sm font-black text-foreground hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors group"
             >
               <span>{t('common', 'viewAll')}</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -56,7 +56,7 @@ export const FeaturedCollections: React.FC = () => {
               key={category.id}
               to={`/products?category=${category.id}`}
               onClick={() => track('category_view', { categoryId: category.id, uniquePerVisitor: true })}
-              className="group relative block rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300"
+              className="group relative block rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 dark:bg-zinc-800 border border-border shadow-xs hover:shadow-xl transition-all duration-300"
             >
               <img
                 src={category.image}

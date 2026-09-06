@@ -18,7 +18,7 @@ export const BrandMarquee: React.FC = () => {
   return (
     <section
       id="brand-strip"
-      className="border-y border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950 py-5 overflow-hidden transition-colors"
+      className="border-y border-border bg-zinc-50/50 dark:bg-background py-5 overflow-hidden transition-colors"
       aria-label={t('pages', 'sections.brandsAria')}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-6">

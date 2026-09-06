@@ -7,23 +7,19 @@ import { NewArrivals } from '../components/homepage/NewArrivals';
 import { ShopByStyle } from '../components/homepage/ShopByStyle';
 import { Community } from '../components/homepage/Community';
 import { StoreExperience } from '../components/homepage/StoreExperience';
-import { Footer } from '../components/homepage/Footer';
 
 export const HomePage: React.FC = () => {
   return (
-    <>
-      <main className="flex-grow space-y-0">
-        <HeroSection />
-        <TrendingNow />
-        <VideoFeed />
-        <FeaturedCollection />
-        <NewArrivals />
-        <ShopByStyle />
-        <Community />
-        <StoreExperience />
-      </main>
-      <Footer />
-    </>
+    <main className="flex-grow space-y-0">
+      <HeroSection />
+      <TrendingNow />
+      <VideoFeed />
+      <FeaturedCollection />
+      <NewArrivals />
+      <ShopByStyle />
+      <Community />
+      <StoreExperience />
+    </main>
   );
 };
 

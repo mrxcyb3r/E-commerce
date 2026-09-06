@@ -45,7 +45,7 @@ export const Footer: React.FC = () => {
   return (
     <footer
       id="footer"
-      className="bg-zinc-950 dark:bg-black border-t border-zinc-800 relative overflow-hidden"
+      className="bg-background dark:bg-background border-t border-border relative overflow-hidden"
       role="contentinfo"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />
@@ -66,7 +66,7 @@ export const Footer: React.FC = () => {
               {tagline || 'Premium fashion for modern living. Curated collections designed for everyday confidence.'}
             </p>
 
-            <div className="flex items-center gap-4 pt-4 border-t border-zinc-800">
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-full bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all" aria-label="Instagram">
                 <Instagram className="w-5 h-5" />
               </a>
@@ -174,7 +174,7 @@ export const Footer: React.FC = () => {
 
         <Reveal
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="pt-8 border-t border-zinc-800"
+          className="pt-8 border-t border-border"
         >
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <p className="text-zinc-500 text-sm">

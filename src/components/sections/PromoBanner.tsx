@@ -8,9 +8,9 @@ export const PromoBanner: React.FC = () => {
   const { homepageCms } = useStore();
 
   return (
-    <section className="py-12 bg-white dark:bg-zinc-900 transition-colors">
+    <section className="py-12 bg-card transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="relative rounded-3xl overflow-hidden bg-zinc-900 dark:bg-zinc-800 text-white p-8 sm:p-12 lg:p-16 shadow-xl border border-zinc-800">
+        <Reveal className="relative rounded-3xl overflow-hidden bg-foreground dark:bg-secondary text-background p-8 sm:p-12 lg:p-16 shadow-xl border border-border">
           {/* Background image overlay */}
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
@@ -31,7 +31,7 @@ export const PromoBanner: React.FC = () => {
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <Link
                 to={homepageCms.promoBannerLink || '/products?sort=newest'}
-                className="inline-flex items-center gap-2.5 px-7 py-4 rounded-xl font-black text-sm tracking-wide bg-white text-zinc-950 hover:bg-zinc-100 transition-all shadow-md group"
+                className="inline-flex items-center gap-2.5 px-7 py-4 rounded-xl font-black text-sm tracking-wide bg-card text-foreground hover:bg-muted transition-all shadow-md group"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>{homepageCms.promoBannerButtonText || 'Yangi mahsulotlarni ko\'rish'}</span>

@@ -33,10 +33,10 @@ export const StoreLocation: React.FC = () => {
   }
 
   return (
-    <section id="location" className="py-8 md:py-12 bg-white dark:bg-zinc-900 transition-colors">
+    <section id="location" className="py-8 md:py-12 bg-card transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {t('pages', 'sections.locationTitle')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">
@@ -51,7 +51,7 @@ export const StoreLocation: React.FC = () => {
             {fullAddress && (
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-zinc-600 dark:text-zinc-400 mt-1 shrink-0" />
-                <span className="text-zinc-900 dark:text-white flex-1 font-medium">
+                <span className="text-foreground flex-1 font-medium">
                   {fullAddress}
                 </span>
               </div>
@@ -110,7 +110,7 @@ export const StoreLocation: React.FC = () => {
                 href={`https://t.me/${storeInfo.telegramUsername}/send`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground shadow-sm"
                 title="Telegram yozish"
               >
                 <Send className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export const StoreLocation: React.FC = () => {
                 href={googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl text-sm font-black tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground shadow-sm"
                 title="Xaritada ko'rish"
               >
                 <ExternalLink className="w-3.5 h-3.5" />

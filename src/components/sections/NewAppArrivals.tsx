@@ -1,3 +1,4 @@
+// Unused — kept for potential future use
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight } from 'lucide-react';
@@ -17,7 +18,7 @@ export const NewAppArrivals: React.FC = () => {
   const ctaText = 'Barchasini ko\'rish →';
 
   return (
-    <section id="new-arrivals" className="py-10 md:py-16 bg-white dark:bg-zinc-900 transition-colors scroll-mt-6">
+    <section id="new-arrivals" className="py-10 md:py-16 bg-card transition-colors scroll-mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
@@ -26,7 +27,7 @@ export const NewAppArrivals: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>{eyebrow}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
               {heading}
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">
@@ -38,7 +39,7 @@ export const NewAppArrivals: React.FC = () => {
           <div className="self-start md:self-auto">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide text-zinc-900 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all"
+              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide text-zinc-900 dark:text-zinc-300 border border-border hover:bg-zinc-50 dark:hover:bg-background transition-all"
             >
               <span>{ctaText}</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

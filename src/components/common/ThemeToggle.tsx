@@ -14,7 +14,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
       id="theme-toggle-btn"
       type="button"
       onClick={toggleTheme}
-      className={`relative inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 shadow-2xs ${className}`}
+      className={`relative inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 border border-border bg-white/80 dark:bg-zinc-900/80 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 shadow-2xs ${className}`}
       aria-label={theme === 'dark' ? 'Light rejimga o\'tish' : 'Dark rejimga o\'tish'}
       title={theme === 'dark' ? 'Light rejimga o\'tish' : 'Dark rejimga o\'tish'}
     >

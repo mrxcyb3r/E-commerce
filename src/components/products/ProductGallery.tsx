@@ -150,7 +150,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
   return (
     <div className="space-y-4">
       <div
-        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 shadow-xs group focus:outline-none"
+        className="relative aspect-[4/5] sm:aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 border border-border shadow-xs group focus:outline-none"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onKeyDown={handleKeyDown}
@@ -318,7 +318,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productN
       )}
 
       {hasVideo && slides.length === 1 && (
-        <p className="text-[11px] text-neutral-400 flex items-center gap-1.5">
+        <p className="text-[11px] text-zinc-400 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-amber-500" /> Mahsulot videosi mavjud
         </p>
       )}

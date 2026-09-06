@@ -96,7 +96,7 @@ const CommentItem: React.FC<{
         {/* Content */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[13px] font-bold text-neutral-900 dark:text-white">
+            <span className="text-[13px] font-bold text-foreground">
               {comment.display_name}
             </span>
             {comment.is_verified && (
@@ -112,14 +112,14 @@ const CommentItem: React.FC<{
             )}
             {comment.is_pinned && (
               <span title={t('comments', 'pinned')}>
-                <Pin className="w-3 h-3 text-neutral-400 dark:text-neutral-500 shrink-0" />
+                <Pin className="w-3 h-3 text-zinc-400 dark:text-zinc-500 shrink-0" />
               </span>
             )}
-            <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-medium">
+            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
               {timeAgo(comment.created_at, t)}
             </span>
           </div>
-          <p className="text-[13px] text-neutral-700 dark:text-neutral-300 mt-0.5 leading-relaxed">
+          <p className="text-[13px] text-zinc-700 dark:text-zinc-300 mt-0.5 leading-relaxed">
             {comment.text}
           </p>
 
@@ -128,7 +128,7 @@ const CommentItem: React.FC<{
             <button
               type="button"
               onClick={() => onLike(comment.id)}
-              className={`flex items-center gap-1 text-[11px] font-medium transition-colors ${isLiked ? 'text-rose-500' : 'text-neutral-400 hover:text-rose-400 dark:hover:text-rose-400'}`}
+              className={`flex items-center gap-1 text-[11px] font-medium transition-colors ${isLiked ? 'text-rose-500' : 'text-zinc-400 hover:text-rose-400 dark:hover:text-rose-400'}`}
               aria-label={t('feed', 'like')}
             >
               <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
@@ -137,7 +137,7 @@ const CommentItem: React.FC<{
             <button
               type="button"
               onClick={() => onReply(comment.id, comment.display_name)}
-              className="flex items-center gap-1 text-[11px] font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              className="flex items-center gap-1 text-[11px] font-medium text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
               aria-label={t('comments', 'reply')}
             >
               <Reply className="w-3.5 h-3.5" />
@@ -150,7 +150,7 @@ const CommentItem: React.FC<{
                 <button
                   type="button"
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors p-0.5 rounded"
+                  className="flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors p-0.5 rounded"
                   aria-label={t('nav', 'openMenu')}
                 >
                   <MoreHorizontal className="w-3.5 h-3.5" />
@@ -162,12 +162,12 @@ const CommentItem: React.FC<{
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
                       transition={{ duration: 0.12 }}
-                      className="absolute left-0 top-full mt-1 z-30 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 min-w-[140px]"
+                      className="absolute left-0 top-full mt-1 z-30 bg-card rounded-xl shadow-lg border border-border py-1 min-w-[140px]"
                     >
                       <button
                         type="button"
                         onClick={() => { setMenuOpen(false); onDeleteConfirm(comment); }}
-                        className="w-full text-left px-3 py-1.5 text-[12px] text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                        className="w-full text-left px-3 py-1.5 text-[12px] text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
                       >
                         {t('comments', 'report')}
                       </button>
@@ -324,18 +324,18 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="fixed inset-0 z-[61] flex items-center justify-center p-6"
                 >
-                  <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl p-6 max-w-xs w-full space-y-4">
-                    <p className="text-sm font-bold text-neutral-900 dark:text-white text-center">
+                  <div className="bg-card rounded-2xl shadow-xl p-6 max-w-xs w-full space-y-4">
+                    <p className="text-sm font-bold text-foreground text-center">
                       {t('comments', 'deleteOwn')}?
                     </p>
-                    <p className="text-xs text-neutral-500 text-center">
+                    <p className="text-xs text-zinc-500 text-center">
                       {deleteConfirm.text.slice(0, 60)}{deleteConfirm.text.length > 60 ? '...' : ''}
                     </p>
                     <div className="flex gap-3">
                       <button
                         type="button"
                         onClick={() => setDeleteConfirm(null)}
-                        className="flex-1 py-2 rounded-xl text-sm font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                        className="flex-1 py-2 rounded-xl text-sm font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                       >
                         {t('common', 'cancel')}
                       </button>
@@ -369,7 +369,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
             role="dialog"
             aria-modal="true"
             aria-label={t('comments', 'title')}
-            className={`fixed z-50 bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 flex flex-col ${
+            className={`fixed z-50 bg-white dark:bg-background border-border flex flex-col ${
               isDesktop
                 ? 'inset-y-0 right-0 w-full sm:w-[400px] shadow-[-12px_0_40px_rgba(0,0,0,0.25)] border-l rounded-l-3xl'
                 : 'bottom-0 left-0 right-0 rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.25)] border-t max-h-[80vh]'
@@ -378,22 +378,22 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
             {/* Drag handle (mobile only) */}
             {!isDesktop && (
               <div className="flex justify-center pt-3 pb-1 pointer-events-none">
-                <div className="w-10 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
               </div>
             )}
 
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pb-4 pt-4 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between px-5 pb-4 pt-4 border-b border-zinc-100 dark:border-border">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                  <MessageCircle className="w-4.5 h-4.5 text-neutral-500 dark:text-neutral-400" />
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <MessageCircle className="w-4.5 h-4.5 text-zinc-500 dark:text-zinc-400" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-black text-neutral-900 dark:text-white leading-none">
+                  <h3 className="text-sm font-black text-foreground leading-none">
                     {t('comments', 'title')}
                   </h3>
                   {commentCount > 0 && (
-                    <span className="text-[11px] font-semibold text-neutral-400">
+                    <span className="text-[11px] font-semibold text-zinc-400">
                       {commentCount} {t('comments', 'count')}
                     </span>
                   )}
@@ -406,7 +406,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   <button
                     type="button"
                     onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                     aria-label={t('comments', sortMode)}
                   >
                     {t('comments', sortMode)}
@@ -419,7 +419,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -4 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute right-0 top-full mt-1 z-30 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 min-w-[130px]"
+                        className="absolute right-0 top-full mt-1 z-30 bg-card rounded-xl shadow-lg border border-border py-1 min-w-[130px]"
                       >
                         {SORT_OPTIONS.map((opt) => (
                           <button
@@ -428,8 +428,8 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                             onClick={() => { setSortMode(opt); setSortDropdownOpen(false); }}
                             className={`w-full text-left px-3 py-1.5 text-[12px] transition-colors ${
                               sortMode === opt
-                                ? 'bg-neutral-100 dark:bg-neutral-700 font-bold text-neutral-900 dark:text-white'
-                                : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700/50'
+                                ? 'bg-zinc-100 dark:bg-zinc-700 font-bold text-foreground'
+                                : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
                             }`}
                           >
                             {t('comments', opt)}
@@ -443,10 +443,10 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
+                  className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                   aria-label={t('comments', 'close')}
                 >
-                  <X className="w-4 h-4 text-neutral-500" />
+                  <X className="w-4 h-4 text-zinc-500" />
                 </button>
               </div>
             </div>
@@ -456,22 +456,22 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
               {/* Loading state */}
               {loading && comments.length === 0 && (
                 <div className="text-center py-8">
-                  <div className="w-7 h-7 border-[2.5px] border-neutral-200 dark:border-neutral-700 border-t-neutral-500 rounded-full animate-spin mx-auto" />
-                  <p className="text-xs text-neutral-400 mt-3 font-medium">{t('common', 'loading')}</p>
+                  <div className="w-7 h-7 border-[2.5px] border-border border-t-zinc-500 rounded-full animate-spin mx-auto" />
+                  <p className="text-xs text-zinc-400 mt-3 font-medium">{t('common', 'loading')}</p>
                 </div>
               )}
 
               {/* Empty state */}
               {!loading && comments.length === 0 && (
                 <div className="text-center py-12 space-y-3">
-                  <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto">
-                    <MessageCircle className="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
+                  <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto">
+                    <MessageCircle className="w-8 h-8 text-zinc-300 dark:text-zinc-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-neutral-600 dark:text-neutral-300">
+                    <p className="text-sm font-bold text-zinc-600 dark:text-zinc-300">
                       {t('comments', 'empty')}
                     </p>
-                    <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
                       {t('comments', 'emptyDesc')}
                     </p>
                   </div>
@@ -544,9 +544,9 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                       className="flex items-center gap-2 px-2 py-1"
                     >
                       <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
                     </motion.div>
                   )}
@@ -557,7 +557,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                       <button
                         type="button"
                         onClick={loadMore}
-                        className="text-[12px] font-semibold text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+                        className="text-[12px] font-semibold text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                       >
                         {t('comments', 'loadMore')}
                       </button>
@@ -576,17 +576,17 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   exit={{ opacity: 0, height: 0 }}
                   className="px-4 overflow-hidden"
                 >
-                  <div className="flex items-center justify-between bg-neutral-50 dark:bg-neutral-900 rounded-xl px-3 py-2 mb-2 border border-neutral-100 dark:border-neutral-800">
+                  <div className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 rounded-xl px-3 py-2 mb-2 border border-zinc-100 dark:border-border">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <Reply className="w-3 h-3 text-neutral-400 shrink-0" />
-                      <span className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                      <Reply className="w-3 h-3 text-zinc-400 shrink-0" />
+                      <span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
                         {t('comments', 'reply')}: {replyTo.name}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setReplyTo(null)}
-                      className="shrink-0 ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 p-0.5"
+                      className="shrink-0 ml-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 p-0.5"
                       aria-label={t('common', 'cancel')}
                     >
                       <X className="w-3 h-3" />
@@ -597,7 +597,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
             </AnimatePresence>
 
             {/* Input area */}
-            <div className="px-4 py-3 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 safe-area-bottom">
+            <div className="px-4 py-3 border-t border-zinc-100 dark:border-border bg-white dark:bg-background safe-area-bottom">
               <div className="flex items-center gap-2.5">
                 <input
                   ref={inputRef}
@@ -609,24 +609,24 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   maxLength={500}
                   disabled={submitting}
                   aria-label={replyTo ? `${t('comments', 'reply')}: ${replyTo.name}` : t('comments', 'placeholder')}
-                  className="flex-1 px-4 py-2.5 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-[13px] text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:focus:ring-neutral-600 transition-shadow"
+                  className="flex-1 px-4 py-2.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-[13px] text-foreground placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition-shadow"
                 />
                 <button
                   type="button"
                   onClick={handleSubmit}
                   disabled={!inputText.trim() || submitting}
-                  className="w-10 h-10 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shrink-0"
+                  className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shrink-0"
                   aria-label={t('comments', 'send')}
                 >
                   {submitting ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white dark:border-neutral-900/30 dark:border-t-neutral-900 rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white dark:border-zinc-900/30 dark:border-t-zinc-900 rounded-full animate-spin" />
                   ) : (
                     <Send className="w-4 h-4" />
                   )}
                 </button>
               </div>
               <div className="flex items-center justify-end mt-2 px-1">
-                <p className={`text-[10px] font-medium ${inputText.length > 450 ? 'text-amber-500' : 'text-neutral-300 dark:text-neutral-600'}`}>
+                <p className={`text-[10px] font-medium ${inputText.length > 450 ? 'text-amber-500' : 'text-zinc-300 dark:text-zinc-600'}`}>
                   {inputText.length}/500
                 </p>
               </div>

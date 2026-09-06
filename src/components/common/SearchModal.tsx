@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, ArrowRight, Tag, Clock, TrendingUp, XCircle } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -140,9 +140,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: -20 }}
           transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="relative w-full max-w-3xl bg-white dark:bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-200/60 dark:border-zinc-800/60 overflow-hidden z-10"
+          className="relative w-full max-w-3xl bg-white dark:bg-background rounded-3xl shadow-2xl border border-border/60 overflow-hidden z-10"
         >
-          <div className="flex items-center px-6 py-5 border-b border-zinc-100 dark:border-zinc-800/60 gap-4">
+          <div className="flex items-center px-6 py-5 border-b border-zinc-100 dark:border-border/60 gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-zinc-500" />
               <input
@@ -156,7 +156,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 }}
                 onFocus={() => setShowSuggestions(true)}
                 placeholder="Search products, categories, brands..."
-                className="w-full pl-12 pr-4 py-3.5 bg-zinc-100 dark:bg-zinc-900 text-zinc-950 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-base font-medium rounded-2xl border border-zinc-200/60 dark:border-zinc-800/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
+                className="w-full pl-12 pr-4 py-3.5 bg-zinc-100 dark:bg-zinc-900 text-foreground placeholder-zinc-400 dark:placeholder-zinc-500 text-base font-medium rounded-2xl border border-border/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
               />
               {query && (
                 <button
@@ -172,7 +172,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
             <button
               type="button"
               onClick={onClose}
-              className="text-xs font-black px-3 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all"
+              className="text-xs font-black px-3 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 rounded-xl border border-border/60 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all"
             >
               ESC
             </button>
@@ -211,7 +211,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                               key={search}
                               type="button"
                               onClick={() => handleSuggestionClick(search)}
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800/60 transition-all"
+                              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
                             >
                               <Clock className="w-3.5 h-3.5 text-zinc-400" />
                               {search}
@@ -254,7 +254,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             key={category}
                             type="button"
                             onClick={() => handleSuggestionClick(category)}
-                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800/60 transition-all"
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
                           >
                             <Tag className="w-3.5 h-3.5 text-zinc-400" />
                             {category}
@@ -296,7 +296,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-display font-black text-zinc-950 dark:text-white text-sm truncate group-hover:text-amber-500 transition-colors">
+                            <div className="font-display font-black text-foreground text-sm truncate group-hover:text-amber-500 transition-colors">
                               {product.name}
                             </div>
                             <div className="flex items-center gap-2 mt-1">
@@ -310,7 +310,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="font-display font-black text-zinc-950 dark:text-white text-base">
+                            <div className="font-display font-black text-foreground text-base">
                               {formatPrice(product.price)}
                             </div>
                             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-wide">
@@ -325,7 +325,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           <div className="inline-flex p-3 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-400 mb-4">
                             <Search className="w-6 h-6" />
                           </div>
-                          <h4 className="font-display font-black text-zinc-950 dark:text-white mb-1">No products found</h4>
+                          <h4 className="font-display font-black text-foreground mb-1">No products found</h4>
                           <p className="text-sm text-zinc-500 dark:text-zinc-400">Try a different search term or browse categories.</p>
                         </div>
                       )}
@@ -337,11 +337,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
           </AnimatePresence>
 
           {query.trim() !== '' && filteredProducts.length > 0 && (
-            <div className="p-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100/60 dark:border-zinc-800/60">
+            <div className="p-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100/60 dark:border-border/60">
               <button
                 type="button"
                 onClick={handleViewAllResults}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-zinc-950 dark:text-white hover:underline transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-foreground hover:underline transition-colors"
               >
                 View All Results
                 <ArrowRight className="w-5 h-5" />
@@ -354,5 +354,4 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   );
 };
 
-import { useMemo } from 'react';
 export default SearchModal;

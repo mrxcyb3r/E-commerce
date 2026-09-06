@@ -33,7 +33,7 @@ export const StoreExperience: React.FC = () => {
   return (
     <section
       id="store-experience"
-      className="section-padding bg-zinc-950 dark:bg-black relative overflow-hidden"
+      className="section-padding bg-background dark:bg-background relative overflow-hidden"
       aria-labelledby="store-heading"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_0%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_80%_0%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />
@@ -125,9 +125,7 @@ export const StoreExperience: React.FC = () => {
                 <br />
                 <span className="text-amber-500">A Destination.</span>
               </h2>
-              <p className="text-zinc-400 text-lg leading-relaxed mb-8 max-w-xl">
-                Touch, try, and experience our collections in person. Our flagship store offers a curated environment designed for discovery.
-              </p>
+
             </Reveal>
 
             <Stagger
@@ -138,7 +136,7 @@ export const StoreExperience: React.FC = () => {
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all group"
+                  className="p-5 rounded-2xl bg-zinc-900/50 border border-border hover:border-zinc-700 transition-all group"
                 >
                   <feature.icon className="w-6 h-6 text-amber-500 mb-3 group-hover:scale-110 transition-transform" />
                   <h4 className="font-display font-bold text-white mb-2">{feature.title}</h4>
@@ -156,7 +154,7 @@ export const StoreExperience: React.FC = () => {
                 {hours.map((hour, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all"
+                    className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-border hover:border-zinc-700 transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-amber-500" />
@@ -171,7 +169,7 @@ export const StoreExperience: React.FC = () => {
             <Reveal
               variant={fadeUp}
               transition={{ duration: 0.6, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="pt-4 border-t border-zinc-800"
+              className="pt-4 border-t border-border"
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -184,7 +182,7 @@ export const StoreExperience: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Link
                     to="/location"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500 text-zinc-950 font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all group"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-accent-foreground font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all group"
                   >
                     Get Directions
                     <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />

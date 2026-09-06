@@ -108,13 +108,13 @@ export const Community: React.FC = () => {
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         <Reveal className="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>Community</span>
             </div>
             <h2
               id="community-heading"
-              className="font-display font-black tracking-tightest text-zinc-950 dark:text-white"
+              className="font-display font-black tracking-tightest text-foreground"
               style={{
                 fontSize: 'clamp(2.25rem, 5vw, 4rem)',
                 lineHeight: '1.02',
@@ -129,7 +129,7 @@ export const Community: React.FC = () => {
 
           <Link
             to="/feed"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-zinc-950 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-all group self-end"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
           >
             View All Posts
             <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -144,7 +144,7 @@ export const Community: React.FC = () => {
             {mockCommunityPosts.map((post) => (
               <article
                 key={post.id}
-                className="group relative bg-white dark:bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800"
+                className="group relative bg-white dark:bg-background rounded-2xl overflow-hidden border border-zinc-100 dark:border-border"
               >
                 <Link
                   to={`/feed/post/${post.id}`}
@@ -181,7 +181,7 @@ export const Community: React.FC = () => {
                       {post.productId && (
                         <Link
                           to={`/products/${post.productId}`}
-                          className="px-3 py-1.5 rounded-full bg-amber-500 text-zinc-950 font-semibold text-xs tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all"
+                          className="px-3 py-1.5 rounded-full bg-accent text-accent-foreground font-semibold text-xs tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all"
                           onClick={(e) => e.stopPropagation()}
                         >
                           Shop This Look
@@ -196,12 +196,12 @@ export const Community: React.FC = () => {
                     <img
                       src={post.userAvatar}
                       alt={post.userName}
-                      className="w-9 h-9 rounded-full object-cover border border-zinc-200 dark:border-zinc-800"
+                      className="w-9 h-9 rounded-full object-cover border border-border"
                     />
                     <div className="flex-1 min-w-0">
                       <Link
                         to={`/profile/${post.userName}`}
-                        className="font-semibold text-zinc-950 dark:text-white hover:text-amber-500 transition-colors truncate block"
+                        className="font-semibold text-foreground hover:text-amber-500 transition-colors truncate block"
                       >
                         @{post.userName}
                       </Link>
@@ -218,7 +218,7 @@ export const Community: React.FC = () => {
                     {post.caption}
                   </p>
 
-                  <div className="flex items-center gap-4 pt-2 border-t border-zinc-100 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400">
+                  <div className="flex items-center gap-4 pt-2 border-t border-zinc-100 dark:border-border text-[11px] text-zinc-500 dark:text-zinc-400">
                     <span className="flex items-center gap-1">
                       <Heart className="w-3.5 h-3.5 text-rose-500" />
                       {post.likes.toLocaleString()}
@@ -240,7 +240,7 @@ export const Community: React.FC = () => {
         <Reveal className="mt-12 text-center">
           <Link
             to="/feed"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong font-semibold text-zinc-950 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-all group"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group"
           >
             Join the Community
             <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -248,7 +248,7 @@ export const Community: React.FC = () => {
         </Reveal>
 
         <Reveal className="mt-10 text-center">
-          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-border">
             <div className="flex -space-x-2">
               {['1', '2', '3', '4'].map((i) => (
                 <img
@@ -262,7 +262,7 @@ export const Community: React.FC = () => {
                 <span className="text-zinc-950 font-black text-xs">+12K</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 pl-4 border-l border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center gap-2 pl-4 border-l border-border">
               <User className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
               <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">12.4K members</span>
             </div>

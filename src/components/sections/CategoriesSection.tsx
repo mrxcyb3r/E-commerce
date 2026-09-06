@@ -23,7 +23,7 @@ const CategoryTile: React.FC<CategoryTileProps> = ({
   return (
     <Link
       to={`/products?category=${slug}`}
-      className={`group block rounded-xl overflow-hidden border border-zinc-200/30 dark:border-zinc-800/30 transition-all hover:border-zinc-400 dark:hover:border-zinc-600`}
+      className={`group block rounded-xl overflow-hidden border border-zinc-200/30 dark:border-border/30 transition-all hover:border-zinc-400 dark:hover:border-zinc-600`}
     >
       {imageUrl ? (
         <img
@@ -41,7 +41,7 @@ const CategoryTile: React.FC<CategoryTileProps> = ({
       )}
 
       <div className="p-3">
-        <p className="font-black text-zinc-900 dark:text-white text-xs line-clamp-2">
+        <p className="font-black text-foreground text-xs line-clamp-2">
           {name}
         </p>
         {productCount !== undefined && (
@@ -67,7 +67,7 @@ export const CategoriesSection: React.FC = () => {
   }));
 
   return (
-    <section id="categories" className="py-8 md:py-12 bg-white dark:bg-zinc-900 transition-colors">
+    <section id="categories" className="py-8 md:py-12 bg-card transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
@@ -76,7 +76,7 @@ export const CategoriesSection: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>{'Kategoriyalar'}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
               { 'Nima izlayapsiz?' }
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -88,7 +88,7 @@ export const CategoriesSection: React.FC = () => {
           <div className="self-start">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide text-zinc-900 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition-all"
+              className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide text-zinc-900 dark:text-zinc-300 border border-border hover:bg-zinc-50 dark:hover:bg-background transition-all"
             >
               <span>Barcha kategoriyani ko'rish</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

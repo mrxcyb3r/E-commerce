@@ -131,13 +131,13 @@ export const FeedPage: React.FC = () => {
   }, [activeVideo]);
 
   return (
-    <div className="pt-20 sm:pt-24 pb-12 min-h-screen bg-zinc-950 text-white flex flex-col justify-center">
+    <div className="pt-20 sm:pt-24 pb-12 min-h-screen bg-background text-white flex flex-col justify-center">
       {/* Top Floating Filter Bar */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Header Title */}
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-500 text-zinc-950 flex items-center justify-center font-black">
+            <div className="w-8 h-8 rounded-xl bg-accent text-accent-foreground flex items-center justify-center font-black">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
@@ -160,8 +160,8 @@ export const FeedPage: React.FC = () => {
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all ${
                 selectedCategory === 'all'
-                  ? 'bg-white text-zinc-950 shadow-md'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               {t('feed', 'all')} ({publishedVideos.length})
@@ -175,8 +175,8 @@ export const FeedPage: React.FC = () => {
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all ${
                 selectedCategory === 'new'
-                  ? 'bg-amber-500 text-zinc-950 shadow-md'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-accent text-accent-foreground shadow-md'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               {t('feed', 'new')}
@@ -190,8 +190,8 @@ export const FeedPage: React.FC = () => {
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all ${
                 selectedCategory === 'erkaklar'
-                  ? 'bg-white text-zinc-950 shadow-md'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               {t('feed', 'clothing')}
@@ -205,8 +205,8 @@ export const FeedPage: React.FC = () => {
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all ${
                 selectedCategory === 'oyoq-kiyimlar'
-                  ? 'bg-white text-zinc-950 shadow-md'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               {t('feed', 'footwear')}
@@ -220,8 +220,8 @@ export const FeedPage: React.FC = () => {
               }}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all ${
                 selectedCategory === 'aksessuarlar'
-                  ? 'bg-white text-zinc-950 shadow-md'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-card text-foreground shadow-md'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               {t('feed', 'accessories')}
@@ -235,7 +235,7 @@ export const FeedPage: React.FC = () => {
         {filteredVideos.length === 0 ? (
           /* Empty state */
           <div className="text-center py-24 px-4 max-w-md mx-auto space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-zinc-900 text-zinc-500 flex items-center justify-center mx-auto border border-zinc-800">
+            <div className="w-16 h-16 rounded-3xl bg-card text-muted-foreground flex items-center justify-center mx-auto border border-border">
               <Layers className="w-8 h-8" />
             </div>
             <div className="space-y-1">
@@ -250,13 +250,13 @@ export const FeedPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedCategory('all')}
-                className="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-black transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-foreground text-xs font-black transition-colors"
               >
                 {t('feed', 'viewAll')}
               </button>
               <Link
                 to="/products"
-                className="px-5 py-2.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-card text-foreground hover:bg-muted text-xs font-black transition-colors"
               >
                 {t('feed', 'goToCatalog')}
               </Link>
@@ -273,9 +273,9 @@ export const FeedPage: React.FC = () => {
                   type="button"
                   disabled={activeIndex === 0}
                   onClick={() => scrollToIndex(activeIndex - 1)}
-                  className="w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none text-white border border-zinc-700/80 flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
-                  aria-label={t('feed', 'prevVideo')}
-                  title={t('feed', 'prevVideoShort')}
+                   className="w-11 h-11 rounded-full bg-card/90 hover:bg-muted disabled:opacity-20 disabled:pointer-events-none text-foreground border border-border flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
+                   aria-label={t('feed', 'prevVideo')}
+                   title={t('feed', 'prevVideoShort')}
                 >
                   <ChevronUp className="w-5 h-5" />
                 </button>
@@ -283,9 +283,9 @@ export const FeedPage: React.FC = () => {
                   type="button"
                   disabled={activeIndex === filteredVideos.length - 1}
                   onClick={() => scrollToIndex(activeIndex + 1)}
-                  className="w-11 h-11 rounded-full bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-20 disabled:pointer-events-none text-white border border-zinc-700/80 flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
-                  aria-label={t('feed', 'nextVideo')}
-                  title={t('feed', 'nextVideoShort')}
+                   className="w-11 h-11 rounded-full bg-card/90 hover:bg-muted disabled:opacity-20 disabled:pointer-events-none text-foreground border border-border flex items-center justify-center transition-all shadow-xl active:scale-90 backdrop-blur-md"
+                   aria-label={t('feed', 'nextVideo')}
+                   title={t('feed', 'nextVideoShort')}
                 >
                   <ChevronDown className="w-5 h-5" />
                 </button>
@@ -317,7 +317,7 @@ export const FeedPage: React.FC = () => {
             </div>
 
             {/* Desktop Right Attached Product / Collection Showcase Panel (Compact & Clean) */}
-            <div className="hidden lg:flex flex-col justify-between w-80 h-[780px] p-6 rounded-3xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-xl shadow-2xl">
+            <div className="hidden lg:flex flex-col justify-between w-80 h-[780px] p-6 rounded-3xl bg-card/70 border border-border backdrop-blur-xl shadow-2xl">
               {activeProduct ? (
                 <div className="space-y-5">
                   <div className="text-[11px] font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
@@ -347,7 +347,7 @@ export const FeedPage: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-800">
+                  <div className="pt-3 border-t border-border">
                     <div className="text-xs text-zinc-400">{t('feed', 'price')}</div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-xl font-black text-amber-400">
@@ -364,7 +364,7 @@ export const FeedPage: React.FC = () => {
                   <Link
                     to={`/products/${activeProduct.id}`}
                     onClick={() => track('feed_product_click', { feedId: activeVideo?.id, productId: activeProduct.id })}
-                    className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-white text-zinc-950 hover:bg-zinc-100 text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95"
+                    className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-card text-foreground hover:bg-muted text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95"
                   >
                     <span>{t('common', 'view')}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -394,7 +394,7 @@ export const FeedPage: React.FC = () => {
               )}
 
               {/* Bottom Sound & Store Note */}
-              <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between gap-3 text-xs">
+              <div className="pt-4 border-t border-border flex items-center justify-between gap-3 text-xs">
                 <button
                   type="button"
                   onClick={toggleMute}

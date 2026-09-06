@@ -1,4 +1,5 @@
 export { ease, duration, transitions } from './config';
+export { hoverTransition, hoverClasses } from './hover';
 
 export {
   fadeIn,

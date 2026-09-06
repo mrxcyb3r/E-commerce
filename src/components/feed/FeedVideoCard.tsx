@@ -296,12 +296,12 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[100dvh] sm:h-[820px] max-w-md mx-auto flex items-center justify-center snap-start snap-always shrink-0 select-none overflow-hidden sm:rounded-3xl bg-zinc-950 shadow-2xl border border-zinc-800/80"
+      className="relative w-full h-[100dvh] sm:h-[820px] max-w-md mx-auto flex items-center justify-center snap-start snap-always shrink-0 select-none overflow-hidden sm:rounded-3xl bg-background shadow-2xl border border-border"
     >
       {/* Media Viewport Container */}
       <div
         onClick={() => togglePlayPause()}
-        className="relative w-full h-full cursor-pointer overflow-hidden flex items-center justify-center bg-zinc-950"
+        className="relative w-full h-full cursor-pointer overflow-hidden flex items-center justify-center bg-background"
       >
         {isCollection ? (
           /* Image Collection Slider (Auto 3s) */
@@ -469,7 +469,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
             {video.badge && (
               <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm backdrop-blur-md ${
                 video.badge.type === 'new'
-                  ? 'bg-amber-500 text-zinc-950'
+                  ? 'bg-accent text-accent-foreground'
                   : video.badge.type === 'sale'
                   ? 'bg-rose-500 text-white'
                   : video.badge.type === 'store'

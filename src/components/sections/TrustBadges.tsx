@@ -23,7 +23,7 @@ const BENEFITS = [
 
 export const TrustBadges: React.FC = () => {
   return (
-    <section className="bg-zinc-50/50 dark:bg-zinc-950 py-8 border-b border-zinc-200 dark:border-zinc-800 transition-colors">
+    <section className="bg-zinc-50/50 dark:bg-background py-8 border-b border-border transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Stagger
           containerVariant={staggerContainer}
@@ -33,13 +33,13 @@ export const TrustBadges: React.FC = () => {
           {BENEFITS.map((item) => (
             <div
               key={item.title}
-              className="flex items-center gap-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900 px-4 py-3.5"
+              className="flex items-center gap-3 rounded-2xl border border-border bg-zinc-50/50 dark:bg-zinc-900 px-4 py-3.5"
             >
-              <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center text-foreground shrink-0">
                 {item.icon}
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-tight">
+                <div className="text-sm font-black text-foreground font-['Outfit',sans-serif] leading-tight">
                   {item.title}
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium leading-tight">

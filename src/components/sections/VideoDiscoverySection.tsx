@@ -17,12 +17,12 @@ export const VideoDiscoverySection: React.FC = () => {
   const displayVideos = publishedVideos.slice(0, 4);
 
   return (
-    <section id="video-discovery" className="py-16 md:py-24 bg-zinc-950 text-white transition-colors overflow-hidden">
+    <section id="video-discovery" className="py-16 md:py-24 bg-background text-white transition-colors overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <Reveal className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500 text-zinc-950">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-accent text-accent-foreground">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Mahsulot videolari</span>
             </div>
@@ -59,10 +59,10 @@ export const VideoDiscoverySection: React.FC = () => {
               <Link
                 key={video.id}
                 to={`/feed?v=${video.id}`}
-                className="group relative flex flex-col rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800/80 shadow-xl hover:border-zinc-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
+                className="group relative flex flex-col rounded-3xl overflow-hidden bg-zinc-900 border border-border shadow-xl hover:border-zinc-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
               >
                 {/* Vertical 9:14 Poster Image Container */}
-                <div className="relative w-full aspect-[9/14] bg-zinc-950 overflow-hidden">
+                <div className="relative w-full aspect-[9/14] bg-background overflow-hidden">
                   <img
                     src={video.posterUrl}
                     alt={video.title}
@@ -78,7 +78,7 @@ export const VideoDiscoverySection: React.FC = () => {
                     {video.badge ? (
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md backdrop-blur-md ${
                         video.badge.type === 'new'
-                          ? 'bg-amber-500 text-zinc-950'
+                          ? 'bg-accent text-accent-foreground'
                           : video.badge.type === 'sale'
                           ? 'bg-rose-500 text-white'
                           : video.badge.type === 'store'

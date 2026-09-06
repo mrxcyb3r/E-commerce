@@ -66,7 +66,7 @@ export const ShopByStyle: React.FC = () => {
   return (
     <section
       id="shop-by-style"
-      className="section-padding bg-zinc-950 dark:bg-black relative overflow-hidden"
+      className="section-padding bg-background dark:bg-background relative overflow-hidden"
       aria-labelledby="shop-by-style-heading"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />
@@ -90,9 +90,7 @@ export const ShopByStyle: React.FC = () => {
             <br />
             <span className="text-amber-500">Aesthetic</span>
           </h2>
-          <p className="mt-4 text-zinc-400 text-lg leading-relaxed max-w-2xl mx-auto">
-            Curated collections for every mood. Explore distinct aesthetics built around how you live.
-          </p>
+
         </Reveal>
 
         <Stagger

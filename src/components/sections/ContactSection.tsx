@@ -56,14 +56,14 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors scroll-mt-28">
+    <section id="contact" className="py-16 md:py-24 bg-zinc-50/50 dark:bg-background transition-colors scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <MessageSquare className="w-3.5 h-3.5" />
             <span>{t('pages', 'sections.contactEyebrow')}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {contactCms.title || t('pages', 'sections.contactHeading')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -74,8 +74,8 @@ export const ContactSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contact Details Column (5 cols) */}
           <Reveal className="lg:col-span-5 space-y-6">
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6">
-              <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+            <div className="bg-card p-6 rounded-2xl border border-border space-y-6">
+              <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                 {t('pages', 'sections.contactDirect')}
               </h3>
 
@@ -92,7 +92,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactViaTelegram')}</div>
-                    <div className="text-sm font-black text-zinc-900 dark:text-white group-hover:underline">
+                    <div className="text-sm font-black text-foreground group-hover:underline">
                       {storeInfo.telegramUsername}
                     </div>
                   </div>
@@ -108,7 +108,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactPhone')}</div>
-                    <div className="text-sm font-black text-zinc-900 dark:text-white group-hover:underline">
+                    <div className="text-sm font-black text-foreground group-hover:underline">
                       {storeInfo.phone}
                     </div>
                   </div>
@@ -120,7 +120,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{t('pages', 'sections.contactAddress')}</div>
-                    <div className="text-sm font-bold text-zinc-900 dark:text-white">
+                    <div className="text-sm font-bold text-foreground">
                       {storeInfo.address}
                     </div>
                   </div>
@@ -128,7 +128,7 @@ export const ContactSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-zinc-900 dark:bg-zinc-800 text-white p-6 rounded-2xl space-y-2 border border-zinc-800">
+            <div className="bg-foreground dark:bg-secondary text-background p-6 rounded-2xl space-y-2 border border-border">
               <div className="text-xs font-black uppercase tracking-wider text-zinc-400">
                 {t('pages', 'sections.contactQuick')}
               </div>
@@ -139,13 +139,13 @@ export const ContactSection: React.FC = () => {
           </Reveal>
 
           {/* Form Column (7 cols) */}
-          <Reveal className="lg:col-span-7 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+          <Reveal className="lg:col-span-7 bg-card p-6 sm:p-8 rounded-3xl border border-border shadow-xs">
             {isSubmitted ? (
               <div className="py-8 text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                   {t('pages', 'sections.contactReceived')}
                 </h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto font-medium">
@@ -176,7 +176,7 @@ export const ContactSection: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
                   {t('pages', 'sections.contactLeave')}
                 </h3>
 
@@ -197,10 +197,10 @@ export const ContactSection: React.FC = () => {
                       if (errors.name) setErrors({ ...errors, name: '' });
                     }}
                     placeholder={t('pages', 'sections.contactNamePlaceholder')}
-                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 ${
+                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 ${
                       errors.name
                         ? 'border-rose-500 focus:ring-rose-500'
-                        : 'border-zinc-200 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100'
+                        : 'border-border focus:ring-zinc-900 dark:focus:ring-zinc-100'
                     }`}
                   />
                   {errors.name && (
@@ -228,10 +228,10 @@ export const ContactSection: React.FC = () => {
                       if (errors.phone) setErrors({ ...errors, phone: '' });
                     }}
                     placeholder="+998 90 123 45 67"
-                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 ${
+                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 ${
                       errors.phone
                         ? 'border-rose-500 focus:ring-rose-500'
-                        : 'border-zinc-200 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100'
+                        : 'border-border focus:ring-zinc-900 dark:focus:ring-zinc-100'
                     }`}
                   />
                   {errors.phone && (
@@ -259,10 +259,10 @@ export const ContactSection: React.FC = () => {
                       if (errors.message) setErrors({ ...errors, message: '' });
                     }}
                     placeholder={t('pages', 'sections.contactMessagePlaceholder')}
-                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 resize-none ${
+                    className={`w-full px-4 py-3.5 rounded-xl border text-sm bg-zinc-50 dark:bg-zinc-800/80 text-foreground placeholder-zinc-400 focus:outline-none focus:ring-2 resize-none ${
                       errors.message
                         ? 'border-rose-500 focus:ring-rose-500'
-                        : 'border-zinc-200 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100'
+                        : 'border-border focus:ring-zinc-900 dark:focus:ring-zinc-100'
                     }`}
                   />
                   {errors.message && (
@@ -278,7 +278,7 @@ export const ContactSection: React.FC = () => {
                   id="contact-submit-btn"
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 px-6 rounded-xl font-black text-sm tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
+                  className="w-full py-4 px-6 rounded-xl font-black text-sm tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <span>{t('pages', 'sections.contactSending')}</span>

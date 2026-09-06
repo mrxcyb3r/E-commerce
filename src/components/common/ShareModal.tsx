@@ -167,7 +167,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
       key: 'x',
       label: 'X',
       icon: <AtSign className="w-5 h-5" />,
-      className: 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100',
+      className: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-100',
     },
     {
       key: 'qr',
@@ -245,17 +245,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 340 }}
-        className="relative w-full sm:w-[420px] bg-white dark:bg-zinc-900 sm:rounded-3xl rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] border-t sm:border border-neutral-200 dark:border-neutral-700 p-5 sm:p-6 max-w-md mx-auto"
+        className="relative w-full sm:w-[420px] bg-card sm:rounded-3xl rounded-t-[28px] shadow-[0_-12px_40px_rgba(0,0,0,0.35)] border-t sm:border border-border p-5 sm:p-6 max-w-md mx-auto"
       >
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0">
             <h3
               id={headingId}
-              className="text-base font-black text-neutral-900 dark:text-white"
+              className="text-base font-black text-foreground"
             >
               {t('common', 'share')}
             </h3>
-            <p className="text-[11px] text-neutral-400 font-medium mt-0.5 line-clamp-1">
+            <p className="text-[11px] text-zinc-400 font-medium mt-0.5 line-clamp-1">
               {title || url}
             </p>
           </div>
@@ -263,10 +263,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
             ref={closeBtnRef}
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors active:scale-90"
+            className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
             aria-label={t('common', 'close')}
           >
-            <X className="w-4 h-4 text-neutral-500" />
+            <X className="w-4 h-4 text-zinc-500" />
           </button>
         </div>
 
@@ -296,7 +296,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
                   {opt.icon}
                 </motion.span>
               </span>
-              <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 text-center leading-tight">
+              <span className="text-[10px] font-bold text-zinc-600 dark:text-zinc-300 text-center leading-tight">
                 {opt.key === 'copy' && copied ? t('common', 'copied') : opt.label}
               </span>
             </motion.button>
@@ -305,15 +305,15 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
 
         {webShareSupported && (
           <div className="mt-4">
-            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 my-3">
-              <span className="flex-1 h-px bg-neutral-200 dark:bg-neutral-700" />
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 my-3">
+              <span className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
               yoki
-              <span className="flex-1 h-px bg-neutral-200 dark:bg-neutral-700" />
+              <span className="flex-1 h-px bg-zinc-200 dark:bg-zinc-700" />
             </div>
             <button
               type="button"
               onClick={handleWebShare}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-300 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors active:scale-95"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-border bg-zinc-50 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-300 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:scale-95"
             >
               <Share2 className="w-4 h-4" />
               Boshqa qurilma bilan ulashish
@@ -329,11 +329,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-neutral-200 dark:border-neutral-700 p-5">
+              <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-border p-5">
                 <div className="bg-white p-3 rounded-xl shadow-sm">
                   <QRCodeCanvas value={url} size={160} marginSize={0} level="M" />
                 </div>
-                <p className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400">
+                <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400">
                   Kamerada skan qilib oching
                 </p>
                 <button
@@ -352,7 +352,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
                   className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all active:scale-95 flex items-center gap-1.5 ${
                     copiedQr
                       ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300'
-                      : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
+                      : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
                   }`}
                 >
                   <AnimatePresence mode="wait">

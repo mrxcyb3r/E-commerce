@@ -15,13 +15,13 @@ export const FavoritesPage: React.FC = () => {
   return (
     <div className="pt-28 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 pb-6 border-b border-border">
         <div>
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-rose-500 mb-1">
             <Heart className="w-3.5 h-3.5 fill-rose-500" />
             <span>{t('pages', 'favorites.eyebrow')}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tighter">
+          <h1 className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
             {t('pages', 'favorites.title')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal">
@@ -54,7 +54,7 @@ export const FavoritesPage: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <h2 className="text-2xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
+            <h2 className="text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
               {t('pages', 'favorites.emptyTitle')}
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
@@ -64,7 +64,7 @@ export const FavoritesPage: React.FC = () => {
 
           <Link
             to="/products"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-black text-sm bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm tracking-wide"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-black text-sm bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm tracking-wide"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>{t('pages', 'favorites.browse')}</span>
@@ -73,13 +73,13 @@ export const FavoritesPage: React.FC = () => {
       ) : (
         <div className="space-y-8">
           {/* Helpful Store Visit Tip Banner */}
-          <div className="p-5 sm:p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="p-5 sm:p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-foreground dark:bg-card text-background dark:text-card-foreground flex items-center justify-center shrink-0">
                 <Store className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-sm sm:text-base font-black text-zinc-900 dark:text-white">
+                <div className="text-sm sm:text-base font-black text-foreground">
                   {t('pages', 'favorites.visitTip')}
                 </div>
                 <div className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-medium">
@@ -92,7 +92,7 @@ export const FavoritesPage: React.FC = () => {
               href={storeInfo.telegram}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 text-xs font-black rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 hover:bg-zinc-800 dark:hover:bg-zinc-100 shrink-0 transition-colors shadow-xs"
+              className="px-5 py-3 text-xs font-black rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground hover:bg-zinc-800 dark:hover:bg-zinc-100 shrink-0 transition-colors shadow-xs"
             >
               {t('pages', 'favorites.sendTelegram')}
             </a>
