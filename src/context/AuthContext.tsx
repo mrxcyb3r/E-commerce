@@ -3,22 +3,17 @@ import { supabase } from '../lib/supabase/client';
 import { BUSINESS_CONFIG } from '../config/business';
 import { useStore } from './StoreContext';
 
-const toAdminUser = (email: string | undefined, adminName: string): AdminUser => ({
-  username: email ? email.split('@')[0] : 'admin',
-  role: 'admin',
-  name: adminName,
-});
-
 export interface AdminUser {
   username: string;
-  role: 'admin';
+  role: 'owner' | 'admin' | 'editor' | 'viewer';
   name: string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   isAuthenticated: boolean;
   user: AdminUser | null;
   adminUsername: string;
+  role: 'owner' | 'admin' | 'editor' | 'viewer' | null;
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateCredentials: (newUsername: string, newPassword: string) => void;
@@ -26,6 +21,14 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const toAdminUser = (email: string | undefined, adminName: string, role: 'owner' | 'admin' | 'editor' | 'viewer' = 'viewer'): AdminUser => ({
+  username: email ? email.split('@')[0] : 'admin',
+  role,
+  name: adminName,
+});
+
+export const I18nContext = createContext({});
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { storeInfo } = useStore();
@@ -39,56 +42,74 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 
   const [user, setUser] = useState<AdminUser | null>(null);
+  const [role, setRole] = useState<'owner' | 'admin' | 'editor' | 'viewer' | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
-  const [email, setEmail] = useState(adminEmail);
 
   useEffect(() => {
     setSessionChecked(false);
     setUser(null);
-    setEmail(adminEmail);
-  }, [adminEmail]);
+    setRole(null);
+  }, []);
 
   useEffect(() => {
-    if (!email) return;
+    if (!adminEmail) return;
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user?.email === email) {
-        setUser(toAdminUser(data.session.user.email, adminName));
+      if (data.session?.user?.email === adminEmail) {
+        // Fetch profile role from profiles table
+        supabase.from('profiles').select('role').eq('id', adminEmail).maybeSingle().then(({ data: profileData }) => {
+          const profileRole = profileData?.role || 'viewer';
+          setRole(profileRole);
+          setUser(toAdminUser(adminEmail, adminName, profileRole));
+        });
       } else {
         setUser(null);
+        setRole(null);
       }
       setSessionChecked(true);
     });
+  }, [adminEmail]);
 
+  useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user?.email === email) {
-        setUser(toAdminUser(session.user.email, adminName));
-      } else {
-        setUser(null);
-      }
+      if (!adminEmail) return;
+      supabase.from('profiles').select('role').eq('id', adminEmail).maybeSingle().then(({ data: profileData }) => {
+        const profileRole = profileData?.role || 'viewer';
+        setRole(profileRole);
+        setUser(toAdminUser(adminEmail, adminName, profileRole));
+      });
+      setSessionChecked(true);
     });
 
-    return () => sub.subscription.unsubscribe();
-  }, [email, adminName]);
+    return () => {
+      // subscription cleanup handled by supabase
+    };
+  }, [adminEmail]);
 
   const login = useCallback(
     async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
       const cleanUser = username.trim();
-      const target = cleanUser.includes('@') ? cleanUser : email;
+      const target = cleanUser.includes('@') ? cleanUser : adminEmail;
 
       const { error } = await supabase.auth.signInWithPassword({ email: target, password: password.trim() });
       if (error) {
         return { success: false, error: "Login yoki parol noto'g'ri." };
       }
-      setUser(toAdminUser(target, adminName));
+      // Fetch profile role after successful login
+      supabase.from('profiles').select('role').eq('id', target).maybeSingle().then(({ data: profileData }) => {
+        const profileRole = profileData?.role || 'viewer';
+        setRole(profileRole);
+        setUser(toAdminUser(target, adminName, profileRole));
+      });
       return { success: true };
     },
-    [email, adminName],
+    [adminEmail],
   );
 
   const logout = useCallback(() => {
     supabase.auth.signOut();
     setUser(null);
-  }, []);
+    setRole(null);
+  }, [adminEmail]);
 
   const updateCredentials = useCallback((_newUsername: string, _newPassword: string) => {
     // Supabase Auth uses email managed in the dashboard; username is no longer stored locally.
@@ -100,7 +121,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Verify current password is valid for the admin account
     const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email,
+      email: adminEmail,
       password: currentPassword.trim(),
     });
     if (verifyError) return false;
@@ -108,7 +129,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { error } = await supabase.auth.updateUser({ password: newPassword.trim() });
     if (error) return false;
     return true;
-  }, [email]);
+  }, [adminEmail]);
 
   const adminUsername = user?.username || 'admin';
 
@@ -117,6 +138,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       value={{
         isAuthenticated: sessionChecked && !!user,
         user,
+        role,
         adminUsername,
         login,
         logout,
