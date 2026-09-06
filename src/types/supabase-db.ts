@@ -314,6 +314,56 @@ type ContactCms = {
   updated_at: string;
 };
 
+type Order = {
+  id: string;
+  shop_id: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  customer_address: string | null;
+  customer_notes: string | null;
+  order_status: 'new' | 'confirmed' | 'preparing' | 'shipped' | 'delivered' | 'cancelled';
+  payment_status: 'pending' | 'paid' | 'verifying' | 'refunded' | 'cancelled';
+  payment_method: string | null;
+  delivery_method: 'pickup' | 'delivery' | 'courier';
+  tracking_number: string | null;
+  subtotal: number;
+  delivery_fee: number;
+  discount: number;
+  total: number;
+  currency: string;
+  source: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+type OrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string | null;
+  product_name: string;
+  product_image: string | null;
+  product_sku: string | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  size: string | null;
+  color: string | null;
+  created_at: string;
+};
+
+type OrderStatusHistory = {
+  id: string;
+  order_id: string;
+  status_type: 'order' | 'payment';
+  old_value: string | null;
+  new_value: string;
+  changed_by: string | null;
+  note: string | null;
+  created_at: string;
+};
+
 type StoreSettings = {
   id: string;
   business_name: string;
@@ -492,6 +542,21 @@ export type Database = {
         Row: AnalyticsEvent;
         Insert: Omit<AnalyticsEvent, 'id' | 'created_at'>;
         Update: Partial<Omit<AnalyticsEvent, 'id' | 'created_at'>>;
+      };
+      orders: {
+        Row: Order;
+        Insert: Omit<Order, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Order, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      order_items: {
+        Row: OrderItem;
+        Insert: Omit<OrderItem, 'id' | 'created_at'>;
+        Update: Partial<Omit<OrderItem, 'id' | 'created_at'>>;
+      };
+      order_status_history: {
+        Row: OrderStatusHistory;
+        Insert: Omit<OrderStatusHistory, 'id' | 'created_at'>;
+        Update: Partial<Omit<OrderStatusHistory, 'id' | 'created_at'>>;
       };
     };
     Views: {};

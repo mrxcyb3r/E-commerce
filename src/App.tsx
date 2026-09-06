@@ -48,6 +48,8 @@ const StoreAdminPage = lazyNamed(() => import('./pages/admin/StoreAdminPage'), '
 const AboutAdminPage = lazyNamed(() => import('./pages/admin/AboutAdminPage'), 'AboutAdminPage');
 const ContactAdminPage = lazyNamed(() => import('./pages/admin/ContactAdminPage'), 'ContactAdminPage');
 const SettingsAdminPage = lazyNamed(() => import('./pages/admin/SettingsAdminPage'), 'SettingsAdminPage');
+const OrdersListPage = lazyNamed(() => import('./pages/admin/OrdersListPage'), 'OrdersListPage');
+const OrderDetailPage = lazyNamed(() => import('./pages/admin/OrderDetailPage'), 'OrderDetailPage');
 const AnalyticsAdminPage = lazyNamed(() => import('./pages/admin/AnalyticsAdminPage'), 'AnalyticsAdminPage');
 const CommentsAdminPage = lazyNamed(() => import('./pages/admin/CommentsAdminPage'), 'CommentsAdminPage');
 const FeedAnalyticsAdminPage = lazyNamed(() => import('./pages/admin/FeedAnalyticsAdminPage'), 'FeedAnalyticsAdminPage');
@@ -190,6 +192,8 @@ export default function App() {
                     <Route path="contact" element={<ContactAdminPage />} />
                     <Route path="settings" element={<SettingsAdminPage />} />
                     <Route path="analytics" element={<AnalyticsAdminPage />} />
+                    <Route path="orders" element={<OrdersListPage />} />
+                    <Route path="orders/:id" element={<OrderDetailPage />} />
                     <Route path="comments" element={<CommentsAdminPage />} />
                   </Route>
                 </Routes>

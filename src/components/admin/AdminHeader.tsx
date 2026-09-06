@@ -12,18 +12,17 @@ const sectionTitles: Record<string, string> = {
   categories: 'Kategoriyalar',
   inventory: 'Inventar',
   homepage: 'Bosh sahifa CMS',
-  feed: 'Feed',
+  feed: 'Videolar / Feed',
   prompts: 'AI Promptlar',
   testimonials: 'Sharhlar',
   faq: 'Savol-Javoblar',
-  store: "Do'kon",
+  store: "Do'kon ma'lumotlari",
   about: 'Biz haqimizda',
-  contact: 'Aloqa',
+  contact: 'Aloqa sahifasi',
   settings: 'Sozlamalar',
-  analytics: 'Analytics',
+  analytics: 'Tahlil',
   comments: 'Izohlar',
-  likes: 'Yoqtirishlar',
-  performance: 'Samaradorlik',
+  orders: 'Buyurtmalar',
 };
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
@@ -32,7 +31,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
 
   const pathParts = location.pathname.split('/').filter(Boolean);
   const currentSection = pathParts[1] || '';
-  const title = sectionTitles[currentSection] || 'Dashboard';
+  const title = sectionTitles[currentSection] || 'Boshqaruv';
 
   return (
     <header className="sticky top-0 z-30 h-14 bg-background/80 backdrop-blur-xl border-b border-border px-4 sm:px-6 flex items-center justify-between">
@@ -47,7 +46,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
         </button>
 
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span className="font-medium">Admin</span>
+          <span className="font-medium">Boshqaruv</span>
           <span className="text-muted-foreground/40">/</span>
           <span className="font-semibold text-foreground">{title}</span>
         </div>
