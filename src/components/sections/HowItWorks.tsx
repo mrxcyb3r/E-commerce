@@ -1,7 +1,7 @@
 import React from 'react';
 import { Smartphone, CheckSquare, Store, ArrowRight } from 'lucide-react';
-import { motion } from 'motion/react';
 import { useI18n } from '../../i18n/I18nContext';
+import { Reveal } from '../motion';
 
 export const HowItWorks: React.FC = () => {
   const { t } = useI18n();
@@ -10,13 +10,7 @@ export const HowItWorks: React.FC = () => {
     <section className="py-16 md:py-24 bg-white dark:bg-zinc-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center max-w-2xl mx-auto mb-14 space-y-2"
-        >
+        <Reveal className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <span>{t('pages', 'sections.howEyebrow')}</span>
           </div>
@@ -26,7 +20,7 @@ export const HowItWorks: React.FC = () => {
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
             {t('pages', 'sections.howSubtitle')}
           </p>
-        </motion.div>
+        </Reveal>
 
         {/* Shopping Journey Steps */}
         <div className="grid max-w-4xl mx-auto grid-cols-1 gap-4">

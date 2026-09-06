@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { useStore } from '../../context/StoreContext';
 import { useBrand } from '../../hooks/useBrand';
 import { Sparkles, Phone } from 'lucide-react';

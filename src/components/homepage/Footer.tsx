@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Instagram, Youtube, Send, Mail, MapPin, Phone, Clock, ChevronRight, Sparkles } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useBrand } from '../../hooks/useBrand';
-import { motion } from 'motion/react';
+import { Reveal } from '../motion';
 
 export const Footer: React.FC = () => {
   const { storeInfo, categories } = useStore();
@@ -52,11 +52,8 @@ export const Footer: React.FC = () => {
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-16 lg:py-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          <Reveal
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="lg:col-span-2 space-y-6"
           >
             <div className="flex items-center gap-3">
@@ -83,97 +80,73 @@ export const Footer: React.FC = () => {
                 <Mail className="w-5 h-5" />
               </a>
             </div>
-          </motion.div>
+          </Reveal>
 
-          <motion.nav
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            aria-label="Shop"
+          <Reveal
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h4 className="font-display font-bold text-white mb-4">Shop</h4>
-            <ul className="space-y-3" role="list">
-              {navigation.shop.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    to={item.href}
-                    className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
-                  >
-                    {item.label}
-                    <motion.div
-                      whileHover={{ x: 3 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            <nav aria-label="Shop">
+              <h4 className="font-display font-bold text-white mb-4">Shop</h4>
+              <ul className="space-y-3" role="list">
+                {navigation.shop.map((item) => (
+                  <li key={item.label}>
+                    <Link
+                      to={item.href}
+                      className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
                     >
-                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500" />
-                    </motion.div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.nav>
+                      {item.label}
+                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </Reveal>
 
-          <motion.nav
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-            aria-label="Discover"
+          <Reveal
+            transition={{ duration: 0.6, delay: 0.25 }}
           >
-            <h4 className="font-display font-bold text-white mb-4">Discover</h4>
-            <ul className="space-y-3" role="list">
-              {navigation.discover.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    to={item.href}
-                    className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
-                  >
-                    {item.label}
-                    <motion.div
-                      whileHover={{ x: 3 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            <nav aria-label="Discover">
+              <h4 className="font-display font-bold text-white mb-4">Discover</h4>
+              <ul className="space-y-3" role="list">
+                {navigation.discover.map((item) => (
+                  <li key={item.label}>
+                    <Link
+                      to={item.href}
+                      className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
                     >
-                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500" />
-                    </motion.div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.nav>
+                      {item.label}
+                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </Reveal>
 
-          <motion.nav
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            aria-label="Support"
+          <Reveal
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h4 className="font-display font-bold text-white mb-4">Support</h4>
-            <ul className="space-y-3" role="list">
-              {navigation.support.map((item) => (
-                <li key={item.label}>
-                  <Link
-                    to={item.href}
-                    className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
-                  >
-                    {item.label}
-                    <motion.div
-                      whileHover={{ x: 3 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            <nav aria-label="Support">
+              <h4 className="font-display font-bold text-white mb-4">Support</h4>
+              <ul className="space-y-3" role="list">
+                {navigation.support.map((item) => (
+                  <li key={item.label}>
+                    <Link
+                      to={item.href}
+                      className="text-zinc-400 hover:text-white transition-colors group inline-flex items-center gap-2 text-sm"
                     >
-                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500" />
-                    </motion.div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.nav>
+                      {item.label}
+                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-amber-500 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </Reveal>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+          <Reveal
+            transition={{ duration: 0.6, delay: 0.35 }}
           >
             <h4 className="font-display font-bold text-white mb-4">Visit Our Store</h4>
             <address className="space-y-4 text-zinc-400 not-italic">
@@ -196,13 +169,10 @@ export const Footer: React.FC = () => {
                 </div>
               </div>
             </address>
-          </motion.div>
+          </Reveal>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <Reveal
           transition={{ duration: 0.5, delay: 0.5 }}
           className="pt-8 border-t border-zinc-800"
         >
@@ -224,7 +194,7 @@ export const Footer: React.FC = () => {
               </span>
             </div>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </footer>
   );

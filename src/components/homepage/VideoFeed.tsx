@@ -5,6 +5,7 @@ import { FeedVideoCard } from '../feed/FeedVideoCard';
 import { useStore } from '../../context/StoreContext';
 import { useVideoFeed } from '../../context/VideoContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { Reveal } from '../motion';
 
 export const VideoFeed: React.FC = () => {
   const { publishedVideos, videos } = useVideoFeed();
@@ -71,13 +72,7 @@ export const VideoFeed: React.FC = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_black_100%)] opacity-50" aria-hidden="true" />
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
-        >
+        <Reveal className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-4">
               <Play className="w-3.5 h-3.5 text-amber-500" />
@@ -117,7 +112,7 @@ export const VideoFeed: React.FC = () => {
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
-        </motion.div>
+        </Reveal>
 
         <div className="relative">
           <AnimatePresence mode="wait" custom={activeIndex}>
@@ -159,36 +154,18 @@ export const VideoFeed: React.FC = () => {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12 text-center"
-        >
+        <Reveal className="mt-12 text-center">
           <Link
             to="/feed"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all border border-white/10 group"
           >
             Explore Full Video Feed
-            <motion.div
-              whileHover={{ x: 4 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </motion.div>
+            <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
-        </motion.div>
+        </Reveal>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-zinc-500 text-xs font-medium uppercase tracking-widest"
-        aria-hidden="true"
-      >
+      <Reveal className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-zinc-500 text-xs font-medium uppercase tracking-widest">
         <span>Scroll or use arrow keys to navigate</span>
         <motion.svg
           animate={{ y: [0, 8, 0] }}
@@ -201,7 +178,7 @@ export const VideoFeed: React.FC = () => {
         >
           <path d="M12 5v14M19 12l-7 7-7-7" />
         </motion.svg>
-      </motion.div>
+      </Reveal>
 
       <AnimatePresence>
         {showOverlay && (

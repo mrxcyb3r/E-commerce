@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useBrand } from '../../hooks/useBrand';
-import { motion } from 'motion/react';
+import { Reveal } from '../motion';
 
 export const EditorialCampaign: React.FC = () => {
   const { storeInfo, homepageCms } = useStore();
@@ -28,13 +28,7 @@ export const EditorialCampaign: React.FC = () => {
     <section id="campaign" className="py-10 md:py-16 bg-white dark:bg-zinc-900 transition-colors scroll-mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-6 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="space-y-3"
-          >
+          <Reveal className="space-y-3">
             <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-500">
               <Sparkles className="w-3.5 h-3.5" />
               <span>{eyebrow}</span>
@@ -59,7 +53,7 @@ export const EditorialCampaign: React.FC = () => {
                 <Sparkles className="w-3.5 h-3.5" />
               </Link>
             </div>
-          </motion.div>
+          </Reveal>
 
           {/* Campaign image or product showcase */}
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm dark:shadow-zinc-800">

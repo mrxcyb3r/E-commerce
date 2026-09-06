@@ -1,9 +1,9 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
-import { motion } from 'motion/react';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBrand } from '../../hooks/useBrand';
+import { Reveal } from '../motion';
 
 interface CategoryTileProps {
   id: string;
@@ -71,13 +71,7 @@ export const CategoriesSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="space-y-2"
-          >
+          <Reveal className="space-y-2">
             <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>{'Kategoriyalar'}</span>
@@ -88,7 +82,7 @@ export const CategoriesSection: React.FC = () => {
             <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
               { 'Sizga mos bo\'lgani kerakli bo\'limni tanlang.' }
             </p>
-          </motion.div>
+          </Reveal>
 
           {/* CTA */}
           <div className="self-start">

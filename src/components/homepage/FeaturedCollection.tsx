@@ -4,9 +4,11 @@ import { ChevronRight, Sparkles } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import { useStore } from '../../context/StoreContext';
 import { motion } from 'motion/react';
+import { Reveal, Stagger } from '../motion';
+import { fadeUp, staggerContainer, staggerItem } from '../../lib/animations';
 
 export const FeaturedCollection: React.FC = () => {
-  const { publishedProducts, homepageCms } = useStore();
+  const { publishedProducts } = useStore();
 
   const featuredProducts = publishedProducts
     .filter((p) => p.isFeatured)
@@ -27,13 +29,7 @@ export const FeaturedCollection: React.FC = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_20%_0%,_amber-500/5_0%,_transparent_50%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_20%_0%,_amber-500/3_0%,_transparent_50%)]" aria-hidden="true" />
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mb-12"
-        >
+        <Reveal className="mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Featured Collection</span>
@@ -51,14 +47,12 @@ export const FeaturedCollection: React.FC = () => {
             <br />
             <span className="text-amber-500">Picks</span>
           </h2>
-        </motion.div>
+        </Reveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {heroProduct && (
-            <motion.article
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
+            <Reveal
+              variant={fadeUp}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="lg:col-span-7 lg:row-span-2 relative group"
             >
@@ -136,68 +130,53 @@ export const FeaturedCollection: React.FC = () => {
                   </div>
                 </div>
               </Link>
-            </motion.article>
+            </Reveal>
           )}
 
-          <div className="lg:col-span-5 space-y-6">
+          <Stagger
+            containerVariant={staggerContainer}
+            itemVariant={staggerItem}
+            className="lg:col-span-5 space-y-6"
+          >
             {secondaryProducts.map((product, index) => (
-              <motion.article
+              <ProductCard
                 key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.6, delay: 0.2 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="relative group"
-              >
-                <ProductCard
-                  product={product}
-                  index={index}
-                  variant="featured"
-                />
-              </motion.article>
+                product={product}
+                index={index}
+                variant="featured"
+              />
             ))}
-          </div>
+          </Stagger>
 
           {tertiaryProducts.length > 0 && (
-            <div className="lg:col-span-12 grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 mt-6">
+            <Stagger
+              containerVariant={staggerContainer}
+              itemVariant={staggerItem}
+              className="lg:col-span-12 grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 mt-6"
+            >
               {tertiaryProducts.map((product, index) => (
-                <motion.article
+                <ProductCard
                   key={product.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-100px' }}
-                  transition={{ duration: 0.5, delay: 0.4 + index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-                >
-                  <ProductCard
-                    product={product}
-                    index={index}
-                    variant="compact"
-                  />
-                </motion.article>
+                  product={product}
+                  index={index}
+                  variant="compact"
+                />
               ))}
-            </div>
+            </Stagger>
           )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.6 }}
+          <Reveal
             className="lg:col-span-12 text-center pt-4"
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
             <Link
               to="/products?featured=true"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong font-semibold text-zinc-950 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 transition-all group"
             >
               View Full Collection
-              <motion.div
-                whileHover={{ x: 4 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </motion.div>
+              <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

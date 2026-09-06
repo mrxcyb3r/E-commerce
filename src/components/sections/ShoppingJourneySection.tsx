@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { Stagger } from '../motion';
+import { staggerContainer, staggerItem } from '../../lib/animations';
 
 export const ShoppingJourneySection: React.FC = () => {
   const steps = [
@@ -38,28 +39,29 @@ export const ShoppingJourneySection: React.FC = () => {
             </p>
           </div>
 
-          {steps.map((step) => (
-            <motion.div
-              key={step.number}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: (Number(step.number) - 1) * 0.1 }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800/30 transition-colors">
-                {step.number}
+          <Stagger
+            containerVariant={staggerContainer}
+            itemVariant={staggerItem}
+          >
+            {steps.map((step) => (
+              <div
+                key={step.number}
+                className="flex items-center gap-2"
+              >
+                <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800/30 transition-colors">
+                  {step.number}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-zinc-900 dark:text-white text-sm">
+                    {step.title}
+                  </p>
+                  <p className="text-zinc-500 dark:text-zinc-400 text-xs">
+                    {step.description}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-black text-zinc-900 dark:text-white text-sm">
-                  {step.title}
-                </p>
-                <p className="text-zinc-500 dark:text-zinc-400 text-xs">
-                  {step.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+            ))}
+          </Stagger>
         </div>
       </div>
     </section>

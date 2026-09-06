@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { motion } from 'motion/react';
+import { Reveal } from '../motion';
 
 export const PromoBanner: React.FC = () => {
   const { homepageCms } = useStore();
@@ -10,13 +10,7 @@ export const PromoBanner: React.FC = () => {
   return (
     <section className="py-12 bg-white dark:bg-zinc-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="relative rounded-3xl overflow-hidden bg-zinc-900 dark:bg-zinc-800 text-white p-8 sm:p-12 lg:p-16 shadow-xl border border-zinc-800"
-        >
+        <Reveal className="relative rounded-3xl overflow-hidden bg-zinc-900 dark:bg-zinc-800 text-white p-8 sm:p-12 lg:p-16 shadow-xl border border-zinc-800">
           {/* Background image overlay */}
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
@@ -45,7 +39,7 @@ export const PromoBanner: React.FC = () => {
               </Link>
             </div>
           </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

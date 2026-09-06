@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Send, Phone, MapPin, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { track } from '../../lib/analytics/client';
-import { motion } from 'motion/react';
 import { useI18n } from '../../i18n/I18nContext';
+import { Reveal } from '../motion';
 
 export const ContactSection: React.FC = () => {
   const { storeInfo, contactCms } = useStore();
@@ -58,13 +58,7 @@ export const ContactSection: React.FC = () => {
   return (
     <section id="contact" className="py-16 md:py-24 bg-zinc-50/50 dark:bg-zinc-950 transition-colors scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center max-w-2xl mx-auto mb-14 space-y-2"
-        >
+        <Reveal className="text-center max-w-2xl mx-auto mb-14 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <MessageSquare className="w-3.5 h-3.5" />
             <span>{t('pages', 'sections.contactEyebrow')}</span>
@@ -75,17 +69,11 @@ export const ContactSection: React.FC = () => {
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
             {contactCms.subtitle || t('pages', 'sections.contactSubtitleFallback')}
           </p>
-        </motion.div>
+        </Reveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contact Details Column (5 cols) */}
-          <motion.div
-            initial={{ opacity: 0, x: -15 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="lg:col-span-5 space-y-6"
-          >
+          <Reveal className="lg:col-span-5 space-y-6">
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-6">
               <h3 className="text-xl font-black text-zinc-900 dark:text-white font-['Outfit',sans-serif] tracking-tight">
                 {t('pages', 'sections.contactDirect')}
@@ -148,16 +136,10 @@ export const ContactSection: React.FC = () => {
                 {contactCms.supportNote || t('pages', 'sections.contactSupport')}
               </p>
             </div>
-          </motion.div>
+          </Reveal>
 
           {/* Form Column (7 cols) */}
-          <motion.div
-            initial={{ opacity: 0, x: 15 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="lg:col-span-7 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs"
-          >
+          <Reveal className="lg:col-span-7 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
             {isSubmitted ? (
               <div className="py-8 text-center space-y-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
@@ -309,7 +291,7 @@ export const ContactSection: React.FC = () => {
                 </button>
               </form>
             )}
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

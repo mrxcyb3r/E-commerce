@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { Reveal } from '../motion';
 
 export const FaqSection: React.FC = () => {
   const { publishedFaq, homepageCms } = useStore();
@@ -14,13 +15,7 @@ export const FaqSection: React.FC = () => {
   return (
     <section className="py-16 md:py-24 bg-white dark:bg-zinc-900 transition-colors">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center mb-12 space-y-2"
-        >
+        <Reveal className="text-center mb-12 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Savol-javoblar</span>
@@ -31,19 +26,15 @@ export const FaqSection: React.FC = () => {
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto font-normal">
             {homepageCms.faqSectionSubtitle || "Do'konimiz xizmati va mahsulotlar bo'yicha eng ko'p uchraydigan savollarga javoblar."}
           </p>
-        </motion.div>
+        </Reveal>
 
         {/* Accordion List */}
         <div className="space-y-3">
-          {publishedFaq.map((item, index) => {
+          {publishedFaq.map((item) => {
             const isOpen = openId === item.id;
             return (
-              <motion.div
+              <div
                 key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
                 className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 overflow-hidden transition-colors"
               >
                 <button
@@ -78,7 +69,7 @@ export const FaqSection: React.FC = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             );
           })}
         </div>

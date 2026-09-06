@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Sparkles } from 'lucide-react';
-import { useStore } from '../../context/StoreContext';
-import { motion } from 'motion/react';
+import { Reveal, Stagger } from '../motion';
+import { staggerContainer, staggerItem } from '../../lib/animations';
 
 interface StyleCollection {
   id: string;
@@ -72,13 +72,7 @@ export const ShopByStyle: React.FC = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mb-12 text-center"
-        >
+        <Reveal className="mb-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Shop by Style</span>
@@ -99,18 +93,15 @@ export const ShopByStyle: React.FC = () => {
           <p className="mt-4 text-zinc-400 text-lg leading-relaxed max-w-2xl mx-auto">
             Curated collections for every mood. Explore distinct aesthetics built around how you live.
           </p>
-        </motion.div>
+        </Reveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
-          {styleCollections.map((collection, index) => (
-            <motion.article
-              key={collection.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, delay: 0.1 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="group relative"
-            >
+        <Stagger
+          containerVariant={staggerContainer}
+          itemVariant={staggerItem}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6"
+        >
+          {styleCollections.map((collection) => (
+            <article key={collection.id} className="group relative">
               <Link
                 to={`/products?category=${collection.categorySlug}`}
                 className="block relative aspect-[3/4] overflow-hidden rounded-2xl"
@@ -145,12 +136,7 @@ export const ShopByStyle: React.FC = () => {
 
                     <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white font-semibold text-sm tracking-wide hover:bg-white/20 transition-all border border-white/20 group-hover:gap-3">
                       Explore
-                      <motion.div
-                        whileHover={{ x: 3 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </motion.div>
+                      <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
                 </div>
@@ -163,30 +149,19 @@ export const ShopByStyle: React.FC = () => {
                   </span>
                 </div>
               </div>
-            </motion.article>
+            </article>
           ))}
-        </div>
+        </Stagger>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="mt-12 text-center"
-        >
+        <Reveal className="mt-12 text-center" transition={{ duration: 0.5, delay: 0.3 }}>
           <Link
             to="/products"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all border border-white/10 group"
           >
             Browse All Categories
-            <motion.div
-              whileHover={{ x: 4 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </motion.div>
+            <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

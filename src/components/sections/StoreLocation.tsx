@@ -1,7 +1,6 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { MapPin, Clock, Phone, Send, ExternalLink } from 'lucide-react';
-import { motion } from 'motion/react';
 import { useI18n } from '../../i18n/I18nContext';
 import { track } from '../../lib/analytics/client';
 

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { MapPin, Clock, Phone, ChevronRight, Navigation, Sparkles, Check, Star, Building2 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useBrand } from '../../hooks/useBrand';
-import { motion } from 'motion/react';
+import { Reveal, Stagger } from '../motion';
+import { fadeUp, staggerContainer, staggerItem } from '../../lib/animations';
 
 export const StoreExperience: React.FC = () => {
   const { storeInfo } = useStore();
@@ -40,16 +41,14 @@ export const StoreExperience: React.FC = () => {
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           <div className="lg:col-span-7 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
+            <Reveal
+              variant={fadeUp}
               transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="relative aspect-[4/3] rounded-3xl overflow-hidden"
             >
               <div className="absolute inset-0">
                 {storeImages.map((img, i) => (
-                  <motion.img
+                  <img
                     key={i}
                     src={img}
                     alt={`${storeName} store view ${i + 1}`}
@@ -101,14 +100,12 @@ export const StoreExperience: React.FC = () => {
                   <Phone className="w-5 h-5" />
                 </button>
               </div>
-            </motion.div>
+            </Reveal>
           </div>
 
           <div className="lg:col-span-5 space-y-8">
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
+            <Reveal
+              variant={fadeUp}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-6">
@@ -131,16 +128,14 @@ export const StoreExperience: React.FC = () => {
               <p className="text-zinc-400 text-lg leading-relaxed mb-8 max-w-xl">
                 Touch, try, and experience our collections in person. Our flagship store offers a curated environment designed for discovery.
               </p>
-            </motion.div>
+            </Reveal>
 
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            <Stagger
+              containerVariant={staggerContainer}
+              itemVariant={staggerItem}
               className="grid grid-cols-2 gap-4"
             >
-              {features.map((feature, index) => (
+              {features.map((feature) => (
                 <div
                   key={feature.title}
                   className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all group"
@@ -150,12 +145,10 @@ export const StoreExperience: React.FC = () => {
                   <p className="text-zinc-400 text-sm leading-relaxed">{feature.description}</p>
                 </div>
               ))}
-            </motion.div>
+            </Stagger>
 
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
+            <Reveal
+              variant={fadeUp}
               transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <h3 className="font-display font-bold text-white mb-4">Opening Hours</h3>
@@ -173,12 +166,10 @@ export const StoreExperience: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </Reveal>
 
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
+            <Reveal
+              variant={fadeUp}
               transition={{ duration: 0.6, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="pt-4 border-t border-zinc-800"
             >
@@ -196,12 +187,7 @@ export const StoreExperience: React.FC = () => {
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-500 text-zinc-950 font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all group"
                   >
                     Get Directions
-                    <motion.div
-                      whileHover={{ x: 4 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </motion.div>
+                    <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     to="/contact"
@@ -211,7 +197,7 @@ export const StoreExperience: React.FC = () => {
                   </Link>
                 </div>
               </div>
-            </motion.div>
+            </Reveal>
           </div>
         </div>
       </div>

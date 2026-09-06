@@ -48,12 +48,6 @@
   --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
   --shadow-glow: 0 0 0 1px rgb(245 158 11 / 0.3), 0 0 20px -5px rgb(245 158 11 / 0.4);
 
-  --animate-fade-in: fade-in 0.6s ease-out forwards;
-  --animate-fade-out: fade-out 0.4s ease-in forwards;
-  --animate-slide-up: slide-up 0.7s ease-out forwards;
-  --animate-slide-down: slide-down 0.5s ease-in forwards;
-  --animate-scale-in: scale-in 0.5s ease-out forwards;
-  --animate-reveal: reveal 0.8s ease-out forwards;
   --animate-marquee: marquee 30s linear infinite;
   --animate-shimmer: shimmer 2s ease-in-out infinite;
   --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
@@ -192,47 +186,6 @@
     text-wrap: balance;
   }
 
-  .animate-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
-
-  .animate-in-delay-1 { animation-delay: 100ms; }
-  .animate-in-delay-2 { animation-delay: 200ms; }
-  .animate-in-delay-3 { animation-delay: 300ms; }
-  .animate-in-delay-4 { animation-delay: 400ms; }
-  .animate-in-delay-5 { animation-delay: 500ms; }
-  .animate-in-delay-6 { animation-delay: 600ms; }
-
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fade-out {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-20px); }
-  }
-
-  @keyframes slide-up {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slide-down {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(40px); }
-  }
-
-  @keyframes scale-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes reveal {
-    from { opacity: 0; clip-path: inset(100% 0 0 0); }
-    to { opacity: 1; clip-path: inset(0 0 0 0); }
-  }
-
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
@@ -295,75 +248,6 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-  }
-
-  .gradient-border {
-    position: relative;
-  }
-  .gradient-border::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
-    opacity: 0;
-    transition: opacity var(--transition-base);
-    z-index: -1;
-  }
-  .gradient-border:hover::before {
-    opacity: 1;
-  }
-
-  .image-reveal {
-    overflow: hidden;
-  }
-  .image-reveal img {
-    transform: scale(1.05);
-    transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  .image-reveal:hover img,
-  .image-reveal:focus-within img {
-    transform: scale(1);
-  }
-
-  .hover-lift {
-    transition: transform var(--transition-base), box-shadow var(--transition-base);
-  }
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-  }
-
-  .hover-scale {
-    transition: transform var(--transition-fast);
-  }
-  .hover-scale:hover {
-    transform: scale(1.02);
-  }
-
-  .hover-scale-lg {
-    transition: transform var(--transition-base);
-  }
-  .hover-scale-lg:hover {
-    transform: scale(1.05);
-  }
-
-  .link-underline {
-    position: relative;
-    text-decoration: none;
-  }
-  .link-underline::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: currentColor;
-    transition: width var(--transition-base);
-  }
-  .link-underline:hover::after {
-    width: 100%;
   }
 
   .container-narrow {

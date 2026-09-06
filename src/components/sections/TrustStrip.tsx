@@ -1,8 +1,9 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { useBrand } from '../../hooks/useBrand';
-import { motion } from 'motion/react';
 import { ShieldCheck, Ruler } from 'lucide-react';
+import { Stagger } from '../motion';
+import { staggerContainer, staggerItem } from '../../lib/animations';
 
 export const TrustStrip: React.FC = () => {
   const { storeInfo, publishedProducts } = useStore();
@@ -52,24 +53,25 @@ export const TrustStrip: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-1.5 py-2.5 text-xs font-black uppercase tracking-wider">
-          {items.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, x: -8 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: index * 0.08 }}
-              className="flex items-center gap-2.5 flex-wrap"
-            >
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
-                {item.icon}
+          <Stagger
+            containerVariant={staggerContainer}
+            itemVariant={staggerItem}
+          >
+            {items.map((item) => (
+              <div
+                key={item.title}
+                className="flex items-center gap-2.5 flex-wrap"
+              >
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0">
+                  {item.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-zinc-900 dark:text-white">{item.title}</p>
+                  <p className="text-zinc-500 dark:text-zinc-400 line-clamp-1">{item.sublabel}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-black text-zinc-900 dark:text-white">{item.title}</p>
-                <p className="text-zinc-500 dark:text-zinc-400 line-clamp-1">{item.sublabel}</p>
-              </div>
-            </motion.div>
-          ))}
+            ))}
+          </Stagger>
         </div>
       </div>
     </section>

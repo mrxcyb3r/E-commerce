@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { ThemeProvider } from './context/ThemeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { VideoProvider } from './context/VideoContext';
@@ -9,6 +10,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { pageTransition } from './lib/animations';
 
 // Public pages — code-split so each route loads only what it needs.
 const lazyNamed = (importFn: () => Promise<{ [key: string]: unknown }>, name: string) =>
@@ -67,6 +69,36 @@ const AnalyticsTracker: React.FC = () => {
   return null;
 };
 
+/** Animated route wrapper — provides page transitions for public routes */
+const AnimatedRoutes: React.FC = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={pageTransition}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        <Routes location={location}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/feed" element={<FeedPage />} />
+          <Route path="/videos" element={<FeedPage />} />
+          <Route path="/prompts" element={<PromptLibraryPage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/location" element={<LocationPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 const SeoMetaManager: React.FC = () => {
   const { storeInfo } = useStore();
   useDocumentMeta({
@@ -111,19 +143,7 @@ export default function App() {
                         <main id="main-content" className="flex-grow">
                           <ErrorBoundary>
                             <Suspense fallback={<PageLoader />}>
-                              <Routes>
-                              <Route path="/" element={<HomePage />} />
-                              <Route path="/products" element={<ProductsPage />} />
-                              <Route path="/products/:id" element={<ProductDetailPage />} />
-                              <Route path="/feed" element={<FeedPage />} />
-                              <Route path="/videos" element={<FeedPage />} />
-                              <Route path="/prompts" element={<PromptLibraryPage />} />
-                              <Route path="/favorites" element={<FavoritesPage />} />
-                              <Route path="/about" element={<AboutPage />} />
-                              <Route path="/location" element={<LocationPage />} />
-                              <Route path="/contact" element={<ContactPage />} />
-                              <Route path="*" element={<NotFoundPage />} />
-                              </Routes>
+                              <AnimatedRoutes />
                             </Suspense>
                           </ErrorBoundary>
                         </main>
