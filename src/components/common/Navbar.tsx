@@ -115,7 +115,6 @@ export const Navbar: React.FC = () => {
       'hero',
       'categories',
       'video-discovery',
-      'store',
       'about',
       'contact',
     ];

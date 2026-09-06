@@ -13,7 +13,7 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="pt-28 pb-20 space-y-16">
       {/* Hero Header */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="about" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-border text-xs font-black text-foreground uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
