@@ -4,6 +4,7 @@ import { Heart, ShoppingBag, Eye, Check, Package, Play } from 'lucide-react';
 import { Product } from '../../types/product';
 import { formatPrice } from '../../lib/utils';
 import { useFavorites } from '../../context/FavoritesContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ProductCardProps {
@@ -121,6 +122,7 @@ export const ProductCardCompact: React.FC<ProductCardProps> = ({ product, index 
 };
 
 export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { t } = useI18n();
   const { isFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
   const isOnSale = !!product.originalPrice && product.originalPrice > product.price;
@@ -224,12 +226,12 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
                 {product.inStock ? (
                   <>
                     <Check className="w-3 h-3" />
-                    <span>In Store</span>
+                    <span>{t('product', 'inStock')}</span>
                   </>
                 ) : (
                   <>
                     <Package className="w-3 h-3" />
-                    <span>Sold Out</span>
+                    <span>{t('product', 'soldOut')}</span>
                   </>
                 )}
               </span>
@@ -242,6 +244,7 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
 };
 
 export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { t } = useI18n();
   const { isFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
   const isOnSale = !!product.originalPrice && product.originalPrice > product.price;
@@ -385,12 +388,12 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
             {product.inStock ? (
               <>
                 <Check className="w-3 h-3" />
-                <span>In Store</span>
+                <span>{t('product', 'inStock')}</span>
               </>
             ) : (
               <>
                 <Package className="w-3 h-3" />
-                <span>Sold Out</span>
+                <span>{t('product', 'soldOut')}</span>
               </>
             )}
           </span>

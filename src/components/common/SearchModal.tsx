@@ -248,7 +248,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                     <div className="px-2 py-3">
                       <div className="flex items-center gap-2 px-2 mb-2">
                         <Tag className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                        <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Categories</span>
+                        <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('common', 'categories')}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 px-2">
                         {allCategories.slice(0, 8).map((category) => (

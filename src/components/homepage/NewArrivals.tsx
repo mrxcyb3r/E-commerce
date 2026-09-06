@@ -84,9 +84,7 @@ export const NewArrivals: React.FC = () => {
                 letterSpacing: '-0.03em',
               }}
             >
-              Just
-              <br />
-              <span className="text-amber-500">Landed</span>
+              {t('pages', 'home.newTitle')}
             </h2>
           </div>
 

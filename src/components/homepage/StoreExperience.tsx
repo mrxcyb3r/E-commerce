@@ -16,8 +16,8 @@ export const StoreExperience: React.FC = () => {
 
   const hours = storeInfo?.workingHoursDetail
     ? [
-        { days: 'Hafta ichi / Будни / Weekdays', time: storeInfo.workingHoursDetail.weekdays },
-        { days: 'Dam olish / Выходные / Weekend', time: storeInfo.workingHoursDetail.weekend },
+        { days: 'Hafta ichi', time: storeInfo.workingHoursDetail.weekdays },
+        { days: 'Dam olish kunlari', time: storeInfo.workingHoursDetail.weekend },
       ].filter((h) => h.time)
     : storeInfo?.workingHours
       ? [{ days: t('pages', 'sections.locationDays'), time: storeInfo.workingHours }]

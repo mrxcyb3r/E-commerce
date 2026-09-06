@@ -44,9 +44,7 @@ export const TrendingNow: React.FC = () => {
                   letterSpacing: '-0.03em',
                 }}
               >
-                Trending
-                <br />
-                <span className="text-amber-500">Now</span>
+                {t('pages', 'home.trendingTitle')}
               </h2>
             </div>
 

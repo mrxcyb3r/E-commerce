@@ -214,7 +214,7 @@ export const FeaturedCollection: React.FC = () => {
                       {tertiaryProduct.name}
                     </span>
                     <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
-                      Discover
+                      {t('product', 'viewDetails')}
                       <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </span>
                   </div>
@@ -233,7 +233,7 @@ export const FeaturedCollection: React.FC = () => {
             to="/products?featured=true"
             className="inline-flex items-center gap-3 text-sm font-semibold text-foreground hover:text-accent transition-colors group"
           >
-            View Full Collection
+            {t('pages', 'home.featuredTitle')}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>

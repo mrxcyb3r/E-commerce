@@ -116,7 +116,7 @@ export const VideoFeed: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-4 backdrop-blur-sm">
               <Play className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>Shop Through Video</span>
+              <span>{t('pages', 'home.feedTitle')}</span>
             </div>
             <h2
               id="video-feed-heading"
@@ -127,12 +127,10 @@ export const VideoFeed: React.FC = () => {
                 letterSpacing: '-0.03em',
               }}
             >
-              Watch.{' '}
-              <span className="text-amber-500">Shop.</span>
-              <span className="text-zinc-500 font-medium" style={{ fontSize: '0.4em' }}> Repeat</span>
+              {t('pages', 'home.feedTitle')}
             </h2>
             <p className="mt-3 text-zinc-400 max-w-xl text-lg leading-relaxed">
-              Discover products in motion. Swipe to explore, shop instantly.
+              {t('pages', 'home.feedExplore')}
             </p>
           </div>
 
@@ -211,7 +209,7 @@ export const VideoFeed: React.FC = () => {
 
             {/* Scroll hint */}
             <div className="mt-4 flex flex-col items-center gap-1 text-zinc-500 text-xs font-medium">
-              <span className="uppercase tracking-widest">Swipe to browse</span>
+              <span className="uppercase tracking-widest">{t('pages', 'home.feedExplore')}</span>
               <motion.svg
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}

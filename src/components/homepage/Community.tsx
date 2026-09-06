@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Eye } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { ProductCard } from '../products/ProductCard';
 import { Reveal, Stagger } from '../motion';
 import { staggerContainer, staggerItem } from '../../lib/animations';
 
 export const Community: React.FC = () => {
+  const { t } = useI18n();
   const { publishedProducts } = useStore();
 
   const featuredLooks = publishedProducts
@@ -31,7 +33,7 @@ export const Community: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
               <Eye className="w-3.5 h-3.5 text-amber-500" />
-              <span>Featured Looks</span>
+              <span>{t('pages', 'home.editorBadge')}</span>
             </div>
             <h2
               id="community-heading"
@@ -42,9 +44,7 @@ export const Community: React.FC = () => {
                 letterSpacing: '-0.03em',
               }}
             >
-              Style
-              <br />
-              <span className="text-amber-500">Inspiration</span>
+              {t('pages', 'home.communityTitle')}
             </h2>
           </div>
 
@@ -52,7 +52,7 @@ export const Community: React.FC = () => {
             to="/products"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
           >
-            View All Products
+            {t('pages', 'home.communityViewAll')}
             <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>
@@ -61,7 +61,6 @@ export const Community: React.FC = () => {
           containerVariant={staggerContainer}
           itemVariant={staggerItem}
         >
-          {/* Hero product — large card */}
           <div className="mb-6 lg:mb-8">
             <ProductCard
               product={heroProduct}
@@ -70,7 +69,6 @@ export const Community: React.FC = () => {
             />
           </div>
 
-          {/* Grid of remaining products */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {gridProducts.map((product, i) => (
               <ProductCard
@@ -88,7 +86,7 @@ export const Community: React.FC = () => {
             to="/products"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group"
           >
-            Browse Full Collection
+            {t('pages', 'home.communityViewAll')}
             <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>

@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { Reveal, Stagger } from '../motion';
 import { staggerContainer, staggerItem } from '../../lib/animations';
 
 export const ShopByStyle: React.FC = () => {
+  const { t } = useI18n();
   const { publishedCategories } = useStore();
 
   if (!publishedCategories || publishedCategories.length === 0) return null;
@@ -20,22 +22,20 @@ export const ShopByStyle: React.FC = () => {
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
         <Reveal className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Shop by Style</span>
+            <span>{t('pages', 'home.styleTitle')}</span>
           </div>
           <h2
             id="shop-by-style-heading"
-            className="font-display font-black tracking-tightest text-white max-w-2xl mx-auto"
+            className="font-display font-black tracking-tightest text-foreground max-w-2xl mx-auto"
             style={{
               fontSize: 'clamp(2.25rem, 5vw, 4rem)',
               lineHeight: '1.02',
               letterSpacing: '-0.03em',
             }}
           >
-            Find Your
-            <br />
-            <span className="text-amber-500">Aesthetic</span>
+            {t('pages', 'home.styleTitle')}
           </h2>
         </Reveal>
 
@@ -49,9 +49,9 @@ export const ShopByStyle: React.FC = () => {
               <Link
                 to={`/products?category=${category.slug}`}
                 className="block relative aspect-[3/4] overflow-hidden rounded-2xl"
-                aria-label={`Shop ${category.name} collection`}
+                aria-label={`${category.name} kolleksiyasini ko'rish`}
               >
-                <div className="absolute inset-0 bg-zinc-900">
+                <div className="absolute inset-0 bg-muted">
                   {category.image ? (
                     <img
                       src={category.image}
@@ -61,8 +61,8 @@ export const ShopByStyle: React.FC = () => {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-                      <span className="text-5xl font-display font-black text-white/10 select-none">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                      <span className="text-5xl font-display font-black text-muted-foreground/20 select-none">
                         {category.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -75,7 +75,7 @@ export const ShopByStyle: React.FC = () => {
                   <div className="relative z-10">
                     {category.productCount !== undefined && category.productCount > 0 && (
                       <span className="inline-block px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm text-white rounded-full border border-white/20 mb-4">
-                        {category.productCount} items
+                        {category.productCount} ta mahsulot
                       </span>
                     )}
 
@@ -93,20 +93,12 @@ export const ShopByStyle: React.FC = () => {
                     )}
 
                     <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white font-semibold text-sm tracking-wide hover:bg-white/20 transition-all border border-white/20 group-hover:gap-3">
-                      Explore
+                      {t('pages', 'home.styleBrowseAll')}
                       <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </div>
                 </div>
               </Link>
-
-              <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="pointer-events-auto">
-                  <span className="inline-block px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm text-white rounded-full border border-white/20">
-                    Category
-                  </span>
-                </div>
-              </div>
             </article>
           ))}
         </Stagger>
@@ -114,9 +106,9 @@ export const ShopByStyle: React.FC = () => {
         <Reveal className="mt-12 text-center" transition={{ duration: 0.5, delay: 0.3 }}>
           <Link
             to="/products"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full glass-strong text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all border border-white/10 group"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-card border border-border text-foreground font-semibold text-sm tracking-wide hover:bg-muted transition-all group"
           >
-            Browse All Categories
+            {t('pages', 'home.styleBrowseAll')}
             <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>
