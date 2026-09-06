@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -8,7 +8,8 @@ import {
   MapPin,
   Send,
   ArrowRight,
-  ShoppingBag
+  ShoppingBag,
+  Sparkles,
 } from 'lucide-react';
 import { useBrand } from '../../hooks/useBrand';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -27,10 +28,11 @@ interface NavItem {
 
 const getNavItems = (t: (section: string, key: string) => string): NavItem[] => [
   { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
-  { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
-  { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-discovery', path: '/feed' },
+  { id: 'products', label: t('nav', 'products'), sectionId: 'trending', path: '/products' },
+  { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-feed', path: '/feed' },
+  { id: 'collections', label: t('nav', 'collections'), sectionId: 'shop-by-style', path: '/collections' },
   { id: 'about', label: t('nav', 'about'), sectionId: 'about', path: '/about' },
-  { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
+  { id: 'location', label: t('nav', 'location'), sectionId: 'store-experience', path: '/location' },
   { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
 ];
 
@@ -41,6 +43,9 @@ export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [navVisible, setNavVisible] = useState(true);
+  const tickingRef = useRef(false);
 
   const { totalFavorites } = useFavorites();
   const location = useLocation();
@@ -51,18 +56,37 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 10);
+
+      if (!tickingRef.current) {
+        window.requestAnimationFrame(() => {
+          if (scrollY > lastScrollY && scrollY > 100) {
+            setNavVisible(false);
+          } else {
+            setNavVisible(true);
+          }
+          setLastScrollY(scrollY);
+          tickingRef.current = false;
+        });
+        tickingRef.current = true;
+      }
     };
+
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setSearchModalOpen((prev) => !prev);
+      }
+      if (e.key === 'Escape') {
+        setSearchModalOpen(false);
+        setMobileMenuOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -75,6 +99,8 @@ export const Navbar: React.FC = () => {
         setActiveSection('products');
       } else if (location.pathname === '/feed' || location.pathname === '/videos') {
         setActiveSection('feed');
+      } else if (location.pathname === '/collections') {
+        setActiveSection('collections');
       } else if (location.pathname === '/about') {
         setActiveSection('about');
       } else if (location.pathname === '/location') {
@@ -87,26 +113,33 @@ export const Navbar: React.FC = () => {
       return;
     }
 
-    const sectionIds = ['hero', 'products', 'video-discovery', 'about', 'location', 'contact'];
+    const sectionIds = [
+      'hero',
+      'trending',
+      'video-feed',
+      'featured-collection',
+      'new-arrivals',
+      'shop-by-style',
+      'community',
+      'store-experience',
+      'about',
+      'contact',
+    ];
 
     const observers: IntersectionObserver[] = [];
 
     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          if (entry.target.id === 'video-discovery') {
-            setActiveSection('feed');
-          } else {
-            setActiveSection(entry.target.id);
-          }
+          setActiveSection(entry.target.id);
         }
       });
     };
 
     const observerOptions = {
       root: null,
-      rootMargin: '-20% 0px -40% 0px',
-      threshold: 0.1,
+      rootMargin: '-30% 0px -50% 0px',
+      threshold: 0.05,
     };
 
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
@@ -118,27 +151,8 @@ export const Navbar: React.FC = () => {
       }
     });
 
-    const handleScrollPrecision = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-
-      if (scrollY < 150) {
-        setActiveSection('hero');
-        return;
-      }
-
-      if (scrollY + windowHeight >= documentHeight - 150) {
-        setActiveSection('contact');
-        return;
-      }
-    };
-
-    window.addEventListener('scroll', handleScrollPrecision, { passive: true });
-
     return () => {
       observer.disconnect();
-      window.removeEventListener('scroll', handleScrollPrecision);
     };
   }, [isHomePage, location.pathname]);
 
@@ -176,23 +190,19 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Fixed Navbar Container */}
       <header
         className={`fixed left-0 right-0 z-50 transition-all duration-300 pointer-events-none ${
-          isScrolled
-            ? 'top-2 sm:top-3.5 px-3 sm:px-6 lg:px-8'
-            : 'top-0 px-0'
+          navVisible ? 'top-0' : '-translate-y-full'
         }`}
       >
         <div
-          className={`pointer-events-auto max-w-7xl mx-auto transition-all duration-300 ${
+          className={`pointer-events-auto mx-auto max-w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
             isScrolled
-              ? 'rounded-xl sm:rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2 sm:py-2.5 px-3.5 sm:px-5'
-              : 'w-full bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 py-3.5 sm:py-4 px-4 sm:px-6 lg:px-8'
+              ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/60 dark:border-zinc-800/60 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2.5'
+              : 'bg-transparent py-4'
           }`}
         >
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            {/* Brand Logo */}
+          <div className="flex items-center justify-between gap-4">
             <Link
               to="/"
               id="brand-logo-link"
@@ -203,7 +213,7 @@ export const Navbar: React.FC = () => {
                   setActiveSection('hero');
                 }
               }}
-              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
+              className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
               aria-label={`${storeInfo.name} ${t('nav', 'home')}`}
             >
               {storeInfo.logoUrl ? (
@@ -211,26 +221,25 @@ export const Navbar: React.FC = () => {
                   src={storeInfo.logoUrl}
                   referrerPolicy="no-referrer"
                   alt=""
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover shadow-xs transition-transform duration-200 group-hover:scale-105"
+                  className="w-9 h-9 rounded-xl object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-200 group-hover:scale-105">
-                  <ShoppingBag className="w-4.5 h-4.5" />
+                <div className="w-9 h-9 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
+                  <ShoppingBag className="w-5 h-5" />
                 </div>
               )}
-              <div className="flex flex-col">
-                <span className="font-black text-sm sm:text-base tracking-tighter text-zinc-900 dark:text-white font-['Outfit',sans-serif] leading-tight">
+              <div className="flex flex-col hidden sm:block">
+                <span className="font-display font-black text-sm tracking-tight text-zinc-900 dark:text-white leading-tight">
                   {storeInfo.name}
                 </span>
-                <span className="text-[8px] sm:text-[9px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400 hidden sm:block">
+                <span className="text-[10px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400">
                   {storeInfo.tagline || storeInfo.businessCategory || t('footer', 'tagline')}
                 </span>
               </div>
             </Link>
 
-            {/* Desktop Navigation Links */}
             <nav
-              className="hidden md:flex items-center gap-2 p-1 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50"
+              className="hidden lg:flex items-center gap-1"
               aria-label={t('nav', 'mainNavigation')}
             >
               {NAV_ITEMS.map((item) => {
@@ -243,10 +252,10 @@ export const Navbar: React.FC = () => {
                     href={linkHref}
                     id={`nav-link-${item.id}`}
                     onClick={(e) => handleNavClick(e, item)}
-                    className={`relative px-2.5 py-1.5 text-xs sm:text-sm rounded-xl transition-all duration-200 ${
+                    className={`relative px-3 py-2 text-sm rounded-xl transition-all duration-200 ${
                       isActive
-                        ? 'text-white dark:text-zinc-950 font-black bg-zinc-900 dark:bg-white shadow-xs'
-                        : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-zinc-700/60 font-bold'
+                        ? 'text-white dark:text-zinc-950 font-black bg-zinc-900 dark:bg-white shadow-sm'
+                        : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 font-medium'
                     }`}
                   >
                     {item.label}
@@ -255,40 +264,35 @@ export const Navbar: React.FC = () => {
               })}
             </nav>
 
-            {/* Right Action Icons & Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Clean Quick Search Button */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 id="navbar-search-btn"
                 type="button"
                 onClick={() => setSearchModalOpen(true)}
-                className="flex items-center gap-2 px-2.5 sm:px-3 py-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100/80 dark:bg-zinc-800/80 hover:bg-zinc-200/80 dark:hover:bg-zinc-700/80 rounded-xl border border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer shadow-2xs"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 transition-all shadow-sm backdrop-blur-sm"
                 aria-label={t('nav', 'searchProducts')}
               >
-                <Search className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
-                <span className="hidden sm:inline font-bold">{t('common', 'search')}...</span>
+                <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+                <span className="hidden sm:inline font-medium">{t('common', 'search')}...</span>
               </button>
 
-              {/* Favorites Link */}
               <Link
                 to="/favorites"
                 id="navbar-favorites-btn"
-                className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-colors shadow-2xs"
+                className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-all shadow-sm backdrop-blur-sm"
                 aria-label={t('nav', 'favoritesList')}
                 title={t('nav', 'favoritesList')}
               >
-                <Heart className={`w-4.5 h-4.5 ${totalFavorites > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
+                <Heart className={`w-5 h-5 ${totalFavorites > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
                 {totalFavorites > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
-                    {totalFavorites}
+                  <span className="absolute -top-1 -right-1 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                    {totalFavorites > 99 ? '99+' : totalFavorites}
                   </span>
                 )}
               </Link>
 
-              {/* Working Dark / Light Theme Toggle */}
               <ThemeToggle />
 
-              {/* Telegram Direct CTA (Desktop) */}
               {storeInfo.telegram && (
                 <a
                   href={storeInfo.telegram}
@@ -296,69 +300,63 @@ export const Navbar: React.FC = () => {
                   rel="noopener noreferrer"
                   id="navbar-telegram-cta"
                   onClick={() => track('telegram_click')}
-                  className="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-xs font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-xs hover:shadow-sm"
+                  className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm hover:shadow-md"
                 >
-                  <Send className="w-3 h-3.5" />
+                  <Send className="w-4 h-4" />
                   <span>{t('common', 'telegram')}</span>
                 </a>
               )}
 
-              {/* Mobile Menu Toggle Button */}
               <button
                 id="mobile-menu-toggle-btn"
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 focus:outline-none shadow-2xs"
+                className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 focus:outline-none shadow-sm backdrop-blur-sm"
                 aria-label={mobileMenuOpen ? t('nav', 'closeMenu') : t('nav', 'openMenu')}
               >
-                {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Drawer Navigation */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 md:hidden">
-            {/* Backdrop */}
+          <div className="fixed inset-0 z-50 lg:hidden">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs"
+              className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm"
             />
 
-            {/* Drawer */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-zinc-900 p-8 pt-16 shadow-2xl flex flex-col justify-between border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto"
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              className="fixed top-0 right-0 bottom-0 w-[88%] max-w-sm bg-white dark:bg-zinc-950 p-6 pt-20 shadow-2xl flex flex-col justify-between border-l border-zinc-200 dark:border-zinc-800 overflow-y-auto"
             >
               <div className="space-y-6">
-                {/* Search Bar in Mobile Menu */}
                 <button
                   type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setSearchModalOpen(true);
                   }}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-sm font-bold border border-zinc-200 dark:border-zinc-700"
+                  className="w-full flex items-center justify-between px-4 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-base font-medium border border-zinc-200 dark:border-zinc-800"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Search className="w-3.5 h-3.5 text-zinc-500" />
+                  <span className="flex items-center gap-3">
+                    <Search className="w-5 h-5 text-zinc-500" />
                     <span>{t('nav', 'searchProducts')}</span>
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-zinc-400" />
+                  <ArrowRight className="w-5 h-5 text-zinc-400" />
                 </button>
 
-                {/* Section Links */}
-                <div className="space-y-1">
-                  <div className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 px-3">
+                <div className="space-y-2">
+                  <div className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 px-2">
                     {t('nav', 'sections')}
                   </div>
                   {NAV_ITEMS.map((item) => {
@@ -370,31 +368,30 @@ export const Navbar: React.FC = () => {
                         key={item.id}
                         href={linkHref}
                         onClick={(e) => handleNavClick(e, item)}
-                        className={`flex items-center justify-between px-4 py-3 rounded-2xl text-base font-bold transition-colors ${
+                        className={`flex items-center justify-between px-4 py-3.5 rounded-2xl text-base font-medium transition-all ${
                           isActive
-                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black shadow-xs'
+                            ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-black shadow-sm'
                             : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                         }`}
                       >
                         <span>{item.label}</span>
-                        <ArrowRight className={`w-3.5 h-3.5 ${isActive ? 'text-zinc-300 dark:text-zinc-700' : 'text-zinc-400'}`} />
+                        <ArrowRight className={`w-5 h-5 ${isActive ? 'text-zinc-300 dark:text-zinc-700' : 'text-zinc-400'}`} />
                       </a>
                     );
                   })}
                 </div>
 
-                {/* Quick Info */}
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
                   <Link
                     to="/favorites"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 text-sm font-bold text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
+                    className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 text-sm font-medium text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
                   >
-                    <span className="flex items-center gap-2.5">
-                      <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                    <span className="flex items-center gap-3">
+                      <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
                       {t('nav', 'favoritesList')}
                     </span>
-                    <span className="px-2 py-0.5 text-xs font-black bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white rounded-full">
+                    <span className="px-3 py-1 text-xs font-black bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white rounded-full">
                       {totalFavorites}
                     </span>
                   </Link>
@@ -402,30 +399,29 @@ export const Navbar: React.FC = () => {
                   <a
                     href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
                     onClick={() => track('phone_click')}
-                    className="flex items-center gap-2 px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400"
                   >
                     <span className="font-black text-zinc-900 dark:text-zinc-100">{t('nav', 'phone')}:</span>
                     <span>{storeInfo.phone}</span>
                   </a>
 
-                  <div className="flex items-start gap-2 px-4 py-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-zinc-700 dark:text-zinc-300" />
+                  <div className="flex items-start gap-3 px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400">
+                    <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-zinc-700 dark:text-zinc-300" />
                     <span>{storeInfo.address}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Mobile CTA */}
               {storeInfo.telegram && (
-                <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                <div className="pt-6 border-t border-zinc-100 dark:border-zinc-800">
                   <a
                     href={storeInfo.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => track('telegram_click')}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-2xl text-base font-black tracking-wide bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-md"
                   >
-                    <Send className="w-3.5 h-3.5" />
+                    <Send className="w-5 h-5" />
                     {t('nav', 'telegramContact')}
                   </a>
                 </div>
@@ -435,8 +431,9 @@ export const Navbar: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Global Quick Search Modal */}
       <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
     </>
   );
 };
+
+export default Navbar;
