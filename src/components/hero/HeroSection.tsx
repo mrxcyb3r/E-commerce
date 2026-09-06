@@ -213,7 +213,7 @@ export const HeroSection: React.FC = () => {
                       {slide.ctaText ||
                         t(
                           'pages',
-                          'home.heroFallbackCta1',
+                        'home.heroFallbackCta1',
                         )}
                     </span>
 

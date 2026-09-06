@@ -1,5 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
+
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
+
 import {
   Search,
   Heart,
@@ -9,14 +20,19 @@ import {
   Send,
   ArrowRight,
   ShoppingBag,
-  Sparkles,
 } from 'lucide-react';
+
 import { useBrand } from '../../hooks/useBrand';
 import { useFavorites } from '../../hooks/useFavorites';
 import { track } from '../../lib/analytics/client';
 import { ThemeToggle } from './ThemeToggle';
 import { SearchModal } from './SearchModal';
-import { motion, AnimatePresence } from 'motion/react';
+
+import {
+  motion,
+  AnimatePresence,
+} from 'motion/react';
+
 import { useI18n } from '../../i18n/I18nContext';
 
 interface NavItem {
@@ -26,411 +42,1056 @@ interface NavItem {
   path: string;
 }
 
-const getNavItems = (t: (section: string, key: string) => string): NavItem[] => [
-    { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
-    { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
-    { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-discovery', path: '/feed' },
-    { id: 'categories', label: t('nav', 'categories'), sectionId: 'categories', path: '/products?category=' },
-    { id: 'about', label: t('nav', 'about'), sectionId: 'store-experience', path: '/about' },
-    { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
-    { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
+/**
+ * IMPORTANT:
+ * These section IDs must match the actual IDs rendered
+ * by the homepage sections.
+ */
+const getNavItems = (
+  t: (section: string, key: string) => string,
+): NavItem[] => [
+  {
+    id: 'hero',
+    label: t('nav', 'home'),
+    sectionId: 'hero',
+    path: '/',
+  },
+  {
+    id: 'products',
+    label: t('nav', 'products'),
+    sectionId: 'products',
+    path: '/products',
+  },
+  {
+    id: 'feed',
+    label: t('nav', 'videos'),
+    sectionId: 'video-feed',
+    path: '/feed',
+  },
+  {
+    id: 'categories',
+    label: t('nav', 'categories'),
+    sectionId: 'categories',
+    path: '/products?category=',
+  },
+  {
+    id: 'about',
+    label: t('nav', 'about'),
+    sectionId: 'about',
+    path: '/about',
+  },
+  {
+    id: 'location',
+    label: t('nav', 'location'),
+    sectionId: 'location',
+    path: '/location',
+  },
+  {
+    id: 'contact',
+    label: t('nav', 'contact'),
+    sectionId: 'contact',
+    path: '/contact',
+  },
 ];
 
 export const Navbar: React.FC = () => {
   const storeInfo = useBrand();
   const { t } = useI18n();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('hero');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
-const [lastScrollY, setLastScrollY] = useState(0);
-   const [navVisible, setNavVisible] = useState(true);
-   const tickingRef = useRef(false);
-   const navbarRef = useRef<HTMLElement>(null);
 
-  const { totalFavorites } = useFavorites();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const { totalFavorites } = useFavorites();
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] =
+    useState<string>('hero');
+
+  const [mobileMenuOpen, setMobileMenuOpen] =
+    useState(false);
+
+  const [searchModalOpen, setSearchModalOpen] =
+    useState(false);
+
+  const [navVisible, setNavVisible] = useState(true);
+
+  const navbarRef = useRef<HTMLElement>(null);
+
+  /**
+   * Stores the previous scroll position without causing
+   * the scroll listener effect to recreate itself.
+   */
+  const lastScrollYRef = useRef(0);
+
+  /**
+   * Prevents multiple requestAnimationFrame callbacks.
+   */
+  const tickingRef = useRef(false);
+
+  /**
+   * Prevent scrollspy from immediately overriding the
+   * active section while smooth scrolling after a click.
+   */
+  const programmaticScrollRef = useRef(false);
+
+  const scrollTimeoutRef =
+    useRef<ReturnType<typeof window.setTimeout> | null>(
+      null,
+    );
+
   const isHomePage = location.pathname === '/';
+
   const NAV_ITEMS = getNavItems(t);
 
+  /**
+   * -------------------------------------------------------
+   * NAVBAR SHOW/HIDE + SCROLL STATE
+   * -------------------------------------------------------
+   */
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScrolled(scrollY > 10);
+      const currentScrollY = window.scrollY;
 
       if (!tickingRef.current) {
         window.requestAnimationFrame(() => {
-          if (scrollY > lastScrollY && scrollY > 100) {
+          setIsScrolled(currentScrollY > 10);
+
+          const previousScrollY =
+            lastScrollYRef.current;
+
+          /**
+           * Always show navbar near the top.
+           */
+          if (currentScrollY <= 80) {
+            setNavVisible(true);
+          } else if (
+            currentScrollY > previousScrollY + 4 &&
+            currentScrollY > 120
+          ) {
             setNavVisible(false);
-          } else {
+          } else if (
+            currentScrollY < previousScrollY - 4
+          ) {
             setNavVisible(true);
           }
-          setLastScrollY(scrollY);
+
+          lastScrollYRef.current = currentScrollY;
           tickingRef.current = false;
         });
+
         tickingRef.current = true;
       }
     };
 
     handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
 
+    window.addEventListener(
+      'scroll',
+      handleScroll,
+      { passive: true },
+    );
+
+    return () => {
+      window.removeEventListener(
+        'scroll',
+        handleScroll,
+      );
+    };
+  }, []);
+
+  /**
+   * -------------------------------------------------------
+   * KEYBOARD SHORTCUTS
+   * -------------------------------------------------------
+   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if (
+        (e.metaKey || e.ctrlKey) &&
+        e.key.toLowerCase() === 'k'
+      ) {
         e.preventDefault();
         setSearchModalOpen((prev) => !prev);
       }
+
       if (e.key === 'Escape') {
         setSearchModalOpen(false);
         setMobileMenuOpen(false);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    window.addEventListener(
+      'keydown',
+      handleKeyDown,
+    );
+
+    return () => {
+      window.removeEventListener(
+        'keydown',
+        handleKeyDown,
+      );
+    };
   }, []);
 
-useEffect(() => {
-     if (!isHomePage) {
-       if (location.pathname === '/products' || location.pathname.startsWith('/products?')) {
-         setActiveSection('products');
-       } else if (location.pathname === '/feed' || location.pathname === '/videos') {
-         setActiveSection('video-discovery');
-       } else if (location.pathname === '/about') {
-         setActiveSection('store-experience');
-       } else if (location.pathname === '/location') {
-         setActiveSection('location');
-       } else if (location.pathname === '/contact') {
-         setActiveSection('contact');
-       } else {
-         setActiveSection('');
-       }
-       return;
-     }
+  /**
+   * -------------------------------------------------------
+   * NON-HOMEPAGE ACTIVE STATE
+   * -------------------------------------------------------
+   */
+  useEffect(() => {
+    if (isHomePage) return;
 
-     const sectionIds = [
-       'hero',
-       'store-experience',
-       'products',
-       'categories',
-       'video-discovery',
-       'location',
-       'contact',
-     ];
+    const pathname = location.pathname;
 
-     const observers: IntersectionObserver[] = [];
+    if (
+      pathname === '/products' ||
+      pathname.startsWith('/products/')
+    ) {
+      setActiveSection('products');
+      return;
+    }
 
-     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-       entries.forEach((entry) => {
-         if (entry.isIntersecting) {
-           setActiveSection(entry.target.id);
-         }
-       });
-     };
+    if (
+      pathname === '/feed' ||
+      pathname === '/videos'
+    ) {
+      setActiveSection('feed');
+      return;
+    }
 
-     const observerOptions = {
-       root: null,
-       rootMargin: '-20% 0px -50% 0px',
-       threshold: 0.05,
-     };
+    if (pathname === '/about') {
+      setActiveSection('about');
+      return;
+    }
 
-     const observer = new IntersectionObserver(handleIntersect, observerOptions);
+    if (pathname === '/location') {
+      setActiveSection('location');
+      return;
+    }
 
-     sectionIds.forEach((id) => {
-       const el = document.getElementById(id);
-       if (el) {
-         observer.observe(el);
-       }
-     });
+    if (pathname === '/contact') {
+      setActiveSection('contact');
+      return;
+    }
 
-     return () => {
-       observer.disconnect();
-     };
-   }, [isHomePage, location.pathname]);
+    setActiveSection('');
+  }, [
+    isHomePage,
+    location.pathname,
+  ]);
 
+  /**
+   * -------------------------------------------------------
+   * HOMEPAGE SCROLLSPY
+   * -------------------------------------------------------
+   *
+   * Uses the actual DOM sections.
+   *
+   * Instead of allowing several IntersectionObserver entries
+   * to randomly overwrite each other, we calculate which
+   * visible section is closest to the navbar.
+   */
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const sections = NAV_ITEMS
+      .map((item) => {
+        const element =
+          document.getElementById(
+            item.sectionId,
+          );
+
+        if (!element) return null;
+
+        return {
+          item,
+          element,
+        };
+      })
+      .filter(
+        (
+          value,
+        ): value is {
+          item: NavItem;
+          element: HTMLElement;
+        } => value !== null,
+      );
+
+    if (sections.length === 0) return;
+
+    const updateActiveSection = () => {
+      if (programmaticScrollRef.current) {
+        return;
+      }
+
+      const navbarHeight =
+        navbarRef.current?.offsetHeight ?? 0;
+
+      /**
+       * The detection line sits below the navbar,
+       * approximately in the upper third of the viewport.
+       */
+      const detectionPoint =
+        navbarHeight +
+        Math.min(
+          180,
+          window.innerHeight * 0.25,
+        );
+
+      let closestSection: string | null = null;
+      let closestDistance = Infinity;
+
+      for (const { item, element } of sections) {
+        const rect =
+          element.getBoundingClientRect();
+
+        /**
+         * Ignore sections that haven't entered the
+         * viewport yet.
+         */
+        if (
+          rect.bottom <= navbarHeight ||
+          rect.top >= window.innerHeight
+        ) {
+          continue;
+        }
+
+        const distance = Math.abs(
+          rect.top - detectionPoint,
+        );
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSection = item.id;
+        }
+      }
+
+      /**
+       * If nothing is currently intersecting, determine
+       * the section based on scroll position.
+       */
+      if (!closestSection) {
+        let previousSection: string | null = null;
+
+        for (const { item, element } of sections) {
+          const rect =
+            element.getBoundingClientRect();
+
+          if (
+            rect.top <= detectionPoint
+          ) {
+            previousSection = item.id;
+          }
+        }
+
+        if (previousSection) {
+          closestSection = previousSection;
+        }
+      }
+
+      if (closestSection) {
+        setActiveSection(closestSection);
+      }
+    };
+
+    let observer: IntersectionObserver | null =
+      null;
+
+    /**
+     * IntersectionObserver wakes up the scrollspy
+     * efficiently, while the calculation itself decides
+     * which section is actually active.
+     */
+    observer =
+      new IntersectionObserver(
+        () => {
+          updateActiveSection();
+        },
+        {
+          root: null,
+          rootMargin:
+            '-90px 0px -45% 0px',
+          threshold: [0, 0.05, 0.15, 0.3],
+        },
+      );
+
+    sections.forEach(
+      ({ element }) => {
+        observer?.observe(element);
+      },
+    );
+
+    /**
+     * Initial state.
+     */
+    updateActiveSection();
+
+    /**
+     * Handle resize because navbar height and viewport
+     * geometry can change.
+     */
+    window.addEventListener(
+      'resize',
+      updateActiveSection,
+    );
+
+    return () => {
+      observer?.disconnect();
+
+      window.removeEventListener(
+        'resize',
+        updateActiveSection,
+      );
+    };
+  }, [
+    isHomePage,
+    NAV_ITEMS,
+  ]);
+
+  /**
+   * -------------------------------------------------------
+   * CLOSE MOBILE MENU AFTER ROUTE CHANGE
+   * -------------------------------------------------------
+   */
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const handleNavClick = useCallback((e: React.MouseEvent, item: NavItem) => {
-    if (item.id === 'feed') {
-      e.preventDefault();
-      navigate('/feed');
-      setActiveSection('feed');
-      setMobileMenuOpen(false);
-      return;
-    }
+  /**
+   * -------------------------------------------------------
+   * NAVIGATION
+   * -------------------------------------------------------
+   */
+  const handleNavClick = useCallback(
+    (
+      e: React.MouseEvent<HTMLAnchorElement>,
+      item: NavItem,
+    ) => {
+      /**
+       * HOME PAGE
+       *
+       * All navbar items scroll to their actual section.
+       */
+      if (isHomePage) {
+        e.preventDefault();
 
-    if (isHomePage) {
-      e.preventDefault();
-const el = document.getElementById(item.sectionId);
-       if (el) {
-         const navbarHeight = navbarRef.current?.offsetHeight || 0;
-         const rect = el.getBoundingClientRect();
-         const top = rect.top + window.pageYOffset - navbarHeight;
-         window.scrollTo({
-           top: top,
-           behavior: 'smooth'
-         });
-         setActiveSection(item.id);
-       }
-    } else {
+        const element =
+          document.getElementById(
+            item.sectionId,
+          );
+
+        if (!element) {
+          /**
+           * If a section is genuinely missing, don't
+           * silently do nothing. Fall back to navigation
+           * for pages such as /feed or /products.
+           */
+          if (item.path !== '/') {
+            navigate(item.path);
+          }
+
+          setMobileMenuOpen(false);
+          return;
+        }
+
+        /**
+         * Immediately update the indicator so the user
+         * gets instant feedback.
+         */
+        setActiveSection(item.id);
+
+        /**
+         * Prevent scrollspy from fighting the smooth
+         * scroll animation.
+         */
+        programmaticScrollRef.current = true;
+
+        if (scrollTimeoutRef.current) {
+          window.clearTimeout(
+            scrollTimeoutRef.current,
+          );
+        }
+
+        const navbarHeight =
+          navbarRef.current?.offsetHeight ?? 0;
+
+        const extraSpacing = 16;
+
+        const elementTop =
+          element.getBoundingClientRect()
+            .top +
+          window.scrollY;
+
+        const targetTop = Math.max(
+          0,
+          elementTop -
+            navbarHeight -
+            extraSpacing,
+        );
+
+        window.scrollTo({
+          top: targetTop,
+          behavior: 'smooth',
+        });
+
+        /**
+         * Release the programmatic-scroll lock after
+         * the smooth animation has had time to finish.
+         */
+        scrollTimeoutRef.current =
+          window.setTimeout(() => {
+            programmaticScrollRef.current =
+              false;
+
+            setActiveSection(item.id);
+          }, 900);
+
+        setMobileMenuOpen(false);
+
+        return;
+      }
+
+      /**
+       * ---------------------------------------------------
+       * NON-HOMEPAGE
+       * ---------------------------------------------------
+       */
+
       if (item.id === 'hero') {
         e.preventDefault();
         navigate('/');
+        setActiveSection('hero');
+        setMobileMenuOpen(false);
+        return;
       }
-    }
-    setMobileMenuOpen(false);
-  }, [isHomePage, navigate]);
+
+      /**
+       * Normal route navigation.
+       */
+      setMobileMenuOpen(false);
+    },
+    [
+      isHomePage,
+      navigate,
+    ],
+  );
+
+  /**
+   * -------------------------------------------------------
+   * LOGO CLICK
+   * -------------------------------------------------------
+   */
+  const handleLogoClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isHomePage) return;
+
+      e.preventDefault();
+
+      programmaticScrollRef.current = true;
+
+      setActiveSection('hero');
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(
+          scrollTimeoutRef.current,
+        );
+      }
+
+      scrollTimeoutRef.current =
+        window.setTimeout(() => {
+          programmaticScrollRef.current =
+            false;
+          setActiveSection('hero');
+        }, 900);
+    },
+    [isHomePage],
+  );
+
+  /**
+   * Cleanup scroll timeout.
+   */
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(
+          scrollTimeoutRef.current,
+        );
+      }
+    };
+  }, []);
 
   return (
     <>
+      {/* ==================================================
+          DESKTOP / MAIN NAVBAR
+          ================================================== */}
+
       <header
-        className={`fixed left-0 right-0 z-50 transition-all duration-300 pointer-events-none ${
-          navVisible ? 'top-0' : '-translate-y-full'
+        ref={navbarRef}
+        className={`fixed left-0 right-0 top-0 z-50 pointer-events-none transition-transform duration-300 ease-out ${
+          navVisible
+            ? 'translate-y-0'
+            : '-translate-y-full'
         }`}
       >
         <div
-          className={`pointer-events-auto mx-auto max-w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+          className={`pointer-events-auto mx-auto w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
             isScrolled
-              ? 'bg-card/90 backdrop-blur-xl border-b border-border/60 shadow-lg shadow-zinc-950/40 py-2'
+              ? 'border-b border-border/60 bg-card/90 py-2 shadow-lg shadow-black/5 backdrop-blur-xl'
               : 'bg-transparent py-4'
           }`}
         >
           <div className="flex items-center justify-between gap-4">
-<Link
+            {/* ==================================================
+                BRAND
+                ================================================== */}
+
+            <Link
               to="/"
               id="brand-logo-link"
-              onClick={(e) => {
-                if (isHomePage) {
-                  e.preventDefault();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setActiveSection('hero');
-                }
-              }}
-              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
-              aria-label={`${storeInfo.name} ${t('nav', 'home')}`}
+              onClick={handleLogoClick}
+              className="group flex shrink-0 items-center gap-2 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
+              aria-label={`${storeInfo.name} ${t(
+                'nav',
+                'home',
+              )}`}
             >
               {storeInfo.logoUrl ? (
                 <img
                   src={storeInfo.logoUrl}
                   referrerPolicy="no-referrer"
                   alt=""
-                  className="w-8 h-8 rounded-xl object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
+                  className="h-8 w-8 rounded-xl object-cover shadow-sm transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
-                  <ShoppingBag className="w-4 h-4" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-foreground text-background shadow-sm transition-transform duration-300 group-hover:scale-105 dark:bg-card dark:text-card-foreground">
+                  <ShoppingBag className="h-4 w-4" />
                 </div>
               )}
-              <span className="font-display font-black text-sm tracking-tight text-foreground hidden sm:inline">
+
+              <span className="hidden font-display text-sm font-black tracking-tight text-foreground sm:inline">
                 {storeInfo.name}
               </span>
             </Link>
 
+            {/* ==================================================
+                DESKTOP NAVIGATION
+                ================================================== */}
+
             <nav
-              className="hidden lg:flex items-center gap-1"
-              aria-label={t('nav', 'mainNavigation')}
+              className="hidden items-center gap-1 lg:flex"
+              aria-label={t(
+                'nav',
+                'mainNavigation',
+              )}
             >
               {NAV_ITEMS.map((item) => {
-                const isActive = activeSection === item.id;
-                const linkHref = isHomePage ? `#${item.sectionId}` : item.path;
+                const isActive =
+                  activeSection === item.id;
+
+                const linkHref = isHomePage
+                  ? `#${item.sectionId}`
+                  : item.path;
 
                 return (
                   <a
                     key={item.id}
                     href={linkHref}
                     id={`nav-link-${item.id}`}
-                    onClick={(e) => handleNavClick(e, item)}
-                    className={`relative px-3 py-2 text-sm rounded-full font-medium transition-colors duration-200 ${
+                    onClick={(e) =>
+                      handleNavClick(
+                        e,
+                        item,
+                      )
+                    }
+                    className={`relative isolate rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                       isActive
-                        ? 'text-primary font-semibold'
-                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+                        ? 'text-primary'
+                        : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white'
                     }`}
                   >
-{isActive && (
-  <motion.div
-    layoutId="nav-indicator"
-    className="absolute inset-0 -bottom-1 bg-primary/20 rounded-full height-1"
-    transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-  />
-)}
-                    <span className="relative z-10">{item.label}</span>
+                    {/* Animated active background */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="navbar-active-pill"
+                        className="absolute inset-0 -z-10 rounded-full bg-primary/10"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 420,
+                          damping: 32,
+                          mass: 0.7,
+                        }}
+                      />
+                    )}
+
+                    {/* Animated bottom indicator */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="navbar-active-line"
+                        className="absolute bottom-0 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-primary"
+                        transition={{
+                          type: 'spring',
+                          stiffness: 420,
+                          damping: 32,
+                          mass: 0.7,
+                        }}
+                      />
+                    )}
+
+                    <span className="relative z-10 whitespace-nowrap">
+                      {item.label}
+                    </span>
                   </a>
                 );
               })}
             </nav>
 
-            <div className="flex items-center gap-2 shrink-0">
+            {/* ==================================================
+                ACTIONS
+                ================================================== */}
+
+            <div className="flex shrink-0 items-center gap-2">
+              {/* Search */}
               <button
                 id="navbar-search-btn"
                 type="button"
-                onClick={() => setSearchModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-card/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 rounded-xl border border-border/80 transition-all shadow-sm backdrop-blur-sm"
-                aria-label={t('nav', 'searchProducts')}
+                onClick={() =>
+                  setSearchModalOpen(true)
+                }
+                className="flex items-center gap-2 rounded-xl border border-border/80 bg-card/80 px-4 py-2 text-sm font-medium text-zinc-600 shadow-sm backdrop-blur-sm transition-all hover:bg-zinc-100/80 dark:text-zinc-400 dark:hover:bg-zinc-700/80"
+                aria-label={t(
+                  'nav',
+                  'searchProducts',
+                )}
               >
-                <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                <span className="hidden sm:inline font-medium">{t('common', 'search')}...</span>
+                <Search className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+
+                <span className="hidden font-medium sm:inline">
+                  {t('common', 'search')}...
+                </span>
               </button>
 
+              {/* Favorites */}
               <Link
                 to="/favorites"
                 id="navbar-favorites-btn"
-                className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-card/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-all shadow-sm backdrop-blur-sm"
-                aria-label={t('nav', 'favoritesList')}
-                title={t('nav', 'favoritesList')}
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border/80 bg-card/80 text-zinc-700 shadow-sm backdrop-blur-sm transition-all hover:bg-zinc-100/80 dark:text-zinc-200 dark:hover:bg-zinc-700/80"
+                aria-label={t(
+                  'nav',
+                  'favoritesList',
+                )}
+                title={t(
+                  'nav',
+                  'favoritesList',
+                )}
               >
-                <Heart className={`w-5 h-5 ${totalFavorites > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
+                <Heart
+                  className={`h-5 w-5 ${
+                    totalFavorites > 0
+                      ? 'fill-rose-500 text-rose-500'
+                      : ''
+                  }`}
+                />
+
                 {totalFavorites > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-foreground text-background dark:bg-card dark:text-card-foreground text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
-                    {totalFavorites > 99 ? '99+' : totalFavorites}
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-[10px] font-black text-background shadow-sm dark:bg-card dark:text-card-foreground">
+                    {totalFavorites > 99
+                      ? '99+'
+                      : totalFavorites}
                   </span>
                 )}
               </Link>
 
+              {/* Theme */}
               <ThemeToggle />
 
+              {/* Telegram */}
               {storeInfo.telegram && (
                 <a
                   href={storeInfo.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
                   id="navbar-telegram-cta"
-                  onClick={() => track('telegram_click')}
-                  className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-black tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm hover:shadow-md"
+                  onClick={() =>
+                    track(
+                      'telegram_click',
+                    )
+                  }
+                  className="hidden items-center gap-2 rounded-xl bg-foreground px-4 py-2 text-sm font-black tracking-wide text-background shadow-sm transition-all hover:bg-zinc-800 hover:shadow-md dark:bg-card dark:text-card-foreground dark:hover:bg-zinc-100 lg:inline-flex"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{t('common', 'telegram')}</span>
+                  <Send className="h-4 w-4" />
+
+                  <span>
+                    {t(
+                      'common',
+                      'telegram',
+                    )}
+                  </span>
                 </a>
               )}
 
+              {/* Mobile menu */}
               <button
                 id="mobile-menu-toggle-btn"
                 type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-card/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 focus:outline-none shadow-sm backdrop-blur-sm"
-                aria-label={mobileMenuOpen ? t('nav', 'closeMenu') : t('nav', 'openMenu')}
+                onClick={() =>
+                  setMobileMenuOpen(
+                    (prev) => !prev,
+                  )
+                }
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border/80 bg-card/80 text-zinc-700 shadow-sm backdrop-blur-sm hover:bg-zinc-100/80 focus:outline-none dark:text-zinc-200 dark:hover:bg-zinc-700/80 lg:hidden"
+                aria-label={
+                  mobileMenuOpen
+                    ? t(
+                        'nav',
+                        'closeMenu',
+                      )
+                    : t(
+                        'nav',
+                        'openMenu',
+                      )
+                }
+                aria-expanded={
+                  mobileMenuOpen
+                }
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </button>
             </div>
           </div>
         </div>
       </header>
 
+      {/* ====================================================
+          MOBILE MENU
+          ==================================================== */}
+
       <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="fixed inset-0 z-[60] lg:hidden">
+            {/* Backdrop */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              exit={{
+                opacity: 0,
+              }}
+              onClick={() =>
+                setMobileMenuOpen(
+                  false,
+                )
+              }
               className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             />
 
+            {/* Drawer */}
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="fixed top-0 right-0 bottom-0 w-[88%] max-w-sm bg-white dark:bg-background p-6 pt-20 shadow-2xl flex flex-col justify-between border-l border-border overflow-y-auto"
+              initial={{
+                x: '100%',
+              }}
+              animate={{
+                x: 0,
+              }}
+              exit={{
+                x: '100%',
+              }}
+              transition={{
+                type: 'spring',
+                damping: 28,
+                stiffness: 280,
+              }}
+              className="fixed bottom-0 right-0 top-0 flex w-[88%] max-w-sm flex-col justify-between overflow-y-auto border-l border-border bg-white p-6 pt-20 shadow-2xl dark:bg-background"
             >
               <div className="space-y-6">
+                {/* Mobile search */}
                 <button
                   type="button"
                   onClick={() => {
-                    setMobileMenuOpen(false);
-                    setSearchModalOpen(true);
+                    setMobileMenuOpen(
+                      false,
+                    );
+                    setSearchModalOpen(
+                      true,
+                    );
                   }}
-                  className="w-full flex items-center justify-between px-4 py-4 rounded-2xl bg-card text-zinc-700 dark:text-zinc-300 text-base font-medium border border-border"
+                  className="flex w-full items-center justify-between rounded-2xl border border-border bg-card px-4 py-4 text-base font-medium text-zinc-700 dark:text-zinc-300"
                 >
                   <span className="flex items-center gap-3">
-                    <Search className="w-5 h-5 text-zinc-500" />
-                    <span>{t('nav', 'searchProducts')}</span>
+                    <Search className="h-5 w-5 text-zinc-500" />
+
+                    <span>
+                      {t(
+                        'nav',
+                        'searchProducts',
+                      )}
+                    </span>
                   </span>
-                  <ArrowRight className="w-5 h-5 text-zinc-400" />
+
+                  <ArrowRight className="h-5 w-5 text-zinc-400" />
                 </button>
 
+                {/* Sections */}
                 <div className="space-y-2">
-                  <div className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2 px-2">
-                    {t('nav', 'sections')}
+                  <div className="mb-2 px-2 text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                    {t(
+                      'nav',
+                      'sections',
+                    )}
                   </div>
-                  {NAV_ITEMS.map((item) => {
-                    const isActive = activeSection === item.id;
-                    const linkHref = isHomePage ? `#${item.sectionId}` : item.path;
 
-                    return (
-                      <a
-                        key={item.id}
-                        href={linkHref}
-                        onClick={(e) => handleNavClick(e, item)}
-                        className={`relative flex items-center justify-between px-4 py-3.5 rounded-2xl text-base font-medium transition-colors ${
-                          isActive
-                            ? 'text-foreground'
-                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                        }`}
-                      >
-                        {isActive && (
-<motion.div
-                             layoutId="mobile-nav-indicator"
-                             className="absolute inset-0 bg-primary/20 rounded-2xl"
-                             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                           />
-                        )}
-                        <span className="relative z-10">{item.label}</span>
-                        <ArrowRight className={`relative z-10 w-5 h-5 ${isActive ? 'text-primary' : 'text-zinc-400'}`} />
-                      </a>
-                    );
-                  })}
+                  {NAV_ITEMS.map(
+                    (item) => {
+                      const isActive =
+                        activeSection ===
+                        item.id;
+
+                      const linkHref =
+                        isHomePage
+                          ? `#${item.sectionId}`
+                          : item.path;
+
+                      return (
+                        <a
+                          key={item.id}
+                          href={linkHref}
+                          onClick={(e) =>
+                            handleNavClick(
+                              e,
+                              item,
+                            )
+                          }
+                          className={`relative flex items-center justify-between overflow-hidden rounded-2xl px-4 py-3.5 text-base font-medium transition-colors ${
+                            isActive
+                              ? 'text-foreground'
+                              : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white'
+                          }`}
+                        >
+                          {isActive && (
+                            <motion.span
+                              layoutId="mobile-active-section"
+                              className="absolute inset-0 -z-0 rounded-2xl bg-primary/10"
+                              transition={{
+                                type: 'spring',
+                                stiffness: 360,
+                                damping: 30,
+                              }}
+                            />
+                          )}
+
+                          <span className="relative z-10">
+                            {item.label}
+                          </span>
+
+                          <ArrowRight
+                            className={`relative z-10 h-5 w-5 ${
+                              isActive
+                                ? 'text-primary'
+                                : 'text-zinc-400'
+                            }`}
+                          />
+                        </a>
+                      );
+                    },
+                  )}
                 </div>
 
-                <div className="pt-4 border-t border-zinc-100 dark:border-border space-y-3">
+                {/* Mobile utilities */}
+                <div className="space-y-3 border-t border-zinc-100 pt-4 dark:border-border">
                   <Link
                     to="/favorites"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-card text-sm font-medium text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
+                    onClick={() =>
+                      setMobileMenuOpen(
+                        false,
+                      )
+                    }
+                    className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-card px-4 py-3.5 text-sm font-medium text-zinc-800 dark:border-zinc-700/50 dark:text-zinc-200"
                   >
                     <span className="flex items-center gap-3">
-                      <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                      {t('nav', 'favoritesList')}
+                      <Heart className="h-5 w-5 fill-rose-500 text-rose-500" />
+
+                      {t(
+                        'nav',
+                        'favoritesList',
+                      )}
                     </span>
-                    <span className="px-3 py-1 text-xs font-black bg-zinc-200 dark:bg-zinc-700 text-foreground rounded-full">
+
+                    <span className="rounded-full bg-zinc-200 px-3 py-1 text-xs font-black text-foreground dark:bg-zinc-700">
                       {totalFavorites}
                     </span>
                   </Link>
 
+                  {/* Phone */}
                   <a
-                    href={`tel:${storeInfo.phoneRaw || storeInfo.phone}`}
-                    onClick={() => track('phone_click')}
+                    href={`tel:${
+                      storeInfo.phoneRaw ||
+                      storeInfo.phone
+                    }`}
+                    onClick={() =>
+                      track(
+                        'phone_click',
+                      )
+                    }
                     className="flex items-center gap-3 px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400"
                   >
-                    <span className="font-black text-zinc-900 dark:text-zinc-100">{t('nav', 'phone')}:</span>
-                    <span>{storeInfo.phone}</span>
+                    <span className="font-black text-zinc-900 dark:text-zinc-100">
+                      {t(
+                        'nav',
+                        'phone',
+                      )}
+                      :
+                    </span>
+
+                    <span>
+                      {storeInfo.phone}
+                    </span>
                   </a>
 
+                  {/* Address */}
                   <div className="flex items-start gap-3 px-4 py-2 text-sm text-zinc-500 dark:text-zinc-400">
-                    <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-zinc-700 dark:text-zinc-300" />
-                    <span>{storeInfo.address}</span>
+                    <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-zinc-700 dark:text-zinc-300" />
+
+                    <span>
+                      {storeInfo.address}
+                    </span>
                   </div>
                 </div>
               </div>
 
+              {/* Telegram */}
               {storeInfo.telegram && (
-                <div className="pt-6 border-t border-zinc-100 dark:border-border">
+                <div className="border-t border-zinc-100 pt-6 dark:border-border">
                   <a
-                    href={storeInfo.telegram}
+                    href={
+                      storeInfo.telegram
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => track('telegram_click')}
-                    className="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-2xl text-base font-black tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground shadow-md"
+                    onClick={() =>
+                      track(
+                        'telegram_click',
+                      )
+                    }
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground px-4 py-4 text-base font-black tracking-wide text-background shadow-md dark:bg-card dark:text-card-foreground"
                   >
-                    <Send className="w-5 h-5" />
-                    {t('nav', 'telegramContact')}
+                    <Send className="h-5 w-5" />
+
+                    {t(
+                      'nav',
+                      'telegramContact',
+                    )}
                   </a>
                 </div>
               )}
@@ -439,7 +1100,13 @@ const el = document.getElementById(item.sectionId);
         )}
       </AnimatePresence>
 
-      <SearchModal isOpen={searchModalOpen} onClose={() => setSearchModalOpen(false)} />
+      {/* Search */}
+      <SearchModal
+        isOpen={searchModalOpen}
+        onClose={() =>
+          setSearchModalOpen(false)
+        }
+      />
     </>
   );
 };
