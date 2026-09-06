@@ -29,14 +29,13 @@ const CategoryTile: React.FC<CategoryTileProps> = ({
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
+          className="w-full h-48 aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105 loading=lazy"
         />
       ) : (
         <div
-          className="w-full h-48 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500"
+          className="w-full h-48 aspect-[4/3] bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500"
         >
-          <span className="text-xs font-bold">{name.substring(0, 3)}</span>
+          <span className="text-xs font-bold">👕</span>
         </div>
       )}
 

@@ -95,12 +95,10 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     if (!isHomePage) {
-      if (location.pathname.startsWith('/products')) {
+      if (location.pathname === '/products' || location.pathname.startsWith('/products?')) {
         setActiveSection('products');
       } else if (location.pathname === '/feed' || location.pathname === '/videos') {
         setActiveSection('feed');
-      } else if (location.pathname === '/collections') {
-        setActiveSection('collections');
       } else if (location.pathname === '/about') {
         setActiveSection('about');
       } else if (location.pathname === '/location') {
@@ -115,13 +113,9 @@ export const Navbar: React.FC = () => {
 
     const sectionIds = [
       'hero',
-      'trending',
-      'video-feed',
-      'featured-collection',
-      'new-arrivals',
-      'shop-by-style',
-      'community',
-      'store-experience',
+      'categories',
+      'video-discovery',
+      'store',
       'about',
       'contact',
     ];
@@ -138,7 +132,7 @@ export const Navbar: React.FC = () => {
 
     const observerOptions = {
       root: null,
-      rootMargin: '-30% 0px -50% 0px',
+      rootMargin: '-20% 0px -50% 0px',
       threshold: 0.05,
     };
 
@@ -198,7 +192,7 @@ export const Navbar: React.FC = () => {
         <div
           className={`pointer-events-auto mx-auto max-w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
             isScrolled
-              ? 'bg-card/80 backdrop-blur-xl border-b border-border/60 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2.5'
+              ? 'bg-card/90 backdrop-blur-xl border-b border-border/60 shadow-lg shadow-zinc-950/40 py-2'
               : 'bg-transparent py-4'
           }`}
         >
@@ -249,14 +243,14 @@ export const Navbar: React.FC = () => {
                     onClick={(e) => handleNavClick(e, item)}
                     className={`relative px-3 py-2 text-sm rounded-full font-medium transition-colors duration-200 ${
                       isActive
-                        ? 'text-foreground'
+                        ? 'text-primary font-semibold'
                         : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="nav-indicator"
-                        className="absolute inset-0 bg-amber-500/10 rounded-full"
+                        className="absolute inset-0 -bottom-1.5 bg-primary/10 rounded-full height-0.5"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -379,12 +373,12 @@ export const Navbar: React.FC = () => {
                         {isActive && (
                           <motion.div
                             layoutId="mobile-nav-indicator"
-                            className="absolute inset-0 bg-amber-500/10 rounded-2xl"
+                            className="absolute inset-0 bg-primary/10 rounded-2xl"
                             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                           />
                         )}
                         <span className="relative z-10">{item.label}</span>
-                        <ArrowRight className={`relative z-10 w-5 h-5 ${isActive ? 'text-amber-500' : 'text-zinc-400'}`} />
+                        <ArrowRight className={`relative z-10 w-5 h-5 ${isActive ? 'text-primary' : 'text-zinc-400'}`} />
                       </a>
                     );
                   })}

@@ -17,7 +17,7 @@ export const VideoDiscoverySection: React.FC = () => {
   const displayVideos = publishedVideos.slice(0, 4);
 
   return (
-    <section id="video-discovery" className="py-16 md:py-24 bg-background text-white transition-colors overflow-hidden">
+    <section id="video-discovery" className="py-16 md:py-24 bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -59,10 +59,10 @@ export const VideoDiscoverySection: React.FC = () => {
               <Link
                 key={video.id}
                 to={`/feed?v=${video.id}`}
-                className="group relative flex flex-col rounded-3xl overflow-hidden bg-zinc-900 border border-border shadow-xl hover:border-zinc-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
+                className="group relative flex flex-col rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-sm hover:border-zinc-600 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
               >
                 {/* Vertical 9:14 Poster Image Container */}
-                <div className="relative w-full aspect-[9/14] bg-background overflow-hidden">
+                <div className="relative w-full aspect-[9/14] bg-zinc-950 overflow-hidden">
                   <img
                     src={video.posterUrl}
                     alt={video.title}
@@ -71,7 +71,7 @@ export const VideoDiscoverySection: React.FC = () => {
                   />
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
 
                   {/* Top Badges */}
                   <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between">
@@ -98,8 +98,8 @@ export const VideoDiscoverySection: React.FC = () => {
 
                   {/* Center Play Indicator */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center border border-white/30 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-zinc-950 group-hover:border-transparent shadow-lg">
-                      <Play className="w-5 h-5 fill-current ml-0.5" />
+                    <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-zinc-950 group-hover:border-transparent shadow-lg">
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
                     </div>
                   </div>
 
@@ -119,7 +119,7 @@ export const VideoDiscoverySection: React.FC = () => {
                             {new Intl.NumberFormat('uz-UZ').format(product.price)} so'm
                           </p>
                         </div>
-                        <span className="text-[10px] font-black text-white uppercase tracking-wider bg-white/10 px-2 py-1 rounded-lg shrink-0 group-hover:bg-white group-hover:text-zinc-950 transition-colors">
+                        <span className="text-[10px] font-black text-white uppercase tracking-wider bg-white/10 px-2 py-1 rounded-lg group-hover:bg-white group-hover:text-zinc-950 transition-colors">
                           Ko'rish
                         </span>
                       </div>
@@ -132,10 +132,10 @@ export const VideoDiscoverySection: React.FC = () => {
         </Stagger>
 
         {/* Mobile Full Discovery CTA */}
-        <div className="mt-8 text-center sm:hidden">
+        <div className="mt-8 sm:hidden text-center">
           <Link
             to="/feed"
-            className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-white text-zinc-950 text-xs font-black uppercase tracking-wider shadow-lg"
+            className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-primary text-primary-foreground text-xs font-black uppercase tracking-wider transition-all duration-300 hover:bg-primary/90"
           >
             <span>Barcha videolarni ko'rish</span>
             <ArrowRight className="w-4 h-4" />

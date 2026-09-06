@@ -99,7 +99,7 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_black/40_100%)] pointer-events-none" />
       </div>
 
-      <div className="relative z-10 w-full px-6 py-20 sm:px-8 lg:px-12 xl:px-16">
+      <div className="relative z-10 w-full px-6 py-20 sm:px-8 lg:px-12 xl:px-16 max-w-4xl">
         <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
@@ -126,10 +126,10 @@ export const HeroSection: React.FC = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="font-display font-black text-white max-w-5xl"
+                  className="font-display font-black text-white max-w-2xl mb-6"
                   style={{
-                    fontSize: 'clamp(3rem, 8vw, 7rem)',
-                    lineHeight: '0.95',
+                    fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                    lineHeight: '1.1',
                     letterSpacing: '-0.04em',
                   }}
                 >
@@ -144,14 +144,14 @@ export const HeroSection: React.FC = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                  className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+                  className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
                 >
                   <CtaComponent
                     to={isInAppLink ? slide.ctaLink : undefined}
                     href={isInAppLink ? undefined : slide.ctaLink}
                     target={isInAppLink ? undefined : '_blank'}
                     rel={isInAppLink ? undefined : 'noopener noreferrer'}
-                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-foreground/30"
+                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
                   >
                     <span>{slide.ctaText || t('pages', 'home.heroFallbackCta1')}</span>
                     <motion.div
@@ -164,7 +164,7 @@ export const HeroSection: React.FC = () => {
 
                   <Link
                     to="/products"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-background/10 backdrop-blur-sm text-foreground font-semibold text-sm tracking-wide hover:bg-background/20 transition-all duration-300 border border-border/30"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-background/10 text-foreground font-medium text-sm tracking-wide hover:bg-background/20 transition-all duration-300 border border-border/30"
                   >
                     {t('pages', 'home.heroViewAllProducts')}
                   </Link>
