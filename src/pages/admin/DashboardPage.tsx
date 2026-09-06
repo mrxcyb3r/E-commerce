@@ -138,7 +138,7 @@ export const DashboardPage: React.FC = () => {
             <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />
           </div>
           <div className="text-xl font-bold text-foreground tabular-nums">{featuredProducts.length}</div>
-          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">Mashhur mahsulotlar</div>
+          <div className="text-[11px] text-muted-foreground font-medium mt-0.5">{publishedProducts.length} ta nashr etilgan</div>
         </Link>
 
         <Link to="/admin/orders" className="block p-4 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all">
