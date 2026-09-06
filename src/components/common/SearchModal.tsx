@@ -157,7 +157,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   setShowSuggestions(true);
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Search products, categories, brands..."
+                placeholder={t('common', 'searchPlaceholder')}
                 className="w-full pl-12 pr-4 py-3.5 bg-card text-foreground placeholder-zinc-400 dark:placeholder-zinc-500 text-base font-medium rounded-2xl border border-border/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
               />
               {query && (
@@ -196,7 +196,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                         <div className="flex items-center justify-between px-2 py-3">
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                            <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Recent Searches</span>
+                            <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('common', 'search')}</span>
                           </div>
                           <button
                             type="button"
@@ -248,7 +248,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                     <div className="px-2 py-3">
                       <div className="flex items-center gap-2 px-2 mb-2">
                         <Tag className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
-                        <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('common', 'categories')}</span>
+                        <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('common', 'category')}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 px-2">
                         {allCategories.slice(0, 8).map((category) => (
@@ -327,7 +327,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           <div className="inline-flex p-3 rounded-full bg-card text-zinc-400 mb-4">
                             <Search className="w-6 h-6" />
                           </div>
-                          <h4 className="font-display font-black text-foreground mb-1">No products found</h4>
+                          <h4 className="font-display font-black text-foreground mb-1">{t('common', 'notFound')}</h4>
                           <p className="text-sm text-zinc-500 dark:text-zinc-400">Try a different search term or browse categories.</p>
                         </div>
                       )}

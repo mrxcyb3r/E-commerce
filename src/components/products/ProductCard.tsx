@@ -72,7 +72,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     ? 'bg-rose-500 text-white'
                     : 'bg-card/80 text-muted-foreground hover:text-rose-500 backdrop-blur-sm'
                 }`}
-                aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
               >
                 <Heart className={`w-3.5 h-3.5 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
               </button>
@@ -134,7 +134,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   ? 'bg-rose-500 text-white'
                   : 'bg-card/80 text-muted-foreground hover:text-rose-500 backdrop-blur-sm'
               }`}
-              aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
             >
               <Heart className={`w-3.5 h-3.5 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
             </button>

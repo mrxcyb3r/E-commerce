@@ -138,14 +138,14 @@ export const VideoFeed: React.FC = () => {
             <button
               onClick={() => goToVideo(activeIndex - 1)}
               className="p-3 rounded-full bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all backdrop-blur-sm"
-              aria-label="Previous video"
+              aria-label={t('feed', 'prevVideo')}
             >
               <ChevronUp className="w-5 h-5" />
             </button>
             <button
               onClick={() => goToVideo(activeIndex + 1)}
               className="p-3 rounded-full bg-accent text-accent-foreground hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all"
-              aria-label="Next video"
+              aria-label={t('feed', 'nextVideo')}
             >
               <ChevronDown className="w-5 h-5" />
             </button>
@@ -243,7 +243,7 @@ export const VideoFeed: React.FC = () => {
                     </span>
                     {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
                       <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-rose-500 text-white rounded-full">
-                        {Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}% off
+                        {Math.round(((currentProduct.originalPrice - currentProduct.price) / currentProduct.originalPrice) * 100)}% {t('common', 'sale')}
                       </span>
                     )}
                   </div>
@@ -357,7 +357,7 @@ export const VideoFeed: React.FC = () => {
               <button
                 onClick={() => setShowOverlay(null)}
                 className="absolute top-4 right-4 z-10 p-2 rounded-full bg-zinc-900/80 backdrop-blur-sm text-white/80 hover:text-white hover:bg-zinc-800 transition-all"
-                aria-label="Close"
+                aria-label={t('common', 'close')}
               >
                 <X className="w-6 h-6" />
               </button>
@@ -427,13 +427,13 @@ export const VideoFeed: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-4 pt-6 border-t border-border">
-                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all" aria-label="Share">
+                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all" aria-label={t('common', 'share')}>
                           <Share2 className="w-5 h-5" />
                         </button>
-                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-rose-500 hover:bg-zinc-700 transition-all" aria-label="Save">
+                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-rose-500 hover:bg-zinc-700 transition-all" aria-label={t('feed', 'save')}>
                           <Bookmark className="w-5 h-5" />
                         </button>
-                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all" aria-label="Comments">
+                        <button className="p-2 rounded-full bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-all" aria-label={t('feed', 'comments')}>
                           <MessageSquare className="w-5 h-5" />
                         </button>
                       </div>

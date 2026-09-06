@@ -54,19 +54,19 @@ export const StoreExperience: React.FC = () => {
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-white text-[11px] font-black uppercase tracking-widest border border-white/20 mb-2">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{t('pages', 'sections.storeExperienceFlagship')}</span>
+                  <span>{t('pages', 'home.storeExperienceFlagship')}</span>
                 </div>
                 <h3 className="font-display font-black text-white"
                   style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
-                  {t('pages', 'sections.storeExperienceDesc', storeName)}
+                  {t('pages', 'home.storeExperienceDesc', storeName)}
                 </h3>
               </div>
 
               <div className="absolute top-6 right-6 flex flex-col gap-2">
-                <button className="p-3 rounded-full bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 border border-white/20 transition-all" aria-label="Get directions">
+                <button className="p-3 rounded-full bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 border border-white/20 transition-all" aria-label={t('pages', 'home.storeExperienceGetDirections')}>
                   <Navigation className="w-5 h-5" />
                 </button>
-                <button className="p-3 rounded-full bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 border border-white/20 transition-all" aria-label="Share location">
+                <button className="p-3 rounded-full bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 border border-white/20 transition-all" aria-label={t('common', 'contact')}>
                   <Phone className="w-5 h-5" />
                 </button>
               </div>
@@ -80,7 +80,7 @@ export const StoreExperience: React.FC = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-[11px] font-black uppercase tracking-widest text-zinc-400 mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t('pages', 'sections.storeExperienceEyebrow')}</span>
+                <span>{t('pages', 'home.storeExperienceEyebrow')}</span>
               </div>
               <h2
                 id="store-heading"
@@ -91,9 +91,9 @@ export const StoreExperience: React.FC = () => {
                   letterSpacing: '-0.03em',
                 }}
               >
-                {t('pages', 'sections.storeExperienceTitle')}
+                {t('pages', 'home.storeExperienceTitle')}
                 <br />
-                <span className="text-amber-500">{t('pages', 'sections.storeExperienceSubtitle')}</span>
+                <span className="text-amber-500">{t('pages', 'home.storeExperienceSubtitle')}</span>
               </h2>
             </Reveal>
 
@@ -102,7 +102,7 @@ export const StoreExperience: React.FC = () => {
                 variant={fadeUp}
                 transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                <h3 className="font-display font-bold text-white mb-4">{t('pages', 'sections.storeExperienceOpeningHours')}</h3>
+                <h3 className="font-display font-bold text-white mb-4">{t('pages', 'home.storeExperienceOpeningHours')}</h3>
                 <div className="space-y-3">
                   {hours.map((hour, index) => (
                     <div
@@ -129,7 +129,7 @@ export const StoreExperience: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <MapPin className="w-6 h-6 text-amber-500" />
                   <div>
-                    <p className="text-zinc-400 text-sm">{t('pages', 'sections.storeExperienceFindUs')}</p>
+                    <p className="text-zinc-400 text-sm">{t('pages', 'home.storeExperienceFindUs')}</p>
                     <p className="font-medium text-white">{storeInfo?.address || ''}</p>
                   </div>
                 </div>
@@ -138,14 +138,14 @@ export const StoreExperience: React.FC = () => {
                     to="/location"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-accent-foreground font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all group"
                   >
-                    {t('pages', 'sections.storeExperienceGetDirections')}
+                    {t('pages', 'home.storeExperienceGetDirections')}
                     <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     to="/contact"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-strong text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all border border-white/10"
                   >
-                    {t('pages', 'sections.storeExperienceContactUs')}
+                    {t('pages', 'home.storeExperienceContactUs')}
                   </Link>
                 </div>
               </div>

@@ -13,6 +13,7 @@ interface ProductCardProps {
 }
 
 function FavoriteButton({ product, size = 'sm' }: { product: Product; size?: 'sm' | 'md' }) {
+  const { t } = useI18n();
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
   const Icon = size === 'sm' ? Heart : Heart;
@@ -35,7 +36,7 @@ function FavoriteButton({ product, size = 'sm' }: { product: Product; size?: 'sm
           ? 'bg-destructive text-destructive-foreground shadow-destructive/30'
           : 'bg-card/90 text-foreground hover:bg-card border border-border'
       }`}
-      aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
     >
       <Icon className={`${size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'} ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
     </motion.button>
@@ -65,6 +66,7 @@ function ProductImage({ product, aspect }: { product: Product; aspect: string })
 }
 
 export const ProductCardCompact: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { t } = useI18n();
   const { isFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
   const isOnSale = !!product.originalPrice && product.originalPrice > product.price;
@@ -92,7 +94,7 @@ export const ProductCardCompact: React.FC<ProductCardProps> = ({ product, index 
           />
           {isOnSale && (
             <span className="absolute top-1 left-1 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
-              Sale
+              {t('common', 'sale')}
             </span>
           )}
         </div>
@@ -159,7 +161,7 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
               whileTap={{ scale: 0.9 }}
               onClick={handleAddToCart}
               className="p-2.5 rounded-full bg-foreground text-background hover:opacity-90 shadow-lg transition-all pointer-events-auto"
-              aria-label="Add to cart"
+                  aria-label={t('product', 'shopNow')}
             >
               <ShoppingBag className="w-5 h-5" />
             </motion.button>
@@ -169,7 +171,7 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
             <div className="pointer-events-auto">
               {isOnSale && (
                 <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full shadow-md">
-                  Sale
+                  {t('common', 'sale')}
                 </span>
               )}
             </div>
@@ -184,7 +186,7 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
                     ? 'bg-destructive text-destructive-foreground shadow-destructive/30'
                     : 'bg-card/90 text-foreground hover:bg-card border border-border'
                 }`}
-                aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
               >
                 <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
               </motion.button>
@@ -288,7 +290,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
                 </span>
                 {isOnSale && (
                   <span className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
-                    Sale
+                    {t('common', 'sale')}
                   </span>
                 )}
               </div>
@@ -303,7 +305,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
                       ? 'bg-destructive text-destructive-foreground shadow-lg shadow-destructive/30'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
                   }`}
-                  aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+                  aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
                 >
                   <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
                 </motion.button>
@@ -313,7 +315,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
                   whileTap={{ scale: 0.95 }}
                   onClick={handleQuickView}
                   className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white/90 hover:bg-white/20 border border-white/20 transition-all"
-                  aria-label="Quick view"
+                  aria-label={t('common', 'view')}
                 >
                   <Eye className="w-5 h-5" />
                 </motion.button>
@@ -323,7 +325,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
                   whileTap={{ scale: 0.95 }}
                   onClick={handleAddToCart}
                   className="p-2.5 rounded-full bg-accent text-accent-foreground hover:opacity-90 shadow-lg shadow-accent/30 transition-all"
-                  aria-label="Add to cart"
+              aria-label={t('product', 'shopNow')}
                 >
                   <ShoppingBag className="w-5 h-5" />
                 </motion.button>
@@ -351,7 +353,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
                   ? 'bg-destructive text-destructive-foreground shadow-destructive/40'
                   : 'bg-white/10 text-white/90 hover:bg-white/20 border border-white/20'
               }`}
-              aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
             >
               <Heart className={`w-5 h-5 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
             </motion.button>
@@ -404,6 +406,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
 };
 
 export const ProductCardMinimal: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { t } = useI18n();
   const isOnSale = !!product.originalPrice && product.originalPrice > product.price;
 
   return (
@@ -429,7 +432,7 @@ export const ProductCardMinimal: React.FC<ProductCardProps> = ({ product, index 
           />
           {isOnSale && (
             <span className="absolute top-2 left-2 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
-              Sale
+              {t('common', 'sale')}
             </span>
           )}
         </div>
@@ -455,6 +458,7 @@ export const ProductCardMinimal: React.FC<ProductCardProps> = ({ product, index 
 };
 
 export const ProductCardVideo: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+  const { t } = useI18n();
   const { isFavorite } = useFavorites();
   const favorite = isFavorite(product.id);
 
@@ -495,7 +499,7 @@ export const ProductCardVideo: React.FC<ProductCardProps> = ({ product, index = 
             whileTap={{ scale: 0.9 }}
             onClick={handlePlay}
             className="absolute inset-0 m-auto w-14 h-14 flex items-center justify-center rounded-full bg-white/90 text-foreground shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            aria-label="Play video"
+            aria-label={t('feed', 'prevVideo')}
           >
             <Play className="w-6 h-6 ml-0.5" fill="currentColor" />
           </motion.button>
@@ -507,10 +511,10 @@ export const ProductCardVideo: React.FC<ProductCardProps> = ({ product, index = 
               onClick={(e) => { e.stopPropagation(); e.preventDefault(); useFavorites().toggleFavorite(product); }}
               className={`p-2 rounded-full backdrop-blur-sm shadow-md transition-all ${
                 favorite
-                  ? 'bg-destructive text-destructive-foreground shadow-destructive/30'
-                  : 'bg-card/90 text-foreground hover:bg-card border border-border'
+                   ? 'bg-destructive text-destructive-foreground shadow-destructive/30'
+                   : 'bg-card/90 text-foreground hover:bg-card border border-border'
               }`}
-              aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
             >
               <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} strokeWidth={favorite ? 0 : 2} />
             </motion.button>

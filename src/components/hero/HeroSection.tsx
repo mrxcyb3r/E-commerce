@@ -41,18 +41,18 @@ export const HeroSection: React.FC = () => {
   const fallbackSlides = [
     {
       id: 'fallback-1',
-      title: t('pages', 'sections.heroFallbackTitle1'),
-      badge: t('pages', 'sections.heroFallbackBadge1'),
+      title: t('pages', 'home.heroFallbackTitle1'),
+      badge: t('pages', 'home.heroFallbackBadge1'),
       imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1920&q=80',
-      ctaText: t('pages', 'sections.heroFallbackCta1'),
+      ctaText: t('pages', 'home.heroFallbackCta1'),
       ctaLink: '/products',
     },
     {
       id: 'fallback-2',
-      title: t('pages', 'sections.heroFallbackTitle2'),
-      badge: t('pages', 'sections.heroFallbackBadge2'),
+      title: t('pages', 'home.heroFallbackTitle2'),
+      badge: t('pages', 'home.heroFallbackBadge2'),
       imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1920&q=80',
-      ctaText: t('pages', 'sections.heroFallbackCta2'),
+      ctaText: t('pages', 'home.heroFallbackCta2'),
       ctaLink: '/products',
     },
   ];
@@ -153,7 +153,7 @@ export const HeroSection: React.FC = () => {
                     rel={isInAppLink ? undefined : 'noopener noreferrer'}
                     className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-foreground text-background font-semibold text-sm tracking-wide transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-foreground/30"
                   >
-                    <span>{slide.ctaText || t('pages', 'sections.heroFallbackCta1')}</span>
+                    <span>{slide.ctaText || t('pages', 'home.heroFallbackCta1')}</span>
                     <motion.div
                       whileHover={{ x: 4 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -166,7 +166,7 @@ export const HeroSection: React.FC = () => {
                     to="/products"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-background/10 backdrop-blur-sm text-foreground font-semibold text-sm tracking-wide hover:bg-background/20 transition-all duration-300 border border-border/30"
                   >
-                    {t('pages', 'sections.heroViewAllProducts')}
+                    {t('pages', 'home.heroViewAllProducts')}
                   </Link>
                 </motion.div>
               )}
