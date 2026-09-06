@@ -18,11 +18,11 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   const baseClass = 'shimmer rounded';
 
   const variants = {
-    text: 'h-4 w-full',
-    card: 'h-64 w-full rounded-xl',
-    table: 'h-12 w-full',
-    avatar: 'w-10 h-10 rounded-full',
-    button: 'h-10 w-24 rounded-xl',
+    text: 'h-3.5 w-full',
+    card: 'h-48 w-full rounded-xl',
+    table: 'h-10 w-full',
+    avatar: 'w-8 h-8 rounded-full',
+    button: 'h-9 w-20 rounded-lg',
     image: 'aspect-video w-full rounded-xl',
   };
 
@@ -34,7 +34,7 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
     />
   ));
 
-  return <div className="space-y-3">{items}</div>;
+  return <div className="space-y-2">{items}</div>;
 };
 
 interface TableSkeletonProps {
@@ -49,14 +49,14 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`card overflow-hidden ${className}`}>
+    <div className={`admin-section overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         <table className="w-full" role="grid" aria-label="Loading table">
           <thead>
             <tr className="border-b border-border">
               {Array.from({ length: columns }).map((_, i) => (
-                <th key={i} className="px-4 py-3 text-left">
-                  <div className="shimmer h-4 w-full" />
+                <th key={i} className="px-4 py-2.5 text-left">
+                  <div className="shimmer h-3 w-full" />
                 </th>
               ))}
             </tr>
@@ -65,8 +65,8 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
             {Array.from({ length: rows }).map((_, rowIndex) => (
               <tr key={rowIndex} className="border-b border-border/50">
                 {Array.from({ length: columns }).map((_, colIndex) => (
-                  <td key={colIndex} className="px-4 py-3">
-                    <div className="shimmer h-4 w-full" />
+                  <td key={colIndex} className="px-4 py-2.5">
+                    <div className="shimmer h-3.5 w-full" />
                   </td>
                 ))}
               </tr>
@@ -90,14 +90,13 @@ export const CardGridSkeleton: React.FC<CardGridSkeletonProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`grid grid-cols-${columns.base} sm:grid-cols-${columns.sm} lg:grid-cols-${columns.lg} xl:grid-cols-${columns.xl} gap-4 ${className}`}>
+    <div className={`grid gap-4 ${className}`} style={{ gridTemplateColumns: `repeat(${columns.base}, minmax(0, 1fr))` }}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="card overflow-hidden">
+        <div key={i} className="admin-section overflow-hidden p-0">
           <div className="aspect-square shimmer" />
-          <div className="p-4 space-y-3">
+          <div className="p-3 space-y-2">
             <div className="shimmer h-3 w-3/4" />
-            <div className="shimmer h-5 w-1/2" />
-            <div className="shimmer h-4 w-1/3" />
+            <div className="shimmer h-4 w-1/2" />
           </div>
         </div>
       ))}

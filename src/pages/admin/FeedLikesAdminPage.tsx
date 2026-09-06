@@ -82,25 +82,25 @@ export const FeedLikesAdminPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative rounded-3xl bg-neutral-900 text-white p-6 sm:p-8 overflow-hidden shadow-xl border border-neutral-800">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-3xl bg-card text-foreground p-6 sm:p-8 overflow-hidden shadow-sm border border-border">
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-400/20 text-rose-300 text-xs font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold">
               <Heart className="w-3.5 h-3.5" />
               <span>Feed yoqtirishlar</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
               Yoqtirishlar
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-300">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Videolarga bo'lgan yoqtirishlar — real 'feed_likes' ma'lumotlaridan.
             </p>
           </div>
           <button
             type="button"
             onClick={fetchLikes}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-all shadow-md active:scale-95 shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-foreground text-background font-bold text-xs hover:bg-foreground/90 transition-all shadow-md active:scale-95 shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Yangilash</span>
@@ -120,19 +120,19 @@ export const FeedLikesAdminPage: React.FC = () => {
         {/* Top liked videos */}
         <SectionCard title="Eng ko'p yoqtirilgan videolar" icon={Heart} accent="text-rose-500" subtitle="feed_likes bo'yicha">
           {perVideo.length === 0 ? (
-            <p className="text-xs text-neutral-400 text-center py-6">Hozircha yoqtirishlar yo'q</p>
+            <p className="text-xs text-muted-foreground text-center py-6">Hozircha yoqtirishlar yo'q</p>
           ) : (
             <div className="space-y-2">
               {perVideo.slice(0, 8).map((v, i) => (
-                <div key={v.feed_id} className="flex items-center gap-3 p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
+                <div key={v.feed_id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted border border-border">
                   <span className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 text-[10px] font-black flex items-center justify-center shrink-0">
                     {i + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-xs font-black text-neutral-900 dark:text-white truncate">
+                    <div className="text-xs font-black text-foreground truncate">
                       {titleMap.get(v.feed_id) ?? v.feed_id}
                     </div>
-                    <div className="text-[10px] text-neutral-400">{v.likers.size} noyob yoqtiruvchi</div>
+                    <div className="text-[10px] text-muted-foreground">{v.likers.size} noyob yoqtiruvchi</div>
                   </div>
                   <span className="text-base font-black text-rose-600 dark:text-rose-400 shrink-0">{v.count}</span>
                 </div>
@@ -155,19 +155,19 @@ export const FeedLikesAdminPage: React.FC = () => {
         subtitle={`${filteredLikes.length} ta yozuv`}
         action={
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-muted text-muted-foreground">
               <Search className="w-3.5 h-3.5" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Qidirish..."
-                className="bg-transparent outline-none text-xs font-semibold text-neutral-800 dark:text-white w-32"
+                className="bg-transparent outline-none text-xs font-semibold text-foreground w-32"
               />
             </div>
             <select
               value={feedFilter}
               onChange={(e) => setFeedFilter(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 outline-none"
+              className="px-2.5 py-1.5 rounded-xl bg-muted text-xs font-bold text-foreground outline-none"
             >
               <option value="all">Barcha videolar</option>
               {perVideo.map((v) => (
@@ -180,14 +180,14 @@ export const FeedLikesAdminPage: React.FC = () => {
         }
       >
         {loading && likes.length === 0 ? (
-          <p className="text-xs text-neutral-400 text-center py-10">Yuklanmoqda...</p>
+          <p className="text-xs text-muted-foreground text-center py-10">Yuklanmoqda...</p>
         ) : filteredLikes.length === 0 ? (
-          <p className="text-xs text-neutral-400 text-center py-10">Hech narsa topilmadi</p>
+          <p className="text-xs text-muted-foreground text-center py-10">Hech narsa topilmadi</p>
         ) : (
           <div className="overflow-x-auto -mx-2">
             <table className="w-full text-xs min-w-[480px]">
               <thead>
-                <tr className="text-left text-[10px] uppercase tracking-wider text-neutral-400 border-b border-neutral-200 dark:border-neutral-800">
+                <tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="px-2 py-2 font-bold">Video</th>
                   <th className="px-2 py-2 font-bold">Tashrifchi ID</th>
                   <th className="px-2 py-2 font-bold text-right">Sana</th>
@@ -195,14 +195,14 @@ export const FeedLikesAdminPage: React.FC = () => {
               </thead>
               <tbody>
                 {filteredLikes.map((l) => (
-                  <tr key={l.id} className="border-b border-neutral-100 dark:border-neutral-800/60 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="px-2 py-2.5 font-bold text-neutral-900 dark:text-white truncate max-w-[200px]">
+                  <tr key={l.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                    <td className="px-2 py-2.5 font-bold text-foreground truncate max-w-[200px]">
                       {titleMap.get(l.feed_id) ?? l.feed_id}
                     </td>
-                    <td className="px-2 py-2.5 font-mono text-[10px] text-neutral-500 dark:text-neutral-400 truncate max-w-[200px]">
+                    <td className="px-2 py-2.5 font-mono text-[10px] text-muted-foreground truncate max-w-[200px]">
                       {l.visitor_id}
                     </td>
-                    <td className="px-2 py-2.5 text-right text-neutral-500 dark:text-neutral-400">
+                    <td className="px-2 py-2.5 text-right text-muted-foreground">
                       {new Date(l.created_at).toLocaleString('uz-UZ')}
                     </td>
                   </tr>
@@ -214,7 +214,7 @@ export const FeedLikesAdminPage: React.FC = () => {
       </SectionCard>
 
       <div className="text-center">
-        <Link to="/feed" target="_blank" className="inline-flex items-center gap-2 text-xs text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 font-bold">
+        <Link to="/feed" target="_blank" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground font-bold">
           <span>Feed ko'rish</span>
           <ArrowUpRight className="w-3 h-3" />
         </Link>
@@ -226,18 +226,18 @@ export const FeedLikesAdminPage: React.FC = () => {
 const LikeTrendChart: React.FC<{ points: { date: string; likes: number }[] }> = ({ points }) => {
   const max = Math.max(1, ...points.map((p) => p.likes));
   if (points.every((p) => p.likes === 0)) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Yoqtirishlar ma'lumoti yo'q</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Yoqtirishlar ma'lumoti yo'q</p>;
   }
   return (
     <div className="flex items-end gap-1.5" style={{ height: 160 }}>
       {points.map((p) => (
         <div key={p.date} className="flex-1 flex flex-col items-center gap-1 group" title={`${p.date} — ${p.likes} yoqtirish`}>
-          <span className="text-[9px] text-neutral-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">{p.likes}</span>
+          <span className="text-[9px] text-muted-foreground font-bold opacity-0 group-hover:opacity-100 transition-opacity">{p.likes}</span>
           <div
             className="w-full rounded-md bg-gradient-to-t from-rose-600 to-rose-400 dark:from-rose-700 dark:to-rose-500 group-hover:opacity-80 transition-opacity"
             style={{ height: `${Math.max(3, (p.likes / max) * (160 - 24))}px` }}
           />
-          <span className="text-[8px] font-bold text-neutral-400">{p.date.slice(5)}</span>
+          <span className="text-[8px] font-bold text-muted-foreground">{p.date.slice(5)}</span>
         </div>
       ))}
     </div>

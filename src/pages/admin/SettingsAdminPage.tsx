@@ -93,17 +93,17 @@ export const SettingsAdminPage: React.FC = () => {
     <div className="space-y-8 max-w-4xl mx-auto pb-16">
       {/* Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+        <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
           Admin Sozlamalari & Zaxira Nusxalash
         </h2>
-        <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
           Admin parolini o'zgartirish, ma'lumotlarni JSON formatida eksport/import qilish
         </p>
       </div>
 
       {/* Change Password Card */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-6">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <KeyRound className="w-4 h-4 text-amber-500" />
           <span>Admin Kirish Ma'lumotlarini O'zgartirish</span>
         </h3>
@@ -127,16 +127,16 @@ export const SettingsAdminPage: React.FC = () => {
 
         <form onSubmit={handleCredentialsSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Admin Kirish (Email)
             </label>
-            <div className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium">
+            <div className="w-full px-3.5 py-2 text-xs rounded-xl admin-input font-medium">
               admin@dokon.uz
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Joriy Parol <span className="text-red-500">*</span>
             </label>
             <input
@@ -145,13 +145,13 @@ export const SettingsAdminPage: React.FC = () => {
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Joriy parolingizni kiriting"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-mono"
+              className="w-full px-3.5 py-2 text-xs rounded-xl admin-input"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-bold text-foreground mb-1">
                 Yangi Parol
               </label>
               <input
@@ -159,12 +159,12 @@ export const SettingsAdminPage: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Yangi parol (ixtiyoriy)"
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-mono"
+                className="w-full px-3.5 py-2 text-xs rounded-xl admin-input"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-bold text-foreground mb-1">
                 Yangi Parolni Qayta Kiriting
               </label>
               <input
@@ -172,7 +172,7 @@ export const SettingsAdminPage: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Yangi parolni takrorlang"
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-mono"
+                className="w-full px-3.5 py-2 text-xs rounded-xl admin-input"
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ export const SettingsAdminPage: React.FC = () => {
           <div className="pt-2">
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-900 text-xs font-bold transition-all shadow-xs"
+              className="px-5 py-2.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 text-xs font-bold transition-all shadow-xs"
             >
               Parolni Yangilash
             </button>
@@ -189,13 +189,13 @@ export const SettingsAdminPage: React.FC = () => {
       </div>
 
       {/* Backup and Restore */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-6">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <Download className="w-4 h-4 text-amber-500" />
           <span>Ma'lumotlar Zaxira Nusxasi (Backup & Restore)</span>
         </h3>
 
-        <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-relaxed">
           Do'kondagi barcha mahsulotlar, kategoriyalar, sharhlar, FAQ, AI promptlar va CMS matnlarini JSON fayl ko'rinishida yuklab oling yoki avvalgi nusxani qayta yuklang.
         </p>
 
@@ -209,13 +209,13 @@ export const SettingsAdminPage: React.FC = () => {
           <button
             type="button"
             onClick={handleExport}
-            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold shadow-sm flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-extrabold shadow-sm flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             <span>Zaxira Nusxasini Yuklab Olish (JSON)</span>
           </button>
 
-          <label className="px-4 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 cursor-pointer flex items-center gap-2">
+          <label className="px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-bold text-foreground hover:bg-muted cursor-pointer flex items-center gap-2">
             <Upload className="w-4 h-4" />
             <span>Nusxadan Tiklash (Import)</span>
             <input
@@ -235,14 +235,14 @@ export const SettingsAdminPage: React.FC = () => {
           <span>Barcha Ma'lumotlarni Dastlabki Holatga Qaytarish (Reset)</span>
         </h3>
 
-        <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-relaxed">
           Agar qilingan o'zgarishlarni bekor qilib, dastlabki standart mahsulotlar va matnlarga qaytmoqchi bo'lsangiz, quyidagi tugmani bosing.
         </p>
 
         <button
           type="button"
           onClick={() => setShowResetConfirm(true)}
-          className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold shadow-sm flex items-center gap-2"
+          className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-background text-xs font-extrabold shadow-sm flex items-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
           <span>Dastlabki Holatga Qaytarish</span>

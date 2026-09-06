@@ -16,7 +16,6 @@ import {
   Settings,
   LogOut,
   ExternalLink,
-  ChevronRight,
   X,
   BarChart3,
   MessageCircle,
@@ -59,7 +58,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       ],
     },
     {
-      title: 'TAHLIL VA TASHHIS',
+      title: 'TAHLIL',
       items: [
         {
           label: 'Analytics',
@@ -93,7 +92,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           icon: FolderTree,
         },
         {
-          label: 'Inventar & Zaxira',
+          label: 'Inventar',
           path: '/admin/inventory',
           icon: Boxes,
         },
@@ -136,7 +135,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       ],
     },
     {
-      title: 'KONTENT VA MEDIA',
+      title: 'KONTENT',
       items: [
         {
           label: 'Bosh sahifa (CMS)',
@@ -155,22 +154,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           icon: MessageSquareQuote,
         },
         {
-          label: 'Savol-Javoblar (FAQ)',
+          label: 'Savol-Javoblar',
           path: '/admin/faq',
           icon: HelpCircle,
         },
       ],
     },
     {
-      title: 'DO\'KON VA ALOQA',
+      title: "DO'KON",
       items: [
         {
-          label: 'Do\'kon ma\'lumotlari',
+          label: "Do'kon ma'lumotlari",
           path: '/admin/store',
           icon: Store,
         },
         {
-          label: 'Biz haqimizda (About)',
+          label: 'Biz haqimizda',
           path: '/admin/about',
           icon: Info,
         },
@@ -185,7 +184,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       title: 'TIZIM',
       items: [
         {
-          label: 'Sozlamalar & Zaxira',
+          label: 'Sozlamalar',
           path: '/admin/settings',
           icon: Settings,
         },
@@ -199,66 +198,63 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-72 bg-card text-card-foreground flex flex-col border-r border-border transition-transform duration-200 ease-in-out ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-card border-r border-border flex flex-col transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Brand Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-border shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-accent text-accent-foreground font-black text-sm flex items-center justify-center shadow-sm">
+        <div className="h-14 px-5 flex items-center justify-between border-b border-border shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-foreground text-background font-bold text-xs flex items-center justify-center">
               {storeInfo.businessName?.charAt(0) || 'D'}
             </div>
-            <div>
-              <div className="font-extrabold text-sm tracking-tight text-foreground flex items-center gap-1.5">
-                <span>{storeInfo.businessName}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-accent/20 text-accent">
-                  CMS
-                </span>
+            <div className="min-w-0">
+              <div className="font-bold text-sm text-foreground truncate leading-tight">
+                {storeInfo.businessName}
               </div>
-              <p className="text-[11px] text-muted-foreground">Boshqaruv markazi</p>
+              <p className="text-[10px] text-muted-foreground leading-tight">Commerce CMS</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-muted-foreground hover:text-foreground lg:hidden"
+            className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted lg:hidden transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Store Live Link */}
-        <div className="p-3 border-b border-border bg-muted/40">
+        <div className="px-3 pt-3 pb-1">
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted hover:bg-muted/80 text-xs font-semibold text-muted-foreground hover:text-foreground transition-all group"
+            className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted text-[11px] font-medium text-muted-foreground hover:text-foreground transition-all group"
           >
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span>Saytni jonli ko'rish</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              <span>Jonli ko'rish</span>
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground" />
+            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
           </a>
         </div>
 
         {/* Nav Links */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin">
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-5 scrollbar-thin" aria-label="Admin navigation">
           {navSections.map((section, sIdx) => (
-            <div key={sIdx} className="space-y-1">
-              <div className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+            <div key={sIdx}>
+              <div className="px-3 mb-1.5 text-[10px] font-semibold tracking-widest text-muted-foreground/60 uppercase">
                 {section.title}
               </div>
-              <div className="space-y-0.5 mt-1">
+              <div className="space-y-0.5">
                 {section.items.map((item) => {
                   const Icon = item.icon;
                   return (
@@ -268,19 +264,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                       end={item.end}
                       onClick={() => onClose()}
                       className={({ isActive }) =>
-                        `flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                          isActive
-                            ? 'bg-accent text-accent-foreground font-bold shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                        }`
+                        `admin-nav-item ${isActive ? 'admin-nav-item-active' : ''}`
                       }
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span>{item.label}</span>
-                      </div>
+                      <Icon className="w-4 h-4 shrink-0 opacity-70" />
+                      <span className="flex-1 truncate">{item.label}</span>
                       {item.badge && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-muted text-muted-foreground group-hover:bg-muted/80">
+                        <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
                           {item.badge}
                         </span>
                       )}
@@ -290,20 +280,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               </div>
             </div>
           ))}
-        </div>
+        </nav>
 
         {/* User Footer & Logout */}
-        <div className="p-3 border-t border-border bg-muted/40 shrink-0">
-          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-muted/40">
-            <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-full bg-muted text-foreground font-bold text-xs flex items-center justify-center shrink-0">
+        <div className="px-3 py-3 border-t border-border shrink-0">
+          <div className="flex items-center justify-between px-2 py-1.5">
+            <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
+              <div className="w-7 h-7 rounded-full bg-muted text-foreground font-semibold text-[11px] flex items-center justify-center shrink-0">
                 {user?.username?.charAt(0).toUpperCase() || 'A'}
               </div>
-              <div className="truncate">
-                <p className="text-xs font-bold text-foreground truncate">
+              <div className="truncate min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate leading-tight">
                   {user?.username || 'admin'}
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate">Administrator</p>
+                <p className="text-[10px] text-muted-foreground truncate leading-tight">Administrator</p>
               </div>
             </div>
 
@@ -311,9 +301,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               type="button"
               onClick={handleLogout}
               title="Chiqish"
-              className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

@@ -83,25 +83,25 @@ export const FeedPerformanceAdminPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative rounded-3xl bg-neutral-900 text-white p-6 sm:p-8 overflow-hidden shadow-xl border border-neutral-800">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-3xl bg-card text-foreground p-6 sm:p-8 overflow-hidden shadow-sm border border-border">
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-400/20 text-indigo-300 text-xs font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold">
               <Film className="w-3.5 h-3.5" />
               <span>Feed samaradorlik</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
               Video samaradorligi
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-300">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Har bir video bo'yicha batafsil real ko'rsatkichlar.
             </p>
           </div>
           <button
             type="button"
             onClick={() => data.refresh()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-all shadow-md active:scale-95 shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-foreground text-background font-bold text-xs hover:bg-foreground/90 transition-all shadow-md active:scale-95 shrink-0"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${data.refreshing ? 'animate-spin' : ''}`} />
             <span>Yangilash</span>
@@ -114,7 +114,7 @@ export const FeedPerformanceAdminPage: React.FC = () => {
         <select
           value={resolvedId}
           onChange={(e) => setSelectedId(e.target.value)}
-          className="px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-xs font-bold text-neutral-900 dark:text-white outline-none max-w-md"
+          className="px-3 py-2.5 rounded-xl bg-card border border-border text-xs font-bold text-foreground outline-none max-w-md"
         >
           {videoOptions.map((v) => (
             <option key={v.id} value={v.id}>
@@ -125,7 +125,7 @@ export const FeedPerformanceAdminPage: React.FC = () => {
         <Link
           to={`/feed?v=${resolvedId}`}
           target="_blank"
-          className="inline-flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-200 font-bold"
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground font-bold"
         >
           <span>Feed'da ochish</span>
           <ArrowUpRight className="w-3 h-3" />
@@ -133,17 +133,17 @@ export const FeedPerformanceAdminPage: React.FC = () => {
       </div>
 
       {!metric ? (
-        <div className="rounded-3xl border border-dashed border-neutral-300 dark:border-neutral-700 p-10 text-center">
-          <p className="text-sm text-neutral-500">Ushbu video uchun hali feed ma'lumotlari yo'q.</p>
+        <div className="rounded-3xl border border-dashed border-border p-10 text-center">
+          <p className="text-sm text-muted-foreground">Ushbu video uchun hali feed ma'lumotlari yo'q.</p>
         </div>
       ) : (
         <>
           {/* Selected video title */}
-          <div className="rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="rounded-3xl bg-card border border-border p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="text-lg font-black text-neutral-900 dark:text-white truncate">{title}</h3>
+              <h3 className="text-lg font-black text-foreground truncate">{title}</h3>
               {linkedProduct && (
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Bog'langan mahsulot: <span className="font-bold">{linkedProduct.name}</span>
                   {typeof linkedProduct.price === 'number' && ` — ${linkedProduct.price.toLocaleString('uz-UZ')} so'm`}
                 </p>
@@ -178,17 +178,17 @@ export const FeedPerformanceAdminPage: React.FC = () => {
             </SectionCard>
             <SectionCard title="Umumiy tomosha vaqti" icon={Clock} accent="text-amber-500" subtitle="Jami va o'rtacha tomosha bo'yicha">
               <div className="space-y-3">
-                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
-                  <div className="text-3xl font-black text-neutral-900 dark:text-white">{formatDuration(metric.totalWatchSec)}</div>
-                  <p className="text-[11px] font-bold text-neutral-400 mt-1">Jami tomosha vaqti</p>
+                <div className="p-4 rounded-2xl bg-muted border border-border">
+                  <div className="text-3xl font-black text-foreground">{formatDuration(metric.totalWatchSec)}</div>
+                  <p className="text-[11px] font-bold text-muted-foreground mt-1">Jami tomosha vaqti</p>
                 </div>
-                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
-                  <div className="text-3xl font-black text-neutral-900 dark:text-white">{formatDuration(metric.avgWatchSec)}</div>
-                  <p className="text-[11px] font-bold text-neutral-400 mt-1">O'rtacha tomosha vaqti</p>
+                <div className="p-4 rounded-2xl bg-muted border border-border">
+                  <div className="text-3xl font-black text-foreground">{formatDuration(metric.avgWatchSec)}</div>
+                  <p className="text-[11px] font-bold text-muted-foreground mt-1">O'rtacha tomosha vaqti</p>
                 </div>
-                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
-                  <div className="text-3xl font-black text-neutral-900 dark:text-white">{percent(metric.feedProductConversion)}</div>
-                  <p className="text-[11px] font-bold text-neutral-400 mt-1">Feed → mahsulot konversiyasi</p>
+                <div className="p-4 rounded-2xl bg-muted border border-border">
+                  <div className="text-3xl font-black text-foreground">{percent(metric.feedProductConversion)}</div>
+                  <p className="text-[11px] font-bold text-muted-foreground mt-1">Feed → mahsulot konversiyasi</p>
                 </div>
               </div>
             </SectionCard>
@@ -200,36 +200,36 @@ export const FeedPerformanceAdminPage: React.FC = () => {
 };
 
 const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }> }> = ({ label, value, icon: Icon }) => (
-  <div className="p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
-    <div className="flex items-center gap-1.5 text-neutral-400 mb-1">
+  <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+    <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
       <Icon className="w-3.5 h-3.5" />
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </div>
-    <div className="text-lg font-black text-neutral-900 dark:text-white">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
+    <div className="text-lg font-black text-foreground">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
   </div>
 );
 
 const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number }[] }> = ({ points }) => {
   const max = Math.max(1, ...points.map((p) => p.value));
   if (points.every((p) => p.value === 0)) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Ushbu video uchun retention ma'lumoti hali yo'q</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Ushbu video uchun retention ma'lumoti hali yo'q</p>;
   }
   return (
     <div>
       <div className="flex items-end gap-1.5" style={{ height: 140 }}>
         {points.map((p) => (
           <div key={p.bucket} className="flex-1 flex flex-col items-center gap-1 group">
-            <span className="text-[9px] text-neutral-400 font-bold opacity-0 group-hover:opacity-100">{p.value}</span>
+            <span className="text-[9px] text-muted-foreground font-bold opacity-0 group-hover:opacity-100">{p.value}</span>
             <div
               className="w-full rounded-md bg-gradient-to-t from-indigo-600 to-indigo-400 dark:from-indigo-700 dark:to-indigo-500 group-hover:opacity-80 transition-opacity"
               style={{ height: `${Math.max(3, (p.value / max) * 116)}px` }}
               title={`${p.bucket} — ${p.value} (${Math.round(p.rate * 100)}%)`}
             />
-            <span className="text-[9px] font-bold text-neutral-400">{p.bucket}</span>
+            <span className="text-[9px] font-bold text-muted-foreground">{p.bucket}</span>
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-neutral-400 mt-2 text-center">
+      <p className="text-[10px] text-muted-foreground mt-2 text-center">
         {percent(resolvedRetentionHighest(points))} mijoz boshlangandan 100% gacha yetib bordi
       </p>
     </div>

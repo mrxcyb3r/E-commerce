@@ -6,22 +6,18 @@ import {
   Film,
   Sparkles,
   Star,
-  Sparkle,
-  Percent,
   AlertTriangle,
   Plus,
   ArrowRight,
   TrendingUp,
   Clock,
-  CheckCircle2,
   ExternalLink,
-  ShieldCheck,
-  HardDrive,
-  Database,
   MessageSquare,
   ThumbsUp,
-  Store,
-  HelpCircle,
+  Eye,
+  Heart,
+  Send,
+  Boxes,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useVideoFeed } from '../../context/VideoContext';
@@ -30,27 +26,16 @@ import { useBrand } from '../../hooks/useBrand';
 import { supabase } from '../../lib/supabase/client';
 import type { AdminActivityLog } from '../../types/cms';
 import { motion } from 'motion/react';
-import {
-  AdminPageLayout,
-  StatCard,
-  StatCardGrid,
-  ActionButton,
-  LoadingSkeleton,
-  EmptyState,
-  PageHeader,
-} from '../../components/admin/ui';
+import { PageHeader, ActionButton } from '../../components/admin/ui';
 
-const entityMeta: Record<
-  AdminActivityLog['entity'],
-  { icon: typeof Package }
-> = {
-  product: { icon: Package },
-  category: { icon: FolderTree },
-  video: { icon: Film },
-  prompt: { icon: Sparkles },
-  testimonial: { icon: Star },
-  faq: { icon: HelpCircle },
-  store: { icon: Store },
+const entityMeta: Record<AdminActivityLog['entity'], { icon: typeof Package; color: string }> = {
+  product: { icon: Package, color: 'text-blue-500' },
+  category: { icon: FolderTree, color: 'text-purple-500' },
+  video: { icon: Film, color: 'text-teal-500' },
+  prompt: { icon: Sparkles, color: 'text-amber-500' },
+  testimonial: { icon: Star, color: 'text-amber-500' },
+  faq: { icon: MessageSquare, color: 'text-muted-foreground' },
+  store: { icon: Package, color: 'text-muted-foreground' },
 };
 
 export const DashboardPage: React.FC = () => {
@@ -73,530 +58,297 @@ export const DashboardPage: React.FC = () => {
 
   const [commentCount, setCommentCount] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
-  const [dbOnline, setDbOnline] = useState(true);
 
   useEffect(() => {
     let active = true;
-    const countTable = async (
-      table: string,
-      setter: (n: number) => void
-    ): Promise<boolean> => {
+    const countTable = async (table: string, setter: (n: number) => void) => {
       try {
         const { count, error } = await supabase
           .from(table as any)
           .select('*', { count: 'exact', head: true });
-        if (!active) return false;
+        if (!active) return;
         if (error) throw error;
         setter(count ?? 0);
-        return true;
       } catch {
         if (active) setter(0);
-        return false;
       }
     };
     (async () => {
-      const commentsOk = await countTable('feed_comments', setCommentCount);
-      const likesOk = await countTable('feed_likes', setLikeCount);
-      if (active) setDbOnline(commentsOk || likesOk);
+      await countTable('feed_comments', setCommentCount);
+      await countTable('feed_likes', setLikeCount);
     })();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, []);
 
-  const imageFileCount = products.reduce((sum, p) => sum + (p.images?.length || 0), 0);
-  const storageUsedMb = imageFileCount * 0.4;
-  const storageEstimateMb = 100;
-  const storagePct = Math.min(100, Math.round((storageUsedMb / storageEstimateMb) * 100));
-
-  const stats = [
-    {
-      title: t('admin', 'totalProducts'),
-      value: products.length,
-      subtitle: `${products.filter((p) => p.published !== false).length} ${t('admin', 'totalProductsSub')}`,
-      icon: <Package className="w-5 h-5" />,
-      iconBg: 'bg-primary/10',
-      href: '/admin/products',
-    },
-    {
-      title: t('admin', 'categories'),
-      value: categories.length,
-      subtitle: t('admin', 'categoriesSub'),
-      icon: <FolderTree className="w-5 h-5" />,
-      iconBg: 'bg-emerald-500/10',
-      href: '/admin/categories',
-    },
-    {
-      title: t('admin', 'liveFeed'),
-      value: (publishedVideos?.length ?? 0),
-      subtitle: t('admin', 'liveFeedSub'),
-      icon: <Film className="w-5 h-5" />,
-      iconBg: 'bg-purple-500/10',
-      href: '/admin/feed',
-    },
-    {
-      title: t('admin', 'aiPrompts'),
-      value: prompts.length,
-      subtitle: t('admin', 'aiPromptsSub'),
-      icon: <Sparkles className="w-5 h-5" />,
-      iconBg: 'bg-amber-500/10',
-      href: '/admin/prompts',
-    },
-    {
-      title: t('admin', 'featuredProducts'),
-      value: featuredProducts.length,
-      subtitle: t('admin', 'featuredProductsSub'),
-      icon: <Star className="w-5 h-5" />,
-      iconBg: 'bg-amber-500/10',
-      href: '/admin/products?filter=featured',
-    },
-    {
-      title: t('admin', 'newArrivals'),
-      value: newProducts.length,
-      subtitle: t('admin', 'newArrivalsSub'),
-      icon: <Sparkle className="w-5 h-5" />,
-      iconBg: 'bg-rose-500/10',
-      href: '/admin/products?filter=new',
-    },
-    {
-      title: t('admin', 'discounted'),
-      value: discountedProducts.length,
-      subtitle: t('admin', 'discountedSub'),
-      icon: <Percent className="w-5 h-5" />,
-      iconBg: 'bg-teal-500/10',
-      href: '/admin/products?filter=discount',
-    },
-    {
-      title: t('admin', 'stockAlerts'),
-      value: outOfStockCount + lowStockCount,
-      subtitle: t('admin', 'stockAlertsSub', outOfStockCount, lowStockCount),
-      icon: <AlertTriangle className="w-5 h-5" />,
-      iconBg: 'bg-red-500/10',
-      href: '/admin/inventory',
-    },
-  ];
-
-  const quickActions = [
-    {
-      title: t('admin', 'addProduct'),
-      desc: t('admin', 'addProductDesc'),
-      link: '/admin/products/new',
-      icon: <Plus className="w-4 h-4" />,
-    },
-    {
-      title: t('admin', 'addVideo'),
-      desc: t('admin', 'addVideoDesc'),
-      link: '/admin/feed',
-      icon: <Film className="w-4 h-4" />,
-    },
-    {
-      title: t('admin', 'addPrompt'),
-      desc: t('admin', 'addPromptDesc'),
-      link: '/admin/prompts',
-      icon: <Sparkles className="w-4 h-4" />,
-    },
-    {
-      title: t('admin', 'addCategory'),
-      desc: t('admin', 'addCategoryDesc'),
-      link: '/admin/categories',
-      icon: <FolderTree className="w-4 h-4" />,
-    },
-  ];
-
-  const healthCards = [
-    {
-      label: 'Rasmlar fayllari',
-      value: `${imageFileCount} fayl`,
-      detail: `${storageUsedMb.toFixed(1)} MB taxminiy`,
-      icon: <HardDrive className="w-5 h-5" />,
-      iconBg: 'bg-primary/10',
-      progress: storagePct,
-    },
-    {
-      label: 'Ma\'lumotlar bazasi',
-      value: dbOnline ? 'Online' : 'Cheklangan',
-      icon: <Database className="w-5 h-5" />,
-      iconBg: dbOnline ? 'bg-emerald-500/10' : 'bg-amber-500/10',
-      status: dbOnline ? 'online' : 'limited',
-    },
-    {
-      label: 'Umumiy izohlar',
-      value: commentCount,
-      icon: <MessageSquare className="w-5 h-5" />,
-      iconBg: 'bg-purple-500/10',
-    },
-    {
-      label: 'Jami yoqtirishlar',
-      value: likeCount,
-      icon: <ThumbsUp className="w-5 h-5" />,
-      iconBg: 'bg-rose-500/10',
-    },
-  ];
+  const stockAlerts = outOfStockCount + lowStockCount;
 
   return (
-    <AdminPageLayout
-      header={{
-        title: t('admin', 'dashboard'),
-        subtitle: t('admin', 'dashboardDesc'),
-        description: t('admin', 'dashboardDesc2'),
-        action: (
-          <div className="flex items-center gap-2">
-            <Link
-              to="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition-all shadow-sm"
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+            {t('admin', 'dashboard')}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {brand.displayName} — {storeInfo.city || "O'zbekiston"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/admin/products/new"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 transition-all active:scale-[0.98] shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+            Yangi mahsulot
+          </Link>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-muted text-foreground text-xs font-semibold hover:bg-muted/80 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Do'kon
+          </a>
+        </div>
+      </div>
+
+      {/* Compact Overview Strip */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+      >
+        {[
+          { label: 'Mahsulotlar', value: products.length, icon: Package, href: '/admin/products', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
+          { label: 'Kategoriyalar', value: categories.length, icon: FolderTree, href: '/admin/categories', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
+          { label: 'Videolar', value: publishedVideos?.length ?? 0, icon: Film, href: '/admin/feed', color: 'bg-teal-500/10 text-teal-600 dark:text-teal-400' },
+          { label: 'Promptlar', value: prompts.length, icon: Sparkles, href: '/admin/prompts', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
+          { label: 'Yoqtirishlar', value: likeCount, icon: ThumbsUp, color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
+          { label: 'Izohlar', value: commentCount, icon: MessageSquare, color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' },
+        ].map((item, idx) => {
+          const Icon = item.icon;
+          const Wrapper = item.href ? Link : 'div';
+          return (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.03, duration: 0.25 }}
             >
-              <span>{t('admin', 'viewStore')}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <Wrapper
+                to={item.href || ''}
+                className="block p-3 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all group"
+                {...(item.href ? { target: undefined } : {})}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${item.color}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  {item.href && <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />}
+                </div>
+                <div className="text-lg font-bold text-foreground tabular-nums">{item.value}</div>
+                <div className="text-[11px] text-muted-foreground font-medium">{item.label}</div>
+              </Wrapper>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      {/* Actionable Insights */}
+      {stockAlerts > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="p-4 rounded-xl bg-accent/5 border border-accent/20"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-4 h-4 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-foreground">
+                {stockAlerts} ta mahsulotga e'tibor kerak
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {outOfStockCount > 0 && `${outOfStockCount} ta tugagan`}
+                {outOfStockCount > 0 && lowStockCount > 0 && ', '}
+                {lowStockCount > 0 && `${lowStockCount} ta kam qolgan`}
+              </p>
+            </div>
+            <Link
+              to="/admin/inventory"
+              className="px-3 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:bg-foreground/90 transition-colors shrink-0"
+            >
+              Zaxirani boshqarish
             </Link>
           </div>
-        ),
-        breadcrumb: [
-          { label: 'Admin' },
-          { label: t('admin', 'dashboard') },
-        ],
-      }}
-    >
-      {/* Welcome Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative rounded-3xl bg-primary text-primary-foreground p-6 sm:p-8 overflow-hidden shadow-xl border border-border"
-      >
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-bold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{brand.displayName} — {t('admin', 'dashboard')}</span>
-            </div>
-            <h2 className="font-display font-black tracking-tight text-primary-foreground"
-              style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', lineHeight: '1.1' }}>
-              {t('admin', 'dashboardDesc')}
-            </h2>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed">
-              {t('admin', 'dashboardDesc2')}
-            </p>
-          </div>
+        </motion.div>
+      )}
 
-          <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary-foreground text-primary font-bold text-xs hover:opacity-90 transition-all shadow-md"
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Products - 2 cols */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="lg:col-span-2"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground">So'nggi mahsulotlar</h2>
+            <Link
+              to="/admin/products"
+              className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
             >
-              <span>{t('admin', 'viewStore')}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-            <span className="text-[11px] text-muted-foreground font-medium">
-              {t('admin', 'location')} {storeInfo.city}
-            </span>
+              Barchasini ko'rish ({products.length})
+              <ArrowRight className="w-3 h-3" />
+            </Link>
           </div>
-        </div>
-      </motion.div>
 
-      {/* Quick Action Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
-        <PageHeader
-          title={t('admin', 'quickActions')}
-          subtitle={`${quickActions.length} actions available`}
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, idx) => {
-            const Icon = action.icon;
-            return (
-              <Link
-                key={idx}
-                to={action.link}
-                className="p-4 rounded-2xl transition-all shadow-sm border border-border hover:shadow-md hover:border-muted-foreground/20 group flex items-start justify-between"
-              >
-                <div className="space-y-1">
-                  <h4 className="font-semibold text-foreground flex items-center gap-2">
-                    <span>{action.title}</span>
-                  </h4>
-                  <p className="text-sm text-muted-foreground">{action.desc}</p>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  {action.icon}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Real Stats Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
-        <PageHeader
-          title={t('admin', 'todayStats')}
-          subtitle={t('admin', 'statsNote')}
-        />
-
-        <StatCardGrid stats={stats} />
-      </motion.div>
-
-      {/* Storage & Health Panel */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
-        <PageHeader
-          title="Saqlash va Sog'liq"
-          subtitle="Storage usage and system health"
-          action={
-            <TrendingUp className="w-4 h-4 text-accent" />
-          }
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {healthCards.map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="p-5 rounded-2xl card flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {card.label}
-                  </span>
-                  <div className={`p-2 rounded-xl ${card.iconBg}`}>
-                    {card.icon}
-                  </div>
-                </div>
-                <div>
-                  {card.progress !== undefined && (
-                    <>
-                      <div className="text-2xl font-black text-foreground tracking-tight mb-1">
-                        {card.value}
-                      </div>
-                      <p className="text-xs font-medium text-muted-foreground mb-2 truncate">
-                        {card.detail}
-                      </p>
-                      <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden mt-2">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${card.progress}%` }}
-                          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                          className="h-full rounded-full bg-gradient-to-r from-accent to-primary"
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {card.status && (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-foreground tracking-tight">
-                          {card.value}
-                        </span>
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          card.status === 'online'
-                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50'
-                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50'
-                        }`}>
-                          <span className="relative flex w-2 h-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-current opacity-75" />
-                            <span className="relative inline-flex rounded-full w-2 h-2 bg-current" />
-                          </span>
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          {card.status === 'online' ? 'Online' : 'Limited'}
-                        </span>
-                      </div>
-                    </>
-                  )}
-
-                  {!card.progress && !card.status && (
-                    <div className="text-2xl font-black text-foreground tracking-tight">
-                      {card.value}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Two Columns: Recent Products & Activity Log */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-      >
-        {/* Recent Products (2 cols) */}
-        <div className="lg:col-span-2 card p-6">
-          <PageHeader
-            title={t('admin', 'recentProducts')}
-            subtitle={t('admin', 'recentProductsDesc')}
-            action={
-              <Link
-                to="/admin/products"
-                className="inline-flex items-center gap-1 text-sm font-bold text-accent hover:underline"
-              >
-                Barchasini ko'rish ({products.length})
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            }
-          />
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm" role="grid">
-              <thead>
-                <tr className="border-b border-border text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  <th className="pb-3 pl-1 text-left">{t('admin', 'product')}</th>
-                  <th className="pb-3">{t('admin', 'category')}</th>
-                  <th className="pb-3">{t('admin', 'price')}</th>
-                  <th className="pb-3">{t('admin', 'stock')}</th>
-                  <th className="pb-3">{t('admin', 'status')}</th>
-                  <th className="pb-3 text-right pr-1">{t('admin', 'action')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {products.slice(0, 6).map((p) => (
-                  <tr key={p.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="py-3 pl-1">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={p.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}
-                          alt=""
-                          className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
-                          referrerPolicy="no-referrer"
-                        />
-                        <div className="min-w-0">
-                          <p className="font-semibold text-foreground truncate max-w-[160px] sm:max-w-xs">
-                            {p.name}
-                          </p>
-                          <span className="text-xs text-muted-foreground">{p.sku}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 font-medium text-muted-foreground">
-                      {p.categoryName || p.category}
-                    </td>
-                    <td className="py-3">
-                      <span className="font-semibold text-foreground">
-                        {p.price.toLocaleString('uz-UZ')} so'm
-                      </span>
-                      {p.originalPrice && p.originalPrice > p.price && (
-                        <span className="block text-xs text-muted-foreground line-through">
-                          {p.originalPrice.toLocaleString('uz-UZ')} so'm
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3">
-                      {p.inStock ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          <span>{p.stockCount ?? 1} dona</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                          <span>{t('admin', 'outOfStock')}</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3">
-                      <div className="flex items-center gap-1">
-                        {p.isFeatured && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold border border-amber-200 dark:border-amber-900/50">
-                            {t('admin', 'featured')}
-                          </span>
-                        )}
-                        {p.isNew && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[10px] font-bold border border-rose-200 dark:border-rose-900/50">
-                            {t('admin', 'new')}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 text-right pr-1">
-                      <Link
-                        to={`/admin/products/${p.id}`}
-                        className="px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/80 text-xs font-semibold text-foreground transition-colors"
-                      >
-                        {t('admin', 'edit')}
-                      </Link>
-                    </td>
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-border text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <th className="px-4 py-2.5 text-left">Mahsulot</th>
+                    <th className="px-4 py-2.5 hidden sm:table-cell">Kategoriya</th>
+                    <th className="px-4 py-2.5">Narx</th>
+                    <th className="px-4 py-2.5 hidden md:table-cell">Zaxira</th>
+                    <th className="px-4 py-2.5 text-right">Amal</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {products.slice(0, 6).map((p) => (
+                    <tr key={p.id} className="admin-table-row">
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={p.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}
+                            alt=""
+                            className="w-8 h-8 rounded-lg object-cover border border-border shrink-0"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="min-w-0">
+                            <p className="font-medium text-foreground truncate max-w-[160px]">
+                              {p.name}
+                            </p>
+                            <span className="text-[10px] text-muted-foreground font-mono">{p.sku}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground hidden sm:table-cell">
+                        {p.categoryName || p.category}
+                      </td>
+                      <td className="px-4 py-2.5 font-semibold text-foreground tabular-nums">
+                        {p.price.toLocaleString('uz-UZ')} so'm
+                      </td>
+                      <td className="px-4 py-2.5 hidden md:table-cell">
+                        {p.inStock ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            {p.stockCount ?? 1} dona
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-red-600 dark:text-red-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                            Tugagan
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        <Link
+                          to={`/admin/products/${p.id}`}
+                          className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Tahrirlash
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Real Activity Logs (1 col) */}
-        <div className="card p-6 flex flex-col">
-          <PageHeader
-            title={t('admin', 'recentActivity')}
-            subtitle={`${activityLogs.length} ${t('admin', 'records')}`}
-            action={
-              <Clock className="w-4 h-4 text-accent" />
-            }
-          />
+        {/* Activity Log - 1 col */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-foreground">So'nggi faoliyat</h2>
+            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto max-h-[380px] pr-1 scrollbar-thin">
+          <div className="bg-card border border-border rounded-xl p-4">
             {activityLogs.length > 0 ? (
-              activityLogs.slice(0, 10).map((log) => {
-                const meta = entityMeta[log.entity] ?? entityMeta.store;
-                const EntityIcon = meta.icon;
-                return (
-                  <motion.div
-                    key={log.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="p-3 rounded-2xl bg-muted/50 border border-border space-y-1 text-sm"
-                  >
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider">
-                        <EntityIcon className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-accent">
-                          {log.entity} • {log.action}
-                        </span>
-                      </span>
-                      <span>
-                        {new Date(log.timestamp).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
+              <div className="space-y-3">
+                {activityLogs.slice(0, 8).map((log) => {
+                  const meta = entityMeta[log.entity] ?? entityMeta.store;
+                  const EntityIcon = meta.icon;
+                  return (
+                    <div key={log.id} className="flex items-start gap-2.5">
+                      <div className={`mt-0.5 ${meta.color}`}>
+                        <EntityIcon className="w-3.5 h-3.5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground leading-snug">{log.description}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                    <p className="font-medium text-foreground text-sm leading-snug">
-                      {log.description}
-                    </p>
-                  </motion.div>
-                );
-              })
+                  );
+                })}
+              </div>
             ) : (
-              <EmptyState
-                illustration="document"
-                title={t('admin', 'noActivity')}
-                description="No recent activity recorded"
-              />
+              <p className="text-xs text-muted-foreground text-center py-6">Hozircha faoliyat yo'q</p>
             )}
           </div>
+        </motion.div>
+      </div>
+
+      {/* Quick Stats Row */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.25 }}
+      >
+        <h2 className="text-sm font-semibold text-foreground mb-3">Tezkor ma'lumotlar</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: 'Mashhurlar', value: featuredProducts.length, icon: Star, href: '/admin/products?filter=featured' },
+            { label: 'Yangilar', value: newProducts.length, icon: Sparkles, href: '/admin/products?filter=new' },
+            { label: 'Chegirmada', value: discountedProducts.length, icon: TrendingUp, href: '/admin/products?filter=discount' },
+            { label: 'Tashriflar', value: '—', icon: Eye, note: "Analytics'da ko'ring" },
+          ].map((item, idx) => {
+            const Icon = item.icon;
+            const Wrapper = item.href ? Link : 'div';
+            return (
+              <Wrapper
+                key={item.label}
+                to={item.href || ''}
+                className="p-3 rounded-xl bg-card border border-border hover:border-muted-foreground/20 hover:shadow-sm transition-all group"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                  {item.href && <ArrowRight className="w-3 h-3 text-muted-foreground/0 group-hover:text-muted-foreground transition-colors" />}
+                </div>
+                <div className="text-base font-bold text-foreground tabular-nums">{item.value}</div>
+                <div className="text-[11px] text-muted-foreground font-medium">{item.label}</div>
+                {item.note && <div className="text-[10px] text-muted-foreground/60 mt-0.5">{item.note}</div>}
+              </Wrapper>
+            );
+          })}
         </div>
       </motion.div>
-    </AdminPageLayout>
+    </div>
   );
 };
 

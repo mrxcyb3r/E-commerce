@@ -76,24 +76,24 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="relative rounded-3xl bg-neutral-900 text-white p-6 sm:p-8 overflow-hidden shadow-xl border border-neutral-800">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative rounded-3xl bg-card text-foreground p-6 sm:p-8 overflow-hidden shadow-sm border border-border">
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-400/20 text-teal-300 text-xs font-bold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold">
               <Film className="w-3.5 h-3.5" />
               <span>Feed tahlili</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
               Videolar tahlili
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl">
               Feed ko'rinishlari, video boshqalari, tomosha vaqti, ushlab turish va konversiyalar —
               barchasi real 'analytics_events' ma'lumotlaridan hisoblanadi.
             </p>
           </div>
           <div className="flex flex-col items-start sm:items-end gap-3 shrink-0">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white/10 border border-neutral-700/60">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-muted border border-border">
               {RANGE_PRESETS.map((r) => (
                 <button
                   key={r.key}
@@ -101,8 +101,8 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
                   onClick={() => data.setRange(r.key)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-black transition-all ${
                     !data.isCustomRange && data.range === r.key
-                      ? 'bg-white text-neutral-950 shadow'
-                      : 'text-neutral-300 hover:text-white'
+                      ? 'bg-foreground text-background shadow'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {r.label}
@@ -111,14 +111,14 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               {data.lastUpdated && (
-                <span className="text-[10px] text-neutral-400">
+                <span className="text-[10px] text-muted-foreground">
                   Yangilandi: {new Date(data.lastUpdated).toLocaleTimeString('uz-UZ')}
                 </span>
               )}
               <button
                 type="button"
                 onClick={() => data.refresh()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-foreground text-background font-bold text-xs hover:bg-foreground/90 transition-all shadow-md active:scale-95"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${data.refreshing ? 'animate-spin' : ''}`} />
                 <span>Yangilash</span>
@@ -129,7 +129,7 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
       </div>
 
       {data.error && (
-        <div className="rounded-2xl border border-amber-300/50 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 p-4 text-sm font-medium">
+        <div className="rounded-2xl border border-warning/50 bg-warning/10 text-warning p-4 text-sm font-medium">
           Ma'lumotlarni yuklashda xatolik. ({data.error})
         </div>
       )}
@@ -195,17 +195,17 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
 };
 
 const FeedEmptyState: React.FC = () => (
-  <div className="rounded-3xl border border-dashed border-neutral-300 dark:border-neutral-700 p-10 text-center space-y-4">
-    <div className="w-16 h-16 mx-auto rounded-3xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 flex items-center justify-center">
+  <div className="rounded-3xl border border-dashed border-border p-10 text-center space-y-4">
+    <div className="w-16 h-16 mx-auto rounded-3xl bg-muted text-muted-foreground flex items-center justify-center">
       <Film className="w-8 h-8" />
     </div>
     <div className="space-y-1">
-      <h3 className="text-lg font-black text-neutral-900 dark:text-white">Hozircha feed ma'lumoti yo'q</h3>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md mx-auto">
+      <h3 className="text-lg font-black text-foreground">Hozircha feed ma'lumoti yo'q</h3>
+      <p className="text-sm text-muted-foreground max-w-md mx-auto">
         Mijozlar videolarni ko'rishni boshlaganda bu yerda real tahlil paydo bo'ladi.
       </p>
     </div>
-    <Link to="/feed" target="_blank" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 text-xs font-black">
+    <Link to="/feed" target="_blank" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-foreground text-background text-xs font-black">
       <span>Feed</span>
       <ArrowUpRight className="w-3.5 h-3.5" />
     </Link>
@@ -213,18 +213,18 @@ const FeedEmptyState: React.FC = () => (
 );
 
 const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }> }> = ({ label, value, icon: Icon }) => (
-  <div className="p-3 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
-    <div className="flex items-center gap-1.5 text-neutral-400 mb-1">
+  <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+    <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
       <Icon className="w-3.5 h-3.5" />
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </div>
-    <div className="text-lg font-black text-neutral-900 dark:text-white">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
+    <div className="text-lg font-black text-foreground">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
   </div>
 );
 
 const FeedFunnel: React.FC<{ stages: { label: string; value: number; rate: number }[] }> = ({ stages }) => {
   if (stages.every((s) => s.value === 0)) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Konversiya ma'lumoti yo'q</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Konversiya ma'lumoti yo'q</p>;
   }
   const first = stages[0].value || 1;
   return (
@@ -235,20 +235,20 @@ const FeedFunnel: React.FC<{ stages: { label: string; value: number; rate: numbe
         return (
           <div key={stage.label} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-neutral-700 dark:text-neutral-300">{stage.label}</span>
+              <span className="font-bold text-foreground">{stage.label}</span>
               <div className="flex items-center gap-2">
                 {i > 0 && (
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black">
                     {stage.rate > 0 ? Math.round(stage.rate * 100) : 0}% o'tdi
                   </span>
                 )}
-                <span className="font-black text-neutral-900 dark:text-white">{stage.value}</span>
+                <span className="font-black text-foreground">{stage.value}</span>
                 {overallDrop > 0 && (
-                  <span className="text-[10px] text-neutral-400">umumiy −{overallDrop}%</span>
+                  <span className="text-[10px] text-muted-foreground">umumiy −{overallDrop}%</span>
                 )}
               </div>
             </div>
-            <div className="h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 overflow-hidden" style={{ width: `${width}%` }}>
+            <div className="h-7 rounded-lg bg-muted overflow-hidden" style={{ width: `${width}%` }}>
               <div className="h-full w-full bg-gradient-to-r from-teal-600 to-indigo-500 dark:from-teal-700 dark:to-indigo-600 rounded-lg" />
             </div>
           </div>
@@ -261,14 +261,14 @@ const FeedFunnel: React.FC<{ stages: { label: string; value: number; rate: numbe
 const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number }[] }> = ({ points }) => {
   const max = Math.max(1, ...points.map((p) => p.value));
   if (points.every((p) => p.value === 0)) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Retention ma'lumoti hali to'planmagan</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Retention ma'lumoti hali to'planmagan</p>;
   }
   return (
     <div>
       <div className="flex items-end gap-1.5" style={{ height: 130 }}>
         {points.map((p) => (
           <div key={p.bucket} className="flex-1 flex flex-col items-center gap-1 group">
-            <span className="text-[9px] text-neutral-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-[9px] text-muted-foreground font-bold opacity-0 group-hover:opacity-100 transition-opacity">
               {p.value}
             </span>
             <div
@@ -276,11 +276,11 @@ const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: 
               style={{ height: `${Math.max(3, (p.value / max) * 106)}px` }}
               title={`${p.bucket} — ${p.value} marta (${Math.round(p.rate * 100)}%)`}
             />
-            <span className="text-[9px] font-bold text-neutral-400">{p.bucket}</span>
+            <span className="text-[9px] font-bold text-muted-foreground">{p.bucket}</span>
           </div>
         ))}
       </div>
-      <p className="text-[10px] text-neutral-400 mt-2 text-center">
+      <p className="text-[10px] text-muted-foreground mt-2 text-center">
         Video boshqasiga nisbatan har bir bosqichda nechta mijoz qolgan
       </p>
     </div>
@@ -294,12 +294,12 @@ const FeedTrendChart: React.FC<{ points: { date: string; impressions: number; st
       <div className="flex items-end gap-1.5" style={{ height: 160 }}>
         {points.map((p) => (
           <div key={p.date} className="flex-1 flex flex-col items-center gap-1 group" title={`${p.date} — ${p.impressions} ko'rinish, ${p.starts} boshlash, ${p.likes} yoqtirish`}>
-            <span className="text-[9px] text-neutral-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">{p.impressions}</span>
+            <span className="text-[9px] text-muted-foreground font-bold opacity-0 group-hover:opacity-100 transition-opacity">{p.impressions}</span>
             <div
               className="w-full rounded-md bg-gradient-to-t from-teal-600 to-blue-400 dark:from-teal-700 dark:to-blue-500 group-hover:opacity-80 transition-opacity"
               style={{ height: `${Math.max(3, (p.impressions / max) * (160 - 24))}px` }}
             />
-            <span className="text-[8px] font-bold text-neutral-400">{p.date.slice(5)}</span>
+            <span className="text-[8px] font-bold text-muted-foreground">{p.date.slice(5)}</span>
           </div>
         ))}
       </div>
@@ -309,22 +309,22 @@ const FeedTrendChart: React.FC<{ points: { date: string; impressions: number; st
 
 const VideoRanking: React.FC<{ metrics: FeedMetric[]; name: (id: string) => string; best?: boolean }> = ({ metrics, name, best }) => {
   if (metrics.length === 0) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Ma'lumot yo'q</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Ma'lumot yo'q</p>;
   }
   return (
     <div className="space-y-2">
       {metrics.map((f, i) => (
-        <div key={f.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
+        <div key={f.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted border border-border">
           <span className={`w-5 h-5 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 ${best ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400'}`}>
             {i + 1}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-black text-neutral-900 dark:text-white truncate">{name(f.id)}</div>
-            <div className="text-[10px] text-neutral-400">
-              {f.views} ko'rinish · {f.videoStarts} boshlash · {f.likes} 👍 · {Math.round(f.engagementScore * 100)}% faollik
+            <div className="text-xs font-black text-foreground truncate">{name(f.id)}</div>
+            <div className="text-[10px] text-muted-foreground">
+              {f.views} ko'rinish · {f.videoStarts} boshlash · {f.likes} yoqtirish · {Math.round(f.engagementScore * 100)}% faollik
             </div>
           </div>
-          <span className="text-xs font-black text-neutral-900 dark:text-white shrink-0">{f.views}</span>
+          <span className="text-xs font-black text-foreground shrink-0">{f.views}</span>
         </div>
       ))}
     </div>
@@ -334,20 +334,20 @@ const VideoRanking: React.FC<{ metrics: FeedMetric[]; name: (id: string) => stri
 const AllVideosTable: React.FC<{ metrics: FeedMetric[]; name: (id: string) => string }> = ({ metrics, name }) => {
   const sorted = [...metrics].sort((a, b) => b.views - a.views);
   if (sorted.length === 0) {
-    return <p className="text-xs text-neutral-400 text-center py-6">Feed ma'lumoti yo'q</p>;
+    return <p className="text-xs text-muted-foreground text-center py-6">Feed ma'lumoti yo'q</p>;
   }
   return (
     <div className="overflow-x-auto -mx-2">
       <table className="w-full text-xs min-w-[640px]">
         <thead>
-          <tr className="text-left text-[10px] uppercase tracking-wider text-neutral-400 border-b border-neutral-200 dark:border-neutral-800">
+          <tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
             <th className="px-2 py-2 font-bold">Video</th>
             <th className="px-2 py-2 font-bold text-right">Ko'rinish</th>
             <th className="px-2 py-2 font-bold text-right">Noyob</th>
             <th className="px-2 py-2 font-bold text-right">Boshlash</th>
             <th className="px-2 py-2 font-bold text-right">To'liq</th>
             <th className="px-2 py-2 font-bold text-right">O'rt. vaqt</th>
-            <th className="px-2 py-2 font-bold text-right">👍</th>
+            <th className="px-2 py-2 font-bold text-right">Yoqtirish</th>
             <th className="px-2 py-2 font-bold text-right">Izoh</th>
             <th className="px-2 py-2 font-bold text-right">Boglanish</th>
             <th className="px-2 py-2 font-bold text-right">Tel.</th>
@@ -357,13 +357,13 @@ const AllVideosTable: React.FC<{ metrics: FeedMetric[]; name: (id: string) => st
         </thead>
         <tbody>
           {sorted.map((f) => (
-            <tr key={f.id} className="border-b border-neutral-100 dark:border-neutral-800/60 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-              <td className="px-2 py-2.5 font-black text-neutral-900 dark:text-white truncate max-w-[180px]">{name(f.id)}</td>
+            <tr key={f.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+              <td className="px-2 py-2.5 font-black text-foreground truncate max-w-[180px]">{name(f.id)}</td>
               <td className="px-2 py-2.5 text-right font-black">{f.views}</td>
-              <td className="px-2 py-2.5 text-right text-neutral-500 dark:text-neutral-400">{f.uniqueViewers}</td>
+              <td className="px-2 py-2.5 text-right text-muted-foreground">{f.uniqueViewers}</td>
               <td className="px-2 py-2.5 text-right">{f.videoStarts}</td>
               <td className="px-2 py-2.5 text-right">{f.videoCompletes}</td>
-              <td className="px-2 py-2.5 text-right text-neutral-500 dark:text-neutral-400">{formatDuration(f.avgWatchSec)}</td>
+              <td className="px-2 py-2.5 text-right text-muted-foreground">{formatDuration(f.avgWatchSec)}</td>
               <td className="px-2 py-2.5 text-right">{f.likes}</td>
               <td className="px-2 py-2.5 text-right">{f.comments}</td>
               <td className="px-2 py-2.5 text-right text-blue-600 dark:text-blue-400">{f.productClicks}</td>

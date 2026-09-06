@@ -11,15 +11,15 @@ interface KpiCardProps {
 
 export const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon: Icon, accent, sub }) => {
   return (
-    <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs">
+    <div className="p-4 rounded-2xl bg-card border border-border shadow-xs">
       <div className={`inline-flex p-2 rounded-xl ${accent} mb-3`}>
         <Icon className="w-4 h-4" />
       </div>
-      <div className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+      <div className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
         {typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}
       </div>
-      <p className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">{label}</p>
-      {sub && <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5 font-medium">{sub}</p>}
+      <p className="text-[11px] font-bold text-muted-foreground mt-0.5">{label}</p>
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{sub}</p>}
     </div>
   );
 };
