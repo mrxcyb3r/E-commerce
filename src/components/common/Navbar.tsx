@@ -27,13 +27,13 @@ interface NavItem {
 }
 
 const getNavItems = (t: (section: string, key: string) => string): NavItem[] => [
-  { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
-  { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
-  { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-feed', path: '/feed' },
-  { id: 'categories', label: t('nav', 'categories'), sectionId: 'categories', path: '/products?category=' },
-  { id: 'about', label: t('nav', 'about'), sectionId: 'about', path: '/about' },
-  { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
-  { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
+    { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
+    { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
+    { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-discovery', path: '/feed' },
+    { id: 'categories', label: t('nav', 'categories'), sectionId: 'categories', path: '/products?category=' },
+    { id: 'about', label: t('nav', 'about'), sectionId: 'store-experience', path: '/about' },
+    { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
+    { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -93,61 +93,63 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (!isHomePage) {
-      if (location.pathname === '/products' || location.pathname.startsWith('/products?')) {
-        setActiveSection('products');
-      } else if (location.pathname === '/feed' || location.pathname === '/videos') {
-        setActiveSection('feed');
-      } else if (location.pathname === '/about') {
-        setActiveSection('about');
-      } else if (location.pathname === '/location') {
-        setActiveSection('location');
-      } else if (location.pathname === '/contact') {
-        setActiveSection('contact');
-      } else {
-        setActiveSection('');
-      }
-      return;
-    }
+useEffect(() => {
+     if (!isHomePage) {
+       if (location.pathname === '/products' || location.pathname.startsWith('/products?')) {
+         setActiveSection('products');
+       } else if (location.pathname === '/feed' || location.pathname === '/videos') {
+         setActiveSection('video-discovery');
+       } else if (location.pathname === '/about') {
+         setActiveSection('store-experience');
+       } else if (location.pathname === '/location') {
+         setActiveSection('location');
+       } else if (location.pathname === '/contact') {
+         setActiveSection('contact');
+       } else {
+         setActiveSection('');
+       }
+       return;
+     }
 
-    const sectionIds = [
-      'hero',
-      'categories',
-      'video-discovery',
-      'about',
-      'contact',
-    ];
+     const sectionIds = [
+       'hero',
+       'store-experience',
+       'products',
+       'categories',
+       'video-discovery',
+       'location',
+       'contact',
+     ];
 
-    const observers: IntersectionObserver[] = [];
+     const observers: IntersectionObserver[] = [];
 
-    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
+     const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+       entries.forEach((entry) => {
+         if (entry.isIntersecting) {
+           setActiveSection(entry.target.id);
+         }
+       });
+     };
 
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20% 0px -50% 0px',
-      threshold: 0.05,
-    };
+     const observerOptions = {
+       root: null,
+       rootMargin: '-20% 0px -50% 0px',
+       threshold: 0.05,
+     };
 
-    const observer = new IntersectionObserver(handleIntersect, observerOptions);
+     const observer = new IntersectionObserver(handleIntersect, observerOptions);
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) {
-        observer.observe(el);
-      }
-    });
+     sectionIds.forEach((id) => {
+       const el = document.getElementById(id);
+       if (el) {
+         observer.observe(el);
+       }
+     });
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [isHomePage, location.pathname]);
+     return () => {
+       observer.disconnect();
+     };
+   }, [isHomePage, location.pathname]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -246,13 +248,13 @@ export const Navbar: React.FC = () => {
                         : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                     }`}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-indicator"
-                        className="absolute inset-0 -bottom-1 bg-primary/20 rounded-full height-1 transition-delay-700"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
+{isActive && (
+  <motion.div
+    layoutId="nav-indicator"
+    className="absolute inset-0 -bottom-1 bg-primary/20 rounded-full height-1"
+    transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+  />
+)}
                     <span className="relative z-10">{item.label}</span>
                   </a>
                 );
@@ -370,11 +372,11 @@ export const Navbar: React.FC = () => {
                         }`}
                       >
                         {isActive && (
-                          <motion.div
-                            layoutId="mobile-nav-indicator"
-                            className="absolute inset-0 bg-primary/10 rounded-2xl"
-                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                          />
+<motion.div
+                             layoutId="mobile-nav-indicator"
+                             className="absolute inset-0 bg-primary/20 rounded-2xl"
+                             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                           />
                         )}
                         <span className="relative z-10">{item.label}</span>
                         <ArrowRight className={`relative z-10 w-5 h-5 ${isActive ? 'text-primary' : 'text-zinc-400'}`} />

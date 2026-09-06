@@ -99,8 +99,8 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_black/40_100%)] pointer-events-none" />
       </div>
 
-      <div className="relative z-10 w-full px-6 py-20 sm:px-8 lg:px-12 xl:px-16 max-w-4xl">
-        <div className="max-w-7xl mx-auto">
+<div className="relative z-10 w-full flex h-full items-center justify-center px-6 sm:px-8 lg:px-12 xl:px-16 max-w-4xl">
+         <div className="max-w-7xl">
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={slide.id}
@@ -121,23 +121,21 @@ export const HeroSection: React.FC = () => {
                 </motion.div>
               )}
 
-              {slide.title && (
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="font-display font-black text-white max-w-2xl mb-6"
-                  style={{
-                    fontSize: 'clamp(2rem, 6vw, 3.5rem)',
-                    lineHeight: '1.1',
-                    letterSpacing: '-0.04em',
-                  }}
-                >
-                  {slide.title.split(' ').map((word, i) => (
-                    <span key={i} className="block">{word}</span>
-                  ))}
-                </motion.h1>
-              )}
+{slide.title && (
+                 <motion.h1
+                   initial={{ opacity: 0, y: 30 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: 0.2, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                   className="font-display font-black text-white max-w-2xl mb-6"
+                   style={{
+                     fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+                     lineHeight: '1.1',
+                     letterSpacing: '-0.04em',
+                   }}
+                 >
+                   {slide.title}
+                 </motion.h1>
+               )}
 
               {slide.ctaLink && (
                 <motion.div
