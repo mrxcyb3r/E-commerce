@@ -17,7 +17,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     duration: '0:14',
     order: 1,
     published: true,
-    createdAt: '2025-01-15',
+    createdAt: '2024-06-15',
   },
   {
     id: 'col-1',
@@ -38,7 +38,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     },
     order: 2,
     published: true,
-    createdAt: '2025-01-16',
+    createdAt: '2024-01-16',
   },
   {
     id: 'vid-2',
@@ -56,7 +56,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     duration: '0:18',
     order: 3,
     published: true,
-    createdAt: '2025-01-18',
+    createdAt: '2024-01-18',
   },
   {
     id: 'col-2',
@@ -76,7 +76,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     },
     order: 4,
     published: true,
-    createdAt: '2025-01-19',
+    createdAt: '2024-01-19',
   },
   {
     id: 'vid-3',
@@ -94,7 +94,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     duration: '0:16',
     order: 5,
     published: true,
-    createdAt: '2025-01-20',
+    createdAt: '2024-01-20',
   },
   {
     id: 'vid-4',
@@ -112,7 +112,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     duration: '0:12',
     order: 6,
     published: true,
-    createdAt: '2025-01-22',
+    createdAt: '2024-01-22',
   },
   {
     id: 'vid-5',
@@ -129,7 +129,7 @@ export const INITIAL_VIDEOS: VideoItem[] = [
     duration: '0:22',
     order: 7,
     published: true,
-    createdAt: '2025-01-25',
+    createdAt: '2024-01-25',
   },
 ];
 
