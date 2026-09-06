@@ -26,15 +26,11 @@ export const Footer: React.FC = () => {
   const shopLinks = [
     { label: t('footer', 'allProducts'), href: '/products' },
     { label: t('footer', 'newArrivals'), href: '/products?sort=newest' },
-    { label: t('footer', 'bestSellers'), href: '/products?sort=popular' },
     { label: t('footer', 'onSale'), href: '/products?sale=true' },
   ];
 
   const helpLinks = [
     { label: t('footer', 'contact'), href: '/contact' },
-    { label: t('footer', 'faq'), href: '/faq' },
-    { label: t('footer', 'shipping'), href: '/shipping' },
-    { label: t('footer', 'returns'), href: '/returns' },
   ];
 
   return (
