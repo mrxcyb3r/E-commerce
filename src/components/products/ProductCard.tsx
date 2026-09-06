@@ -41,7 +41,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <Link
           to={`/products/${product.id}`}
           className="block relative overflow-hidden rounded-2xl"
-          aria-label={`View ${product.name}`}
+          aria-label={`${product.name} ${t('common', 'viewProduct')}`}
         >
           <div className={`relative ${aspectRatio} overflow-hidden bg-muted`}>
             {product.images?.[0] && !imgError ? (
@@ -103,7 +103,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <Link
         to={`/products/${product.id}`}
         className="block relative overflow-hidden rounded-xl bg-card"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className={`relative ${aspectRatio} overflow-hidden bg-muted`}>
           {product.images?.[0] && !imgError ? (

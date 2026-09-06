@@ -52,7 +52,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   }, []);
 
   useEffect(() => {
-    const popular = ['oversized hoodie', 'minimal tee', 'cargo pants', 'premium denim', 'leather jacket', 'running shoes'];
+    const popular = ['kurtka', 'futbolka', 'shim', 'krossovka', 'ko\'ylak', 'poyabzal'];
     setTrendingSearches(popular);
   }, []);
 
@@ -203,7 +203,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             onClick={handleClearRecent}
                             className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium flex items-center gap-1"
                           >
-                            Clear
+                            {t('common', 'clearRecent')}
                             <XCircle className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -269,7 +269,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                   <>
                     <div className="flex items-center justify-between px-2 py-3">
                       <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                        Products ({filteredProducts.length})
+                        {t('common', 'productsCount', filteredProducts.length)}
                       </span>
                       {filteredProducts.length > 5 && (
                         <button
@@ -315,8 +315,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             <div className="font-display font-black text-foreground text-base">
                               {formatPrice(product.price)}
                             </div>
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-wide">
-                              In Stock
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-wide">
+                                {t('common', 'inStock')}
                             </span>
                           </div>
                         </button>
@@ -328,7 +328,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             <Search className="w-6 h-6" />
                           </div>
                           <h4 className="font-display font-black text-foreground mb-1">{t('common', 'notFound')}</h4>
-                          <p className="text-sm text-zinc-500 dark:text-zinc-400">Try a different search term or browse categories.</p>
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('common', 'tryDifferent')}</p>
                         </div>
                       )}
                     </div>

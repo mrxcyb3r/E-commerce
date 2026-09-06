@@ -82,7 +82,7 @@ export const ProductCardCompact: React.FC<ProductCardProps> = ({ product, index 
       <Link
         to={`/products/${product.id}`}
         className="flex gap-3 items-center group/card"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
           <img
@@ -145,7 +145,7 @@ export const ProductCardStandard: React.FC<ProductCardProps> = ({ product, index
       <Link
         to={`/products/${product.id}`}
         className="block relative overflow-hidden rounded-xl bg-card"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className="relative aspect-[4/5] overflow-hidden">
           <ProductImage product={product} aspect="aspect-[4/5]" />
@@ -272,7 +272,7 @@ export const ProductCardFeature: React.FC<ProductCardProps> = ({ product, index 
       <Link
         to={`/products/${product.id}`}
         className="block relative overflow-hidden rounded-2xl"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-muted">
           <ProductImage product={product} aspect="aspect-[16/10]" />
@@ -420,7 +420,7 @@ export const ProductCardMinimal: React.FC<ProductCardProps> = ({ product, index 
       <Link
         to={`/products/${product.id}`}
         className="block group/card"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted">
           <img
@@ -478,7 +478,7 @@ export const ProductCardVideo: React.FC<ProductCardProps> = ({ product, index = 
       <Link
         to={`/products/${product.id}`}
         className="block relative overflow-hidden rounded-xl bg-card"
-        aria-label={`View ${product.name}`}
+        aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
         <div className="relative aspect-[9/16] overflow-hidden bg-muted">
           <img
