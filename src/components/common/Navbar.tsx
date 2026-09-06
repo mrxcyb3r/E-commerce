@@ -28,11 +28,11 @@ interface NavItem {
 
 const getNavItems = (t: (section: string, key: string) => string): NavItem[] => [
   { id: 'hero', label: t('nav', 'home'), sectionId: 'hero', path: '/' },
-  { id: 'products', label: t('nav', 'products'), sectionId: 'trending', path: '/products' },
+  { id: 'products', label: t('nav', 'products'), sectionId: 'products', path: '/products' },
   { id: 'feed', label: t('nav', 'videos'), sectionId: 'video-feed', path: '/feed' },
-  { id: 'collections', label: t('nav', 'collections'), sectionId: 'shop-by-style', path: '/collections' },
+  { id: 'categories', label: t('nav', 'categories'), sectionId: 'categories', path: '/products?category=' },
   { id: 'about', label: t('nav', 'about'), sectionId: 'about', path: '/about' },
-  { id: 'location', label: t('nav', 'location'), sectionId: 'store-experience', path: '/location' },
+  { id: 'location', label: t('nav', 'location'), sectionId: 'location', path: '/location' },
   { id: 'contact', label: t('nav', 'contact'), sectionId: 'contact', path: '/contact' },
 ];
 
@@ -203,7 +203,7 @@ export const Navbar: React.FC = () => {
           }`}
         >
           <div className="flex items-center justify-between gap-4">
-            <Link
+<Link
               to="/"
               id="brand-logo-link"
               onClick={(e) => {
@@ -213,7 +213,7 @@ export const Navbar: React.FC = () => {
                   setActiveSection('hero');
                 }
               }}
-              className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
+              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 rounded-xl shrink-0"
               aria-label={`${storeInfo.name} ${t('nav', 'home')}`}
             >
               {storeInfo.logoUrl ? (
@@ -221,21 +221,16 @@ export const Navbar: React.FC = () => {
                   src={storeInfo.logoUrl}
                   referrerPolicy="no-referrer"
                   alt=""
-                  className="w-9 h-9 rounded-xl object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
+                  className="w-8 h-8 rounded-xl object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
-                  <ShoppingBag className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
+                  <ShoppingBag className="w-4 h-4" />
                 </div>
               )}
-              <div className="flex flex-col hidden sm:block">
-                <span className="font-display font-black text-sm tracking-tight text-foreground leading-tight">
-                  {storeInfo.name}
-                </span>
-                <span className="text-[10px] tracking-widest uppercase font-black text-zinc-500 dark:text-zinc-400">
-                  {storeInfo.tagline || storeInfo.businessCategory || t('footer', 'tagline')}
-                </span>
-              </div>
+              <span className="font-display font-black text-sm tracking-tight text-foreground hidden sm:inline">
+                {storeInfo.name}
+              </span>
             </Link>
 
             <nav
