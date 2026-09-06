@@ -66,7 +66,7 @@ export const HeroSection: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative h-[70vh] min-h-[480px] max-h-[700px] flex items-center overflow-hidden"
+      className="relative h-[70vh] min-h-[480px] max-h-[700px] overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Hero"
