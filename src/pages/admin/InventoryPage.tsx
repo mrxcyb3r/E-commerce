@@ -98,10 +98,10 @@ export const InventoryPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
             Inventar va Zaxiralar Boshqaruvi
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Barcha mahsulotlar soni va mavjudligini tezkor yangilang
           </p>
         </div>
@@ -109,7 +109,7 @@ export const InventoryPage: React.FC = () => {
         <button
           type="button"
           onClick={handleSaveAll}
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
+          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
         >
           {savedSuccess ? (
             <>
@@ -126,9 +126,9 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Filters Bar */}
-      <div className="p-4 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="p-4 rounded-3xl bg-card border border-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
             <Search className="w-4 h-4" />
           </div>
           <input
@@ -136,7 +136,7 @@ export const InventoryPage: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Mahsulot yoki SKU izlash..."
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-muted border border-border text-foreground focus:outline-hidden focus:ring-2 focus:ring-amber-500"
           />
         </div>
 
@@ -146,8 +146,8 @@ export const InventoryPage: React.FC = () => {
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               filter === 'all'
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+                ? 'bg-card text-foreground bg-card text-background shadow-xs'
+                : 'bg-muted text-foreground'
             }`}
           >
             Barchasi ({products.length})
@@ -158,7 +158,7 @@ export const InventoryPage: React.FC = () => {
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               filter === 'in-stock'
                 ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+                : 'bg-muted text-foreground'
             }`}
           >
             Mavjud
@@ -168,8 +168,8 @@ export const InventoryPage: React.FC = () => {
             onClick={() => setFilter('low')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               filter === 'low'
-                ? 'bg-amber-500 text-neutral-950 shadow-xs'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+                ? 'bg-amber-500 text-background shadow-xs'
+                : 'bg-muted text-foreground'
             }`}
           >
             Kam qolgan (1-3 dona)
@@ -180,7 +180,7 @@ export const InventoryPage: React.FC = () => {
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               filter === 'out'
                 ? 'bg-red-600 text-white shadow-xs'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+                : 'bg-muted text-foreground'
             }`}
           >
             Tugagan
@@ -189,11 +189,11 @@ export const InventoryPage: React.FC = () => {
       </div>
 
       {/* Inventory Table */}
-      <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs overflow-hidden">
+      <div className="bg-card rounded-3xl border border-border shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/70 dark:bg-neutral-800/40 text-neutral-500 font-bold uppercase text-[10px]">
+              <tr className="border-b border-border bg-muted/70 bg-muted/40 text-muted-foreground font-bold uppercase text-[10px]">
                 <th className="py-3.5 pl-6 pr-3">Mahsulot</th>
                 <th className="py-3.5 px-3">Kategoriya</th>
                 <th className="py-3.5 px-3">Narxi</th>
@@ -201,33 +201,33 @@ export const InventoryPage: React.FC = () => {
                 <th className="py-3.5 pr-6 pl-3 text-right">Qoldiq Soni (Dona)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+            <tbody className="divide-y divide-border dark:divide-border">
               {filteredProducts.map((p) => {
                 const stockItem = localStock[p.id] || { inStock: p.inStock, count: p.stockCount ?? 0 };
                 return (
-                  <tr key={p.id} className="hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40">
+                  <tr key={p.id} className="hover:bg-muted/80 dark:hover:bg-muted/40">
                     <td className="py-3.5 pl-6 pr-3">
                       <div className="flex items-center gap-3">
                         <img
                           src={p.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}
                           alt=""
-                          className="w-10 h-10 rounded-xl object-cover border border-neutral-200 dark:border-neutral-700 shrink-0"
+                          className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
                           referrerPolicy="no-referrer"
                         />
                         <div>
-                          <p className="font-bold text-neutral-900 dark:text-white truncate max-w-xs">
+                          <p className="font-bold text-foreground truncate max-w-xs">
                             {p.name}
                           </p>
-                          <span className="font-mono text-[10px] text-neutral-400">{p.sku}</span>
+                          <span className="font-mono text-[10px] text-muted-foreground">{p.sku}</span>
                         </div>
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-3 font-medium text-neutral-600 dark:text-neutral-300">
+                    <td className="py-3.5 px-3 font-medium text-foreground">
                       {p.categoryName || p.category}
                     </td>
 
-                    <td className="py-3.5 px-3 font-bold text-neutral-900 dark:text-white">
+                    <td className="py-3.5 px-3 font-bold text-foreground">
                       {p.price.toLocaleString('uz-UZ')} so'm
                     </td>
 
@@ -251,11 +251,11 @@ export const InventoryPage: React.FC = () => {
                     </td>
 
                     <td className="py-3.5 pr-6 pl-3 text-right">
-                      <div className="inline-flex items-center gap-1.5 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
+                      <div className="inline-flex items-center gap-1.5 bg-muted p-1 rounded-xl">
                         <button
                           type="button"
                           onClick={() => handleChangeCount(p.id, stockItem.count - 1)}
-                          className="p-1 rounded-lg bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200"
+                          className="p-1 rounded-lg bg-white bg-muted text-foreground text-foreground hover:bg-muted"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -264,12 +264,12 @@ export const InventoryPage: React.FC = () => {
                           min={0}
                           value={stockItem.count}
                           onChange={(e) => handleChangeCount(p.id, Number(e.target.value))}
-                          className="w-14 text-center font-extrabold text-xs bg-transparent border-none focus:outline-hidden text-neutral-900 dark:text-white"
+                          className="w-14 text-center font-extrabold text-xs bg-transparent border-none focus:outline-hidden text-foreground"
                         />
                         <button
                           type="button"
                           onClick={() => handleChangeCount(p.id, stockItem.count + 1)}
-                          className="p-1 rounded-lg bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200"
+                          className="p-1 rounded-lg bg-white bg-muted text-foreground text-foreground hover:bg-muted"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>

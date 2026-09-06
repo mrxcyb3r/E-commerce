@@ -109,19 +109,19 @@ export const StoreAdminPage: React.FC = () => {
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl mx-auto pb-16">
       {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-16 z-20 bg-neutral-100/90 dark:bg-neutral-950/90 backdrop-blur-md py-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-16 z-20 bg-muted/90 bg-card/90 backdrop-blur-md py-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
             Do'kon Ma'lumotlari va Aloqa
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Do'kon nomi, telefonlari, manzili va ijtimoiy tarmoqlarini yangilang
           </p>
         </div>
 
         <button
           type="submit"
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
+          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
         >
           {savedSuccess ? (
             <>
@@ -138,15 +138,15 @@ export const StoreAdminPage: React.FC = () => {
       </div>
 
       {/* Main Info */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <Store className="w-4 h-4 text-amber-500" />
           <span>Umumiy Do'kon Tafsilotlari</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Do'kon Nomi <span className="text-red-500">*</span>
             </label>
             <input
@@ -154,12 +154,12 @@ export const StoreAdminPage: React.FC = () => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-bold"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground font-bold"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Shior / Tagline
             </label>
             <input
@@ -167,14 +167,14 @@ export const StoreAdminPage: React.FC = () => {
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
               placeholder="Zamonaviy kiyimlar va poyabzallar do'koni"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Ish Vaqti
             </label>
             <input
@@ -182,12 +182,12 @@ export const StoreAdminPage: React.FC = () => {
               value={workingHours}
               onChange={(e) => setWorkingHours(e.target.value)}
               placeholder="Har kuni: 09:00 - 21:00"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Shahar
             </label>
             <input
@@ -195,22 +195,22 @@ export const StoreAdminPage: React.FC = () => {
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="Shahringiz"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
       </div>
 
       {/* Contact Channels */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <Phone className="w-4 h-4 text-amber-500" />
           <span>Telefon Raqamlari va Ijtimoiy Tarmoqlar</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Asosiy Telefon Raqami
             </label>
             <input
@@ -218,12 +218,12 @@ export const StoreAdminPage: React.FC = () => {
               value={phone1}
               onChange={(e) => setPhone1(e.target.value)}
               placeholder="+998 90 123 45 67"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Qo'shimcha Telefon Raqami
             </label>
             <input
@@ -231,14 +231,14 @@ export const StoreAdminPage: React.FC = () => {
               value={phone2}
               onChange={(e) => setPhone2(e.target.value)}
               placeholder="+998 91 987 65 43"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Elektron Pochta
             </label>
             <input
@@ -246,14 +246,14 @@ export const StoreAdminPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="info@do-konim.uz"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Telegram Administrator (Username)
             </label>
             <input
@@ -261,12 +261,12 @@ export const StoreAdminPage: React.FC = () => {
               value={telegramUsername}
               onChange={(e) => setTelegramUsername(e.target.value)}
               placeholder="do_konim_admin"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Telegram Kanal
             </label>
             <input
@@ -274,12 +274,12 @@ export const StoreAdminPage: React.FC = () => {
               value={telegramChannel}
               onChange={(e) => setTelegramChannel(e.target.value)}
               placeholder="do_konim_kanal"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Instagram Username
             </label>
             <input
@@ -287,22 +287,22 @@ export const StoreAdminPage: React.FC = () => {
               value={instagramUsername}
               onChange={(e) => setInstagramUsername(e.target.value)}
               placeholder="do_konim.uz"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
       </div>
 
       {/* Address and Map Coordinates */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <MapPin className="w-4 h-4 text-amber-500" />
           <span>Manzil va Xaritalar (Geolokatsiya)</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               To'liq Manzil
             </label>
             <input
@@ -310,12 +310,12 @@ export const StoreAdminPage: React.FC = () => {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Sharof Rashidov shoh ko'chasi, 45-uy"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground font-medium"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Mo'ljal (Landmark)
             </label>
             <input
@@ -323,14 +323,14 @@ export const StoreAdminPage: React.FC = () => {
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
               placeholder="Markaziy dehqon bozori ro'parasida"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Google Maps Havolasi
             </label>
             <input
@@ -338,12 +338,12 @@ export const StoreAdminPage: React.FC = () => {
               value={googleMapsUrl}
               onChange={(e) => setGoogleMapsUrl(e.target.value)}
               placeholder="https://maps.google.com/..."
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Yandex Maps Havolasi
             </label>
             <input
@@ -351,14 +351,14 @@ export const StoreAdminPage: React.FC = () => {
               value={yandexMapsUrl}
               onChange={(e) => setYandexMapsUrl(e.target.value)}
               placeholder="https://yandex.uz/maps/..."
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Kenglik (Latitude)
             </label>
             <input
@@ -366,12 +366,12 @@ export const StoreAdminPage: React.FC = () => {
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
               placeholder="40.1158"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Uzunlik (Longitude)
             </label>
             <input
@@ -379,22 +379,22 @@ export const StoreAdminPage: React.FC = () => {
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
               placeholder="67.8422"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
       </div>
 
       {/* Brand Identity */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200/80 dark:border-neutral-800/80 shadow-xs space-y-4">
-        <h3 className="text-sm font-extrabold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <h3 className="text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2">
           <Palette className="w-4 h-4 text-amber-500" />
           <span>Brend Identiteti va SEO</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-foreground mb-1 flex items-center gap-1.5">
               <ImageIcon className="w-3.5 h-3.5" /> Logo URL (Rasm havolasi)
             </label>
             <input
@@ -402,15 +402,15 @@ export const StoreAdminPage: React.FC = () => {
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
               placeholder="https://.../logo.png"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
-            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1">
+            <p className="text-[10px] text-muted-foreground mt-1">
               Agar bo'sh bo'lsa, do'kon nomining bosh harfi (monogramma) ko'rsatiladi.
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1 flex items-center gap-1.5">
+            <label className="block text-xs font-bold text-foreground mb-1 flex items-center gap-1.5">
               <ImageIcon className="w-3.5 h-3.5" /> Favicon URL
             </label>
             <input
@@ -418,14 +418,14 @@ export const StoreAdminPage: React.FC = () => {
               value={faviconUrl}
               onChange={(e) => setFaviconUrl(e.target.value)}
               placeholder="https://.../favicon.ico"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Asosiy Rang (Accent)
             </label>
             <div className="flex items-center gap-2">
@@ -433,20 +433,20 @@ export const StoreAdminPage: React.FC = () => {
                 type="color"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                className="w-10 h-9 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-transparent cursor-pointer"
+                className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
               />
               <input
                 type="text"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
                 placeholder="#0f172a"
-                className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
               />
             </div>
           </div>
 
 <div>
-              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-bold text-foreground mb-1">
                 Ikkinchi Rang (Secondary)
               </label>
               <div className="flex items-center gap-2">
@@ -454,20 +454,20 @@ export const StoreAdminPage: React.FC = () => {
                   type="color"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="w-10 h-9 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-transparent cursor-pointer"
+                  className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
                 />
                 <input
                   type="text"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
                   placeholder="#334155"
-                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-bold text-foreground mb-1">
                 Aksent Rang (CTA)
               </label>
               <div className="flex items-center gap-2">
@@ -475,20 +475,20 @@ export const StoreAdminPage: React.FC = () => {
                   type="color"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
-                  className="w-10 h-9 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-transparent cursor-pointer"
+                  className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
                 />
                 <input
                   type="text"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
                   placeholder="#f59e0b"
-                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-bold text-foreground mb-1">
                 Savdo Sohasi
               </label>
               <input
@@ -496,20 +496,20 @@ export const StoreAdminPage: React.FC = () => {
                 value={businessCategory}
                 onChange={(e) => setBusinessCategory(e.target.value)}
                 placeholder="Kiyim-kechak, poyabzal"
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
               />
             </div>
           </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Til
             </label>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             >
               <option value="uz">O'zbekcha (uz)</option>
               <option value="ru">Русский (ru)</option>
@@ -518,7 +518,7 @@ export const StoreAdminPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Qisqa Nomi (Logo alt)
             </label>
             <input
@@ -526,12 +526,12 @@ export const StoreAdminPage: React.FC = () => {
               value={shortName}
               onChange={(e) => setShortName(e.target.value)}
               placeholder="Do'kon"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Administrator E-pochtasi
             </label>
             <input
@@ -539,14 +539,14 @@ export const StoreAdminPage: React.FC = () => {
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
               placeholder="admin@dokon.uz"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               SEO: Standart Sarlavha (Title)
             </label>
             <input
@@ -554,12 +554,12 @@ export const StoreAdminPage: React.FC = () => {
               value={defaultSeoTitle}
               onChange={(e) => setDefaultSeoTitle(e.target.value)}
               placeholder="Do'kon nomi — eng yaxshi mahsulotlar"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               SEO: Standart Tavsif (Description)
             </label>
             <input
@@ -567,13 +567,13 @@ export const StoreAdminPage: React.FC = () => {
               value={defaultSeoDescription}
               onChange={(e) => setDefaultSeoDescription(e.target.value)}
               placeholder="Do'konimizda sifatli mahsulotlar..."
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+          <label className="block text-xs font-bold text-foreground mb-1">
             SEO: Open Graph Rasm (ijtimoiy tarmoqlarda)
           </label>
           <input
@@ -581,13 +581,13 @@ export const StoreAdminPage: React.FC = () => {
             value={ogImageUrl}
             onChange={(e) => setOgImageUrl(e.target.value)}
             placeholder="https://.../og-cover.jpg"
-            className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+            className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               SEO: Kalit So'zlar (Keywords)
             </label>
             <input
@@ -595,12 +595,12 @@ export const StoreAdminPage: React.FC = () => {
               value={defaultSeoKeywords}
               onChange={(e) => setDefaultSeoKeywords(e.target.value)}
               placeholder="kiyim, poyabzal, Jizzax do'kon"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               SEO: Twitter/X Rasm
             </label>
             <input
@@ -608,14 +608,14 @@ export const StoreAdminPage: React.FC = () => {
               value={twitterImageUrl}
               onChange={(e) => setTwitterImageUrl(e.target.value)}
               placeholder="https://.../twitter-card.jpg"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Bosh Sahifa Sarlavhasi (Hero)
             </label>
             <input
@@ -623,12 +623,12 @@ export const StoreAdminPage: React.FC = () => {
               value={heroTitle}
               onChange={(e) => setHeroTitle(e.target.value)}
               placeholder="Premium kiyimlar va poyabzallar"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Bosh Sahifa Kichik Matni (Hero)
             </label>
             <input
@@ -636,13 +636,13 @@ export const StoreAdminPage: React.FC = () => {
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
               placeholder="2026-yilning eng yangi kolleksiyalari"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+          <label className="block text-xs font-bold text-foreground mb-1">
             Kompaniya Haqida Matn (About)
           </label>
           <textarea
@@ -650,13 +650,13 @@ export const StoreAdminPage: React.FC = () => {
             onChange={(e) => setAboutText(e.target.value)}
             rows={3}
             placeholder="Biz haqimizda qisqacha ma'lumot..."
-            className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+            className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground resize-y"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Missiya
             </label>
             <textarea
@@ -664,12 +664,12 @@ export const StoreAdminPage: React.FC = () => {
               onChange={(e) => setMission(e.target.value)}
               rows={2}
               placeholder="Bizning missiyamiz..."
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground resize-y"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Vizyon
             </label>
             <textarea
@@ -677,14 +677,14 @@ export const StoreAdminPage: React.FC = () => {
               onChange={(e) => setVision(e.target.value)}
               rows={2}
               placeholder="Bizning vizyonimiz..."
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white resize-y"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground resize-y"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Copyright Matni (footer)
             </label>
             <input
@@ -692,12 +692,12 @@ export const StoreAdminPage: React.FC = () => {
               value={copyright}
               onChange={(e) => setCopyright(e.target.value)}
               placeholder="© 2026 Do'kon. Barcha huquqlar himoyalangan."
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-bold text-foreground mb-1">
               Footer Qo'shimcha Matn
             </label>
             <input
@@ -705,7 +705,7 @@ export const StoreAdminPage: React.FC = () => {
               value={footerText}
               onChange={(e) => setFooterText(e.target.value)}
               placeholder="20 yildan ortiq tajriba"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
         </div>
