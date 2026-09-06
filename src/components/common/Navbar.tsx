@@ -249,7 +249,7 @@ export const Navbar: React.FC = () => {
                     {isActive && (
                       <motion.div
                         layoutId="nav-indicator"
-                        className="absolute inset-0 -bottom-1.5 bg-primary/10 rounded-full height-0.5"
+                        className="absolute inset-0 -bottom-1 bg-primary/20 rounded-full height-1 transition-delay-700"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}

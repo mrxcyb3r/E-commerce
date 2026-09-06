@@ -84,7 +84,7 @@ export const ProductCardCompact: React.FC<ProductCardProps> = ({ product, index 
         className="flex gap-3 items-center group/card"
         aria-label={`${product.name} ${t('common', 'viewProduct')}`}
       >
-        <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+        <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
           <img
             src={product.images?.[0] ?? ''}
             alt={product.name}

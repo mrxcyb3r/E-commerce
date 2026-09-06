@@ -11,7 +11,6 @@ import {
   LogOut,
   ExternalLink,
   X,
-  Sparkles,
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
@@ -84,12 +83,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       title: "DO'KON",
       items: [
         { label: "Do'kon sozlamalari", path: '/admin/store', icon: Store },
-      ],
-    },
-    {
-      title: 'VOSITALAR',
-      items: [
-        { label: 'AI Promptlar', path: '/admin/prompts', icon: Sparkles },
       ],
     },
     {

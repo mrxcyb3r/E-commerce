@@ -196,20 +196,14 @@ export const HeroSection: React.FC = () => {
         </div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8, ease: 'easeOut' }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        aria-hidden="true"
-      >
-        <div className="w-px h-10 bg-gradient-to-b from-white/0 to-white/40" />
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-1 h-1 rounded-full bg-white/50"
-        />
-      </motion.div>
+<motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.8, ease: 'easeOut' }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          aria-hidden="true"
+        >
+        </motion.div>
     </section>
   );
 };
