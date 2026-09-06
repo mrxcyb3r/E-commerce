@@ -24,7 +24,7 @@ export const FinalCTASection: React.FC = () => {
                 <Sparkles className="w-3 h-3" />
                 {eyebrow}
               </p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter leading-tight">
                 {heading}
               </h2>
               <p className="text-zinc-500 dark:text-zinc-300 text-lg font-normal leading-relaxed mt-3">

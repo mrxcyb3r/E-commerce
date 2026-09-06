@@ -63,7 +63,7 @@ export const ContactSection: React.FC = () => {
             <MessageSquare className="w-3.5 h-3.5" />
             <span>{t('pages', 'sections.contactEyebrow')}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
             {contactCms.title || t('pages', 'sections.contactHeading')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -75,7 +75,7 @@ export const ContactSection: React.FC = () => {
           {/* Contact Details Column (5 cols) */}
           <Reveal className="lg:col-span-5 space-y-6">
             <div className="bg-card p-6 rounded-2xl border border-border space-y-6">
-              <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+              <h3 className="text-xl font-black text-foreground font-display tracking-tight">
                 {t('pages', 'sections.contactDirect')}
               </h3>
 
@@ -145,7 +145,7 @@ export const ContactSection: React.FC = () => {
                 <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-2xl font-black text-foreground font-display tracking-tight">
                   {t('pages', 'sections.contactReceived')}
                 </h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md mx-auto font-medium">
@@ -176,7 +176,7 @@ export const ContactSection: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-xl font-black text-foreground font-display tracking-tight">
                   {t('pages', 'sections.contactLeave')}
                 </h3>
 

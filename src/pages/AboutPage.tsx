@@ -20,7 +20,7 @@ export const AboutPage: React.FC = () => {
             <span>{t('pages', 'about.badge')}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground font-display tracking-tighter">
             {aboutCms.title || `${storeInfo.name} — ${t('pages', 'about.titleFallback')}`}
           </h1>
 
@@ -35,7 +35,7 @@ export const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-foreground dark:bg-card text-background dark:text-card-foreground flex items-center justify-center">
               <ShoppingBag className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+            <h3 className="text-xl font-black text-foreground font-display tracking-tight">
               {t('pages', 'about.pillar1Title')}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
@@ -47,7 +47,7 @@ export const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-foreground dark:bg-card text-background dark:text-card-foreground flex items-center justify-center">
               <Store className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+            <h3 className="text-xl font-black text-foreground font-display tracking-tight">
               {t('pages', 'about.pillar2Title')}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
@@ -59,7 +59,7 @@ export const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-foreground dark:bg-card text-background dark:text-card-foreground flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+            <h3 className="text-xl font-black text-foreground font-display tracking-tight">
               {t('pages', 'about.pillar3Title')}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">

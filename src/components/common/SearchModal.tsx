@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Search, X, ArrowRight, Tag, Clock, TrendingUp, XCircle } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { formatPrice } from '../../lib/utils';
 import { track } from '../../lib/analytics/client';
 import { motion, AnimatePresence } from 'motion/react';
@@ -12,6 +13,7 @@ interface SearchModalProps {
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useI18n();
   const { publishedProducts: PRODUCTS } = useStore();
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
@@ -132,7 +134,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-zinc-950/70 backdrop-blur-sm"
+          className="fixed inset-0 bg-background/70 backdrop-blur-sm"
         />
 
         <motion.div
@@ -156,7 +158,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 }}
                 onFocus={() => setShowSuggestions(true)}
                 placeholder="Search products, categories, brands..."
-                className="w-full pl-12 pr-4 py-3.5 bg-zinc-100 dark:bg-zinc-900 text-foreground placeholder-zinc-400 dark:placeholder-zinc-500 text-base font-medium rounded-2xl border border-border/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
+                className="w-full pl-12 pr-4 py-3.5 bg-card text-foreground placeholder-zinc-400 dark:placeholder-zinc-500 text-base font-medium rounded-2xl border border-border/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
               />
               {query && (
                 <button
@@ -172,7 +174,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
             <button
               type="button"
               onClick={onClose}
-              className="text-xs font-black px-3 py-2 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 rounded-xl border border-border/60 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all"
+              className="text-xs font-black px-3 py-2 bg-card text-zinc-500 dark:text-zinc-400 rounded-xl border border-border/60 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all"
             >
               ESC
             </button>
@@ -211,7 +213,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                               key={search}
                               type="button"
                               onClick={() => handleSuggestionClick(search)}
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
+                              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-card text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
                             >
                               <Clock className="w-3.5 h-3.5 text-zinc-400" />
                               {search}
@@ -225,7 +227,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       <>
                         <div className="flex items-center gap-2 px-2 py-3">
                           <TrendingUp className="w-4 h-4 text-amber-500" />
-                          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Trending Now</span>
+                          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('pages.home', 'searchTrending')}</span>
                         </div>
                         <div className="flex flex-wrap gap-2 px-2 pb-4">
                           {trendingSearches.map((search) => (
@@ -254,7 +256,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                             key={category}
                             type="button"
                             onClick={() => handleSuggestionClick(category)}
-                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-card text-zinc-700 dark:text-zinc-300 text-sm font-medium hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-border/60 transition-all"
                           >
                             <Tag className="w-3.5 h-3.5 text-zinc-400" />
                             {category}
@@ -275,7 +277,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           onClick={handleViewAllResults}
                           className="text-xs font-medium text-amber-500 hover:underline"
                         >
-                          View All
+                          {t('common', 'viewAll')}
                         </button>
                       )}
                     </div>
@@ -287,7 +289,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           onClick={() => handleSelectProduct(product.id)}
                           className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 transition-all text-left group"
                         >
-                          <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 shrink-0">
+                          <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-card shrink-0">
                             <img
                               src={product.images?.[0]}
                               alt={product.name}
@@ -322,7 +324,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
 
                       {filteredProducts.length === 0 && (
                         <div className="py-12 text-center">
-                          <div className="inline-flex p-3 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-400 mb-4">
+                          <div className="inline-flex p-3 rounded-full bg-card text-zinc-400 mb-4">
                             <Search className="w-6 h-6" />
                           </div>
                           <h4 className="font-display font-black text-foreground mb-1">No products found</h4>
@@ -337,13 +339,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
           </AnimatePresence>
 
           {query.trim() !== '' && filteredProducts.length > 0 && (
-            <div className="p-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100/60 dark:border-border/60">
+            <div className="p-4 bg-card border-t border-zinc-100/60 dark:border-border/60">
               <button
                 type="button"
                 onClick={handleViewAllResults}
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-foreground hover:underline transition-colors"
               >
-                View All Results
+                {t('pages.home', 'viewAllResults')}
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>

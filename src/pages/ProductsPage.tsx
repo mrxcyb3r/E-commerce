@@ -137,7 +137,7 @@ export const ProductsPage: React.FC = () => {
       {/* Page Header */}
       <div className="mb-8 space-y-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'catalog.title')}
           </h1>
           <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 mt-1">
@@ -280,7 +280,7 @@ export const ProductsPage: React.FC = () => {
                 <Search className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="text-xl font-black text-foreground font-display tracking-tight">
                   {t('pages', 'catalog.emptyTitle')}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">

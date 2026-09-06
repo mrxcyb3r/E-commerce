@@ -45,7 +45,7 @@ export const TrustStats: React.FC = () => {
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                   <CountUp
                     value={stat.value}
-                    className="font-black text-lg sm:text-2xl text-foreground font-['Outfit',sans-serif] tracking-tight"
+                    className="font-black text-lg sm:text-2xl text-foreground font-display tracking-tight"
                   />
                   <span className="font-extrabold text-sm sm:text-base text-zinc-800 dark:text-zinc-200">
                     {stat.label}

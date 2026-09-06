@@ -1,68 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Sparkles } from 'lucide-react';
+import { useStore } from '../../context/StoreContext';
 import { Reveal, Stagger } from '../motion';
 import { staggerContainer, staggerItem } from '../../lib/animations';
 
-interface StyleCollection {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  productCount: number;
-  categorySlug: string;
-  accentColor?: string;
-}
-
-const styleCollections: StyleCollection[] = [
-  {
-    id: 'minimal',
-    name: 'Minimal',
-    description: 'Clean lines. Essential pieces. Timeless style.',
-    imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1200&q=80',
-    productCount: 24,
-    categorySlug: 'minimal',
-    accentColor: '#18181b',
-  },
-  {
-    id: 'street',
-    name: 'Street',
-    description: 'Bold graphics. Oversized fits. Urban attitude.',
-    imageUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1200&q=80',
-    productCount: 31,
-    categorySlug: 'streetwear',
-    accentColor: '#0f172a',
-  },
-  {
-    id: 'sport',
-    name: 'Sport',
-    description: 'Performance fabrics. Movement-first design.',
-    imageUrl: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80',
-    productCount: 18,
-    categorySlug: 'sportswear',
-    accentColor: '#166534',
-  },
-  {
-    id: 'classic',
-    name: 'Classic',
-    description: 'Heritage silhouettes. Refined details. Forever relevant.',
-    imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=1200&q=80',
-    productCount: 22,
-    categorySlug: 'classic',
-    accentColor: '#451a03',
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    description: 'Luxury materials. Impeccable craftsmanship.',
-    imageUrl: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?auto=format&fit=crop&w=1200&q=80',
-    productCount: 15,
-    categorySlug: 'premium',
-    accentColor: '#78350f',
-  },
-];
-
 export const ShopByStyle: React.FC = () => {
+  const { publishedCategories } = useStore();
+
+  if (!publishedCategories || publishedCategories.length === 0) return null;
+
   return (
     <section
       id="shop-by-style"
@@ -90,47 +37,60 @@ export const ShopByStyle: React.FC = () => {
             <br />
             <span className="text-amber-500">Aesthetic</span>
           </h2>
-
         </Reveal>
 
         <Stagger
           containerVariant={staggerContainer}
           itemVariant={staggerItem}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"
         >
-          {styleCollections.map((collection) => (
-            <article key={collection.id} className="group relative">
+          {publishedCategories.map((category) => (
+            <article key={category.id} className="group relative">
               <Link
-                to={`/products?category=${collection.categorySlug}`}
+                to={`/products?category=${category.slug}`}
                 className="block relative aspect-[3/4] overflow-hidden rounded-2xl"
-                aria-label={`Shop ${collection.name} collection`}
+                aria-label={`Shop ${category.name} collection`}
               >
                 <div className="absolute inset-0 bg-zinc-900">
-                  <img
-                    src={collection.imageUrl}
-                    alt={collection.name}
-                    className="w-full h-full object-cover object-center transition-all duration-1000 ease-out group-hover:scale-105"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover object-center transition-all duration-1000 ease-out group-hover:scale-105"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
+                      <span className="text-5xl font-display font-black text-white/10 select-none">
+                        {category.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_center,_transparent_0%,_black/40_100%)]" />
                 </div>
 
                 <div className="absolute inset-0 p-6 lg:p-8 flex flex-col justify-end">
                   <div className="relative z-10">
-                    <span className="inline-block px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm text-white rounded-full border border-white/20 mb-4">
-                      {collection.productCount} items
-                    </span>
+                    {category.productCount !== undefined && category.productCount > 0 && (
+                      <span className="inline-block px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm text-white rounded-full border border-white/20 mb-4">
+                        {category.productCount} items
+                      </span>
+                    )}
 
-                    <h3 className="font-display font-black text-white mb-2 leading-tight"
-                      style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
-                      {collection.name}
+                    <h3
+                      className="font-display font-black text-white mb-2 leading-tight"
+                      style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', lineHeight: '1.1', letterSpacing: '-0.02em' }}
+                    >
+                      {category.name}
                     </h3>
 
-                    <p className="text-white/70 mb-6 max-w-xs leading-relaxed text-sm">
-                      {collection.description}
-                    </p>
+                    {category.description && (
+                      <p className="text-white/70 mb-6 max-w-xs leading-relaxed text-sm">
+                        {category.description}
+                      </p>
+                    )}
 
                     <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 backdrop-blur-sm text-white font-semibold text-sm tracking-wide hover:bg-white/20 transition-all border border-white/20 group-hover:gap-3">
                       Explore
@@ -143,7 +103,7 @@ export const ShopByStyle: React.FC = () => {
               <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="pointer-events-auto">
                   <span className="inline-block px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm text-white rounded-full border border-white/20">
-                    Collection
+                    Category
                   </span>
                 </div>
               </div>

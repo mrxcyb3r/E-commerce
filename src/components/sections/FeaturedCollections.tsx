@@ -26,7 +26,7 @@ export const FeaturedCollections: React.FC = () => {
               <Layers className="w-3.5 h-3.5 text-amber-500" />
               <span>Tanlangan kolleksiyalar</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
               {homepageCms.featuredCollectionsSectionTitle || "Tayyor to'plamlar"}
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">
@@ -73,7 +73,7 @@ export const FeaturedCollections: React.FC = () => {
                   <span className="text-[11px] font-black text-zinc-300 tracking-wider uppercase">
                     {category.productCount ?? 0} ta mahsulot
                   </span>
-                  <h3 className="text-xl font-black text-white tracking-tight font-['Outfit',sans-serif]">
+                  <h3 className="text-xl font-black text-white tracking-tight font-display">
                     {category.name}
                   </h3>
                   <p className="text-xs text-zinc-300 line-clamp-1 opacity-90 font-medium">

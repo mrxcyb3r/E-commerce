@@ -20,7 +20,7 @@ export const PromoBanner: React.FC = () => {
               <span>Yangi to'plam</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter font-['Outfit',sans-serif] leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter font-display leading-tight">
               {homepageCms.promoBannerTitle || 'Yangi mahsulotlar keldi'}
             </h2>
 

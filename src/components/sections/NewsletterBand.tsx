@@ -29,7 +29,7 @@ export const NewsletterBand: React.FC = () => {
               <Mail className="w-4 h-4" />
               <span>{t('pages', 'sections.newsletterEyebrow')}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-background font-['Outfit',sans-serif] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-background font-display tracking-tight">
               {t('pages', 'sections.newsletterTitle')}
             </h2>
             <p className="text-sm text-zinc-400 font-normal">

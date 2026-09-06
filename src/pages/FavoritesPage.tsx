@@ -21,7 +21,7 @@ export const FavoritesPage: React.FC = () => {
             <Heart className="w-3.5 h-3.5 fill-rose-500" />
             <span>{t('pages', 'favorites.eyebrow')}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h1 className="text-3xl sm:text-4xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'favorites.title')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal">
@@ -54,7 +54,7 @@ export const FavoritesPage: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <h2 className="text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+            <h2 className="text-2xl font-black text-foreground font-display tracking-tight">
               {t('pages', 'favorites.emptyTitle')}
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">

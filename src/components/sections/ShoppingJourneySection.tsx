@@ -31,7 +31,7 @@ export const ShoppingJourneySection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-4">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-2xl sm:text-3xl font-black text-foreground font-display tracking-tighter">
               Qanday xarid qilinadi
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 text-sm font-normal">

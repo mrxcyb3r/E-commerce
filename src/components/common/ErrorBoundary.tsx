@@ -43,7 +43,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             </p>
             <button
               onClick={this.handleReload}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-950 hover:opacity-90 transition-opacity"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-foreground text-background dark:bg-card dark:text-card-foreground hover:opacity-90 transition-opacity"
             >
               Qayta yuklash
             </button>

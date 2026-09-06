@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const NewArrivals: React.FC = () => {
+  const { t } = useI18n();
   const { publishedProducts } = useStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -69,9 +71,9 @@ export const NewArrivals: React.FC = () => {
           className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4"
         >
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>New Arrivals</span>
+              <span>{t('pages.home', 'newTitle')}</span>
             </div>
             <h2
               id="new-arrivals-heading"
@@ -92,7 +94,7 @@ export const NewArrivals: React.FC = () => {
             to="/products?sort=newest"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
           >
-            View All New
+            {t('pages.home', 'newViewAll')}
             <motion.div
               whileHover={{ x: 4 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}

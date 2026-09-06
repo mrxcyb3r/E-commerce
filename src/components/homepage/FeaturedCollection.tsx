@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { Reveal, Stagger } from '../motion';
+import { formatPrice } from '../../lib/utils';
 import { fadeUp, staggerContainer, staggerItem } from '../../lib/animations';
 
 export const FeaturedCollection: React.FC = () => {
+  const { t } = useI18n();
   const { publishedProducts } = useStore();
 
   const featuredProducts = publishedProducts
@@ -60,7 +63,7 @@ export const FeaturedCollection: React.FC = () => {
                 </span>
                 {heroProduct.isNew && (
                   <span className="ml-2 inline-block px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] bg-accent text-accent-foreground rounded-full">
-                    New In
+                    {t('common', 'new')}
                   </span>
                 )}
               </div>
@@ -87,7 +90,7 @@ export const FeaturedCollection: React.FC = () => {
                 }}
               >
                 {heroProduct.description ||
-                  'Curated for those who appreciate the details.'}
+                  t('pages.home', 'featuredCurated')}
               </p>
 
               {/* Price + CTA row */}
@@ -99,10 +102,10 @@ export const FeaturedCollection: React.FC = () => {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  {heroProduct.price.toLocaleString()} UZS
+                  {formatPrice(heroProduct.price)}
                 </span>
                 <span className="flex items-center gap-2 text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
-                  Shop Now
+                  {t('product', 'shopNow')}
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </span>
               </div>
@@ -118,7 +121,7 @@ export const FeaturedCollection: React.FC = () => {
             className="font-display font-black uppercase tracking-[0.15em] text-muted-foreground"
             style={{ fontSize: 'clamp(0.75rem, 1.2vw, 1rem)' }}
           >
-            Editor&apos;s Selection
+            {t('pages.home', 'editorBadge')}
           </p>
         </Reveal>
 

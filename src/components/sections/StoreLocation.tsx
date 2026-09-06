@@ -36,7 +36,7 @@ export const StoreLocation: React.FC = () => {
     <section id="location" className="py-8 md:py-12 bg-card transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'sections.locationTitle')}
           </h2>
           <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">

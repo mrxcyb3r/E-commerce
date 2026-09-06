@@ -131,7 +131,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
       icon: copied ? <Check className="w-5 h-5" /> : <Link2 className="w-5 h-5" />,
       className: copied
         ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300'
-        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200',
+        : 'bg-card text-zinc-700 dark:text-zinc-200',
     },
     {
       key: 'telegram',
@@ -263,7 +263,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
             ref={closeBtnRef}
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
+            className="w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
             aria-label={t('common', 'close')}
           >
             <X className="w-4 h-4 text-zinc-500" />
@@ -352,7 +352,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ open, url, title, text, 
                   className={`px-4 py-2 rounded-xl text-[11px] font-extrabold transition-all active:scale-95 flex items-center gap-1.5 ${
                     copiedQr
                       ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300'
-                      : 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
+                      : 'bg-foreground text-background dark:bg-card dark:text-card-foreground'
                   }`}
                 >
                   <AnimatePresence mode="wait">

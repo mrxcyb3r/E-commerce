@@ -159,7 +159,7 @@ export const ProductDetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="pt-32 pb-24 max-w-2xl mx-auto px-4 text-center space-y-6">
-        <h2 className="text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+        <h2 className="text-3xl font-black text-foreground font-display tracking-tight">
           {t('pages', 'productNotFound.heading')}
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -271,13 +271,13 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground font-display tracking-tighter">
               {product.name}
             </h1>
 
             {/* Price Box */}
             <div className="flex items-baseline gap-3 pt-1">
-              <span className="text-3xl sm:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+              <span className="text-3xl sm:text-4xl font-black text-foreground font-display tracking-tight">
                 {formatPrice(product.price)}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
@@ -444,7 +444,7 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* Description & Features */}
           <div className="space-y-3 pt-2">
-            <h3 className="text-sm font-black uppercase tracking-wider text-foreground font-['Outfit',sans-serif]">
+            <h3 className="text-sm font-black uppercase tracking-wider text-foreground font-display">
               {t('product', 'description')}
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
@@ -469,7 +469,7 @@ export const ProductDetailPage: React.FC = () => {
         <div className="mt-24 pt-12 border-t border-border">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-foreground font-display tracking-tight">
                 {t('product', 'similar')}
               </h2>
               <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
@@ -495,7 +495,7 @@ export const ProductDetailPage: React.FC = () => {
       {/* Recently Viewed strip */}
       {viewedProducts.length > 0 && (
         <section className="mt-20 pt-12 border-t border-border">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground font-display tracking-tight mb-6 flex items-center gap-2">
             <History className="w-5 h-5 text-zinc-400 shrink-0" />
             {t('product', 'recentlyViewed')}
           </h2>
@@ -518,7 +518,7 @@ export const ProductDetailPage: React.FC = () => {
           transition={{ duration: 0.4 }}
           className="mt-20 pt-12 border-t border-border"
         >
-          <h2 className="text-xl sm:text-2xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight mb-6 flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-black text-foreground font-display tracking-tight mb-6 flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-zinc-400" />
             {t('product', 'frequentlyBought')}
           </h2>
@@ -576,7 +576,7 @@ export const ProductDetailPage: React.FC = () => {
               )}
               <div className="min-w-0 flex-1">
                 <div className="truncate text-xs font-bold text-zinc-700 dark:text-zinc-300">{product.name}</div>
-                <div className="text-base font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+                <div className="text-base font-black text-foreground font-display tracking-tight">
                   {formatPrice(product.price)}
                 </div>
               </div>

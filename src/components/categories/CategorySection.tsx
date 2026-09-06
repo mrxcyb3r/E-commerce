@@ -24,7 +24,7 @@ export const CategorySection: React.FC = () => {
               <Layers className="w-3.5 h-3.5" />
               <span>Kerakli bo‘limni tanlang</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
               Kerakli bo‘limni tanlang
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">

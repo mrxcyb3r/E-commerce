@@ -77,7 +77,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       <div className="flex items-center justify-between pb-3 border-b border-border">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-foreground" />
-          <span className="font-black text-sm text-foreground font-['Outfit',sans-serif]">{t('pages', 'catalog.filters')}</span>
+          <span className="font-black text-sm text-foreground font-display">{t('pages', 'catalog.filters')}</span>
         </div>
         {hasActiveFilters && (
           <button
@@ -140,7 +140,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               onClick={() => handleSizeChange(s)}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-black border transition-all ${
                 filters.size === s
-                  ? 'bg-zinc-900 text-white border-zinc-900 dark:bg-white dark:text-zinc-950 dark:border-white shadow-xs'
+                  ? 'bg-foreground text-background border-zinc-900 dark:bg-card dark:text-card-foreground dark:border-white shadow-xs'
                   : 'bg-card/80 border-border text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
               }`}
             >
@@ -245,7 +245,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onMobileClose}
-              className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs"
+              className="fixed inset-0 bg-background/60 backdrop-blur-xs"
             />
             <motion.div
               initial={{ y: '100%' }}
@@ -255,7 +255,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               className="fixed inset-x-0 bottom-0 max-h-[85vh] bg-card rounded-t-3xl p-6 shadow-2xl flex flex-col justify-between overflow-hidden"
             >
               <div className="flex items-center justify-between pb-4 border-b border-border">
-                <h3 className="font-black text-lg text-foreground font-['Outfit',sans-serif] tracking-tight">
+                <h3 className="font-black text-lg text-foreground font-display tracking-tight">
                   {t('pages', 'catalog.filters')}
                 </h3>
                 <button

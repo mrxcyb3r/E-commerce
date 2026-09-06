@@ -14,7 +14,7 @@ export const HowItWorks: React.FC = () => {
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             <span>{t('pages', 'sections.howEyebrow')}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'sections.howTitle')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -24,7 +24,7 @@ export const HowItWorks: React.FC = () => {
 
         {/* Shopping Journey Steps */}
         <div className="grid max-w-4xl mx-auto grid-cols-1 gap-4">
-          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
+          <div className="bg-card rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
             <div className="text-4xl font-black text-foreground mb-4">01</div>
             <h3 className="font-black text-foreground mb-2">Ko'ring</h3>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
@@ -32,7 +32,7 @@ export const HowItWorks: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
+          <div className="bg-card rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
             <div className="text-4xl font-black text-foreground mb-4">02</div>
             <h3 className="font-black text-foreground mb-2">Tanlang</h3>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
@@ -40,7 +40,7 @@ export const HowItWorks: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
+          <div className="bg-card rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
             <div className="text-4xl font-black text-foreground mb-4">03</div>
             <h3 className="font-black text-foreground mb-2">Bog'laning</h3>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
@@ -48,7 +48,7 @@ export const HowItWorks: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
+          <div className="bg-card rounded-2xl border border-border/20 p-6 pt-8 pb-10 transition-colors">
             <div className="text-4xl font-black text-foreground mb-4">04</div>
             <h3 className="font-black text-foreground mb-2">Do'konga keling</h3>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">

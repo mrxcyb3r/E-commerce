@@ -34,7 +34,7 @@ export const EditorialCampaign: React.FC = () => {
               <span>{eyebrow}</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
               {heading}
             </h2>
 

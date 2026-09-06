@@ -46,7 +46,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, index }) =
             <span className="text-[11px] font-black text-zinc-300 tracking-wider uppercase">
               {category.productCount} ta mahsulot
             </span>
-            <h3 className="text-xl font-black text-white tracking-tight font-['Outfit',sans-serif]">
+            <h3 className="text-xl font-black text-white tracking-tight font-display">
               {category.name}
             </h3>
             <p className="text-xs text-zinc-300 line-clamp-1 opacity-90 font-medium">

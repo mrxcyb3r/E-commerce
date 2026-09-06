@@ -26,7 +26,7 @@ export const VideoDiscoverySection: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5" />
               <span>Mahsulot videolari</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black font-['Outfit',sans-serif] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-black font-display tracking-tight">
               Mahsulotni videoda ham ko'ring
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base max-w-xl">
@@ -105,7 +105,7 @@ export const VideoDiscoverySection: React.FC = () => {
 
                   {/* Bottom Info Overlay inside card */}
                   <div className="absolute bottom-3 left-3 right-3 space-y-2">
-                    <h3 className="text-sm font-black text-white font-['Outfit',sans-serif] line-clamp-2 drop-shadow-md">
+                    <h3 className="text-sm font-black text-white font-display line-clamp-2 drop-shadow-md">
                       {video.title}
                     </h3>
 

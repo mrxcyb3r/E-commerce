@@ -27,7 +27,7 @@ export const NewAppArrivals: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>{eyebrow}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground font-display tracking-tighter">
               {heading}
             </h2>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg font-normal">

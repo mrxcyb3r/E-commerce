@@ -33,13 +33,13 @@ export const TrustBadges: React.FC = () => {
           {BENEFITS.map((item) => (
             <div
               key={item.title}
-              className="flex items-center gap-3 rounded-2xl border border-border bg-zinc-50/50 dark:bg-zinc-900 px-4 py-3.5"
+              className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5"
             >
               <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center text-foreground shrink-0">
                 {item.icon}
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-black text-foreground font-['Outfit',sans-serif] leading-tight">
+                <div className="text-sm font-black text-foreground font-display leading-tight">
                   {item.title}
                 </div>
                 <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium leading-tight">

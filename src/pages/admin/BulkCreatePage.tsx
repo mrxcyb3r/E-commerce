@@ -25,6 +25,7 @@ import {
   uploadMediaWithProgress,
   validateMediaFile,
 } from '../../lib/supabase/storage';
+import { formatPrice } from '../../lib/utils';
 
 type Step = 'select' | 'settings' | 'review' | 'running' | 'done';
 
@@ -104,9 +105,6 @@ function errorMessage(err: unknown): string {
   if (/network/i.test(msg) || /fetch/i.test(msg)) return 'Tarmoq xatosi — qayta urinib ko\'ring';
   return msg;
 }
-
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat('uz-UZ').format(value).replace(/\u00A0/g, ' ');
 
 export function BulkCreatePage() {
   const { categories, products, insertBulkProduct, cleanupBulkProduct } = useStore();
@@ -887,7 +885,7 @@ export function BulkCreatePage() {
               {items.length} ta mahsulot yaratishga tayyor
             </h3>
             <span className="text-xs font-extrabold text-amber-600">
-              Umumiy: {formatPrice(items.reduce((sum, it) => sum + (Number(it.price) || 0), 0))} so'm
+              Umumiy: {formatPrice(items.reduce((sum, it) => sum + (Number(it.price) || 0), 0))}
             </span>
           </div>
 
@@ -923,7 +921,7 @@ export function BulkCreatePage() {
                     </p>
                   </div>
                   <span className="text-xs font-black text-foreground whitespace-nowrap">
-                    {formatPrice(Number(it.price) || 0)} so'm
+                    {formatPrice(Number(it.price) || 0)}
                   </span>
                 </div>
               );

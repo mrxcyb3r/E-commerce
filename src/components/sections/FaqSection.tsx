@@ -20,7 +20,7 @@ export const FaqSection: React.FC = () => {
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Savol-javoblar</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
             {homepageCms.faqSectionTitle || "Umumiy savollar"}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-lg mx-auto font-normal">
@@ -43,7 +43,7 @@ export const FaqSection: React.FC = () => {
                   aria-expanded={isOpen}
                   className="w-full px-6 py-5 flex items-center justify-between gap-4 text-left transition-colors hover:bg-zinc-100/60 dark:hover:bg-zinc-800/80 focus:outline-none"
                 >
-                  <span className="text-sm sm:text-base font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+                  <span className="text-sm sm:text-base font-black text-foreground font-display tracking-tight">
                     {item.question}
                   </span>
                   <div

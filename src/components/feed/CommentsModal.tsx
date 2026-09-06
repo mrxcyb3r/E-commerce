@@ -576,7 +576,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   exit={{ opacity: 0, height: 0 }}
                   className="px-4 overflow-hidden"
                 >
-                  <div className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-900 rounded-xl px-3 py-2 mb-2 border border-zinc-100 dark:border-border">
+                  <div className="flex items-center justify-between bg-card rounded-xl px-3 py-2 mb-2 border border-zinc-100 dark:border-border">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Reply className="w-3 h-3 text-zinc-400 shrink-0" />
                       <span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
@@ -615,7 +615,7 @@ export const CommentsModal: React.FC<CommentsModalProps> = ({ feedId, isOpen, on
                   type="button"
                   onClick={handleSubmit}
                   disabled={!inputText.trim() || submitting}
-                  className="w-10 h-10 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shrink-0"
+                  className="w-10 h-10 rounded-full bg-foreground text-background dark:bg-card dark:text-card-foreground flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shrink-0"
                   aria-label={t('comments', 'send')}
                 >
                   {submitting ? (

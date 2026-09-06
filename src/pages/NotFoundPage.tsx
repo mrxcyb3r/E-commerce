@@ -15,7 +15,7 @@ export const NotFoundPage: React.FC = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-16">
       <div className="max-w-md w-full text-center space-y-6">
         <div className="relative inline-flex justify-center">
-          <span className="text-[120px] font-black leading-none tracking-tighter text-zinc-200 dark:text-zinc-800 font-['Outfit',sans-serif] select-none">
+          <span className="text-[120px] font-black leading-none tracking-tighter text-zinc-200 dark:text-zinc-800 font-display select-none">
             404
           </span>
           <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
@@ -24,7 +24,7 @@ export const NotFoundPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-black text-foreground font-['Outfit',sans-serif]">
+          <h1 className="text-2xl font-black text-foreground font-display">
             {t('pages', 'notFound.heading')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">

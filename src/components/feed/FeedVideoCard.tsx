@@ -499,7 +499,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
         {/* Bottom Left: Title, Description & Compact Product CTA */}
         <div className="absolute bottom-3 left-3 right-24 sm:bottom-4 sm:left-4 sm:right-28 z-20 space-y-2.5 pointer-events-auto">
           <div className="space-y-0.5 text-left px-1">
-            <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md font-['Outfit',sans-serif] leading-snug line-clamp-2">
+            <h3 className="text-base sm:text-lg font-black text-white drop-shadow-md font-display leading-snug line-clamp-2">
               {video.title}
             </h3>
             {video.description && (
@@ -524,7 +524,7 @@ export const FeedVideoCard: React.FC<FeedVideoCardProps> = ({
                   />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[11px] sm:text-xs font-black text-white truncate font-['Outfit',sans-serif]">
+                  <div className="text-[11px] sm:text-xs font-black text-white truncate font-display">
                     {product.name}
                   </div>
                   <div className="flex items-baseline gap-2 mt-0.5">

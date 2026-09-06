@@ -45,7 +45,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs"
+          className="fixed inset-0 bg-background/60 backdrop-blur-xs"
         />
 
         {/* Modal Window */}
@@ -71,7 +71,7 @@ export const StoreVisitModal: React.FC<StoreVisitModalProps> = ({
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Do'konda mavjud</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-foreground font-['Outfit',sans-serif] tracking-tight">
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground font-display tracking-tight">
               Do'konda ko'rish & Band qilish
             </h3>
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-normal">

@@ -198,7 +198,7 @@ export const Navbar: React.FC = () => {
         <div
           className={`pointer-events-auto mx-auto max-w-full px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
             isScrolled
-              ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-border/60 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2.5'
+              ? 'bg-card/80 backdrop-blur-xl border-b border-border/60 shadow-sm shadow-zinc-950/5 dark:shadow-black/40 py-2.5'
               : 'bg-transparent py-4'
           }`}
         >
@@ -224,7 +224,7 @@ export const Navbar: React.FC = () => {
                   className="w-9 h-9 rounded-xl object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
+                <div className="w-9 h-9 rounded-xl bg-foreground text-background dark:bg-card dark:text-card-foreground flex items-center justify-center font-black text-lg shadow-xs transition-transform duration-300 group-hover:scale-105">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
               )}
@@ -276,7 +276,7 @@ export const Navbar: React.FC = () => {
                 id="navbar-search-btn"
                 type="button"
                 onClick={() => setSearchModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 rounded-xl border border-border/80 transition-all shadow-sm backdrop-blur-sm"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 bg-card/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 rounded-xl border border-border/80 transition-all shadow-sm backdrop-blur-sm"
                 aria-label={t('nav', 'searchProducts')}
               >
                 <Search className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
@@ -286,7 +286,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/favorites"
                 id="navbar-favorites-btn"
-                className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-white/80 dark:bg-zinc-800/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-all shadow-sm backdrop-blur-sm"
+                className="relative inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-card/80 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 text-zinc-700 dark:text-zinc-200 transition-all shadow-sm backdrop-blur-sm"
                 aria-label={t('nav', 'favoritesList')}
                 title={t('nav', 'favoritesList')}
               >
@@ -307,7 +307,7 @@ export const Navbar: React.FC = () => {
                   rel="noopener noreferrer"
                   id="navbar-telegram-cta"
                   onClick={() => track('telegram_click')}
-                  className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-black tracking-wide text-white bg-zinc-900 dark:bg-white dark:text-zinc-950 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm hover:shadow-md"
+                  className="hidden lg:inline-flex items-center gap-2 px-4 py-2 text-sm font-black tracking-wide bg-foreground text-background dark:bg-card dark:text-card-foreground rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-sm hover:shadow-md"
                 >
                   <Send className="w-4 h-4" />
                   <span>{t('common', 'telegram')}</span>
@@ -318,7 +318,7 @@ export const Navbar: React.FC = () => {
                 id="mobile-menu-toggle-btn"
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-white/80 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 focus:outline-none shadow-sm backdrop-blur-sm"
+                className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/80 bg-card/80 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-700/80 focus:outline-none shadow-sm backdrop-blur-sm"
                 aria-label={mobileMenuOpen ? t('nav', 'closeMenu') : t('nav', 'openMenu')}
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -336,7 +336,7 @@ export const Navbar: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm"
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm"
             />
 
             <motion.div
@@ -353,7 +353,7 @@ export const Navbar: React.FC = () => {
                     setMobileMenuOpen(false);
                     setSearchModalOpen(true);
                   }}
-                  className="w-full flex items-center justify-between px-4 py-4 rounded-2xl bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-base font-medium border border-border"
+                  className="w-full flex items-center justify-between px-4 py-4 rounded-2xl bg-card text-zinc-700 dark:text-zinc-300 text-base font-medium border border-border"
                 >
                   <span className="flex items-center gap-3">
                     <Search className="w-5 h-5 text-zinc-500" />
@@ -399,7 +399,7 @@ export const Navbar: React.FC = () => {
                   <Link
                     to="/favorites"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 text-sm font-medium text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
+                    className="flex items-center justify-between px-4 py-3.5 rounded-2xl bg-card text-sm font-medium text-zinc-800 dark:text-zinc-200 border border-zinc-100 dark:border-zinc-700/50"
                   >
                     <span className="flex items-center gap-3">
                       <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />

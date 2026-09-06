@@ -51,7 +51,7 @@ export const ReviewsSection: React.FC = () => {
             <MessageSquareQuote className="w-3.5 h-3.5" />
             <span>Mijozlarimiz fikrlari</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
             {homepageCms.testimonialsSectionTitle || 'Xaridorlar nima deydi?'}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -107,7 +107,7 @@ export const ReviewsSection: React.FC = () => {
                     />
                   )}
                   <div className="text-left">
-                    <div className="text-sm font-black text-foreground font-['Outfit',sans-serif]">
+                    <div className="text-sm font-black text-foreground font-display">
                       {review.name}
                     </div>
                     <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
@@ -158,7 +158,7 @@ export const ReviewsSection: React.FC = () => {
                 onClick={() => goTo(i, i > index ? 1 : -1)}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   i === index
-                    ? 'w-8 bg-zinc-900 dark:bg-white'
+                    ? 'w-8 bg-foreground dark:bg-card'
                     : 'w-2 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-600'
                 }`}
               />

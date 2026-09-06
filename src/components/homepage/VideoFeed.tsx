@@ -16,10 +16,13 @@ import {
 import { FeedVideoCard } from '../feed/FeedVideoCard';
 import { useStore } from '../../context/StoreContext';
 import { useVideoFeed } from '../../context/VideoContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Reveal } from '../motion';
+import { formatPrice } from '../../lib/utils';
 
 export const VideoFeed: React.FC = () => {
+  const { t } = useI18n();
   const { publishedVideos, videos } = useVideoFeed();
   const { publishedProducts } = useStore();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -238,7 +241,7 @@ export const VideoFeed: React.FC = () => {
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-5 space-y-4">
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
-                      {currentProduct.categoryName || 'Featured'}
+                      {currentProduct.categoryName || t('pages.home', 'editorBadge')}
                     </span>
                     {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
                       <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-rose-500 text-white rounded-full">
@@ -253,11 +256,11 @@ export const VideoFeed: React.FC = () => {
 
                   <div className="flex items-baseline gap-3">
                     <span className="font-display font-black text-white text-2xl">
-                      {currentProduct.price.toLocaleString()} UZS
+                      {formatPrice(currentProduct.price)}
                     </span>
                     {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
                       <span className="font-display font-medium text-zinc-500 line-through text-lg">
-                        {currentProduct.originalPrice.toLocaleString()} UZS
+                        {formatPrice(currentProduct.originalPrice)}
                       </span>
                     )}
                   </div>
@@ -271,13 +274,13 @@ export const VideoFeed: React.FC = () => {
                   <div className="flex flex-col gap-2.5 pt-2">
                     <button className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-accent text-accent-foreground font-black text-sm tracking-wide hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all">
                       <ShoppingBag className="w-4 h-4" />
-                      Shop Now
+                      {t('product', 'shopNow')}
                     </button>
                     <Link
                       to={`/products/${currentProduct.id}`}
                       className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white/5 border border-white/10 text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all"
                     >
-                      View Details
+                      {t('product', 'viewDetails')}
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -287,15 +290,15 @@ export const VideoFeed: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <Heart className="w-4 h-4" />
-                    Save
+                    {t('pages.home', 'feedSave')}
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <Share2 className="w-4 h-4" />
-                    Share
+                    {t('pages.home', 'feedShare')}
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <MessageSquare className="w-4 h-4" />
-                    Comment
+                    {t('pages.home', 'feedComment')}
                   </button>
                 </div>
 
@@ -304,7 +307,7 @@ export const VideoFeed: React.FC = () => {
                   to="/feed"
                   className="flex items-center justify-center gap-3 px-6 py-3.5 rounded-full bg-white/5 border border-white/10 text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all group"
                 >
-                  Explore Full Video Feed
+                  {t('pages.home', 'feedExplore')}
                   <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </motion.div>
@@ -399,29 +402,29 @@ export const VideoFeed: React.FC = () => {
 
                       <div className="flex items-baseline gap-3 mb-6">
                         <span className="font-display font-black text-white text-2xl lg:text-3xl">
-                          {showOverlay.product.price.toLocaleString()} UZS
+                          {formatPrice(showOverlay.product.price)}
                         </span>
                         {showOverlay.product.originalPrice && showOverlay.product.originalPrice > showOverlay.product.price && (
                           <span className="font-display font-medium text-zinc-500 line-through text-xl">
-                            {showOverlay.product.originalPrice.toLocaleString()} UZS
+                            {formatPrice(showOverlay.product.originalPrice)}
                           </span>
                         )}
                       </div>
 
                       <p className="text-zinc-400 mb-8 leading-relaxed max-w-md">
-                        {showOverlay.product.description || 'Premium quality product from our latest collection.'}
+                        {showOverlay.product.description || t('pages.home', 'feedPremiumQuality')}
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-3 mb-6">
                         <button className="flex-1 px-6 py-4 rounded-full bg-accent text-accent-foreground font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all">
                           <ShoppingBag className="w-5 h-5 inline-block mr-2" />
-                          Add to Cart
+                          {t('pages.home', 'feedAddToCart')}
                         </button>
                         <Link
                           to={`/products/${showOverlay.product.id}`}
                           className="flex-1 px-6 py-4 rounded-full glass-strong text-white font-semibold text-sm tracking-wide text-center hover:bg-white/10 transition-all border border-white/10"
                         >
-                          View Details
+                          {t('product', 'viewDetails')}
                         </Link>
                       </div>
 

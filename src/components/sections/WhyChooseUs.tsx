@@ -21,7 +21,7 @@ export const WhyChooseUs: React.FC = () => {
             <Clock className="w-3.5 h-3.5" />
             <span>{t('pages', 'sections.whyEyebrow')}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-['Outfit',sans-serif] tracking-tighter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'sections.whyTitle')}
           </h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 font-normal">
@@ -40,7 +40,7 @@ export const WhyChooseUs: React.FC = () => {
                 <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center border border-border">
                   <Icon className="w-6 h-6 text-foreground" />
                 </div>
-                <h3 className="text-lg font-black text-foreground font-['Outfit',sans-serif]">
+                <h3 className="text-lg font-black text-foreground font-display">
                   {t('pages', f.titleKey)}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-normal">

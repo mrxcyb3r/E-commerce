@@ -141,7 +141,7 @@ export const FeedPage: React.FC = () => {
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black font-['Outfit',sans-serif] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black font-display tracking-tight">
                 {t('feed', 'title')}
               </h1>
               <p className="text-xs text-zinc-400">
@@ -239,7 +239,7 @@ export const FeedPage: React.FC = () => {
               <Layers className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-black font-['Outfit',sans-serif]">
+              <h2 className="text-xl font-black font-display">
                 {t('feed', 'emptyTitle')}
               </h2>
               <p className="text-xs text-zinc-400">
@@ -339,7 +339,7 @@ export const FeedPage: React.FC = () => {
                     <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">
                       {activeProduct.categoryName}
                     </span>
-                    <h4 className="text-lg font-black text-white font-['Outfit',sans-serif] leading-tight">
+                    <h4 className="text-lg font-black text-white font-display leading-tight">
                       {activeProduct.name}
                     </h4>
                     <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed">
@@ -376,7 +376,7 @@ export const FeedPage: React.FC = () => {
                     <Sparkles className="w-8 h-8" />
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-lg font-black text-white font-['Outfit',sans-serif]">
+                    <h4 className="text-lg font-black text-white font-display">
                       {t('feed', 'collectionsAndStyles')}
                     </h4>
                     <p className="text-xs text-zinc-400 leading-relaxed max-w-xs mx-auto">

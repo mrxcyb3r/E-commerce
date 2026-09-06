@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, TrendingUp } from 'lucide-react';
 import { ProductCard } from '../products/ProductCard';
 import { useStore } from '../../context/StoreContext';
+import { useI18n } from '../../i18n/I18nContext';
 import { Reveal, Stagger } from '../motion';
 import { staggerContainer, staggerItem } from '../../lib/animations';
 
 export const TrendingNow: React.FC = () => {
+  const { t } = useI18n();
   const { publishedProducts } = useStore();
 
   const trendingProducts = publishedProducts
-    .filter((p) => p.isFeatured || p.isNew)
+    .filter((p) => p.isFeatured && !p.isNew)
     .slice(0, 7);
 
   if (trendingProducts.length === 0) return null;
@@ -29,9 +31,9 @@ export const TrendingNow: React.FC = () => {
         <Reveal className="mb-12">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
                 <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
-                <span>Trending Now</span>
+                <span>{t('pages.home', 'trendingTitle')}</span>
               </div>
               <h2
                 id="trending-heading"
@@ -52,7 +54,7 @@ export const TrendingNow: React.FC = () => {
               to="/products?sort=trending"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
             >
-              View All
+              {t('pages.home', 'trendingViewAll')}
               <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
