@@ -241,7 +241,7 @@ export const VideoFeed: React.FC = () => {
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-5 space-y-4">
                   <div className="flex items-center gap-2">
                     <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-accent text-accent-foreground rounded-full">
-                      {currentProduct.categoryName || t('pages.home', 'editorBadge')}
+                      {currentProduct.categoryName || t('pages', 'home.editorBadge')}
                     </span>
                     {currentProduct.originalPrice && currentProduct.originalPrice > currentProduct.price && (
                       <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-rose-500 text-white rounded-full">
@@ -290,15 +290,15 @@ export const VideoFeed: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <Heart className="w-4 h-4" />
-                    {t('pages.home', 'feedSave')}
+                    {t('pages', 'home.feedSave')}
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <Share2 className="w-4 h-4" />
-                    {t('pages.home', 'feedShare')}
+                    {t('pages', 'home.feedShare')}
                   </button>
                   <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-zinc-300 text-sm font-medium hover:bg-white/10 hover:text-white transition-all">
                     <MessageSquare className="w-4 h-4" />
-                    {t('pages.home', 'feedComment')}
+                    {t('pages', 'home.feedComment')}
                   </button>
                 </div>
 
@@ -307,7 +307,7 @@ export const VideoFeed: React.FC = () => {
                   to="/feed"
                   className="flex items-center justify-center gap-3 px-6 py-3.5 rounded-full bg-white/5 border border-white/10 text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-all group"
                 >
-                  {t('pages.home', 'feedExplore')}
+                  {t('pages', 'home.feedExplore')}
                   <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </motion.div>
@@ -412,13 +412,13 @@ export const VideoFeed: React.FC = () => {
                       </div>
 
                       <p className="text-zinc-400 mb-8 leading-relaxed max-w-md">
-                        {showOverlay.product.description || t('pages.home', 'feedPremiumQuality')}
+                        {showOverlay.product.description || t('pages', 'home.feedPremiumQuality')}
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-3 mb-6">
                         <button className="flex-1 px-6 py-4 rounded-full bg-accent text-accent-foreground font-black text-sm tracking-wider hover:bg-amber-400 shadow-lg shadow-amber-500/30 transition-all">
                           <ShoppingBag className="w-5 h-5 inline-block mr-2" />
-                          {t('pages.home', 'feedAddToCart')}
+                          {t('pages', 'home.feedAddToCart')}
                         </button>
                         <Link
                           to={`/products/${showOverlay.product.id}`}

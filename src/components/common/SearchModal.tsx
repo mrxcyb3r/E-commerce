@@ -227,7 +227,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       <>
                         <div className="flex items-center gap-2 px-2 py-3">
                           <TrendingUp className="w-4 h-4 text-amber-500" />
-                          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('pages.home', 'searchTrending')}</span>
+                          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{t('pages', 'home.searchTrending')}</span>
                         </div>
                         <div className="flex flex-wrap gap-2 px-2 pb-4">
                           {trendingSearches.map((search) => (
@@ -345,7 +345,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                 onClick={handleViewAllResults}
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-black text-foreground hover:underline transition-colors"
               >
-                {t('pages.home', 'viewAllResults')}
+                {t('pages', 'home.viewAllResults')}
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>

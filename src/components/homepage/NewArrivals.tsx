@@ -73,7 +73,7 @@ export const NewArrivals: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>{t('pages.home', 'newTitle')}</span>
+              <span>{t('pages', 'home.newTitle')}</span>
             </div>
             <h2
               id="new-arrivals-heading"
@@ -94,7 +94,7 @@ export const NewArrivals: React.FC = () => {
             to="/products?sort=newest"
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
           >
-            {t('pages.home', 'newViewAll')}
+            {t('pages', 'home.newViewAll')}
             <motion.div
               whileHover={{ x: 4 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}

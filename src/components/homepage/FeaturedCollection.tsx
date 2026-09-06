@@ -90,7 +90,7 @@ export const FeaturedCollection: React.FC = () => {
                 }}
               >
                 {heroProduct.description ||
-                  t('pages.home', 'featuredCurated')}
+                  t('pages', 'home.featuredCurated')}
               </p>
 
               {/* Price + CTA row */}
@@ -121,7 +121,7 @@ export const FeaturedCollection: React.FC = () => {
             className="font-display font-black uppercase tracking-[0.15em] text-muted-foreground"
             style={{ fontSize: 'clamp(0.75rem, 1.2vw, 1rem)' }}
           >
-            {t('pages.home', 'editorBadge')}
+            {t('pages', 'home.editorBadge')}
           </p>
         </Reveal>
 

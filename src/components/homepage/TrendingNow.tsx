@@ -33,7 +33,7 @@ export const TrendingNow: React.FC = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
                 <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
-                <span>{t('pages.home', 'trendingTitle')}</span>
+                <span>{t('pages', 'home.trendingTitle')}</span>
               </div>
               <h2
                 id="trending-heading"
@@ -54,7 +54,7 @@ export const TrendingNow: React.FC = () => {
               to="/products?sort=trending"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full glass-strong font-semibold text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-border transition-all group self-end"
             >
-              {t('pages.home', 'trendingViewAll')}
+              {t('pages', 'home.trendingViewAll')}
               <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
