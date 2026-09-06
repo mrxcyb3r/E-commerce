@@ -97,7 +97,7 @@ export const VideoFeed: React.FC = () => {
   return (
     <section
       id="video-feed"
-      className="relative overflow-hidden min-h-screen"
+      className="relative overflow-hidden py-16 lg:py-24"
       style={{
         background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 40%, #16213e 70%, #0a0a0a 100%)',
       }}

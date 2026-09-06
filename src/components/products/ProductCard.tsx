@@ -27,7 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0;
 
-  const aspectRatio = variant === 'editorial' ? 'aspect-[16/10]' : variant === 'compact' ? 'aspect-square' : 'aspect-[3/4]';
+  const aspectRatio = variant === 'editorial' ? 'aspect-[16/10]' : variant === 'compact' ? 'aspect-square' : 'aspect-[4/5]';
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();

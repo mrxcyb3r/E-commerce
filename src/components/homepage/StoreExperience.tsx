@@ -26,7 +26,7 @@ export const StoreExperience: React.FC = () => {
   return (
     <section
       id="store-experience"
-      className="section-padding bg-background dark:bg-background relative overflow-hidden"
+      className="py-16 lg:py-24 bg-background dark:bg-background relative overflow-hidden"
       aria-labelledby="store-heading"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_0%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_80%_0%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />

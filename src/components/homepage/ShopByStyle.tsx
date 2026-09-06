@@ -15,23 +15,19 @@ export const ShopByStyle: React.FC = () => {
   return (
     <section
       id="shop-by-style"
-      className="section-padding bg-background dark:bg-background relative overflow-hidden"
+      className="py-16 lg:py-24 bg-background dark:bg-background relative overflow-hidden"
       aria-labelledby="shop-by-style-heading"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/3_0%,_transparent_60%)] dark:bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,_amber-500/2_0%,_transparent_60%)]" aria-hidden="true" />
 
       <div className="relative z-10 max-w-full mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
-        <Reveal className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-card border border-border text-[11px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>{t('pages', 'home.styleTitle')}</span>
-          </div>
+        <Reveal className="mb-10 text-center">
           <h2
             id="shop-by-style-heading"
-            className="font-display font-black tracking-tightest text-foreground max-w-2xl mx-auto"
+            className="font-display font-black tracking-tight text-foreground max-w-2xl mx-auto"
             style={{
-              fontSize: 'clamp(2.25rem, 5vw, 4rem)',
-              lineHeight: '1.02',
+              fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+              lineHeight: '1.1',
               letterSpacing: '-0.03em',
             }}
           >
@@ -48,7 +44,7 @@ export const ShopByStyle: React.FC = () => {
             <article key={category.id} className="group relative">
               <Link
                 to={`/products?category=${category.slug}`}
-                className="block relative aspect-[3/4] overflow-hidden rounded-2xl"
+                className="block relative aspect-[4/5] overflow-hidden rounded-2xl"
                 aria-label={`${category.name} kolleksiyasini ko'rish`}
               >
                 <div className="absolute inset-0 bg-muted">
