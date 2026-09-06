@@ -43,9 +43,10 @@ export const Navbar: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [navVisible, setNavVisible] = useState(true);
-  const tickingRef = useRef(false);
+const [lastScrollY, setLastScrollY] = useState(0);
+   const [navVisible, setNavVisible] = useState(true);
+   const tickingRef = useRef(false);
+   const navbarRef = useRef<HTMLElement>(null);
 
   const { totalFavorites } = useFavorites();
   const location = useLocation();
@@ -166,14 +167,17 @@ useEffect(() => {
 
     if (isHomePage) {
       e.preventDefault();
-      const el = document.getElementById(item.sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        setActiveSection(item.id);
-      } else if (item.id === 'hero') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setActiveSection('hero');
-      }
+const el = document.getElementById(item.sectionId);
+       if (el) {
+         const navbarHeight = navbarRef.current?.offsetHeight || 0;
+         const rect = el.getBoundingClientRect();
+         const top = rect.top + window.pageYOffset - navbarHeight;
+         window.scrollTo({
+           top: top,
+           behavior: 'smooth'
+         });
+         setActiveSection(item.id);
+       }
     } else {
       if (item.id === 'hero') {
         e.preventDefault();
