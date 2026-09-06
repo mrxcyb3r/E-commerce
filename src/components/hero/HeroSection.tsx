@@ -108,7 +108,7 @@ export const HeroSection: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -40 * dir }}
               transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="flex flex-col items-center text-center"
+              className="flex flex-col items-center text-center justify-center"
             >
               {slide.badge && (
                 <motion.div
