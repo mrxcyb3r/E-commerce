@@ -51,13 +51,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setRole(null);
   }, []);
 
+  const fetchProfileRole = useCallback(async (userId: string) => {
+    const { data: profileData } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
+    return profileData?.role || 'viewer';
+  }, []);
+
   useEffect(() => {
     if (!adminEmail) return;
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user?.email === adminEmail) {
-        // Fetch profile role from profiles table
-        supabase.from('profiles').select('role').eq('id', adminEmail).maybeSingle().then(({ data: profileData }) => {
-          const profileRole = profileData?.role || 'viewer';
+        // Fetch profile role from profiles table using user ID (UUID)
+        const userId = data.session.user.id;
+        fetchProfileRole(userId).then((profileRole) => {
           setRole(profileRole);
           setUser(toAdminUser(adminEmail, adminName, profileRole));
         });
@@ -67,49 +72,54 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       setSessionChecked(true);
     });
-  }, [adminEmail]);
+  }, [adminEmail, fetchProfileRole]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!adminEmail) return;
-      supabase.from('profiles').select('role').eq('id', adminEmail).maybeSingle().then(({ data: profileData }) => {
-        const profileRole = profileData?.role || 'viewer';
-        setRole(profileRole);
-        setUser(toAdminUser(adminEmail, adminName, profileRole));
-      });
+      if (session?.user?.email === adminEmail) {
+        const userId = session.user.id;
+        fetchProfileRole(userId).then((profileRole) => {
+          setRole(profileRole);
+          setUser(toAdminUser(adminEmail, adminName, profileRole));
+        });
+      } else {
+        setUser(null);
+        setRole(null);
+      }
       setSessionChecked(true);
     });
 
     return () => {
       // subscription cleanup handled by supabase
     };
-  }, [adminEmail]);
+  }, [adminEmail, fetchProfileRole]);
 
   const login = useCallback(
     async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
       const cleanUser = username.trim();
       const target = cleanUser.includes('@') ? cleanUser : adminEmail;
 
-      const { error } = await supabase.auth.signInWithPassword({ email: target, password: password.trim() });
+      const { data, error } = await supabase.auth.signInWithPassword({ email: target, password: password.trim() });
       if (error) {
         return { success: false, error: "Login yoki parol noto'g'ri." };
       }
-      // Fetch profile role after successful login
-      supabase.from('profiles').select('role').eq('id', target).maybeSingle().then(({ data: profileData }) => {
-        const profileRole = profileData?.role || 'viewer';
+      // Fetch profile role after successful login using user ID
+      if (data.user) {
+        const profileRole = await fetchProfileRole(data.user.id);
         setRole(profileRole);
         setUser(toAdminUser(target, adminName, profileRole));
-      });
+      }
       return { success: true };
     },
-    [adminEmail],
+    [adminEmail, adminName, fetchProfileRole],
   );
 
   const logout = useCallback(() => {
     supabase.auth.signOut();
     setUser(null);
     setRole(null);
-  }, [adminEmail]);
+  }, []);
 
   const updateCredentials = useCallback((_newUsername: string, _newPassword: string) => {
     // Supabase Auth uses email managed in the dashboard; username is no longer stored locally.
