@@ -34,6 +34,7 @@ import { useVideoFeed } from '../../context/VideoContext';
 import { useBrand } from '../../hooks/useBrand';
 import { supabase } from '../../lib/supabase/client';
 import { formatPrice } from '../../lib/utils';
+import { relativeTime } from '../../lib/admin/relativeTime';
 
 interface TodayStats {
   orders: number;
@@ -53,12 +54,12 @@ interface HealthCheck {
 }
 
 const QUICK_ACTIONS = [
-  { label: "Mahsulot qo'shish", desc: 'Katalogga yangi mahsulot', path: '/admin/products/new', icon: Package, accent: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
-  { label: 'Video yuklash', desc: 'Feed / lentaga video', path: '/admin/feed', icon: Film, accent: 'bg-violet-500/10 text-violet-600 dark:text-violet-400' },
-  { label: 'Bosh sahifa', desc: 'Banner va bloklarni tahrirlash', path: '/admin/homepage', icon: Send, accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
-  { label: 'Kategoriyalar', desc: 'Bo‘limlar va tartib', path: '/admin/categories', icon: FolderTree, accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-  { label: 'Buyurtmalar', desc: 'Yangi buyurtmalarni ko‘rish', path: '/admin/orders', icon: ShoppingCart, accent: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
-  { label: 'Analitika', desc: 'Tashrif, sotuv, feed', path: '/admin/analytics', icon: BarChart3, accent: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
+  { label: "Mahsulot qo'shish", desc: 'Katalogga yangi mahsulot', path: '/admin/products/new', icon: Package, kbd: 'G P', accent: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
+  { label: 'Video yuklash', desc: 'Feed / lentaga video', path: '/admin/feed', icon: Film, kbd: 'G F', accent: 'bg-violet-500/10 text-violet-600 dark:text-violet-400' },
+  { label: 'Bosh sahifa', desc: 'Banner va bloklarni tahrirlash', path: '/admin/homepage', icon: Send, kbd: 'G H', accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
+  { label: 'Kategoriyalar', desc: 'Bo‘limlar va tartib', path: '/admin/categories', icon: FolderTree, kbd: 'G C', accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
+  { label: 'Buyurtmalar', desc: 'Yangi buyurtmalarni ko‘rish', path: '/admin/orders', icon: ShoppingCart, kbd: 'G O', accent: 'bg-rose-500/10 text-rose-600 dark:text-rose-400' },
+  { label: 'Analitika', desc: 'Tashrif, sotuv, feed', path: '/admin/analytics', icon: BarChart3, kbd: 'G A', accent: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400' },
 ];
 
 export const DashboardPage: React.FC = () => {
@@ -267,13 +268,19 @@ export const DashboardPage: React.FC = () => {
               </div>
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {healthChecks.map((h) => (
-                  <div key={h.key} className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-muted/50 border border-border/50">
-                    {h.ok ? <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" /> : <XCircle className="w-4 h-4 text-muted-foreground shrink-0" />}
-                    <div className="min-w-0">
+                  <Link
+                    key={h.key}
+                    to={h.href}
+                    aria-label={`${h.label}: ${h.ok ? 'bajarilgan' : h.suggestion}`}
+                    className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-muted/50 border border-border/50 hover:border-primary/30 hover:bg-muted/70 transition-all group"
+                  >
+                    {h.ok ? <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" /> : <XCircle className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-amber-500 transition-colors" />}
+                    <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold truncate">{h.label}</p>
-                      {!h.ok && <Link to={h.href} className="text-[10px] text-primary hover:underline truncate block">{h.suggestion}</Link>}
+                      {!h.ok && <span className="text-[10px] text-primary truncate block">{h.suggestion} →</span>}
+                      {h.ok && <span className="text-[10px] text-muted-foreground truncate block">Tayyor ✓</span>}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
               {healthSuggestions.length > 0 && (
@@ -304,11 +311,14 @@ export const DashboardPage: React.FC = () => {
                   {notifications.map((n, i) => {
                     const Icon = n.icon;
                     return (
-                      <Link key={i} to={n.href} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-muted/40 border border-border/50 hover:border-primary/30 hover:bg-muted/70 transition-all">
+                      <Link key={i} to={n.href} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-muted/40 border border-border/50 hover:border-primary/30 hover:bg-muted/70 transition-all group">
                         <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${n.tone}`}><Icon className="w-3.5 h-3.5" /></span>
-                        <span className="min-w-0">
+                        <span className="min-w-0 flex-1">
                           <span className="block text-xs font-bold truncate">{n.title}</span>
                           <span className="block text-[11px] text-muted-foreground truncate">{n.desc}</span>
+                          <span className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-bold text-primary">
+                            Ko‘rish <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
                         </span>
                       </Link>
                     );
@@ -354,7 +364,7 @@ export const DashboardPage: React.FC = () => {
                         <span className="relative z-10 w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center shrink-0"><Icon className="w-3.5 h-3.5 text-muted-foreground" /></span>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-semibold leading-snug line-clamp-2">{a.title}</p>
-                          <p className="text-[10px] text-muted-foreground">{a.meta} · {new Date(a.time).toLocaleString('uz-UZ')}</p>
+                          <p className="text-[10px] text-muted-foreground">{a.meta} · <span title={new Date(a.time).toLocaleString('uz-UZ')}>{relativeTime(a.time)}</span></p>
                         </div>
                       </li>
                     );
@@ -372,10 +382,13 @@ export const DashboardPage: React.FC = () => {
                 {QUICK_ACTIONS.map((a) => {
                   const Icon = a.icon;
                   return (
-                    <Link key={a.path + a.label} to={a.path} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40 border border-border/60 hover:border-primary/30 hover:bg-muted/70 hover:shadow-sm transition-all group">
+                    <Link key={a.path + a.label} to={a.path} className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40 border border-border/60 hover:border-primary/30 hover:bg-muted/70 hover:shadow-sm hover:-translate-y-px active:translate-y-0 transition-all group">
                       <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${a.accent}`}><Icon className="w-5 h-5" /></span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-xs font-bold">{a.label}</span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="block text-xs font-bold truncate">{a.label}</span>
+                          <kbd className="admin-kbd hidden xl:inline-flex shrink-0">{a.kbd}</kbd>
+                        </span>
                         <span className="block text-[11px] text-muted-foreground truncate">{a.desc}</span>
                       </span>
                       <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />

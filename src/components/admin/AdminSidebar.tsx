@@ -14,6 +14,14 @@ import {
   ChevronDown,
   ChevronRight,
   Send,
+  ShoppingCart,
+  Boxes,
+  MessageSquare,
+  Sparkles,
+  Quote,
+  HelpCircle,
+  Info,
+  Phone,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -43,6 +51,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const navigate = useNavigate();
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({
     'KATALOG': true,
+    'SAVDO': true,
   });
 
   const handleLogout = () => {
@@ -67,6 +76,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       items: [
         { label: 'Mahsulotlar', path: '/admin/products', icon: Package },
         { label: 'Kategoriyalar', path: '/admin/categories', icon: FolderTree },
+        { label: 'Inventar', path: '/admin/inventory', icon: Boxes },
+      ],
+    },
+    {
+      title: 'SAVDO',
+      defaultOpen: true,
+      items: [
+        { label: 'Buyurtmalar', path: '/admin/orders', icon: ShoppingCart },
+        { label: 'Izohlar', path: '/admin/comments', icon: MessageSquare },
       ],
     },
     {
@@ -74,6 +92,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       items: [
         { label: 'Video / Feed', path: '/admin/feed', icon: Film },
         { label: 'Bosh sahifa CMS', path: '/admin/homepage', icon: Send },
+        { label: 'AI Promptlar', path: '/admin/prompts', icon: Sparkles },
+        { label: 'Sharhlar', path: '/admin/testimonials', icon: Quote },
+        { label: 'Savol-Javoblar', path: '/admin/faq', icon: HelpCircle },
+        { label: 'Biz haqimizda', path: '/admin/about', icon: Info },
+        { label: 'Aloqa sahifasi', path: '/admin/contact', icon: Phone },
       ],
     },
     {
