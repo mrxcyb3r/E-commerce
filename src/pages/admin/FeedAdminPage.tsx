@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   Film,
   Plus,
@@ -10,12 +10,16 @@ import {
   X,
   Package,
   Loader2,
+  Check,
+  AlertCircle,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
 import { VideoItem } from '../../types/video';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { VideoUploader } from '../../components/admin/VideoUploader';
+import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { deleteMediaObjects, MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { useFeedAdmStats } from '../../hooks/useFeedAdmStats';
 import { formatDuration } from '../../components/admin/analytics/util';
@@ -32,6 +36,9 @@ export const FeedAdminPage: React.FC = () => {
   const [videoToDelete, setVideoToDelete] = useState<VideoItem | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -46,25 +53,46 @@ export const FeedAdminPage: React.FC = () => {
   const [pendingFeedId, setPendingFeedId] = useState<string>('feed-' + Date.now());
   const pendingUploadsRef = useRef<{ bucket: string; path: string }[]>([]);
 
-  const recordUploaded = (media: { bucket: string; path: string }) => { pendingUploadsRef.current.push(media); };
-  const cleanupPendingUploads = () => { const pending = pendingUploadsRef.current.splice(0, pendingUploadsRef.current.length); for (const item of pending) { void deleteMediaObjects(item.bucket, [item.path]); } };
+  const recordUploaded = useCallback((media: { bucket: string; path: string }) => { pendingUploadsRef.current.push(media); }, []);
+  const cleanupPendingUploads = useCallback(() => { const pending = pendingUploadsRef.current.splice(0, pendingUploadsRef.current.length); for (const item of pending) { void deleteMediaObjects(item.bucket, [item.path]); } }, []);
 
-  const openCreateModal = () => { setTitle(''); setDescription(''); setVideoUrl(''); setPosterUrl(''); setAuthor(''); setProductId(products[0]?.id || ''); setBadge(''); setCategory('all'); setPublished(true); setPendingFeedId('feed-' + Date.now()); setIsCreating(true); setEditingVideo(null); };
-  const openEditModal = (v: VideoItem) => { setTitle(v.title); setDescription(v.description || ''); setVideoUrl(v.videoUrl || ''); setPosterUrl(v.posterUrl || ''); setAuthor(v.author || ''); setProductId(v.productId || ''); setBadge(v.badge?.text || ''); setCategory(v.category || 'all'); setPublished(v.published !== false); setPendingFeedId(v.id); setEditingVideo(v); setIsCreating(false); };
-  const closeModal = () => { cleanupPendingUploads(); setIsCreating(false); setEditingVideo(null); };
+  const openCreateModal = useCallback(() => {
+    setTitle(''); setDescription(''); setVideoUrl(''); setPosterUrl(''); setAuthor(''); setProductId(products[0]?.id || ''); setBadge(''); setCategory('all'); setPublished(true); setPendingFeedId('feed-' + Date.now()); setIsCreating(true); setEditingVideo(null); setFieldErrors({}); setErrorMessage(null); setSavedSuccess(false);
+  }, [products]);
+
+  const openEditModal = useCallback((v: VideoItem) => {
+    setTitle(v.title); setDescription(v.description || ''); setVideoUrl(v.videoUrl || ''); setPosterUrl(v.posterUrl || ''); setAuthor(v.author || ''); setProductId(v.productId || ''); setBadge(v.badge?.text || ''); setCategory(v.category || 'all'); setPublished(v.published !== false); setPendingFeedId(v.id); setEditingVideo(v); setIsCreating(false); setFieldErrors({}); setErrorMessage(null); setSavedSuccess(false);
+  }, []);
+
+  const closeModal = useCallback(() => { cleanupPendingUploads(); setIsCreating(false); setEditingVideo(null); setFieldErrors({}); setErrorMessage(null); }, [cleanupPendingUploads]);
+
+  const validateForm = useCallback((): boolean => {
+    const errors: Record<string, string> = {};
+    if (!title.trim()) errors.title = "Video sarlavhasi kiritilishi shart";
+    if (!videoUrl.trim()) errors.videoUrl = "Video fayli yuklanishi shart";
+    if (!posterUrl.trim()) errors.posterUrl = "Poster rasmi yuklanishi shart";
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [title, videoUrl, posterUrl]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || saving) return;
+    if (!validateForm() || saving) return;
     setSaving(true);
+    setErrorMessage(null);
+    setSavedSuccess(false);
     try {
       if (isCreating) {
         const ok = await addVideo({ title: title.trim(), description: description.trim(), videoUrl: videoUrl.trim() || undefined, posterUrl: posterUrl.trim() || undefined, author: author.trim() || undefined, productId: productId || undefined, badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined, category: category || 'all', published, order: videos.length + 1 }, pendingFeedId);
-        if (ok) { pendingUploadsRef.current = []; setIsCreating(false); } else { cleanupPendingUploads(); }
+        if (ok) { pendingUploadsRef.current = []; setIsCreating(false); setSavedSuccess(true); setTimeout(() => setSavedSuccess(false), 2000); } else { cleanupPendingUploads(); }
       } else if (editingVideo) {
         const ok = await updateVideo(editingVideo.id, { title: title.trim(), description: description.trim(), videoUrl: videoUrl.trim() || undefined, posterUrl: posterUrl.trim() || undefined, author: author.trim() || undefined, productId: productId || undefined, badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined, category: category || 'all', published });
-        if (ok) { pendingUploadsRef.current = []; setEditingVideo(null); } else { cleanupPendingUploads(); }
+        if (ok) { pendingUploadsRef.current = []; setEditingVideo(null); setSavedSuccess(true); setTimeout(() => setSavedSuccess(false), 2000); } else { cleanupPendingUploads(); }
       }
+    } catch (err) {
+      console.error('Failed to save video:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Saqlashda xatolik yuz berdi');
     } finally { setSaving(false); }
   };
 
@@ -101,65 +129,80 @@ export const FeedAdminPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Video Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos.map((vid, idx) => {
-          const linkedProduct = products.find((p) => p.id === vid.productId);
-          return (
-            <div key={vid.id} className={`group bg-card border border-border rounded-xl overflow-hidden flex flex-col hover:border-muted-foreground/20 hover:shadow-sm transition-all ${!vid.published ? 'opacity-60' : ''}`}>
-              <div className="relative aspect-9/16 max-h-64 bg-muted overflow-hidden">
-                <img src={vid.posterUrl || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500'} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent flex flex-col justify-between p-3">
-                  <div className="flex items-center justify-between">
-                    {vid.badge ? <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[9px] font-bold uppercase">{vid.badge.text}</span> : <div />}
-                    <button type="button" onClick={() => togglePublish(vid.id)} className={`px-2 py-0.5 rounded text-[9px] font-medium ${vid.published ? 'bg-emerald-500/90 text-white' : 'bg-black/40 text-white/60'}`}>
-                      {vid.published ? 'Faol' : 'Yashirin'}
-                    </button>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-medium text-accent">{vid.author || "@do'kon"}</p>
-                    <h3 className="text-xs font-semibold text-white leading-snug line-clamp-2">{vid.title}</h3>
-                  </div>
-                </div>
-              </div>
+      {/* Empty State */}
+      {videos.length === 0 && (
+        <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-muted text-muted-foreground mx-auto flex items-center justify-center mb-4">
+            <Film className="w-8 h-8" />
+          </div>
+          <h3 className="text-sm font-bold text-foreground">Hali videolar yo'q</h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+            "Yangi video" tugmasini bosing va birinchi videongizni yuklang.
+          </p>
+        </div>
+      )}
 
-              <div className="p-3 space-y-2 flex-1">
-                {linkedProduct ? (
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50">
-                    <img src={linkedProduct.images[0] || ''} alt="" className="w-7 h-7 rounded-md object-cover border border-border shrink-0" referrerPolicy="no-referrer" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-semibold text-foreground truncate">{linkedProduct.name}</p>
-                      <span className="text-[10px] font-bold text-foreground tabular-nums">{linkedProduct.price.toLocaleString('uz-UZ')} so'm</span>
+      {/* Video Grid */}
+      {videos.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {videos.map((vid, idx) => {
+            const linkedProduct = products.find((p) => p.id === vid.productId);
+            return (
+              <div key={vid.id} className={`group bg-card border border-border rounded-xl overflow-hidden flex flex-col hover:border-muted-foreground/20 hover:shadow-sm transition-all ${!vid.published ? 'opacity-60' : ''}`}>
+                <div className="relative aspect-9/16 max-h-64 bg-muted overflow-hidden">
+                  <img src={vid.posterUrl || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500'} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent flex flex-col justify-between p-3">
+                    <div className="flex items-center justify-between">
+                      {vid.badge ? <span className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[9px] font-bold uppercase">{vid.badge.text}</span> : <div />}
+                      <button type="button" onClick={() => togglePublish(vid.id)} className={`px-2 py-0.5 rounded text-[9px] font-medium ${vid.published ? 'bg-emerald-500/90 text-white' : 'bg-black/40 text-white/60'}`}>
+                        {vid.published ? 'Faol' : 'Yashirin'}
+                      </button>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium text-accent">{vid.author || "@do'kon"}</p>
+                      <h3 className="text-xs font-semibold text-white leading-snug line-clamp-2">{vid.title}</h3>
                     </div>
                   </div>
-                ) : (
-                  <div className="p-2 rounded-lg bg-muted/30 text-[10px] text-muted-foreground italic">Mahsulot biriktirilmagan</div>
-                )}
+                </div>
 
-                {stats[vid.id] && (
-                  <div className="grid grid-cols-4 gap-1 text-center">
-                    <StatChip label="Ko'r" value={stats[vid.id].views.toLocaleString('uz-UZ')} />
-                    <StatChip label="Yoqdi" value={stats[vid.id].likes.toLocaleString('uz-UZ')} />
-                    <StatChip label="Izoh" value={stats[vid.id].comments.toLocaleString('uz-UZ')} />
-                    <StatChip label="Vaqt" value={formatDuration(stats[vid.id].watchSec)} />
+                <div className="p-3 space-y-2 flex-1">
+                  {linkedProduct ? (
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border border-border/50">
+                      <img src={linkedProduct.images[0] || ''} alt="" className="w-7 h-7 rounded-md object-cover border border-border shrink-0" referrerPolicy="no-referrer" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-semibold text-foreground truncate">{linkedProduct.name}</p>
+                        <span className="text-[10px] font-bold text-foreground tabular-nums">{linkedProduct.price.toLocaleString('uz-UZ')} so'm</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-2 rounded-lg bg-muted/30 text-[10px] text-muted-foreground italic">Mahsulot biriktirilmagan</div>
+                  )}
+
+                  {stats[vid.id] && (
+                    <div className="grid grid-cols-4 gap-1 text-center">
+                      <StatChip label="Ko'r" value={stats[vid.id].views.toLocaleString('uz-UZ')} />
+                      <StatChip label="Yoqdi" value={stats[vid.id].likes.toLocaleString('uz-UZ')} />
+                      <StatChip label="Izoh" value={stats[vid.id].comments.toLocaleString('uz-UZ')} />
+                      <StatChip label="Vaqt" value={formatDuration(stats[vid.id].watchSec)} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="px-3 pb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-0.5">
+                    <button type="button" disabled={idx === 0} onClick={() => reorderVideos(idx, idx - 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Yuqoriga surish"><ArrowUp className="w-3.5 h-3.5" /></button>
+                    <button type="button" disabled={idx === videos.length - 1} onClick={() => reorderVideos(idx, idx + 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Keyinga surish"><ArrowDown className="w-3.5 h-3.5" /></button>
                   </div>
-                )}
-              </div>
-
-              <div className="px-3 pb-3 flex items-center justify-between">
-                <div className="flex items-center gap-0.5">
-                  <button type="button" disabled={idx === 0} onClick={() => reorderVideos(idx, idx - 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30"><ArrowUp className="w-3.5 h-3.5" /></button>
-                  <button type="button" disabled={idx === videos.length - 1} onClick={() => reorderVideos(idx, idx + 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30"><ArrowDown className="w-3.5 h-3.5" /></button>
-                </div>
-                <div className="flex items-center gap-0.5">
-                  <button type="button" onClick={() => openEditModal(vid)} className="px-2.5 py-1 rounded-md bg-muted text-[11px] font-medium text-foreground hover:bg-muted/80 flex items-center gap-1"><Edit className="w-3 h-3" /> Tahrirlash</button>
-                  <button type="button" onClick={() => setVideoToDelete(vid)} className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <div className="flex items-center gap-0.5">
+                    <button type="button" onClick={() => openEditModal(vid)} className="px-2.5 py-1 rounded-md bg-muted text-[11px] font-medium text-foreground hover:bg-muted/80 flex items-center gap-1" aria-label={`${vid.title} ni tahrirlash`}><Edit className="w-3 h-3" /> Tahrirlash</button>
+                    <button type="button" onClick={() => setVideoToDelete(vid)} className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10" aria-label={`${vid.title} ni o'chirish`}><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Create / Edit Modal */}
       {(isCreating || editingVideo) && (
@@ -168,13 +211,14 @@ export const FeedAdminPage: React.FC = () => {
           <div className="relative z-10 w-full max-w-xl bg-card rounded-xl p-6 shadow-xl border border-border space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-foreground">{isCreating ? 'Yangi video' : 'Videoni tahrirlash'}</h3>
-              <button type="button" onClick={closeModal} className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"><X className="w-4 h-4" /></button>
+              <button type="button" onClick={closeModal} className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted" aria-label="Yopish"><X className="w-4 h-4" /></button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-3">
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Sarlavha <span className="text-destructive">*</span></label>
-                <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Video sarlavhasi" className="admin-input font-medium" />
+                <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Video sarlavhasi" className={`admin-input font-medium ${fieldErrors.title ? 'border-destructive' : ''}`} aria-invalid={!!fieldErrors.title} />
+                {fieldErrors.title && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.title}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -204,7 +248,20 @@ export const FeedAdminPage: React.FC = () => {
                 </div>
               </div>
 
-              <VideoUploader value={videoUrl || undefined} onChange={(url) => setVideoUrl(url || '')} poster={posterUrl || undefined} onPosterChange={(url) => setPosterUrl(url || '')} bucket={MEDIA_BUCKETS.FEED_MEDIA} scope={pendingFeedId} label="Video fayl" helperText="MP4 yoki WebM (100 MB gacha)." onUploaded={recordUploaded} />
+              <VideoUploader value={videoUrl || undefined} onChange={(url) => setVideoUrl(url || '')} poster={posterUrl || undefined} onPosterChange={(url) => setPosterUrl(url || '')} bucket={MEDIA_BUCKETS.FEED_MEDIA} scope={pendingFeedId} label="Video fayl *" helperText="MP4 yoki WebM (100 MB gacha)." onUploaded={recordUploaded} />
+              {fieldErrors.videoUrl && <p className="text-[10px] text-destructive" role="alert">{fieldErrors.videoUrl}</p>}
+
+              <div>
+                <label className="block text-[11px] font-medium text-muted-foreground mb-1">Poster rasm <span className="text-destructive">*</span></label>
+                <SingleImageUpload
+                  label="Poster rasmi"
+                  value={posterUrl || undefined}
+                  onChange={(url) => setPosterUrl(url || '')}
+                  bucket={MEDIA_BUCKETS.FEED_MEDIA}
+                  scope={pendingFeedId}
+                />
+              </div>
+              {fieldErrors.posterUrl && <p className="text-[10px] text-destructive" role="alert">{fieldErrors.posterUrl}</p>}
 
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Tavsif</label>
@@ -222,8 +279,8 @@ export const FeedAdminPage: React.FC = () => {
               <div className="pt-3 flex items-center justify-end gap-2 border-t border-border">
                 <button type="button" onClick={closeModal} className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">Bekor qilish</button>
                 <button type="submit" disabled={saving} className="px-4 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 disabled:opacity-50 flex items-center gap-1.5 shadow-sm">
-                  {saving && <Loader2 className="w-3 h-3 animate-spin" />}
-                  {isCreating ? 'Yaratish' : 'Saqlash'}
+                  {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : savedSuccess ? <Check className="w-3 h-3" /> : null}
+                  {saving ? 'Saqlanmoqda...' : savedSuccess ? 'Saqlandi!' : isCreating ? 'Yaratish' : 'Saqlash'}
                 </button>
               </div>
             </form>
@@ -243,3 +300,5 @@ const StatChip: React.FC<{ label: string; value: string }> = ({ label, value }) 
     <div className="text-[8px] font-medium text-muted-foreground uppercase tracking-wide">{label}</div>
   </div>
 );
+
+export default FeedAdminPage;

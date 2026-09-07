@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Home,
   Save,
@@ -14,6 +14,8 @@ import {
   ArrowUp,
   ArrowDown,
   Trash2,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
@@ -53,6 +55,8 @@ export const HomepageCmsPage: React.FC = () => {
   const [videoSectionSubtitle, setVideoSectionSubtitle] = useState(homepageCms.videoSectionSubtitle);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Hero slider slides (managed locally, published on save)
   const [slides, setSlides] = useState<HomepageSlide[]>([]);
@@ -62,11 +66,11 @@ export const HomepageCmsPage: React.FC = () => {
     setSlides(homepageSlides);
   }, [homepageSlides]);
 
-  const updateSlide = (id: string, patch: Partial<HomepageSlide>) => {
+  const updateSlide = useCallback((id: string, patch: Partial<HomepageSlide>) => {
     setSlides((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
-  };
+  }, []);
 
-  const addSlide = () => {
+  const addSlide = useCallback(() => {
     const id = `slide-${Date.now()}`;
     const newSlide: HomepageSlide = {
       id,
@@ -81,9 +85,9 @@ export const HomepageCmsPage: React.FC = () => {
       order: slides.length * 10 + 10,
     };
     setSlides((prev) => [...prev, newSlide]);
-  };
+  }, [slides.length]);
 
-  const moveSlide = (index: number, dir: -1 | 1) => {
+  const moveSlide = useCallback((index: number, dir: -1 | 1) => {
     setSlides((prev) => {
       const next = [...prev];
       const target = index + dir;
@@ -92,49 +96,78 @@ export const HomepageCmsPage: React.FC = () => {
       next.splice(target, 0, item);
       return next.map((s, i) => ({ ...s, order: i * 10 + 10 }));
     });
-  };
+  }, []);
 
-  const removeSlide = (id: string) => {
+  const removeSlide = useCallback((id: string) => {
     setSlides((prev) => prev.filter((s) => s.id !== id));
     setSlideToDelete(null);
-  };
+  }, []);
 
-  const handleSave = (e: React.FormEvent) => {
+  const validateForm = useCallback((): boolean => {
+    const errors: string[] = [];
+    if (!heroTitle.trim()) errors.push('Asosiy sarlavha kiritilishi shart');
+    if (!heroSubtitle.trim()) errors.push('Quyi matn (subtitle) kiritilishi shart');
+    if (!heroImage.trim()) errors.push('Hero orqa fon rasmi kiritilishi shart');
+    if (slides.length === 0) errors.push('Kamida bitta slider banneri qo\'shilishi shart');
+    if (slides.some(s => s.active && !s.imageUrl.trim())) errors.push('Faol bannerlar uchun rasm kiritilishi shart');
+
+    if (errors.length > 0) {
+      setErrorMessage(errors.join('. '));
+      return false;
+    }
+    setErrorMessage(null);
+    return true;
+  }, [heroTitle, heroSubtitle, heroImage, slides]);
+
+  const handleSave = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    updateHomepageCms({
-      hero: {
-        badge: heroBadge,
-        title: heroTitle,
-        highlightedTitle: heroHighlightedTitle,
-        subtitle: heroSubtitle,
-        primaryButtonText: heroPrimaryButtonText,
-        primaryButtonLink: heroPrimaryButtonLink,
-        secondaryButtonText: heroSecondaryButtonText,
-        secondaryButtonLink: heroSecondaryButtonLink,
-        heroImage,
-      },
-      promoBanner: {
-        badge: promoBadge,
-        title: promoTitle,
-        subtitle: promoSubtitle,
-        description: promoDescription,
-        buttonText: promoButtonText,
-        buttonLink: promoButtonLink,
-        imageUrl: promoImageUrl,
-        enabled: promoEnabled,
-      },
-      whyChooseUsTitle,
-      whyChooseUsSubtitle,
-      featuredSectionTitle,
-      featuredSectionSubtitle,
-      videoSectionTitle,
-      videoSectionSubtitle,
-    });
+    if (!validateForm()) return;
 
-    setSavedSuccess(true);
-    publishHomepageSlides(slides);
-    setTimeout(() => setSavedSuccess(false), 2500);
-  };
+    setIsSaving(true);
+    setSavedSuccess(false);
+    setErrorMessage(null);
+
+    try {
+      updateHomepageCms({
+        hero: {
+          badge: heroBadge,
+          title: heroTitle,
+          highlightedTitle: heroHighlightedTitle,
+          subtitle: heroSubtitle,
+          primaryButtonText: heroPrimaryButtonText,
+          primaryButtonLink: heroPrimaryButtonLink,
+          secondaryButtonText: heroSecondaryButtonText,
+          secondaryButtonLink: heroSecondaryButtonLink,
+          heroImage,
+        },
+        promoBanner: {
+          badge: promoBadge,
+          title: promoTitle,
+          subtitle: promoSubtitle,
+          description: promoDescription,
+          buttonText: promoButtonText,
+          buttonLink: promoButtonLink,
+          imageUrl: promoImageUrl,
+          enabled: promoEnabled,
+        },
+        whyChooseUsTitle,
+        whyChooseUsSubtitle,
+        featuredSectionTitle,
+        featuredSectionSubtitle,
+        videoSectionTitle,
+        videoSectionSubtitle,
+      });
+
+      publishHomepageSlides(slides);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (err) {
+      console.error('Failed to save homepage CMS:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Saqlashda xatolik yuz berdi');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink, heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoSubtitle, promoDescription, promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, whyChooseUsTitle, whyChooseUsSubtitle, featuredSectionTitle, featuredSectionSubtitle, videoSectionTitle, videoSectionSubtitle, slides, updateHomepageCms, publishHomepageSlides, validateForm]);
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-5xl mx-auto pb-16">
@@ -151,9 +184,15 @@ export const HomepageCmsPage: React.FC = () => {
 
         <button
           type="submit"
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
+          disabled={isSaving}
+          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {savedSuccess ? (
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin stroke-[3]" />
+              <span>Saqlanmoqda...</span>
+            </>
+          ) : savedSuccess ? (
             <>
               <Check className="w-4 h-4 stroke-[3]" />
               <span>Saqlandi!</span>
@@ -166,6 +205,13 @@ export const HomepageCmsPage: React.FC = () => {
           )}
         </button>
       </div>
+
+      {errorMessage && (
+        <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20 text-destructive text-xs font-medium flex items-center gap-2" role="alert">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {errorMessage}
+        </div>
+      )}
 
       {/* Card: Hero Section */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">
@@ -191,10 +237,11 @@ export const HomepageCmsPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-foreground mb-1">
-                Asosiy Sarlavha
+                Asosiy Sarlavha <span className="text-destructive">*</span>
               </label>
               <input
                 type="text"
+                required
                 value={heroTitle}
                 onChange={(e) => setHeroTitle(e.target.value)}
                 placeholder="Sifatli Kiyimlar va Oyoq Kiyimlar"
@@ -218,10 +265,11 @@ export const HomepageCmsPage: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-foreground mb-1">
-              Quyi Matn (Subtitle)
+              Quyi Matn (Subtitle) <span className="text-destructive">*</span>
             </label>
             <textarea
               rows={3}
+              required
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
               placeholder="Mahsulotlarimizni uydan chiqmasdan ko'ring..."
@@ -277,14 +325,14 @@ export const HomepageCmsPage: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-foreground mb-1">
-              Hero Orqa Fon Rasmi URL
+              Hero Orqa Fon Rasmi URL <span className="text-destructive">*</span>
             </label>
-            <input
-              type="url"
-              value={heroImage}
-              onChange={(e) => setHeroImage(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
+            <SingleImageUpload
+              label="Hero orqa fon rasmi"
+              value={heroImage || undefined}
+              onChange={(url) => setHeroImage(url || '')}
+              bucket={MEDIA_BUCKETS.STORE_ASSETS}
+              scope="homepage/hero"
             />
           </div>
         </div>
@@ -355,6 +403,7 @@ export const HomepageCmsPage: React.FC = () => {
                       disabled={idx === 0}
                       className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground dark:hover:text-foreground hover:bg-muted disabled:opacity-30"
                       title="Yuqoriga"
+                      aria-label="Yuqoriga surish"
                     >
                       <ArrowUp className="w-4 h-4" />
                     </button>
@@ -364,6 +413,7 @@ export const HomepageCmsPage: React.FC = () => {
                       disabled={idx === slides.length - 1}
                       className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground dark:hover:text-foreground hover:bg-muted disabled:opacity-30"
                       title="Pastga"
+                      aria-label="Pastga surish"
                     >
                       <ArrowDown className="w-4 h-4" />
                     </button>
@@ -372,6 +422,7 @@ export const HomepageCmsPage: React.FC = () => {
                       onClick={() => setSlideToDelete(slide)}
                       className="p-1.5 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                       title="O'chirish"
+                      aria-label={`${slide.title || 'Banner'} ni o'chirish`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -396,7 +447,7 @@ export const HomepageCmsPage: React.FC = () => {
                         type="text"
                         value={slide.title}
                         onChange={(e) => updateSlide(slide.id, { title: e.target.value })}
-                        placeholder="Yangi mavsum to'plamlari"
+                        placeholder="Yangi yil to'plamlari"
                         className="w-full px-3 py-2 text-xs rounded-xl bg-card border border-border text-foreground font-bold"
                       />
                     </div>
@@ -436,7 +487,7 @@ export const HomepageCmsPage: React.FC = () => {
 
                   <div className="space-y-4">
                     <SingleImageUpload
-                      label="Banner rasmi (katta ekran)"
+                      label="Banner rasmi (katta ekran) *"
                       value={slide.imageUrl}
                       onChange={(url) => updateSlide(slide.id, { imageUrl: url })}
                       bucket={MEDIA_BUCKETS.STORE_ASSETS}
@@ -545,12 +596,12 @@ export const HomepageCmsPage: React.FC = () => {
               <label className="block text-xs font-bold text-foreground mb-1">
                 Rasm URL manzili
               </label>
-              <input
-                type="url"
-                value={promoImageUrl}
-                onChange={(e) => setPromoImageUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
+              <SingleImageUpload
+                label="Promo banner rasmi"
+                value={promoImageUrl || undefined}
+                onChange={(url) => setPromoImageUrl(url || '')}
+                bucket={MEDIA_BUCKETS.STORE_ASSETS}
+                scope="homepage/promo"
               />
             </div>
           </div>
@@ -657,3 +708,5 @@ export const HomepageCmsPage: React.FC = () => {
     </form>
   );
 };
+
+export default HomepageCmsPage;

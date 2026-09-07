@@ -11,6 +11,10 @@ import {
   Boxes,
   Tag,
   Layers,
+  Loader2,
+  AlertCircle,
+  Image as ImageIcon,
+  Film,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ImageUploader } from '../../components/admin/ImageUploader';
@@ -54,15 +58,13 @@ export const ProductEditPage: React.FC = () => {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const createScopeId = useRef(`prod-${Date.now()}`).current;
   const storageScope = existingProduct ? existingProduct.id : createScopeId;
   const pendingUploadsRef = useRef<{ bucket: string; path: string }[]>([]);
   const savedRef = useRef(false);
-
-  const recordUploaded = (media: { bucket: string; path: string }) => {
-    pendingUploadsRef.current.push(media);
-  };
 
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [videoPosterUrl, setVideoPosterUrl] = useState<string>('');
@@ -102,7 +104,7 @@ export const ProductEditPage: React.FC = () => {
       setMadeIn(existingProduct.madeIn || '');
       setTags(existingProduct.tags || []);
     } else if (isNew) {
-      if (categories.length > 0) setCategory(categories[0].id);
+      if (categories.length > 0) setCategory(categories[0].slug || categories[0].id);
       setSku(`CLO-${Math.floor(1000 + Math.random() * 9000)}`);
       setSizes(['M', 'L', 'XL']);
       setColors(["Qora", "To'q ko'k"]);
@@ -125,52 +127,74 @@ export const ProductEditPage: React.FC = () => {
   const handleAddTag = () => { if (tagInput.trim() && !tags.includes(tagInput.trim().toLowerCase())) { setTags([...tags, tagInput.trim().toLowerCase()]); setTagInput(''); } };
   const handleRemoveTag = (t: string) => setTags(tags.filter((item) => item !== t));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Mahsulot nomi kiritilishi shart";
+    if (!category) errors.category = "Kategoriya tanlanishi shart";
+    if (price <= 0) errors.price = "Iltimos, haqiqiy narxni kiriting (0 dan katta)";
+    if (originalPrice && originalPrice <= price) errors.originalPrice = "Eski narx hozirgi narxdan katta bo'lishi kerak";
+    if (stockCount < 0) errors.stockCount = "Qoldiq soni manfiy bo'lishi mumkin emas";
+    if (images.length === 0) errors.images = "Kamida bitta rasm yuklanishi kerak";
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) { setErrorMessage("Mahsulot nomini kiritish shart."); return; }
-    if (price <= 0) { setErrorMessage("Iltimos, haqiqiy narxni kiriting."); return; }
+    if (!validateForm()) return;
 
-    const currentCatObj = categories.find((c) => c.id === category || c.slug === category);
-    const categoryName = currentCatObj ? currentCatObj.name : category;
+    setIsSaving(true);
+    setErrorMessage(null);
 
-    const payload: Omit<Product, 'id'> = {
-      name: name.trim(),
-      slug: slug.trim() || name.toLowerCase().replace(/\s+/g, '-'),
-      sku: sku.trim() || `SKU-${Date.now()}`,
-      description: description.trim() || name,
-      category,
-      categoryName,
-      subcategory: subcategory.trim() || undefined,
-      price: Number(price),
-      originalPrice: originalPrice && originalPrice > price ? Number(originalPrice) : undefined,
-      inStock,
-      stockCount: Number(stockCount),
-      isFeatured,
-      isNew: isNewBadge,
-      published,
-      details: existingProduct ? existingProduct.details : [],
-      images,
-      sizes,
-      colors: colors.map((c) => ({ name: c, hex: '#18181b' })),
-      material: material.trim() || undefined,
-      madeIn: madeIn.trim() || undefined,
-      tags,
-      videoUrl: videoUrl.trim() || undefined,
-      videoPosterUrl: videoPosterUrl.trim() || undefined,
-    };
+    try {
+      const currentCatObj = categories.find((c) => c.slug === category || c.id === category);
+      const categoryName = currentCatObj ? currentCatObj.name : category;
 
-    if (isNew) {
-      const created = addProduct(payload, storageScope);
-      savedRef.current = true;
-      pendingUploadsRef.current = [];
-      setSavedSuccess(true);
-      setTimeout(() => navigate(`/admin/products/${created.id}`), 700);
-    } else if (id) {
-      updateProduct(id, payload);
-      savedRef.current = true;
-      pendingUploadsRef.current = [];
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
+      const payload: Omit<Product, 'id'> = {
+        name: name.trim(),
+        slug: slug.trim() || name.toLowerCase().replace(/\s+/g, '-'),
+        sku: sku.trim() || `SKU-${Date.now()}`,
+        description: description.trim() || name,
+        category,
+        categoryName,
+        subcategory: subcategory.trim() || undefined,
+        price: Number(price),
+        originalPrice: originalPrice && originalPrice > price ? Number(originalPrice) : undefined,
+        inStock,
+        stockCount: Number(stockCount),
+        isFeatured,
+        isNew: isNewBadge,
+        published,
+        details: existingProduct ? existingProduct.details : [],
+        images,
+        sizes,
+        colors: colors.map((c) => ({ name: c, hex: '#18181b' })),
+        material: material.trim() || undefined,
+        madeIn: madeIn.trim() || undefined,
+        tags,
+        videoUrl: videoUrl.trim() || undefined,
+        videoPosterUrl: videoPosterUrl.trim() || undefined,
+      };
+
+      if (isNew) {
+        const created = addProduct(payload, storageScope);
+        savedRef.current = true;
+        pendingUploadsRef.current = [];
+        setSavedSuccess(true);
+        setTimeout(() => navigate(`/admin/products/${created.id}`), 700);
+      } else if (id) {
+        updateProduct(id, payload);
+        savedRef.current = true;
+        pendingUploadsRef.current = [];
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('Failed to save product:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Saqlashda xatolik yuz berdi');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -179,7 +203,7 @@ export const ProductEditPage: React.FC = () => {
       {/* Sticky Top Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sticky top-14 z-20 bg-background/90 backdrop-blur-xl py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <Link to="/admin/products" className="p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors">
+          <Link to="/admin/products" className="p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors" aria-label="Orqaga">
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
@@ -197,18 +221,30 @@ export const ProductEditPage: React.FC = () => {
               Ko'rish
             </a>
           )}
-          <button type="submit" className="px-4 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 transition-all active:scale-[0.98] flex items-center gap-1.5 shadow-sm">
-            {savedSuccess ? (
-              <><Check className="w-3.5 h-3.5" /><span>Saqlandi!</span></>
+          <button type="submit" disabled={isSaving} className="px-4 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 transition-all active:scale-[0.98] flex items-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Saqlanmoqda...</span>
+              </>
+            ) : savedSuccess ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>Saqlandi!</span>
+              </>
             ) : (
-              <><Save className="w-3.5 h-3.5" /><span>{isNew ? 'Yaratish' : 'Saqlash'}</span></>
+              <>
+                <Save className="w-3.5 h-3.5" />
+                <span>{isNew ? 'Yaratish' : 'Saqlash'}</span>
+              </>
             )}
           </button>
         </div>
       </div>
 
       {errorMessage && (
-        <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20 text-destructive text-xs font-medium">
+        <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20 text-destructive text-xs font-medium flex items-center gap-2" role="alert">
+          <AlertCircle className="w-4 h-4 shrink-0" />
           {errorMessage}
         </div>
       )}
@@ -226,7 +262,17 @@ export const ProductEditPage: React.FC = () => {
 
             <div>
               <label className="block text-[11px] font-medium text-muted-foreground mb-1">Mahsulot nomi <span className="text-destructive">*</span></label>
-              <input type="text" required value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder="Masalan: Erkaklar Premium Kostyum-Shim" className="admin-input font-medium" />
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Masalan: Erkaklar Premium Kostyum-Shim"
+                className={`admin-input font-medium ${fieldErrors.name ? 'border-destructive' : ''}`}
+                aria-invalid={!!fieldErrors.name}
+                aria-describedby={fieldErrors.name ? 'name-error' : undefined}
+              />
+              {fieldErrors.name && <p id="name-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.name}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -243,9 +289,16 @@ export const ProductEditPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Kategoriya <span className="text-destructive">*</span></label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="admin-input font-medium">
-                  {categories.map((cat) => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className={`admin-input font-medium ${fieldErrors.category ? 'border-destructive' : ''}`}
+                  aria-invalid={!!fieldErrors.category}
+                >
+                  <option value="">Kategoriya tanlang</option>
+                  {categories.map((cat) => (<option key={cat.id} value={cat.slug || cat.id}>{cat.name}</option>))}
                 </select>
+                {fieldErrors.category && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.category}</p>}
               </div>
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Ichki kategoriya</label>
@@ -255,15 +308,48 @@ export const ProductEditPage: React.FC = () => {
 
             <div>
               <label className="block text-[11px] font-medium text-muted-foreground mb-1">Tavsif</label>
-              <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Mahsulot haqida to'liq ma'lumot..." className="admin-input text-[11px] leading-relaxed resize-none" />
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Mahsulot haqida to'liq ma'lumot..."
+                className="admin-input text-[11px] leading-relaxed resize-none"
+              />
             </div>
           </div>
 
           {/* Images */}
           <div className="admin-section">
-            <ImageUploader images={images} onChange={setImages} maxImages={8} label="Mahsulot rasmlari" helperText="Birinchi rasm asosiy rasm sifatida ko'rsatiladi (JPG, PNG, WebP; 5 MB gacha)." scope={storageScope} onUploaded={recordUploaded} />
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2 mb-3">
+              <ImageIcon className="w-3.5 h-3.5 text-muted-foreground" />
+              Mahsulot rasmlari
+            </h3>
+            <ImageUploader
+              images={images}
+              onChange={setImages}
+              maxImages={8}
+              label="Mahsulot rasmlari"
+              helperText="Birinchi rasm asosiy rasm sifatida ko'rsatiladi (JPG, PNG, WebP; 5 MB gacha)."
+              scope={storageScope}
+              onUploaded={(media) => pendingUploadsRef.current.push(media)}
+            />
+            {fieldErrors.images && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.images}</p>}
             <div className="mt-4 pt-4 border-t border-border">
-              <VideoUploader value={videoUrl || undefined} onChange={(url) => setVideoUrl(url || '')} poster={videoPosterUrl || undefined} onPosterChange={(url) => setVideoPosterUrl(url || '')} bucket={MEDIA_BUCKETS.PRODUCT_IMAGES} scope={storageScope} label="Mahsulot videosi (ixtiyoriy)" helperText="MP4 yoki WebM faylni yuklang (100 MB gacha)." onUploaded={recordUploaded} />
+              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2 mb-3">
+                <Film className="w-3.5 h-3.5 text-muted-foreground" />
+                Mahsulot videosi (ixtiyoriy)
+              </h3>
+              <VideoUploader
+                value={videoUrl || undefined}
+                onChange={(url) => setVideoUrl(url || '')}
+                poster={videoPosterUrl || undefined}
+                onPosterChange={(url) => setVideoPosterUrl(url || '')}
+                bucket={MEDIA_BUCKETS.PRODUCT_IMAGES}
+                scope={storageScope}
+                label="Video fayl"
+                helperText="MP4 yoki WebM faylni yuklang (100 MB gacha)."
+                onUploaded={(media) => pendingUploadsRef.current.push(media)}
+              />
             </div>
           </div>
 
@@ -278,16 +364,37 @@ export const ProductEditPage: React.FC = () => {
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Sotuv narxi (so'm) <span className="text-destructive">*</span></label>
                 <div className="relative">
-                  <input type="number" required min={0} step={1000} value={price || ''} onChange={(e) => setPrice(Number(e.target.value))} placeholder="250000" className="admin-input font-semibold pr-12" />
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    step={1000}
+                    value={price || ''}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    placeholder="250000"
+                    className={`admin-input font-semibold pr-12 ${fieldErrors.price ? 'border-destructive' : ''}`}
+                    aria-invalid={!!fieldErrors.price}
+                  />
                   <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-[11px] text-muted-foreground pointer-events-none">so'm</span>
                 </div>
+                {fieldErrors.price && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.price}</p>}
               </div>
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Asl narxi (chegirma uchun)</label>
                 <div className="relative">
-                  <input type="number" min={0} step={1000} value={originalPrice || ''} onChange={(e) => setOriginalPrice(e.target.value ? Number(e.target.value) : undefined)} placeholder="320000" className="admin-input pr-12" />
+                  <input
+                    type="number"
+                    min={0}
+                    step={1000}
+                    value={originalPrice || ''}
+                    onChange={(e) => setOriginalPrice(e.target.value ? Number(e.target.value) : undefined)}
+                    placeholder="320000"
+                    className={`admin-input pr-12 ${fieldErrors.originalPrice ? 'border-destructive' : ''}`}
+                    aria-invalid={!!fieldErrors.originalPrice}
+                  />
                   <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-[11px] text-muted-foreground pointer-events-none">so'm</span>
                 </div>
+                {fieldErrors.originalPrice && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.originalPrice}</p>}
               </div>
             </div>
 
@@ -308,7 +415,15 @@ export const ProductEditPage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-[11px] font-medium text-muted-foreground mb-1">Qoldiq soni</label>
-                <input type="number" min={0} value={stockCount} onChange={(e) => setStockCount(Number(e.target.value))} className="admin-input font-semibold" />
+                <input
+                  type="number"
+                  min={0}
+                  value={stockCount}
+                  onChange={(e) => setStockCount(Number(e.target.value))}
+                  className={`admin-input font-semibold ${fieldErrors.stockCount ? 'border-destructive' : ''}`}
+                  aria-invalid={!!fieldErrors.stockCount}
+                />
+                {fieldErrors.stockCount && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.stockCount}</p>}
               </div>
             </div>
           </div>
@@ -447,3 +562,5 @@ export const ProductEditPage: React.FC = () => {
     </form>
   );
 };
+
+export default ProductEditPage;

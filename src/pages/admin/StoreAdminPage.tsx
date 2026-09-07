@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Store,
   MapPin,
@@ -12,8 +12,12 @@ import {
   Compass,
   Palette,
   Image as ImageIcon,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
+import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 
 export const StoreAdminPage: React.FC = () => {
   const { storeInfo, updateStoreInfo } = useStore();
@@ -58,53 +62,91 @@ export const StoreAdminPage: React.FC = () => {
   const [footerText, setFooterText] = useState(storeInfo.footerText || '');
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const handleSave = (e: React.FormEvent) => {
+  const validateForm = useCallback((): boolean => {
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Do'kon nomi kiritilishi shart";
+    if (!phone1.trim()) errors.phone1 = "Asosiy telefon raqami kiritilishi shart";
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Noto'g'ri email formati";
+    if (adminEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) errors.adminEmail = "Noto'g'ri admin email formati";
+    if (googleMapsUrl && !googleMapsUrl.startsWith('http')) errors.googleMapsUrl = "Google Maps havolasi http/https bilan boshlanishi kerak";
+    if (yandexMapsUrl && !yandexMapsUrl.startsWith('http')) errors.yandexMapsUrl = "Yandex Maps havolasi http/https bilan boshlanishi kerak";
+    if (logoUrl && !logoUrl.startsWith('http')) errors.logoUrl = "Logo URL http/https bilan boshlanishi kerak";
+    if (faviconUrl && !faviconUrl.startsWith('http')) errors.faviconUrl = "Favicon URL http/https bilan boshlanishi kerak";
+    if (ogImageUrl && !ogImageUrl.startsWith('http')) errors.ogImageUrl = "OG rasm URL http/https bilan boshlanishi kerak";
+    if (twitterImageUrl && !twitterImageUrl.startsWith('http')) errors.twitterImageUrl = "Twitter rasm URL http/https bilan boshlanishi kerak";
+
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    if (isNaN(lat) || lat < -90 || lat > 90) errors.latitude = "Noto'g'ri kenglik (latitude)";
+    if (isNaN(lng) || lng < -180 || lng > 180) errors.longitude = "Noto'g'ri uzunlik (longitude)";
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [name, phone1, email, adminEmail, googleMapsUrl, yandexMapsUrl, logoUrl, faviconUrl, ogImageUrl, twitterImageUrl, latitude, longitude]);
+
+  const handleSave = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    updateStoreInfo({
-      businessName: name,
-      tagline,
-      address,
-      landmark,
-      city,
-      workingHours,
-      phoneNumbers: [phone1, phone2].filter(Boolean),
-      email: email || undefined,
-      telegramUsername,
-      telegramChannel,
-      instagramUsername,
-      googleMapsUrl,
-      yandexMapsUrl,
-      coordinates: {
-        lat: parseFloat(latitude) || 40.1158,
-        lng: parseFloat(longitude) || 67.8422,
-      },
-      logoUrl: logoUrl || undefined,
-      faviconUrl: faviconUrl || undefined,
-      primaryColor,
-      businessCategory: businessCategory || undefined,
-      language,
-      defaultSeoTitle: defaultSeoTitle || undefined,
-      defaultSeoDescription: defaultSeoDescription || undefined,
-      defaultSeoKeywords: defaultSeoKeywords || undefined,
-      ogImageUrl: ogImageUrl || undefined,
-      twitterImageUrl: twitterImageUrl || undefined,
-      shortName: shortName || undefined,
-      secondaryColor: secondaryColor || undefined,
-      accentColor: accentColor || undefined,
-      heroTitle: heroTitle || undefined,
-      heroSubtitle: heroSubtitle || undefined,
-      aboutText: aboutText || undefined,
-      mission: mission || undefined,
-      vision: vision || undefined,
-      adminEmail: adminEmail || undefined,
-      copyright: copyright || undefined,
-      footerText: footerText || undefined,
-    });
+    if (!validateForm()) return;
 
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
-  };
+    setIsSaving(true);
+    setSavedSuccess(false);
+    setErrorMessage(null);
+
+    try {
+      updateStoreInfo({
+        businessName: name,
+        tagline,
+        address,
+        landmark,
+        city,
+        workingHours,
+        phoneNumbers: [phone1, phone2].filter(Boolean),
+        email: email || undefined,
+        telegramUsername,
+        telegramChannel,
+        instagramUsername,
+        googleMapsUrl: googleMapsUrl || undefined,
+        yandexMapsUrl: yandexMapsUrl || undefined,
+        coordinates: {
+          lat: parseFloat(latitude) || 40.1158,
+          lng: parseFloat(longitude) || 67.8422,
+        },
+        logoUrl: logoUrl || undefined,
+        faviconUrl: faviconUrl || undefined,
+        primaryColor,
+        businessCategory: businessCategory || undefined,
+        language,
+        defaultSeoTitle: defaultSeoTitle || undefined,
+        defaultSeoDescription: defaultSeoDescription || undefined,
+        defaultSeoKeywords: defaultSeoKeywords || undefined,
+        ogImageUrl: ogImageUrl || undefined,
+        twitterImageUrl: twitterImageUrl || undefined,
+        shortName: shortName || undefined,
+        secondaryColor: secondaryColor || undefined,
+        accentColor: accentColor || undefined,
+        heroTitle: heroTitle || undefined,
+        heroSubtitle: heroSubtitle || undefined,
+        aboutText: aboutText || undefined,
+        mission: mission || undefined,
+        vision: vision || undefined,
+        adminEmail: adminEmail || undefined,
+        copyright: copyright || undefined,
+        footerText: footerText || undefined,
+      });
+
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (err) {
+      console.error('Failed to save store info:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Saqlashda xatolik yuz berdi');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [name, tagline, address, landmark, city, workingHours, phone1, phone2, email, telegramUsername, telegramChannel, instagramUsername, googleMapsUrl, yandexMapsUrl, latitude, longitude, logoUrl, faviconUrl, primaryColor, businessCategory, language, defaultSeoTitle, defaultSeoDescription, defaultSeoKeywords, ogImageUrl, twitterImageUrl, shortName, secondaryColor, accentColor, heroTitle, heroSubtitle, aboutText, mission, vision, adminEmail, copyright, footerText, updateStoreInfo, validateForm]);
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl mx-auto pb-16">
@@ -121,9 +163,15 @@ export const StoreAdminPage: React.FC = () => {
 
         <button
           type="submit"
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto"
+          disabled={isSaving}
+          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {savedSuccess ? (
+          {isSaving ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin stroke-[3]" />
+              <span>Saqlanmoqda...</span>
+            </>
+          ) : savedSuccess ? (
             <>
               <Check className="w-4 h-4 stroke-[3]" />
               <span>Saqlandi!</span>
@@ -136,6 +184,13 @@ export const StoreAdminPage: React.FC = () => {
           )}
         </button>
       </div>
+
+      {errorMessage && (
+        <div className="p-3 rounded-lg bg-destructive/5 border border-destructive/20 text-destructive text-xs font-medium flex items-center gap-2" role="alert">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {errorMessage}
+        </div>
+      )}
 
       {/* Main Info */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
@@ -154,8 +209,11 @@ export const StoreAdminPage: React.FC = () => {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground font-bold"
+              className={`w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground font-bold ${fieldErrors.name ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.name}
+              aria-describedby={fieldErrors.name ? 'name-error' : undefined}
             />
+            {fieldErrors.name && <p id="name-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.name}</p>}
           </div>
 
           <div>
@@ -211,15 +269,19 @@ export const StoreAdminPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-foreground mb-1">
-              Asosiy Telefon Raqami
+              Asosiy Telefon Raqami <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              required
               value={phone1}
               onChange={(e) => setPhone1(e.target.value)}
               placeholder="+998 90 123 45 67"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.phone1 ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.phone1}
+              aria-describedby={fieldErrors.phone1 ? 'phone1-error' : undefined}
             />
+            {fieldErrors.phone1 && <p id="phone1-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.phone1}</p>}
           </div>
 
           <div>
@@ -246,8 +308,11 @@ export const StoreAdminPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="info@do-konim.uz"
-              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground ${fieldErrors.email ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.email}
+              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
             />
+            {fieldErrors.email && <p id="email-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.email}</p>}
           </div>
         </div>
 
@@ -338,8 +403,11 @@ export const StoreAdminPage: React.FC = () => {
               value={googleMapsUrl}
               onChange={(e) => setGoogleMapsUrl(e.target.value)}
               placeholder="https://maps.google.com/..."
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.googleMapsUrl ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.googleMapsUrl}
+              aria-describedby={fieldErrors.googleMapsUrl ? 'googleMapsUrl-error' : undefined}
             />
+            {fieldErrors.googleMapsUrl && <p id="googleMapsUrl-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.googleMapsUrl}</p>}
           </div>
 
           <div>
@@ -351,8 +419,11 @@ export const StoreAdminPage: React.FC = () => {
               value={yandexMapsUrl}
               onChange={(e) => setYandexMapsUrl(e.target.value)}
               placeholder="https://yandex.uz/maps/..."
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.yandexMapsUrl ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.yandexMapsUrl}
+              aria-describedby={fieldErrors.yandexMapsUrl ? 'yandexMapsUrl-error' : undefined}
             />
+            {fieldErrors.yandexMapsUrl && <p id="yandexMapsUrl-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.yandexMapsUrl}</p>}
           </div>
         </div>
 
@@ -366,8 +437,11 @@ export const StoreAdminPage: React.FC = () => {
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
               placeholder="40.1158"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.latitude ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.latitude}
+              aria-describedby={fieldErrors.latitude ? 'latitude-error' : undefined}
             />
+            {fieldErrors.latitude && <p id="latitude-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.latitude}</p>}
           </div>
 
           <div>
@@ -379,8 +453,11 @@ export const StoreAdminPage: React.FC = () => {
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
               placeholder="67.8422"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.longitude ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.longitude}
+              aria-describedby={fieldErrors.longitude ? 'longitude-error' : undefined}
             />
+            {fieldErrors.longitude && <p id="longitude-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.longitude}</p>}
           </div>
         </div>
       </div>
@@ -397,13 +474,14 @@ export const StoreAdminPage: React.FC = () => {
             <label className="block text-xs font-bold text-foreground mb-1 flex items-center gap-1.5">
               <ImageIcon className="w-3.5 h-3.5" /> Logo URL (Rasm havolasi)
             </label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://.../logo.png"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+            <SingleImageUpload
+              label="Logo rasmi"
+              value={logoUrl || undefined}
+              onChange={(url) => setLogoUrl(url || '')}
+              bucket={MEDIA_BUCKETS.STORE_ASSETS}
+              scope="store/logo"
             />
+            {fieldErrors.logoUrl && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.logoUrl}</p>}
             <p className="text-[10px] text-muted-foreground mt-1">
               Agar bo'sh bo'lsa, do'kon nomining bosh harfi (monogramma) ko'rsatiladi.
             </p>
@@ -413,13 +491,14 @@ export const StoreAdminPage: React.FC = () => {
             <label className="block text-xs font-bold text-foreground mb-1 flex items-center gap-1.5">
               <ImageIcon className="w-3.5 h-3.5" /> Favicon URL
             </label>
-            <input
-              type="url"
-              value={faviconUrl}
-              onChange={(e) => setFaviconUrl(e.target.value)}
-              placeholder="https://.../favicon.ico"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+            <SingleImageUpload
+              label="Favicon rasmi"
+              value={faviconUrl || undefined}
+              onChange={(url) => setFaviconUrl(url || '')}
+              bucket={MEDIA_BUCKETS.STORE_ASSETS}
+              scope="store/favicon"
             />
+            {fieldErrors.faviconUrl && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.faviconUrl}</p>}
           </div>
         </div>
 
@@ -445,63 +524,63 @@ export const StoreAdminPage: React.FC = () => {
             </div>
           </div>
 
-<div>
-              <label className="block text-xs font-bold text-foreground mb-1">
-                Ikkinchi Rang (Secondary)
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={secondaryColor}
-                  onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={secondaryColor}
-                  onChange={(e) => setSecondaryColor(e.target.value)}
-                  placeholder="#334155"
-                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-foreground mb-1">
-                Aksent Rang (CTA)
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={accentColor}
-                  onChange={(e) => setAccentColor(e.target.value)}
-                  className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={accentColor}
-                  onChange={(e) => setAccentColor(e.target.value)}
-                  placeholder="#f59e0b"
-                  className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-foreground mb-1">
-                Savdo Sohasi
-              </label>
+          <div>
+            <label className="block text-xs font-bold text-foreground mb-1">
+              Ikkinchi Rang (Secondary)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+                className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
+              />
               <input
                 type="text"
-                value={businessCategory}
-                onChange={(e) => setBusinessCategory(e.target.value)}
-                placeholder="Kiyim-kechak, poyabzal"
-                className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+                placeholder="#334155"
+                className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
               />
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-foreground mb-1">
+              Aksent Rang (CTA)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="w-10 h-9 rounded-lg border border-border bg-transparent cursor-pointer"
+              />
+              <input
+                type="text"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                placeholder="#f59e0b"
+                className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-foreground mb-1">
+              Savdo Sohasi
+            </label>
+            <input
+              type="text"
+              value={businessCategory}
+              onChange={(e) => setBusinessCategory(e.target.value)}
+              placeholder="Kiyim-kechak, poyabzal"
+              className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
+            />
+          </div>
+
           <div>
             <label className="block text-xs font-bold text-foreground mb-1">
               Til
@@ -529,7 +608,9 @@ export const StoreAdminPage: React.FC = () => {
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-bold text-foreground mb-1">
               Administrator E-pochtasi
@@ -539,8 +620,11 @@ export const StoreAdminPage: React.FC = () => {
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
               placeholder="admin@dokon.uz"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+              className={`w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground ${fieldErrors.adminEmail ? 'border-destructive' : ''}`}
+              aria-invalid={!!fieldErrors.adminEmail}
+              aria-describedby={fieldErrors.adminEmail ? 'adminEmail-error' : undefined}
             />
+            {fieldErrors.adminEmail && <p id="adminEmail-error" className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.adminEmail}</p>}
           </div>
         </div>
 
@@ -576,13 +660,14 @@ export const StoreAdminPage: React.FC = () => {
           <label className="block text-xs font-bold text-foreground mb-1">
             SEO: Open Graph Rasm (ijtimoiy tarmoqlarda)
           </label>
-          <input
-            type="url"
-            value={ogImageUrl}
-            onChange={(e) => setOgImageUrl(e.target.value)}
-            placeholder="https://.../og-cover.jpg"
-            className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+          <SingleImageUpload
+            label="OG rasm"
+            value={ogImageUrl || undefined}
+            onChange={(url) => setOgImageUrl(url || '')}
+            bucket={MEDIA_BUCKETS.STORE_ASSETS}
+            scope="store/og-image"
           />
+          {fieldErrors.ogImageUrl && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.ogImageUrl}</p>}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -603,13 +688,14 @@ export const StoreAdminPage: React.FC = () => {
             <label className="block text-xs font-bold text-foreground mb-1">
               SEO: Twitter/X Rasm
             </label>
-            <input
-              type="url"
-              value={twitterImageUrl}
-              onChange={(e) => setTwitterImageUrl(e.target.value)}
-              placeholder="https://.../twitter-card.jpg"
-              className="w-full px-3.5 py-2 text-xs font-mono rounded-xl bg-muted border border-border text-foreground"
+            <SingleImageUpload
+              label="Twitter rasm"
+              value={twitterImageUrl || undefined}
+              onChange={(url) => setTwitterImageUrl(url || '')}
+              bucket={MEDIA_BUCKETS.STORE_ASSETS}
+              scope="store/twitter-image"
             />
+            {fieldErrors.twitterImageUrl && <p className="text-[10px] text-destructive mt-1" role="alert">{fieldErrors.twitterImageUrl}</p>}
           </div>
         </div>
 
@@ -635,7 +721,7 @@ export const StoreAdminPage: React.FC = () => {
               type="text"
               value={heroSubtitle}
               onChange={(e) => setHeroSubtitle(e.target.value)}
-              placeholder="2026-yilning eng yangi kolleksiyalari"
+              placeholder="2026 Ochirg'i eng yangi kolleksiyalari"
               className="w-full px-3.5 py-2 text-xs rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
@@ -713,3 +799,5 @@ export const StoreAdminPage: React.FC = () => {
     </form>
   );
 };
+
+export default StoreAdminPage;

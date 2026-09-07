@@ -17,10 +17,15 @@ import {
   Tag,
   CheckCircle2,
   UploadCloud,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  RefreshCw,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { Product } from '../../types/product';
+import { formatPrice } from '../../lib/utils';
 
 type BulkAction =
   | 'publish'
@@ -31,6 +36,8 @@ type BulkAction =
   | 'sale-off'
   | 'stock-on'
   | 'stock-off';
+
+const PAGE_SIZE = 20;
 
 export const ProductsListPage: React.FC = () => {
   const {
@@ -56,6 +63,7 @@ export const ProductsListPage: React.FC = () => {
   const [badgeFilter, setBadgeFilter] = useState<string>(initialFilter);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'name'>('newest');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkConfirm, setBulkConfirm] = useState<BulkAction | null>(null);
@@ -118,14 +126,24 @@ export const ProductsListPage: React.FC = () => {
     });
   }, [products, searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy, categories]);
 
+  const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE) || 1;
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredProducts.slice(start, start + PAGE_SIZE);
+  }, [filteredProducts, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy]);
+
   useEffect(() => {
     setSelectedIds((prev) => prev.filter((id) => products.some((p) => p.id === id)));
   }, [products]);
 
-  const allVisibleSelected = filteredProducts.length > 0 && filteredProducts.every((p) => selectedIds.includes(p.id));
+  const allVisibleSelected = paginatedProducts.length > 0 && paginatedProducts.every((p) => selectedIds.includes(p.id));
 
   const toggleSelectAll = () => {
-    const visibleIds = filteredProducts.map((p) => p.id);
+    const visibleIds = paginatedProducts.map((p) => p.id);
     if (allVisibleSelected) {
       setSelectedIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
@@ -428,9 +446,9 @@ export const ProductsListPage: React.FC = () => {
             ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300'
             : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300'
         }`}>
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          {batchStatus.text}
-        </div>
+        <CheckCircle2 className="w-3.5 h-3.5" />
+        {batchStatus.text}
+      </div>
       )}
 
       {/* Products Table */}
@@ -453,7 +471,7 @@ export const ProductsListPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {filteredProducts.map((p) => {
+                {paginatedProducts.map((p) => {
                   const isPublished = p.published !== false;
                   const checked = selectedIds.includes(p.id);
                   return (
@@ -484,11 +502,11 @@ export const ProductsListPage: React.FC = () => {
 
                       <td className="py-2.5 px-3">
                         <div className="font-semibold text-foreground tabular-nums">
-                          {p.price.toLocaleString('uz-UZ')} so'm
+                          {formatPrice(p.price)}
                         </div>
                         {p.originalPrice && p.originalPrice > p.price && (
                           <div className="text-[10px] text-red-500 flex items-center gap-1">
-                            <span className="line-through text-muted-foreground">{p.originalPrice.toLocaleString('uz-UZ')}</span>
+                            <span className="line-through text-muted-foreground">{formatPrice(p.originalPrice)}</span>
                             <span>-{Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}%</span>
                           </div>
                         )}
@@ -552,6 +570,55 @@ export const ProductsListPage: React.FC = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+          <div className="text-xs text-muted-foreground">
+            Sahifa {currentPage} / {totalPages} — {filteredProducts.length} ta mahsulot
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              let pageNum = i + 1;
+              if (totalPages > 5) {
+                if (currentPage <= 3) pageNum = i + 1;
+                else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                else pageNum = currentPage - 2 + i;
+              }
+              return (
+                <button
+                  key={pageNum}
+                  type="button"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                    currentPage === pageNum
+                      ? 'bg-foreground text-background'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation */}
       <ConfirmDialog isOpen={!!productToDelete} title="Mahsulotni o'chirish" message={`"${productToDelete?.name}" nomli mahsulotni rostdan ham o'chirmoqchimisiz?`} confirmLabel="Ha, o'chirilsin" onConfirm={handleDeleteConfirm} onCancel={() => setProductToDelete(null)} />
 
@@ -565,3 +632,5 @@ export const ProductsListPage: React.FC = () => {
     </div>
   );
 };
+
+export default ProductsListPage;
