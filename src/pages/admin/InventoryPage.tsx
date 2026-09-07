@@ -45,6 +45,23 @@ export const InventoryPage: React.FC = () => {
   }, [products]);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [restocked, setRestocked] = useState(false);
+
+  const lowCount = products.filter((p) => p.inStock && (p.stockCount ?? 0) > 0 && (p.stockCount ?? 0) <= 3).length;
+  const outCount = products.filter((p) => !p.inStock || (p.stockCount ?? 0) <= 0).length;
+
+  const handleRestockLow = () => {
+    const updated: Record<string, { inStock: boolean; count: number }> = {};
+    products.forEach((p) => {
+      const cur = localStock[p.id] ?? { inStock: p.inStock, count: p.stockCount ?? 0 };
+      if (cur.inStock && cur.count > 0 && cur.count <= 3) updated[p.id] = { inStock: true, count: cur.count + 5 };
+    });
+    if (Object.keys(updated).length === 0) return;
+    setLocalStock((prev) => ({ ...prev, ...updated }));
+    Object.entries(updated).forEach(([pid, v]) => updateProductStock(pid, v.inStock, v.count));
+    setRestocked(true);
+    setTimeout(() => setRestocked(false), 2500);
+  };
 
   const filteredProducts = products.filter((p) => {
     if (searchQuery.trim()) {
@@ -125,6 +142,21 @@ export const InventoryPage: React.FC = () => {
         </button>
       </div>
 
+      {(lowCount > 0 || outCount > 0) && (
+        <div className="p-4 rounded-3xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center gap-3" role="alert">
+          <div className="flex items-start gap-2.5 flex-1">
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-bold text-amber-800 dark:text-amber-300">Zaxira ogohlantirishi: {lowCount} ta kam qoldi, {outCount} ta tugagan</p>
+              <p className="text-[11px] text-amber-700/80 dark:text-amber-400/80 mt-0.5">Manfiy qoldiq avtomatik bloklanadi (0 dan pastga tushib ketmaydi). Kam qolganlarga +5 dona qo‘shishingiz mumkin.</p>
+            </div>
+          </div>
+          <button type="button" onClick={handleRestockLow} disabled={lowCount === 0} className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-black shadow-sm disabled:opacity-40 flex items-center gap-1.5 self-start sm:self-auto">
+            <Plus className="w-3.5 h-3.5" /> {restocked ? 'Qo‘shildi!' : `Kam qolganlarga +5 (${lowCount})`}
+          </button>
+        </div>
+      )}
+
       {/* Filters Bar */}
       <div className="p-4 rounded-3xl bg-card border border-border shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
@@ -190,8 +222,8 @@ export const InventoryPage: React.FC = () => {
 
       {/* Inventory Table */}
       <div className="bg-card rounded-3xl border border-border shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto max-h-[70vh]">
+          <table className="w-full text-left text-xs admin-table-sticky">
             <thead>
               <tr className="border-b border-border bg-muted/70 bg-muted/40 text-muted-foreground font-bold uppercase text-[10px]">
                 <th className="py-3.5 pl-6 pr-3">Mahsulot</th>

@@ -371,6 +371,34 @@
   .admin-table-row:hover {
     background: var(--color-muted);
   }
+  .admin-table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--color-card);
+  }
+  .admin-kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-muted);
+    font-size: 10px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+  }
+  @media print {
+    aside, header, nav, .no-print {
+      display: none !important;
+    }
+    main {
+      padding: 0 !important;
+    }
+    body {
+      background: #fff !important;
+    }
+  }
 
   .nav-link {
     position: relative;

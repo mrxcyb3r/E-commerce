@@ -14,6 +14,7 @@ import {
   Image as ImageIcon,
   Loader2,
   AlertCircle,
+  Eye,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
@@ -191,6 +192,42 @@ export const StoreAdminPage: React.FC = () => {
           {errorMessage}
         </div>
       )}
+
+      {/* Brand preview */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs">
+        <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-2 mb-4">
+          <Eye className="w-4 h-4 text-amber-500" /><span>Brend ko‘rinishi (jonli)</span>
+        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-border overflow-hidden">
+          <div className="flex items-center gap-3 p-4 flex-1 min-w-0" style={{ background: `linear-gradient(135deg, ${primaryColor}14, ${accentColor}14)` }}>
+            {logoUrl ? (
+              <img src={logoUrl} alt={name || 'Logo'} className="w-12 h-12 rounded-xl object-cover border border-border bg-white" referrerPolicy="no-referrer" />
+            ) : (
+              <span className="w-12 h-12 rounded-xl text-white font-black text-lg flex items-center justify-center" style={{ background: primaryColor }}>{(name || 'D').charAt(0).toUpperCase()}</span>
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-black truncate">{name || 'Do‘kon nomi'}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{tagline || 'Shior kiritilmagan'}</p>
+              <div className="flex gap-1.5 mt-1.5">
+                <span className="w-5 h-5 rounded-md border border-border" style={{ background: primaryColor }} title="Asosiy rang" />
+                <span className="w-5 h-5 rounded-md border border-border" style={{ background: secondaryColor }} title="Ikkinchi rang" />
+                <span className="w-5 h-5 rounded-md border border-border" style={{ background: accentColor }} title="Aksent rang" />
+              </div>
+            </div>
+          </div>
+          <div className="p-4 sm:w-64 shrink-0 space-y-1.5 border-t sm:border-t-0 sm:border-l border-border">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">SEO ko‘rinishi</p>
+            <p className="text-xs font-bold text-blue-700 dark:text-blue-400 truncate">{defaultSeoTitle || name || 'Sayt sarlavhasi'}</p>
+            <p className="text-[11px] text-muted-foreground line-clamp-2">{defaultSeoDescription || aboutText || 'Sayt tavsifi kiritilmagan'}</p>
+            {(googleMapsUrl || yandexMapsUrl) && (
+              <div className="flex gap-2 pt-1">
+                {googleMapsUrl && <a href={googleMapsUrl} target="_blank" rel="noreferrer" className="text-[11px] font-bold text-primary hover:underline">Google Maps ↗</a>}
+                {yandexMapsUrl && <a href={yandexMapsUrl} target="_blank" rel="noreferrer" className="text-[11px] font-bold text-primary hover:underline">Yandex Maps ↗</a>}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Main Info */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">

@@ -20,11 +20,12 @@ import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 
 export const CategoriesPage: React.FC = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, reorderCategories } = useStore();
+  const { categories, products, addCategory, updateCategory, deleteCategory, reorderCategories, bulkUpdateProducts } = useStore();
 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [moveTargetId, setMoveTargetId] = useState<string>('');
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -94,16 +95,53 @@ export const CategoriesPage: React.FC = () => {
     }
   }, [name, slug, description, image, isCreating, editingCategory, addCategory, updateCategory, validateForm]);
 
+  const productsInCategory = useCallback((cat: Category | null) => {
+    if (!cat) return [];
+    return products.filter((p) => p.category === cat.id || p.category === cat.slug || p.categoryName === cat.name);
+  }, [products]);
+
+  const categoryHealth = useCallback((cat: Category) => {
+    const items = productsInCategory(cat);
+    const featured = items.filter((p) => p.isFeatured).length;
+    const hidden = items.filter((p) => p.published === false).length;
+    const noImage = items.filter((p) => !p.images || p.images.length === 0).length;
+    const checks = [
+      !!cat.image,
+      !!cat.description?.trim(),
+      items.length > 0,
+      noImage === 0,
+    ];
+    const score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    return { total: items.length, featured, hidden, noImage, score };
+  }, [productsInCategory]);
+
   const handleDeleteConfirm = useCallback(async () => {
     if (!categoryToDelete) return;
     setDeleteError(null);
     try {
       deleteCategory(categoryToDelete.id);
       setCategoryToDelete(null);
+      setMoveTargetId('');
     } catch (e: any) {
       setDeleteError(e.message || 'Kategoriyani o\'chirishda xatolik yuz berdi');
     }
   }, [categoryToDelete, deleteCategory]);
+
+  const handleMoveAndDelete = useCallback(async () => {
+    if (!categoryToDelete || !moveTargetId) return;
+    const target = categories.find((c) => c.id === moveTargetId);
+    if (!target) return;
+    setDeleteError(null);
+    try {
+      const ids = productsInCategory(categoryToDelete).map((p) => p.id);
+      if (ids.length > 0) bulkUpdateProducts(ids, { category: target.slug });
+      deleteCategory(categoryToDelete.id);
+      setCategoryToDelete(null);
+      setMoveTargetId('');
+    } catch (e: any) {
+      setDeleteError(e.message || 'Ko‘chirishda xatolik yuz berdi');
+    }
+  }, [categoryToDelete, moveTargetId, categories, productsInCategory, bulkUpdateProducts, deleteCategory]);
 
   // Check for duplicate slug
   const duplicateSlug = categories.find(c => c.slug === slug && c.id !== editingCategory?.id);
@@ -142,7 +180,9 @@ export const CategoriesPage: React.FC = () => {
       {/* Grid */}
       {categories.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map((cat, idx) => (
+          {categories.map((cat, idx) => {
+            const h = categoryHealth(cat);
+            return (
             <div key={cat.id} className="group bg-card border border-border rounded-xl overflow-hidden hover:border-muted-foreground/20 hover:shadow-sm transition-all">
               <div className="relative aspect-16/9 bg-muted overflow-hidden">
                 <img src={cat.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" />
@@ -154,12 +194,21 @@ export const CategoriesPage: React.FC = () => {
                 </div>
                 <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Package className="w-3 h-3" />
-                  {cat.productCount ?? 0}
+                  {h.total}
+                </div>
+                <div className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm ${h.score >= 75 ? 'bg-emerald-500/90 text-white' : h.score >= 50 ? 'bg-amber-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
+                  {h.score}%
                 </div>
               </div>
 
-              <div className="p-3">
+              <div className="p-3 space-y-2">
                 <p className="text-[11px] text-muted-foreground line-clamp-2">{cat.description || "Ushbu kategoriya bo'yicha mahsulotlar"}</p>
+                <div className="flex flex-wrap gap-1.5 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold">★ {h.featured} mashhur</span>
+                  {h.hidden > 0 && <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-semibold">{h.hidden} yashirin</span>}
+                  {h.noImage > 0 && <span className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 font-semibold">{h.noImage} rasmsiz</span>}
+                  {!cat.image && <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-semibold">Muqova yo‘q</span>}
+                </div>
               </div>
 
               <div className="px-3 pb-3 flex items-center justify-between">
@@ -181,7 +230,8 @@ export const CategoriesPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -255,33 +305,56 @@ export const CategoriesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Delete confirmation with error handling */}
-      {categoryToDelete && deleteError === null && (
+      {/* Delete confirmation with move-before-delete */}
+      {categoryToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+          <div onClick={() => { setCategoryToDelete(null); setDeleteError(null); setMoveTargetId(''); }} className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="relative z-10 w-full max-w-md bg-card rounded-xl p-6 shadow-xl border border-border space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground">Kategoriyani o'chirish</h3>
-              <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><X className="w-4 h-4" /></button>
+              <h3 className="text-sm font-semibold text-foreground">Kategoriyani o‘chirish</h3>
+              <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); setMoveTargetId(''); }} className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Yopish"><X className="w-4 h-4" /></button>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40">
-              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-              <p className="text-[11px] text-amber-800 dark:text-amber-300">
-                Bu kategoriyada <strong>{categories.find(c => c.id === categoryToDelete?.id)?.productCount ?? 0} ta mahsulot</strong> mavjud.
-                Avval mahsulotlarni boshqa kategoriyaga o'tkazing.
-              </p>
-            </div>
-
-            <div className="pt-3 flex items-center justify-end gap-2 border-t border-border">
-              <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">Bekor qilish</button>
-              <button type="button" onClick={handleDeleteConfirm} className="px-4 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/90 transition-all shadow-sm">Ha, o'chirilsin</button>
-            </div>
+            {(() => {
+              const count = productsInCategory(categoryToDelete).length;
+              const targets = categories.filter((c) => c.id !== categoryToDelete.id);
+              return (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40">
+                    <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                      <strong>“{categoryToDelete.name}”</strong> o‘chiriladi.
+                      {count > 0 ? (
+                        <> Bu kategoriyada <strong>{count} ta mahsulot</strong> bor. O‘chirishdan oldin ularni boshqa kategoriyaga ko‘chiring.</>
+                      ) : (
+                        <> Bu kategoriyada mahsulot yo‘q — xavfsiz o‘chirish mumkin.</>
+                      )}
+                    </p>
+                  </div>
+                  {count > 0 && (
+                    <div>
+                      <label className="block text-[11px] font-medium text-muted-foreground mb-1">Mahsulotlarni ko‘chirish</label>
+                      <select value={moveTargetId} onChange={(e) => setMoveTargetId(e.target.value)} className="admin-input font-medium" aria-label="Qayerga ko‘chirish">
+                        <option value="">Kategoriya tanlang…</option>
+                        {targets.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
+                      </select>
+                    </div>
+                  )}
+                  {deleteError && <p className="text-[11px] text-destructive font-medium" role="alert">{deleteError}</p>}
+                  <div className="pt-3 flex items-center justify-end gap-2 border-t border-border">
+                    <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); setMoveTargetId(''); }} className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">Bekor qilish</button>
+                    {count > 0 ? (
+                      <button type="button" disabled={!moveTargetId} onClick={handleMoveAndDelete} className="px-4 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold hover:bg-foreground/90 transition-all shadow-sm disabled:opacity-40">Ko‘chirib o‘chirish</button>
+                    ) : (
+                      <button type="button" onClick={handleDeleteConfirm} className="px-4 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/90 transition-all shadow-sm">Ha, o‘chirilsin</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
-
-      <ConfirmDialog isOpen={!!categoryToDelete && !deleteError} title="Kategoriyani o'chirish" message={`"${categoryToDelete?.name}" o'chiriladi.`} confirmLabel="Ha, o'chirilsin" onConfirm={handleDeleteConfirm} onCancel={() => setCategoryToDelete(null)} />
     </div>
   );
 };

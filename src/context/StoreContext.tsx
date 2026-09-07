@@ -1152,6 +1152,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       clean.stock_status = updates.inStock ? 'mavjud' : 'tugagan';
     }
     if ('stockCount' in updates) clean.stock_count = updates.stockCount ?? 0;
+    if ('price' in updates && typeof updates.price === 'number') clean.price = updates.price;
+    if ('originalPrice' in updates) clean.original_price = updates.originalPrice ?? null;
     if ('category' in updates && updates.category) {
       const cat = categories.find((c) => c.slug === updates.category || c.id === updates.category);
       clean.category_id = cat?.id ?? null;

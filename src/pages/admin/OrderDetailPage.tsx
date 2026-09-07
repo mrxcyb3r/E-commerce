@@ -13,8 +13,10 @@ import {
   StickyNote,
   ChevronRight,
   User,
+  Printer,
+  History,
 } from 'lucide-react';
-import { fetchOrderById, updateOrderStatus, fetchOrderHistory } from '../../lib/supabase/orders';
+import { fetchOrderById, updateOrderStatus, fetchOrderHistory, fetchOrders } from '../../lib/supabase/orders';
 import type { Order, OrderStatusHistory } from '../../types/order';
 import {
   ORDER_STATUS_LABELS,
@@ -43,6 +45,7 @@ export const OrderDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [history, setHistory] = useState<OrderStatusHistory[]>([]);
+  const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
@@ -55,6 +58,11 @@ export const OrderDetailPage: React.FC = () => {
     ]).then(([orderData, historyData]) => {
       setOrder(orderData);
       setHistory(historyData);
+      if (orderData?.customer_phone) {
+        fetchOrders({ search: orderData.customer_phone }).then((res) => {
+          setCustomerOrders(res.orders.filter((o) => o.id !== id).slice(0, 5));
+        }).catch(() => undefined);
+      }
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -146,7 +154,15 @@ export const OrderDetailPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            title="Buyurtmani chop etish"
+            className="px-3.5 py-2 rounded-lg border border-border bg-card text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all flex items-center gap-1.5"
+          >
+            <Printer className="w-3.5 h-3.5" /> Chop etish
+          </button>
           {order.order_status !== 'cancelled' && order.order_status !== 'delivered' && (
             <>
               {nextStatus && (
@@ -358,6 +374,26 @@ export const OrderDetailPage: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Customer history */}
+          <div className="bg-card border border-border rounded-xl p-4">
+            <h3 className="text-xs font-semibold text-foreground flex items-center gap-1.5 mb-2.5">
+              <History className="w-3.5 h-3.5 text-muted-foreground" /> Mijozning boshqa buyurtmalari
+            </h3>
+            {customerOrders.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground">Bu telefon raqamidan boshqa buyurtma topilmadi.</p>
+            ) : (
+              <div className="space-y-1.5">
+                {customerOrders.map((o) => (
+                  <Link key={o.id} to={`/admin/orders/${o.id}`} className="flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-muted/40 hover:bg-muted/70 border border-border/50 text-xs">
+                    <span className="font-bold">#{o.id.slice(-8).toUpperCase()}</span>
+                    <span className="text-muted-foreground tabular-nums">{formatPrice(o.total)}</span>
+                    <span className="text-muted-foreground">{new Date(o.created_at).toLocaleDateString('uz-UZ')}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

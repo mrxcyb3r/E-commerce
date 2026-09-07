@@ -11,7 +11,7 @@ import {
   Filter,
   ChevronRight,
   RefreshCw,
-  Plus,
+  Download,
 } from 'lucide-react';
 import {
   fetchOrders,
@@ -119,6 +119,29 @@ export const OrdersListPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={() => {
+              if (orders.length === 0) return;
+              const header = 'id,customer,phone,total,status,payment,created_at';
+              const body = orders.map((o) => [`#${o.id.slice(-8).toUpperCase()}`, `"${o.customer_name}"`, o.customer_phone, o.total, o.order_status, o.payment_status, o.created_at].join(',')).join('\n');
+              const blob = new Blob([header + '\n' + body], { type: 'text/csv;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `orders-export-${new Date().toISOString().slice(0, 10)}.csv`;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(url);
+            }}
+            disabled={orders.length === 0}
+            title="Ko‘rinib turgan buyurtmalarni CSV ga eksport qilish"
+            className="px-3 py-2 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-40"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Eksport</span>
+          </button>
+          <button
+            type="button"
             onClick={() => loadOrders(true)}
             disabled={refreshing}
             className="px-3 py-2 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors flex items-center gap-1.5"
@@ -220,8 +243,8 @@ export const OrdersListPage: React.FC = () => {
         />
       ) : (
         <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto max-h-[70vh]">
+            <table className="w-full text-left text-xs border-collapse admin-table-sticky">
               <thead>
                 <tr className="border-b border-border text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/30">
                   <th className="py-2.5 pl-4 pr-3">Buyurtma</th>

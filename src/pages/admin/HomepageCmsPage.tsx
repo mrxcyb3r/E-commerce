@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Home,
   Save,
@@ -16,6 +16,12 @@ import {
   Trash2,
   Loader2,
   AlertCircle,
+  Undo2,
+  Redo2,
+  Monitor,
+  Tablet,
+  Smartphone,
+  RotateCcw,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
@@ -61,16 +67,101 @@ export const HomepageCmsPage: React.FC = () => {
   // Hero slider slides (managed locally, published on save)
   const [slides, setSlides] = useState<HomepageSlide[]>([]);
   const [slideToDelete, setSlideToDelete] = useState<HomepageSlide | null>(null);
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+
+  interface DraftSnapshot {
+    heroBadge: string; heroTitle: string; heroHighlightedTitle: string; heroSubtitle: string;
+    heroPrimaryButtonText: string; heroPrimaryButtonLink: string; heroSecondaryButtonText: string; heroSecondaryButtonLink: string;
+    heroImage: string; promoBadge: string; promoTitle: string; promoDescription: string; promoButtonText: string; promoButtonLink: string;
+    promoImageUrl: string; promoEnabled: boolean; slides: HomepageSlide[];
+  }
+  const [history, setHistory] = useState<DraftSnapshot[]>([]);
+  const [historyIdx, setHistoryIdx] = useState(-1);
+
+  const captureDraft = useCallback((): DraftSnapshot => ({
+    heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink,
+    heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoDescription,
+    promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, slides: JSON.parse(JSON.stringify(slides)),
+  }), [heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink, heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoDescription, promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, slides]);
+
+  const restoreDraft = useCallback((s: DraftSnapshot) => {
+    setHeroBadge(s.heroBadge); setHeroTitle(s.heroTitle); setHeroHighlightedTitle(s.heroHighlightedTitle);
+    setHeroSubtitle(s.heroSubtitle); setHeroPrimaryButtonText(s.heroPrimaryButtonText); setHeroPrimaryButtonLink(s.heroPrimaryButtonLink);
+    setHeroSecondaryButtonText(s.heroSecondaryButtonText); setHeroSecondaryButtonLink(s.heroSecondaryButtonLink);
+    setHeroImage(s.heroImage); setPromoBadge(s.promoBadge); setPromoTitle(s.promoTitle); setPromoDescription(s.promoDescription);
+    setPromoButtonText(s.promoButtonText); setPromoButtonLink(s.promoButtonLink); setPromoImageUrl(s.promoImageUrl);
+    setPromoEnabled(s.promoEnabled); setSlides(s.slides);
+  }, []);
+
+  const pushHistory = useCallback(() => {
+    const snap = captureDraft();
+    setHistory((prev) => {
+      const base = historyIdx >= 0 ? prev.slice(0, historyIdx + 1) : prev;
+      const next = [...base, snap].slice(-20);
+      return next;
+    });
+    setHistoryIdx((i) => Math.min(i + 1, 19));
+  }, [captureDraft, historyIdx]);
+
+  const handleUndo = useCallback(() => {
+    if (historyIdx < 0) return;
+    const target = history[historyIdx];
+    const nextIdx = historyIdx - 1;
+    // push current state to redo stack position
+    setHistory((prev) => {
+      const cur = captureDraft();
+      const withCur = nextIdx < prev.length - 1 ? prev : [...prev, cur].slice(-20);
+      return withCur;
+    });
+    if (target) restoreDraft(target);
+    setHistoryIdx(nextIdx);
+  }, [history, historyIdx, restoreDraft, captureDraft]);
+
+  const handleRedo = useCallback(() => {
+    const next = history[historyIdx + 1];
+    if (!next) return;
+    restoreDraft(next);
+    setHistoryIdx(historyIdx + 1);
+  }, [history, historyIdx, restoreDraft]);
 
   useEffect(() => {
     setSlides(homepageSlides);
   }, [homepageSlides]);
+
+  const isDirty = useMemo(() => {
+    try {
+      const pub = JSON.stringify({ h: homepageCms.hero, p: homepageCms.promoBanner, s: homepageSlides });
+      const draft = JSON.stringify({
+        h: { badge: heroBadge, title: heroTitle, highlightedTitle: heroHighlightedTitle, subtitle: heroSubtitle, primaryButtonText: heroPrimaryButtonText, primaryButtonLink: heroPrimaryButtonLink, secondaryButtonText: heroSecondaryButtonText, secondaryButtonLink: heroSecondaryButtonLink, heroImage },
+        p: { badge: promoBadge, title: promoTitle, description: promoDescription, buttonText: promoButtonText, buttonLink: promoButtonLink, imageUrl: promoImageUrl, enabled: promoEnabled },
+        s: slides,
+      });
+      return pub !== draft;
+    } catch { return false; }
+  }, [homepageCms, homepageSlides, heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink, heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoDescription, promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, slides]);
+
+  const handleDiscard = useCallback(() => {
+    setHeroBadge(homepageCms.hero.badge); setHeroTitle(homepageCms.hero.title);
+    setHeroHighlightedTitle(homepageCms.hero.highlightedTitle); setHeroSubtitle(homepageCms.hero.subtitle);
+    setHeroPrimaryButtonText(homepageCms.hero.primaryButtonText); setHeroPrimaryButtonLink(homepageCms.hero.primaryButtonLink);
+    setHeroSecondaryButtonText(homepageCms.hero.secondaryButtonText); setHeroSecondaryButtonLink(homepageCms.hero.secondaryButtonLink);
+    setHeroImage(homepageCms.hero.heroImage || '');
+    setPromoBadge(homepageCms.promoBanner?.badge || ''); setPromoTitle(homepageCms.promoBanner?.title || '');
+    setPromoDescription(homepageCms.promoBanner?.description || ''); setPromoButtonText(homepageCms.promoBanner?.buttonText || '');
+    setPromoButtonLink(homepageCms.promoBanner?.buttonLink || ''); setPromoImageUrl(homepageCms.promoBanner?.imageUrl || '');
+    setPromoEnabled(homepageCms.promoBanner?.enabled !== false);
+    setWhyChooseUsTitle(homepageCms.whyChooseUsTitle); setWhyChooseUsSubtitle(homepageCms.whyChooseUsSubtitle);
+    setFeaturedSectionTitle(homepageCms.featuredSectionTitle); setFeaturedSectionSubtitle(homepageCms.featuredSectionSubtitle);
+    setVideoSectionTitle(homepageCms.videoSectionTitle); setVideoSectionSubtitle(homepageCms.videoSectionSubtitle);
+    setSlides(homepageSlides); setHistory([]); setHistoryIdx(-1); setErrorMessage(null);
+  }, [homepageCms, homepageSlides]);
 
   const updateSlide = useCallback((id: string, patch: Partial<HomepageSlide>) => {
     setSlides((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   }, []);
 
   const addSlide = useCallback(() => {
+    pushHistory();
     const id = `slide-${Date.now()}`;
     const newSlide: HomepageSlide = {
       id,
@@ -85,9 +176,10 @@ export const HomepageCmsPage: React.FC = () => {
       order: slides.length * 10 + 10,
     };
     setSlides((prev) => [...prev, newSlide]);
-  }, [slides.length]);
+  }, [slides.length, pushHistory]);
 
   const moveSlide = useCallback((index: number, dir: -1 | 1) => {
+    pushHistory();
     setSlides((prev) => {
       const next = [...prev];
       const target = index + dir;
@@ -96,12 +188,13 @@ export const HomepageCmsPage: React.FC = () => {
       next.splice(target, 0, item);
       return next.map((s, i) => ({ ...s, order: i * 10 + 10 }));
     });
-  }, []);
+  }, [pushHistory]);
 
   const removeSlide = useCallback((id: string) => {
+    pushHistory();
     setSlides((prev) => prev.filter((s) => s.id !== id));
     setSlideToDelete(null);
-  }, []);
+  }, [pushHistory]);
 
   const validateForm = useCallback((): boolean => {
     const errors: string[] = [];
@@ -123,6 +216,7 @@ export const HomepageCmsPage: React.FC = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    pushHistory();
     setIsSaving(true);
     setSavedSuccess(false);
     setErrorMessage(null);
@@ -167,43 +261,51 @@ export const HomepageCmsPage: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink, heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoSubtitle, promoDescription, promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, whyChooseUsTitle, whyChooseUsSubtitle, featuredSectionTitle, featuredSectionSubtitle, videoSectionTitle, videoSectionSubtitle, slides, updateHomepageCms, publishHomepageSlides, validateForm]);
+  }, [heroBadge, heroTitle, heroHighlightedTitle, heroSubtitle, heroPrimaryButtonText, heroPrimaryButtonLink, heroSecondaryButtonText, heroSecondaryButtonLink, heroImage, promoBadge, promoTitle, promoSubtitle, promoDescription, promoButtonText, promoButtonLink, promoImageUrl, promoEnabled, whyChooseUsTitle, whyChooseUsSubtitle, featuredSectionTitle, featuredSectionSubtitle, videoSectionTitle, videoSectionSubtitle, slides, updateHomepageCms, publishHomepageSlides, validateForm, pushHistory]);
+
+  const previewWidth = previewMode === 'desktop' ? 'max-w-3xl' : previewMode === 'tablet' ? 'max-w-md' : 'max-w-[320px]';
+  const activeSlidesCount = () => slides.filter((s) => s.active).length;
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-5xl mx-auto pb-16">
       {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-16 z-20 bg-muted/90 bg-card/90 backdrop-blur-md py-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
-            Bosh Sahifa (Homepage CMS)
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            Bosh sahifadagi barcha sarlavhalar, bannerlar va taqdimot bloklarini tahrirlang
-          </p>
-        </div>
+      <div className="flex flex-col gap-3 sticky top-16 z-20 bg-muted/90 bg-card/90 backdrop-blur-md py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 border-b border-border/50">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
+              Bosh Sahifa (Homepage CMS)
+              {isDirty ? (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600">Qoralama</span>
+              ) : (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600">Nashr qilingan</span>
+              )}
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              O‘zgarishlar saqlanmaguncha mijozlarga ko‘rinmaydi. Oldin ko‘rib chiqing, keyin nashr qiling.
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin stroke-[3]" />
-              <span>Saqlanmoqda...</span>
-            </>
-          ) : savedSuccess ? (
-            <>
-              <Check className="w-4 h-4 stroke-[3]" />
-              <span>Saqlandi!</span>
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              <span>Bosh sahifani saqlash</span>
-            </>
-          )}
-        </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" disabled={historyIdx < 0} onClick={handleUndo} title="Bekor qilish (undo)" className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Undo"><Undo2 className="w-4 h-4" /></button>
+            <button type="button" disabled={!history[historyIdx + 1]} onClick={handleRedo} title="Qaytarish (redo)" className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Redo"><Redo2 className="w-4 h-4" /></button>
+            <button type="button" disabled={!isDirty || isSaving} onClick={handleDiscard} title="O‘zgarishlarni bekor qilish" className="px-3 py-2 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-40 flex items-center gap-1.5">
+              <RotateCcw className="w-3.5 h-3.5" /> Bekor qilish
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-background text-xs font-black shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? (
+                <><Loader2 className="w-4 h-4 animate-spin stroke-[3]" /><span>Saqlanmoqda...</span></>
+              ) : savedSuccess ? (
+                <><Check className="w-4 h-4 stroke-[3]" /><span>Saqlandi!</span></>
+              ) : (
+                <><Save className="w-4 h-4" /><span>{isDirty ? 'Nashr qilish' : 'Bosh sahifani saqlash'}</span></>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {errorMessage && (
@@ -212,6 +314,47 @@ export const HomepageCmsPage: React.FC = () => {
           {errorMessage}
         </div>
       )}
+
+      {/* Live preview */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-2">
+            <Eye className="w-4 h-4 text-amber-500" /><span>Jonli ko‘rinish (nashrdan oldin)</span>
+          </h3>
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-muted border border-border" role="tablist" aria-label="Preview o‘lchami">
+            {([
+              { k: 'desktop', icon: Monitor, label: 'Desktop' },
+              { k: 'tablet', icon: Tablet, label: 'Planshet' },
+              { k: 'mobile', icon: Smartphone, label: 'Mobil' },
+            ] as const).map((m) => (
+              <button key={m.k} type="button" role="tab" aria-selected={previewMode === m.k} onClick={() => setPreviewMode(m.k)} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-1.5 ${previewMode === m.k ? 'bg-foreground text-background shadow' : 'text-muted-foreground hover:text-foreground'}`}>
+                <m.icon className="w-3.5 h-3.5" />{m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <div className={`w-full ${previewWidth} transition-all rounded-2xl overflow-hidden border border-border bg-background`}>
+            <div className="relative aspect-[16/9] bg-muted">
+              {heroImage ? <img src={heroImage} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" /> : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">Hero rasmi tanlanmagan</div>}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 flex flex-col justify-end">
+                {heroBadge && <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white mb-1.5">{heroBadge}</span>}
+                <p className="text-white font-black leading-tight text-base sm:text-xl">{heroTitle} <span className="text-amber-400">{heroHighlightedTitle}</span></p>
+                <p className="text-white/80 text-[11px] mt-1 line-clamp-2">{heroSubtitle}</p>
+                <div className="flex gap-2 mt-2">
+                  {heroPrimaryButtonText && <span className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-white text-black">{heroPrimaryButtonText}</span>}
+                  {heroSecondaryButtonText && <span className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-white/60 text-white">{heroSecondaryButtonText}</span>}
+                </div>
+              </div>
+            </div>
+            <div className="p-3 flex items-center justify-between text-[11px] text-muted-foreground border-t border-border">
+              <span>{activeSlidesCount()} faol slayd · {slides.length} jami</span>
+              <span>{promoEnabled && promoTitle ? `Promo: ${promoTitle.slice(0, 24)}` : 'Promo o‘chiq'}</span>
+            </div>
+          </div>
+        </div>
+        <p className="text-[11px] text-muted-foreground">Bu — qoralama ko‘rinishi. “Nashr qilish” bosilgach ommaviy saytda ko‘rinadi.</p>
+      </div>
 
       {/* Card: Hero Section */}
       <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs space-y-6">

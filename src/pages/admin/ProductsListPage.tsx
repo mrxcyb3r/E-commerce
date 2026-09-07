@@ -21,6 +21,8 @@ import {
   ChevronRight,
   Filter,
   RefreshCw,
+  Download,
+  Banknote,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
@@ -49,6 +51,7 @@ export const ProductsListPage: React.FC = () => {
     toggleProductFeatured,
     toggleProductNew,
     toggleProductPublished,
+    updateProduct,
     updateProductStock,
     bulkUpdateProducts,
     bulkDeleteProducts,
@@ -59,10 +62,14 @@ export const ProductsListPage: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedBrand, setSelectedBrand] = useState<string>('all');
+  const [minPrice, setMinPrice] = useState<string>('');
+  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [recencyFilter, setRecencyFilter] = useState<string>('all');
   const [stockFilter, setStockFilter] = useState<string>('all');
   const [badgeFilter, setBadgeFilter] = useState<string>(initialFilter);
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'name'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'name' | 'updated'>('newest');
   const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -71,6 +78,12 @@ export const ProductsListPage: React.FC = () => {
   const [bulkCategoryMenu, setBulkCategoryMenu] = useState(false);
   const [bulkDupeMenu, setBulkDupeMenu] = useState(false);
   const [bulkDupeCount, setBulkDupeCount] = useState(2);
+  const [bulkPriceOpen, setBulkPriceOpen] = useState(false);
+  const [bulkPriceValue, setBulkPriceValue] = useState('');
+  const [bulkStockOpen, setBulkStockOpen] = useState(false);
+  const [bulkStockValue, setBulkStockValue] = useState('');
+  const [bulkDiscountOpen, setBulkDiscountOpen] = useState(false);
+  const [bulkDiscountPct, setBulkDiscountPct] = useState('10');
   const [bulkBusy, setBulkBusy] = useState(false);
   const [batchStatus, setBatchStatus] = useState<{ ok: boolean; text: string } | null>(null);
   const statusTimer = useRef<number | null>(null);
@@ -89,7 +102,17 @@ export const ProductsListPage: React.FC = () => {
     statusTimer.current = window.setTimeout(() => setBatchStatus(null), 3000);
   };
 
+  const brandOptions = useMemo(() => {
+    const set = new Set<string>();
+    products.forEach((p) => { if (p.brand?.trim()) set.add(p.brand.trim()); });
+    return Array.from(set).sort();
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    const min = minPrice.trim() ? Number(minPrice) : null;
+    const max = maxPrice.trim() ? Number(maxPrice) : null;
     return products.filter((product) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -97,13 +120,27 @@ export const ProductsListPage: React.FC = () => {
         const matchesSku = product.sku?.toLowerCase().includes(q);
         const matchesDesc = product.description.toLowerCase().includes(q);
         const matchesTags = product.tags?.some((t) => t.toLowerCase().includes(q));
-        if (!matchesName && !matchesSku && !matchesDesc && !matchesTags) return false;
+        const matchesBrand = product.brand?.toLowerCase().includes(q);
+        if (!matchesName && !matchesSku && !matchesDesc && !matchesTags && !matchesBrand) return false;
       }
 
       if (selectedCategory !== 'all') {
         const cat = categories.find((c) => c.id === selectedCategory);
         if (product.category !== selectedCategory && product.categoryName !== selectedCategory) return false;
         if (cat && product.category !== cat.slug && product.categoryName !== cat.name) return false;
+      }
+
+      if (selectedBrand !== 'all' && (product.brand || '') !== selectedBrand) return false;
+      if (min !== null && Number.isFinite(min) && product.price < min) return false;
+      if (max !== null && Number.isFinite(max) && product.price > max) return false;
+
+      if (recencyFilter === 'created-7d') {
+        const t = new Date(product.createdAt || 0).getTime();
+        if (!t || now - t > sevenDays) return false;
+      }
+      if (recencyFilter === 'updated-7d') {
+        const t = new Date(product.updatedAt || product.createdAt || 0).getTime();
+        if (!t || now - t > sevenDays) return false;
       }
 
       if (stockFilter === 'in-stock' && !product.inStock) return false;
@@ -122,9 +159,10 @@ export const ProductsListPage: React.FC = () => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       if (sortBy === 'name') return a.name.localeCompare(b.name);
+      if (sortBy === 'updated') return (new Date(b.updatedAt || b.createdAt || 0).getTime()) - (new Date(a.updatedAt || a.createdAt || 0).getTime());
       return (new Date(b.createdAt || 0).getTime()) - (new Date(a.createdAt || 0).getTime());
     });
-  }, [products, searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy, categories]);
+  }, [products, searchQuery, selectedCategory, selectedBrand, minPrice, maxPrice, recencyFilter, stockFilter, badgeFilter, statusFilter, sortBy, categories]);
 
   const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE) || 1;
   const paginatedProducts = useMemo(() => {
@@ -134,7 +172,13 @@ export const ProductsListPage: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, stockFilter, badgeFilter, statusFilter, sortBy]);
+  }, [searchQuery, selectedCategory, selectedBrand, minPrice, maxPrice, recencyFilter, stockFilter, badgeFilter, statusFilter, sortBy]);
+
+  const clearFilters = () => {
+    setSearchQuery(''); setSelectedCategory('all'); setSelectedBrand('all');
+    setMinPrice(''); setMaxPrice(''); setRecencyFilter('all');
+    setStockFilter('all'); setBadgeFilter('all'); setStatusFilter('all');
+  };
 
   useEffect(() => {
     setSelectedIds((prev) => prev.filter((id) => products.some((p) => p.id === id)));
@@ -217,6 +261,70 @@ export const ProductsListPage: React.FC = () => {
     }
   };
 
+  const runBulkPrice = () => {
+    const price = Number(bulkPriceValue);
+    if (selectedIds.length === 0 || !Number.isFinite(price) || price < 0) return;
+    setBulkBusy(true);
+    bulkUpdateProducts(selectedIds, { price: Math.round(price) });
+    notify(true, `${selectedIds.length} ta mahsulot narxi ${formatPrice(Math.round(price))} qilindi`);
+    setSelectedIds([]);
+    setBulkPriceValue('');
+    setBulkPriceOpen(false);
+    setBulkBusy(false);
+  };
+
+  const runBulkStock = () => {
+    const count = Math.max(0, Math.floor(Number(bulkStockValue)));
+    if (selectedIds.length === 0 || !Number.isFinite(count)) return;
+    setBulkBusy(true);
+    bulkUpdateProducts(selectedIds, { stockCount: count, inStock: count > 0 });
+    notify(true, `${selectedIds.length} ta mahsulot zaxirasi ${count} dona qilindi`);
+    setSelectedIds([]);
+    setBulkStockValue('');
+    setBulkStockOpen(false);
+    setBulkBusy(false);
+  };
+
+  const runBulkDiscount = () => {
+    const pct = Math.min(90, Math.max(1, Number(bulkDiscountPct)));
+    if (selectedIds.length === 0 || !Number.isFinite(pct)) return;
+    setBulkBusy(true);
+    let n = 0;
+    selectedIds.forEach((id) => {
+      const p = products.find((x) => x.id === id);
+      if (!p) return;
+      const base = p.originalPrice && p.originalPrice > p.price ? p.originalPrice : p.price;
+      const nextPrice = Math.max(0, Math.round(base * (1 - pct / 100)));
+      updateProduct(id, { originalPrice: base, price: nextPrice, isOnSale: true });
+      n += 1;
+    });
+    notify(true, `${n} ta mahsulotga ${pct}% chegirma qo‘llandi`);
+    setSelectedIds([]);
+    setBulkDiscountOpen(false);
+    setBulkBusy(false);
+  };
+
+  const runBulkExport = () => {
+    const rows = (selectedIds.length > 0 ? products.filter((p) => selectedIds.includes(p.id)) : filteredProducts).map((p) => ({
+      id: p.id, name: p.name, sku: p.sku, price: p.price, originalPrice: p.originalPrice ?? '',
+      category: p.categoryName || p.category, brand: p.brand ?? '', inStock: p.inStock, stockCount: p.stockCount ?? '',
+      published: p.published !== false, featured: !!p.isFeatured, isNew: !!p.isNew,
+    }));
+    if (rows.length === 0) { notify(false, 'Eksport uchun mahsulot topilmadi'); return; }
+    const header = Object.keys(rows[0]).join(',');
+    const body = rows.map((r) => Object.values(r).map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([header + '\n' + body], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `products-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    notify(true, `${rows.length} ta mahsulot CSV ga eksport qilindi`);
+  };
+
   const bulkLabels: Record<BulkAction, { title: string; message: string; confirm: string }> = {
     publish: { title: 'Nashr etish', message: "Tanlangan mahsulotlarni saytda ko'rsatishga ruxsat berasizmi?", confirm: 'Ha, nashr etish' },
     unpublish: { title: 'Nashrdan olib tashlash', message: "Tanlangan mahsulotlarni saytdan yashirishni tasdiqlaysizmi?", confirm: 'Ha, yashirish' },
@@ -242,6 +350,15 @@ export const ProductsListPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={runBulkExport}
+            title="Filtrlangan ro‘yxatni CSV ga eksport qilish"
+            className="px-3 py-2 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Eksport</span>
+          </button>
           <Link
             to="/admin/inventory"
             className="px-3 py-2 rounded-lg border border-border bg-card text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors flex items-center gap-1.5"
@@ -306,9 +423,36 @@ export const ProductsListPage: React.FC = () => {
             className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring"
           >
             <option value="newest">Yangi qo'shilganlar</option>
+            <option value="updated">So‘nggi yangilanganlar</option>
             <option value="price-asc">Narx: Arzondan qimmatga</option>
             <option value="price-desc">Narx: Qimmatdan arzonga</option>
             <option value="name">Nomi bo'yicha (A-Z)</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <select
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring"
+            aria-label="Brend bo‘yicha filtr"
+          >
+            <option value="all">Brend: Barchasi</option>
+            {brandOptions.map((b) => (<option key={b} value={b}>{b}</option>))}
+          </select>
+          <div className="flex items-center gap-1.5">
+            <input type="number" min={0} value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="Min narx" aria-label="Minimal narx" className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring" />
+            <input type="number" min={0} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="Max narx" aria-label="Maksimal narx" className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring" />
+          </div>
+          <select
+            value={recencyFilter}
+            onChange={(e) => setRecencyFilter(e.target.value)}
+            className="w-full px-3 py-2 text-xs rounded-lg bg-background border border-border text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring sm:col-span-2"
+            aria-label="Yaqinda qo‘shilgan/yangilangan"
+          >
+            <option value="all">Davr: Barchasi</option>
+            <option value="created-7d">So‘nggi 7 kunda yaratilgan</option>
+            <option value="updated-7d">So‘nggi 7 kunda yangilangan</option>
           </select>
         </div>
 
@@ -413,6 +557,18 @@ export const ProductsListPage: React.FC = () => {
           <button type="button" onClick={() => setBulkConfirm('stock-off')} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors">
             Tugadi
           </button>
+          <button type="button" onClick={() => setBulkPriceOpen((v) => !v)} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors flex items-center gap-1">
+            <Banknote className="w-3 h-3" /> Narx
+          </button>
+          <button type="button" onClick={() => setBulkStockOpen((v) => !v)} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors flex items-center gap-1">
+            <Boxes className="w-3 h-3" /> Soni
+          </button>
+          <button type="button" onClick={() => setBulkDiscountOpen((v) => !v)} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors flex items-center gap-1">
+            <Percent className="w-3 h-3" /> -%
+          </button>
+          <button type="button" onClick={runBulkExport} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors flex items-center gap-1">
+            <Download className="w-3 h-3" /> CSV
+          </button>
 
           <div className="relative">
             <button type="button" onClick={() => setBulkDupeMenu((v) => !v)} className="px-2.5 py-1 rounded-md bg-muted text-foreground text-[10px] font-medium hover:bg-muted/80 transition-colors flex items-center gap-1">
@@ -439,6 +595,33 @@ export const ProductsListPage: React.FC = () => {
         </div>
       )}
 
+      {bulkPriceOpen && selectedIds.length > 0 && (
+        <div className="p-3 rounded-xl bg-card border border-border flex flex-wrap items-center gap-2" role="dialog" aria-label="Ommaviy narx">
+          <span className="text-[11px] font-semibold">{selectedIds.length} ta mahsulot narxi:</span>
+          <input type="number" min={0} step={1000} value={bulkPriceValue} onChange={(e) => setBulkPriceValue(e.target.value)} placeholder="250000" className="w-36 px-2.5 py-1.5 text-xs rounded-lg bg-background border border-border font-semibold" />
+          <button type="button" onClick={runBulkPrice} disabled={bulkBusy || !bulkPriceValue} className="px-3 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold disabled:opacity-40">Qo‘llash</button>
+          <button type="button" onClick={() => setBulkPriceOpen(false)} className="px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground">Bekor</button>
+        </div>
+      )}
+
+      {bulkStockOpen && selectedIds.length > 0 && (
+        <div className="p-3 rounded-xl bg-card border border-border flex flex-wrap items-center gap-2" role="dialog" aria-label="Ommaviy zaxira">
+          <span className="text-[11px] font-semibold">{selectedIds.length} ta mahsulot soni:</span>
+          <input type="number" min={0} step={1} value={bulkStockValue} onChange={(e) => setBulkStockValue(e.target.value)} placeholder="10" className="w-24 px-2.5 py-1.5 text-xs rounded-lg bg-background border border-border font-semibold" />
+          <button type="button" onClick={runBulkStock} disabled={bulkBusy || bulkStockValue === ''} className="px-3 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold disabled:opacity-40">Qo‘llash</button>
+          <button type="button" onClick={() => setBulkStockOpen(false)} className="px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground">Bekor</button>
+        </div>
+      )}
+
+      {bulkDiscountOpen && selectedIds.length > 0 && (
+        <div className="p-3 rounded-xl bg-card border border-border flex flex-wrap items-center gap-2" role="dialog" aria-label="Ommaviy chegirma">
+          <span className="text-[11px] font-semibold">{selectedIds.length} ta mahsulotga chegirma (%):</span>
+          <input type="number" min={1} max={90} value={bulkDiscountPct} onChange={(e) => setBulkDiscountPct(e.target.value)} className="w-20 px-2.5 py-1.5 text-xs rounded-lg bg-background border border-border font-semibold" />
+          <button type="button" onClick={runBulkDiscount} disabled={bulkBusy} className="px-3 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold disabled:opacity-40">Qo‘llash</button>
+          <button type="button" onClick={() => setBulkDiscountOpen(false)} className="px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground">Bekor</button>
+        </div>
+      )}
+
       {/* Status Banner */}
       {batchStatus && (
         <div className={`px-3 py-2 rounded-lg border text-[11px] font-medium flex items-center gap-2 ${
@@ -454,8 +637,8 @@ export const ProductsListPage: React.FC = () => {
       {/* Products Table */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         {filteredProducts.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto max-h-[70vh]">
+            <table className="w-full text-left text-xs border-collapse admin-table-sticky">
               <thead>
                 <tr className="border-b border-border text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/30">
                   <th className="py-2.5 pl-4 pr-2 w-8">
@@ -467,6 +650,7 @@ export const ProductsListPage: React.FC = () => {
                   <th className="py-2.5 px-3 hidden md:table-cell">Zaxira</th>
                   <th className="py-2.5 px-3 text-center hidden lg:table-cell">Belgilar</th>
                   <th className="py-2.5 px-3 text-center">Holat</th>
+                  <th className="py-2.5 px-3 hidden xl:table-cell text-right">Yangilangan</th>
                   <th className="py-2.5 pr-4 pl-3 text-right">Amallar</th>
                 </tr>
               </thead>
@@ -488,6 +672,7 @@ export const ProductsListPage: React.FC = () => {
                             </Link>
                             <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-muted-foreground">
                               <span className="font-mono">{p.sku}</span>
+                              {p.brand && (<span className="bg-muted px-1 py-0.5 rounded text-[9px] font-medium truncate max-w-[90px]">{p.brand}</span>)}
                               {(p.images?.length ?? 0) > 1 && (
                                 <span className="bg-muted px-1 py-0.5 rounded text-[9px] font-medium">{p.images?.length} rasm</span>
                               )}
@@ -536,6 +721,10 @@ export const ProductsListPage: React.FC = () => {
                         </button>
                       </td>
 
+                      <td className="py-2.5 px-3 hidden xl:table-cell text-right text-[10px] text-muted-foreground whitespace-nowrap">
+                        {p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }) : '—'}
+                      </td>
+
                       <td className="py-2.5 pr-4 pl-3 text-right">
                         <div className="flex items-center justify-end gap-0.5">
                           <a href={`/products/${p.id}`} target="_blank" rel="noreferrer" title="Saytda ko'rish" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
@@ -563,7 +752,7 @@ export const ProductsListPage: React.FC = () => {
             <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
             <h3 className="text-sm font-semibold text-foreground">Hech qanday mahsulot topilmadi</h3>
             <p className="text-xs text-muted-foreground mt-1">Qidiruv so'zini o'zgartiring yoki filtrlarni tozalang.</p>
-            <button type="button" onClick={() => { setSearchQuery(''); setSelectedCategory('all'); setStockFilter('all'); setBadgeFilter('all'); setStatusFilter('all'); }} className="mt-3 px-3 py-1.5 rounded-lg bg-muted text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
+            <button type="button" onClick={clearFilters} className="mt-3 px-3 py-1.5 rounded-lg bg-muted text-xs font-medium text-foreground hover:bg-muted/80 transition-colors">
               Filtrlarni tozalash
             </button>
           </div>

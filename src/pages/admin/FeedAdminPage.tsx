@@ -8,11 +8,15 @@ import {
   ArrowDown,
   RotateCcw,
   X,
-  Package,
   Loader2,
   Check,
   AlertCircle,
   Image as ImageIcon,
+  Search,
+  Pin,
+  Copy,
+  Archive,
+  RefreshCw,
 } from 'lucide-react';
 import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
@@ -51,6 +55,9 @@ export const FeedAdminPage: React.FC = () => {
   const [published, setPublished] = useState(true);
 
   const [pendingFeedId, setPendingFeedId] = useState<string>('feed-' + Date.now());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'archived'>('all');
+  const [actionBusy, setActionBusy] = useState<string | null>(null);
   const pendingUploadsRef = useRef<{ bucket: string; path: string }[]>([]);
 
   const recordUploaded = useCallback((media: { bucket: string; path: string }) => { pendingUploadsRef.current.push(media); }, []);
@@ -105,6 +112,47 @@ export const FeedAdminPage: React.FC = () => {
     }
   };
 
+  const handlePin = async (idx: number) => {
+    if (idx <= 0) return;
+    setActionBusy(videos[idx].id + ':pin');
+    await reorderVideos(idx, 0);
+    setActionBusy(null);
+  };
+
+  const handleDuplicate = async (v: VideoItem) => {
+    setActionBusy(v.id + ':copy');
+    await addVideo({
+      title: `${v.title} (nusxa)`,
+      description: v.description,
+      videoUrl: v.videoUrl,
+      posterUrl: v.posterUrl,
+      author: v.author,
+      productId: v.productId,
+      badge: v.badge,
+      category: v.category,
+      published: false,
+      order: videos.length + 1,
+    });
+    setActionBusy(null);
+  };
+
+  const handleArchive = async (v: VideoItem) => {
+    setActionBusy(v.id + ':archive');
+    if (v.published) await togglePublish(v.id);
+    await reorderVideos(videos.findIndex((x) => x.id === v.id), videos.length - 1);
+    setActionBusy(null);
+  };
+
+  const filteredVideos = videos.filter((v) => {
+    if (statusFilter === 'published' && !v.published) return false;
+    if (statusFilter === 'archived' && v.published) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      if (!v.title.toLowerCase().includes(q) && !(v.description || '').toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
   if (feedLoading) {
     return (<div className="flex items-center justify-center py-20"><Loader2 className="w-5 h-5 text-muted-foreground animate-spin" /><span className="ml-2 text-xs text-muted-foreground">Videolar yuklanmoqda...</span></div>);
   }
@@ -129,6 +177,23 @@ export const FeedAdminPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Search & status filter */}
+      {videos.length > 0 && (
+        <div className="p-3 rounded-xl bg-card border border-border flex flex-col sm:flex-row gap-2.5 sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Video sarlavhasi bo‘yicha qidirish…" aria-label="Video qidirish" className="w-full pl-9 pr-4 py-2 text-xs rounded-lg bg-background border border-border font-medium focus:outline-none focus:ring-2 focus:ring-ring/20" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            {(['all', 'published', 'archived'] as const).map((s) => (
+              <button key={s} type="button" onClick={() => setStatusFilter(s)} className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${statusFilter === s ? 'bg-foreground text-background' : 'bg-muted text-muted-foreground hover:text-foreground'}`}>
+                {s === 'all' ? `Barchasi (${videos.length})` : s === 'published' ? `Faol (${videos.filter((v) => v.published).length})` : `Arxiv (${videos.filter((v) => !v.published).length})`}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Empty State */}
       {videos.length === 0 && (
         <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
@@ -142,10 +207,19 @@ export const FeedAdminPage: React.FC = () => {
         </div>
       )}
 
+      {videos.length > 0 && filteredVideos.length === 0 && (
+        <div className="rounded-2xl border border-border p-10 text-center">
+          <p className="text-sm font-semibold">Hech narsa topilmadi</p>
+          <p className="text-xs text-muted-foreground mt-1">Qidiruv yoki filtrni o‘zgartiring.</p>
+          <button type="button" onClick={() => { setSearchQuery(''); setStatusFilter('all'); }} className="mt-3 px-3 py-1.5 rounded-lg bg-muted text-xs font-medium">Tozalash</button>
+        </div>
+      )}
+
       {/* Video Grid */}
-      {videos.length > 0 && (
+      {filteredVideos.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {videos.map((vid, idx) => {
+          {filteredVideos.map((vid) => {
+            const idx = videos.findIndex((v) => v.id === vid.id);
             const linkedProduct = products.find((p) => p.id === vid.productId);
             return (
               <div key={vid.id} className={`group bg-card border border-border rounded-xl overflow-hidden flex flex-col hover:border-muted-foreground/20 hover:shadow-sm transition-all ${!vid.published ? 'opacity-60' : ''}`}>
@@ -188,13 +262,21 @@ export const FeedAdminPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="px-3 pb-3 flex items-center justify-between">
+                <div className="px-3 pb-1 flex items-center justify-between text-[10px] text-muted-foreground">
+                  <span className="font-mono">{vid.duration || '—'}</span>
+                  <span>{vid.createdAt ? new Date(vid.createdAt).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }) : ''}</span>
+                  {idx === 0 && <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 text-[9px] font-bold">PINNED</span>}
+                </div>
+                <div className="px-3 pb-3 flex items-center justify-between gap-1">
                   <div className="flex items-center gap-0.5">
                     <button type="button" disabled={idx === 0} onClick={() => reorderVideos(idx, idx - 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Yuqoriga surish"><ArrowUp className="w-3.5 h-3.5" /></button>
-                    <button type="button" disabled={idx === videos.length - 1} onClick={() => reorderVideos(idx, idx + 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Keyinga surish"><ArrowDown className="w-3.5 h-3.5" /></button>
+                    <button type="button" disabled={idx === videos.length - 1} onClick={() => reorderVideos(idx, idx + 1)} className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30" aria-label="Pastga surish"><ArrowDown className="w-3.5 h-3.5" /></button>
+                    <button type="button" disabled={idx === 0 || actionBusy !== null} onClick={() => handlePin(idx)} title="Eng yuqoriga mahkamlash (pin)" aria-label="Pin qilish" className="p-1 rounded text-muted-foreground hover:text-amber-500 disabled:opacity-30"><Pin className="w-3.5 h-3.5" /></button>
                   </div>
                   <div className="flex items-center gap-0.5">
-                    <button type="button" onClick={() => openEditModal(vid)} className="px-2.5 py-1 rounded-md bg-muted text-[11px] font-medium text-foreground hover:bg-muted/80 flex items-center gap-1" aria-label={`${vid.title} ni tahrirlash`}><Edit className="w-3 h-3" /> Tahrirlash</button>
+                    <button type="button" disabled={actionBusy !== null} onClick={() => handleDuplicate(vid)} title="Nusxa olish" aria-label="Nusxa olish" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40"><Copy className="w-3.5 h-3.5" /></button>
+                    <button type="button" disabled={actionBusy !== null} onClick={() => handleArchive(vid)} title={vid.published ? 'Arxivlash (yashirish + oxiriga)' : 'Arxivda'} aria-label="Arxivlash" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-40"><Archive className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => openEditModal(vid)} title="Tahrirlash / videoni almashtirish" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted flex items-center gap-1" aria-label={`${vid.title} ni tahrirlash`}><RefreshCw className="w-3.5 h-3.5" /><Edit className="w-3 h-3" /></button>
                     <button type="button" onClick={() => setVideoToDelete(vid)} className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10" aria-label={`${vid.title} ni o'chirish`}><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
