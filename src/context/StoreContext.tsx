@@ -1243,9 +1243,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const deleteCategory = (id: string) => {
     const target = categories.find((c) => c.id === id);
+    const hasProducts = (products ?? []).some((p) => p.category === id || p.category === target?.slug);
+if (hasProducts) {
+      logActivity('delete', 'category', `Kategoriya ochirish bekor qilindi: "${target?.name || id}" - mahsulotlar bog'li`);
+      throw new Error('Kategoriyada mahsulotlar mavjud. Avval mahsulotlarni boshqa kategoriyaga oatzing.');
+    }
     setCategories((prev) => prev.filter((c) => c.id !== id));
     deleteCategoryRow(id);
-    logActivity('delete', 'category', `Kategoriya o'chirildi: "${target?.name || id}"`);
+    logActivity('delete', 'category', `Kategoriya ochirildi: "${target?.name || id}"`);
   };
 
   const reorderCategories = (startIndex: number, endIndex: number) => {

@@ -13,6 +13,7 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  Send,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -27,6 +28,7 @@ interface NavItem {
   path: string;
   icon: React.ComponentType<{ className?: string }>;
   end?: boolean;
+  description?: string;
 }
 
 interface NavSection {
@@ -56,7 +58,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     {
       title: 'UMUMIY',
       items: [
-        { label: 'Boshqaruv', path: '/admin', icon: LayoutDashboard, end: true },
+        { label: 'Boshqaruv', path: '/admin', icon: LayoutDashboard, end: true, description: 'Asosiy overview' },
       ],
     },
     {
@@ -71,6 +73,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       title: 'KONTENT',
       items: [
         { label: 'Video / Feed', path: '/admin/feed', icon: Film },
+        { label: 'Bosh sahifa CMS', path: '/admin/homepage', icon: Send },
       ],
     },
     {
@@ -179,6 +182,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                         >
                           <Icon className="w-4 h-4 shrink-0 opacity-70" />
                           <span className="flex-1 truncate">{item.label}</span>
+                          {item.description && (
+                            <span className="text-[9px] font-medium opacity-60">{item.description}</span>
+                          )}
                         </NavLink>
                       );
                     })}

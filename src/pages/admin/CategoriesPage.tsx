@@ -19,7 +19,7 @@ export const CategoriesPage: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
-
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
@@ -29,11 +29,13 @@ export const CategoriesPage: React.FC = () => {
     setName(''); setSlug(''); setDescription('');
     setImage('https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800');
     setIsCreating(true); setEditingCategory(null);
+    setDeleteError(null);
   };
 
   const openEditModal = (cat: Category) => {
     setName(cat.name); setSlug(cat.slug); setDescription(cat.description || ''); setImage(cat.image || '');
     setEditingCategory(cat); setIsCreating(false);
+    setDeleteError(null);
   };
 
   const handleNameChange = (val: string) => {
@@ -53,7 +55,15 @@ export const CategoriesPage: React.FC = () => {
     }
   };
 
-  const handleDeleteConfirm = () => { if (categoryToDelete) { deleteCategory(categoryToDelete.id); setCategoryToDelete(null); } };
+  const handleDeleteConfirm = () => {
+    setDeleteError(null);
+    try {
+      deleteCategory(categoryToDelete!.id);
+      setCategoryToDelete(null);
+    } catch (e: any) {
+      setDeleteError(e.message || 'Kategoriyani o\'chirishda xatolik yuz berdi');
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -113,7 +123,7 @@ export const CategoriesPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Creating/Editing modal */}
       {(isCreating || editingCategory) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div onClick={() => { setIsCreating(false); setEditingCategory(null); }} className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
@@ -150,7 +160,31 @@ export const CategoriesPage: React.FC = () => {
         </div>
       )}
 
-      <ConfirmDialog isOpen={!!categoryToDelete} title="Kategoriyani o'chirish" message={`"${categoryToDelete?.name}" o'chiriladi.`} onConfirm={handleDeleteConfirm} onCancel={() => setCategoryToDelete(null)} />
+      {/* Delete confirmation with error handling */}
+      {categoryToDelete && deleteError === null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative z-10 w-full max-w-md bg-card rounded-xl p-6 shadow-xl border border-border space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-foreground">Kategoriyani o'chirish</h3>
+              <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"><X className="w-4 h-4" /></button>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground mb-4">
+              Bu kategoriya mahsulotlari mavjud. Avval mahsulotlarni boshqa kategoriyaga o'tkazing.
+            </p>
+
+            <div className="pt-3 flex items-center justify-end gap-2 border-t border-border">
+              <button type="button" onClick={() => { setCategoryToDelete(null); setDeleteError(null); }} className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">Bekor qilish</button>
+              <button type="button" onClick={handleDeleteConfirm} className="px-4 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-semibold hover:bg-destructive/90 transition-all shadow-sm">
+                Ha, o'chirilsin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog isOpen={!!categoryToDelete && !deleteError} title="Kategoriyani o'chirish" message={`"${categoryToDelete?.name}" o'chiriladi.`} confirmLabel="Ha, o'chirilsin" onConfirm={handleDeleteConfirm} onCancel={() => setCategoryToDelete(null)} />
     </div>
   );
 };
