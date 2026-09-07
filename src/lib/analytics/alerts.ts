@@ -22,8 +22,13 @@ export function buildAlerts(input: {
   products: ProductMetric[];
   feed: FeedMetric[];
   search: SearchSummary;
+  /** Owner-facing name resolvers — alerts must never print raw prod- IDs. */
+  resolveProduct?: (id: string) => string;
+  resolveVideo?: (id: string) => string;
 }): Alert[] {
   const alerts: Alert[] = [];
+  const pName = input.resolveProduct ?? ((id: string) => id);
+  const vName = input.resolveVideo ?? ((id: string) => id);
   const inRange = input.events.filter((e) => withinRange(e, input.range));
   const days = Math.max(1, Math.round((new Date(input.range.to + 'T00:00:00Z').getTime() - new Date(input.range.from + 'T00:00:00Z').getTime()) / 86400000) + 1);
 
@@ -34,7 +39,7 @@ export function buildAlerts(input: {
     alerts.push({
       level: 'info',
       title: 'Mahsulot trendga chiqdi',
-      detail: `"${top.id}" ${fmt(top.views)} ko'rish bilan tez o'smoqda — inventar va reklamani ustuvor qiling.`,
+      detail: `"${pName(top.id)}" ${fmt(top.views)} ko'rish bilan tez o'smoqda — inventar va reklamani ustuvor qiling.`,
     });
   }
 
@@ -45,7 +50,7 @@ export function buildAlerts(input: {
     alerts.push({
       level: 'info',
       title: 'Ko\'p saqlangan mahsulot',
-      detail: `"${top.id}" ${fmt(top.saves)} marta saqlangan (${fmt(top.uniqueSavers)} mijoz).`,
+      detail: `"${pName(top.id)}" ${fmt(top.saves)} marta saqlangan (${fmt(top.uniqueSavers)} mijoz).`,
     });
   }
 
@@ -78,18 +83,18 @@ export function buildAlerts(input: {
     alerts.push({
       level: 'info',
       title: 'Feed post viral bo\'ldi',
-      detail: `"${top.id}" ${fmt(top.views)} ko'rish, ${fmt(top.productClicks)} mahsulotga o'tish.`,
+      detail: `"${vName(top.id)}" ${fmt(top.views)} ko'rish, ${fmt(top.productClicks)} mahsulotga o'tish.`,
     });
   }
 
   // Products with views but zero engagement for the whole period.
-  const ignored = input.products.filter((p) => p.views >= 3 && p.engagementRate === 0);
+  const ignored = input.products.filter((p) => p.views >= 3 && (p.engagementRate ?? 0) === 0);
   if (ignored.length > 0) {
     const top = [...ignored].sort((a, b) => b.views - a.views)[0];
     alerts.push({
       level: 'warn',
       title: 'Mahsulotlar e\'tiborsiz qolmoqda',
-      detail: `"${top.id}" ${fmt(top.views)} marta ko'rildi, ammo hech qanday savdo/harakat yo'q.`,
+      detail: `"${pName(top.id)}" ${fmt(top.views)} marta ko'rildi, ammo hech qanday savdo/harakat yo'q.`,
     });
   }
 

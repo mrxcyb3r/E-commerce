@@ -346,8 +346,8 @@ export const ProductEditPage: React.FC = () => {
                 onPosterChange={(url) => setVideoPosterUrl(url || '')}
                 bucket={MEDIA_BUCKETS.PRODUCT_IMAGES}
                 scope={storageScope}
-                label="Video fayl"
-                helperText="MP4 yoki WebM faylni yuklang (100 MB gacha)."
+                label="Video (URL tavsiya etiladi)"
+                helperText="YouTube yoki to‘g‘ridan-to‘g‘ri video havolasi qo‘ying — yoki MP4/WebM fayl yuklang (100 MB gacha)."
                 onUploaded={(media) => pendingUploadsRef.current.push(media)}
               />
             </div>

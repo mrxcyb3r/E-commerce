@@ -13,6 +13,15 @@ import {
   type FeedMetric,
   type InterestLevel,
 } from './aggregate';
+import {
+  tashkentParts,
+  startOfTashkentDay,
+  startOfTashkentWeek,
+  startOfTashkentMonth,
+  collapseJourney,
+  journeyKey,
+  rateUnique,
+} from './metrics';
 
 // ---------------------------------------------------------------------------
 // Date helpers
@@ -59,14 +68,24 @@ function metaStr(e: AnalyticsEvent, key: string): string {
   return typeof v === 'string' && v ? v : 'unknown';
 }
 
-function countBreakdown(events: AnalyticsEvent[], key: (e: AnalyticsEvent) => string): BreakdownRow[] {
-  const map = new Map<string, number>();
+/**
+ * Visitor-basis variant: unique visitors per attribute value (a visitor on
+ * two browsers counts in both). Event-count versions misled owners
+ * ("Chrome 678" next to "55 visitors"); audience composition must be people.
+ */
+function visitorBreakdown(events: AnalyticsEvent[], key: (e: AnalyticsEvent) => string): BreakdownRow[] {
+  const map = new Map<string, Set<string>>();
   for (const e of events) {
     const k = key(e);
-    map.set(k, (map.get(k) ?? 0) + 1);
+    let s = map.get(k);
+    if (!s) {
+      s = new Set();
+      map.set(k, s);
+    }
+    s.add(e.visitor_id);
   }
   return Array.from(map.entries())
-    .map(([label, value]) => ({ label, value }))
+    .map(([label, s]) => ({ label, value: s.size }))
     .sort((a, b) => b.value - a.value);
 }
 
@@ -104,11 +123,11 @@ export function computeAudience(events: AnalyticsEvent[], range: DateRange): Aud
   return {
     entryPages: toRows(entryCounts),
     exitPages: toRows(exitCounts),
-    browsers: countBreakdown(inRange, (e) => metaStr(e, 'browser')),
-    oses: countBreakdown(inRange, (e) => metaStr(e, 'os')),
-    languages: countBreakdown(inRange, (e) => metaStr(e, 'language')),
-    darkMode: countBreakdown(inRange, (e) => (e.metadata?.dark_mode === true ? 'dark' : 'light')),
-    screens: countBreakdown(inRange, (e) => metaStr(e, 'screen')),
+    browsers: visitorBreakdown(inRange, (e) => metaStr(e, 'browser')),
+    oses: visitorBreakdown(inRange, (e) => metaStr(e, 'os')),
+    languages: visitorBreakdown(inRange, (e) => metaStr(e, 'language')),
+    darkMode: visitorBreakdown(inRange, (e) => (e.metadata?.dark_mode === true ? 'dark' : 'light')),
+    screens: visitorBreakdown(inRange, (e) => metaStr(e, 'screen')),
     bounceRate: sessions.size > 0 ? singleViewSessions / sessions.size : 0,
   };
 }
@@ -129,6 +148,10 @@ export function computeVisitorWindows(
   range: DateRange,
   liveWindowMs: number
 ): VisitorWindows {
+  // Absolute windows (live / today / week / month) are computed over ALL
+  // loaded events, NOT filtered by the selected relative range — a past custom
+  // range must not zero out "who is online now". Day bounds use Asia/Tashkent.
+  void range;
   const now = Date.now();
   const liveCut = now - liveWindowMs;
   const live = new Set<string>();
@@ -136,19 +159,14 @@ export function computeVisitorWindows(
   const week = new Set<string>();
   const month = new Set<string>();
 
-  const todayStart = startOfUtcDay(new Date()).getTime();
-  const weekStart = (() => {
-    const d = new Date();
-    const day = d.getDay();
-    const offset = day === 0 ? 6 : day - 1;
-    d.setDate(d.getDate() - offset);
-    return startOfUtcDay(d).getTime();
-  })();
-  const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)).getTime();
+  const todayStart = startOfTashkentDay(now);
+  const weekStart = startOfTashkentWeek(now);
+  const monthStart = startOfTashkentMonth(now);
 
   for (const e of events) {
-    if (!withinRange(e, range) || !e.created_at) continue;
+    if (!e.created_at) continue;
     const t = new Date(e.created_at).getTime();
+    if (!Number.isFinite(t)) continue;
     if (t >= liveCut) live.add(e.visitor_id);
     if (t >= todayStart) today.add(e.visitor_id);
     if (t >= weekStart) week.add(e.visitor_id);
@@ -168,6 +186,7 @@ export interface TimeAnalytics {
   weekendShare: number; // 0..1 of events on Sat/Sun
   eveningCount: number;
   morningCount: number;
+  totalEvents: number; // in-range events (honest denominator for shares)
   weekdayHourly: number[][]; // [day][hour] counts, day 0=Sun, hour 0-23
 }
 
@@ -182,9 +201,9 @@ export function computeTimeAnalytics(events: AnalyticsEvent[], range: DateRange)
   let morning = 0;
 
   for (const e of inRange) {
-    const d = new Date(e.created_at!);
-    const dow = d.getUTCDay();
-    const h = d.getUTCHours();
+    // Asia/Tashkent wall clock — "evening 18:00" means 18:00 in Uzbekistan,
+    // not 18:00 UTC (which is 23:00 local).
+    const { day: dow, hour: h } = tashkentParts(e.created_at!);
     hourCounts[h] += 1;
     dayCounts[dow] += 1;
     weekdayHourly[dow][h] += 1;
@@ -203,6 +222,7 @@ export function computeTimeAnalytics(events: AnalyticsEvent[], range: DateRange)
     weekendShare: total > 0 ? weekend / total : 0,
     eveningCount: evening,
     morningCount: morning,
+    totalEvents: total,
     weekdayHourly,
   };
 }
@@ -218,11 +238,13 @@ function argMax(arr: number[]): number {
 // ---------------------------------------------------------------------------
 
 export interface BusinessKpis {
-  conversionRate: number; // intent actions / page_views
-  engagementRate: number; // (saves+shares+intent) / page_views
-  favoriteRate: number; // product_save / product_view
-  productCtr: number; // (telegram+phone+directions+share) / product_view
-  feedCtr: number; // feed_product_click / feed_view
+  // All visitor-based (uniqueVisitors(action) / uniqueVisitors(base)),
+  // bounded 0..1, null when the base set is empty (UI shows "—").
+  conversionRate: number | null; // unique intent visitors / unique visitors
+  engagementRate: number | null; // unique engaged visitors / unique visitors
+  favoriteRate: number | null; // unique savers / unique product viewers
+  productCtr: number | null; // unique intent visitors among product viewers / unique product viewers
+  feedCtr: number | null; // unique feed→product clickers / unique feed viewers
   returningRate: number;
   avgInterest: number; // 0..2 average of product interest scores
   bestProductViews: number;
@@ -238,15 +260,60 @@ export function computeBusinessKpis(input: {
   returningRate: number;
 }): BusinessKpis {
   const inRange = input.events.filter((e) => withinRange(e, input.range));
-  const pageViews = inRange.filter((e) => e.event_type === 'page_view').length;
-  const productViews = inRange.filter((e) => e.event_type === 'product_view').length;
-  const feedViews = inRange.filter((e) => e.event_type === 'feed_view').length;
-  const saves = inRange.filter((e) => e.event_type === 'product_save').length;
-  const shares = inRange.filter((e) => ['product_share', 'feed_share'].includes(e.event_type)).length;
-  const intent = inRange.filter((e) =>
-    ['telegram_click', 'phone_click', 'directions_click', 'contact_click'].includes(e.event_type)
-  ).length;
-  const feedClicks = inRange.filter((e) => e.event_type === 'feed_product_click').length;
+  const visitors = new Set<string>();
+  const intentVisitors = new Set<string>();
+  const engagedVisitors = new Set<string>();
+  const productViewers = new Set<string>();
+  const productIntentVisitors = new Set<string>();
+  const savers = new Set<string>();
+  const feedViewers = new Set<string>();
+  const feedClickers = new Set<string>();
+
+  for (const e of inRange) {
+    visitors.add(e.visitor_id);
+    switch (e.event_type) {
+      case 'telegram_click':
+      case 'phone_click':
+      case 'directions_click':
+      case 'contact_click':
+        intentVisitors.add(e.visitor_id);
+        engagedVisitors.add(e.visitor_id);
+        break;
+      case 'product_view':
+        productViewers.add(e.visitor_id);
+        break;
+      case 'product_save':
+      case 'product_share':
+      case 'feed_like':
+      case 'feed_share':
+      case 'feed_favorite':
+        engagedVisitors.add(e.visitor_id);
+        break;
+      case 'feed_view':
+        feedViewers.add(e.visitor_id);
+        break;
+      case 'feed_product_click':
+        feedClickers.add(e.visitor_id);
+        engagedVisitors.add(e.visitor_id);
+        break;
+      default:
+        break;
+    }
+    if (e.event_type === 'product_save') savers.add(e.visitor_id);
+  }
+  // Intent visitors restricted to product viewers (for product CTR).
+  const productViewerSet = productViewers;
+  for (const e of inRange) {
+    if (
+      productViewerSet.has(e.visitor_id) &&
+      (e.event_type === 'telegram_click' ||
+        e.event_type === 'phone_click' ||
+        e.event_type === 'directions_click' ||
+        e.event_type === 'contact_click')
+    ) {
+      productIntentVisitors.add(e.visitor_id);
+    }
+  }
 
   const score: Record<InterestLevel, number> = { low: 0, medium: 1, high: 2 };
   const withViews = input.products.filter((p) => p.views > 0);
@@ -254,11 +321,11 @@ export function computeBusinessKpis(input: {
     withViews.length > 0 ? withViews.reduce((s, p) => s + score[p.interest], 0) / withViews.length : 0;
 
   return {
-    conversionRate: pageViews > 0 ? intent / pageViews : 0,
-    engagementRate: pageViews > 0 ? (saves + shares + intent) / pageViews : 0,
-    favoriteRate: productViews > 0 ? saves / productViews : 0,
-    productCtr: productViews > 0 ? (intent + shares) / productViews : 0,
-    feedCtr: feedViews > 0 ? feedClicks / feedViews : 0,
+    conversionRate: rateUnique(intentVisitors.size, visitors.size),
+    engagementRate: rateUnique(engagedVisitors.size, visitors.size),
+    favoriteRate: rateUnique(savers.size, productViewers.size),
+    productCtr: rateUnique(productIntentVisitors.size, productViewers.size),
+    feedCtr: rateUnique(feedClickers.size, feedViewers.size),
     returningRate: input.returningRate,
     avgInterest,
     bestProductViews: withViews.length ? Math.max(...withViews.map((p) => p.views)) : 0,
@@ -288,11 +355,16 @@ export function computeJourneys(events: AnalyticsEvent[], range: DateRange, maxL
 
   const map = new Map<string, Journey>();
   for (const seq of bySession.values()) {
-    const trimmed = seq.slice(0, maxLen);
-    const key = trimmed.join(' > ');
+    // Collapse consecutive duplicates (StrictMode double-fire, reloads,
+    // query-only navigations like ?v= / ?q=) and group query-string variants
+    // of the same page together — "Bosh sahifa → Bosh sahifa → Bosh sahifa"
+    // carries no journey information.
+    const collapsed = collapseJourney(seq).map(journeyKey).slice(0, maxLen);
+    if (collapsed.length === 0) continue;
+    const key = collapsed.join(' > ');
     const cur = map.get(key);
     if (cur) cur.count += 1;
-    else map.set(key, { path: trimmed, count: 1 });
+    else map.set(key, { path: collapsed, count: 1 });
   }
   return Array.from(map.values()).sort((a, b) => b.count - a.count).slice(0, 10);
 }
@@ -305,7 +377,8 @@ export interface KpiCompare {
   label: string;
   current: number;
   previous: number;
-  changePct: number; // (cur-prev)/prev, 0 if prev is 0
+  hasPrevious: boolean; // false when the previous window has zero of this metric
+  changePct: number | null; // (cur-prev)/prev*100, null when prev is 0
 }
 
 export function computeComparison(input: {
@@ -335,7 +408,8 @@ export function computeComparison(input: {
     label,
     current: c[key],
     previous: p[key],
-    changePct: p[key] > 0 ? ((c[key] - p[key]) / p[key]) * 100 : 0,
+    hasPrevious: p[key] > 0,
+    changePct: p[key] > 0 ? ((c[key] - p[key]) / p[key]) * 100 : null,
   });
   return {
     pageViews: mk('Sahifa ko\'rishlar', 'pageViews'),
@@ -344,7 +418,8 @@ export function computeComparison(input: {
     productViews: mk('Mahsulot ko\'rishlar', 'productViews'),
     saves: mk('Saqlashlar', 'saves'),
     searches: mk('Qidiruvlar', 'searches'),
-    intent: mk('Sotib olish niyati', 'intent'),
+    // Intent = contact clicks (Telegram/phone/map/form), NOT purchases.
+    intent: mk('Aloqa niyati (bosishlar)', 'intent'),
   };
 }
 

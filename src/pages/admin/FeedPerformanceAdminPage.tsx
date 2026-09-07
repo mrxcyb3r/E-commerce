@@ -24,6 +24,7 @@ import { useStore } from '../../context/StoreContext';
 import { KpiCard } from '../../components/admin/analytics/KpiCard';
 import { SectionCard } from '../../components/admin/analytics/SectionCard';
 import { formatDuration, percent } from '../../components/admin/analytics/util';
+import { formatRate } from '../../lib/analytics/metrics';
 import type { VideoItem } from '../../types/video';
 
 export const FeedPerformanceAdminPage: React.FC = () => {
@@ -72,11 +73,16 @@ export const FeedPerformanceAdminPage: React.FC = () => {
     if (!metric) return [];
     const order = ['start', '3s', '5s', '10s', '25%', '50%', '75%', '100%'];
     const totals = new Map<string, number>();
-    for (const r of metric.retentions) totals.set(r.bucket, r.count);
+    const rates = new Map<string, number | null>();
+    for (const r of metric.retentions) {
+      totals.set(r.bucket, r.count);
+      rates.set(r.bucket, r.rate);
+    }
     return order.map((b) => ({
       bucket: b,
       value: totals.get(b) ?? 0,
-      rate: metric.videoStarts > 0 ? (totals.get(b) ?? 0) / metric.videoStarts : 0,
+      // Unique bucket visitors / unique starters (bounded, null → "—").
+      rate: rates.get(b) ?? null,
     }));
   }, [metric]);
 
@@ -158,7 +164,7 @@ export const FeedPerformanceAdminPage: React.FC = () => {
             <KpiCard label="O'rt. tomosha vaqti" value={formatDuration(metric.avgWatchSec)} icon={Clock} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
             <KpiCard label="Video boshlandi" value={metric.videoStarts} icon={Play} accent="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" />
             <KpiCard label="To'liq ko'rildi" value={metric.videoCompletes} icon={CheckCircle2} accent="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" />
-            <KpiCard label="Faollik darajasi" value={percent(metric.engagementScore)} icon={Activity} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" />
+            <KpiCard label="Faollik darajasi" value={formatRate(metric.engagementScore)} icon={Activity} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" />
           </div>
 
           {/* Engagement + conversion */}
@@ -168,7 +174,7 @@ export const FeedPerformanceAdminPage: React.FC = () => {
             <MiniStat label="Mahsulot ochish" value={metric.productClicks} icon={ShoppingBag} />
             <MiniStat label="Telegram" value={metric.telegramClicks} icon={Send} />
             <MiniStat label="Saqlangan" value={metric.favorites} icon={Bookmark} />
-            <MiniStat label="Tugallash" value={percent(metric.completionRate)} icon={Gauge} />
+            <MiniStat label="Tugallash" value={formatRate(metric.completionRate)} icon={Gauge} />
           </div>
 
           {/* Retention + watch */}
@@ -187,8 +193,8 @@ export const FeedPerformanceAdminPage: React.FC = () => {
                   <p className="text-[11px] font-bold text-muted-foreground mt-1">O'rtacha tomosha vaqti</p>
                 </div>
                 <div className="p-4 rounded-2xl bg-muted border border-border">
-                  <div className="text-3xl font-black text-foreground">{percent(metric.feedProductConversion)}</div>
-                  <p className="text-[11px] font-bold text-muted-foreground mt-1">Feed → mahsulot konversiyasi</p>
+                  <div className="text-3xl font-black text-foreground">{formatRate(metric.feedProductConversion)}</div>
+                  <p className="text-[11px] font-bold text-muted-foreground mt-1">Feed → mahsulot o‘tishi (bosganlarning ulushi)</p>
                 </div>
               </div>
             </SectionCard>
@@ -209,7 +215,7 @@ const MiniStat: React.FC<{ label: string; value: number | string; icon: React.Co
   </div>
 );
 
-const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number }[] }> = ({ points }) => {
+const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number | null }[] }> = ({ points }) => {
   const max = Math.max(1, ...points.map((p) => p.value));
   if (points.every((p) => p.value === 0)) {
     return <p className="text-xs text-muted-foreground text-center py-6">Ushbu video uchun retention ma'lumoti hali yo'q</p>;
@@ -223,20 +229,20 @@ const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: 
             <div
               className="w-full rounded-md bg-gradient-to-t from-indigo-600 to-indigo-400 dark:from-indigo-700 dark:to-indigo-500 group-hover:opacity-80 transition-opacity"
               style={{ height: `${Math.max(3, (p.value / max) * 116)}px` }}
-              title={`${p.bucket} — ${p.value} (${Math.round(p.rate * 100)}%)`}
+              title={`${p.bucket} — ${p.value} (${formatRate(p.rate)})`}
             />
             <span className="text-[9px] font-bold text-muted-foreground">{p.bucket}</span>
           </div>
         ))}
       </div>
       <p className="text-[10px] text-muted-foreground mt-2 text-center">
-        {percent(resolvedRetentionHighest(points))} mijoz boshlangandan 100% gacha yetib bordi
+        {formatRate(resolvedRetentionHighestRate(points))} boshlaganlar 100% gacha yetib bordi
       </p>
     </div>
   );
 };
 
-function resolvedRetentionHighest(points: { bucket: string; value: number }[]): number {
+function resolvedRetentionHighestRate(points: { bucket: string; rate: number | null }[]): number | null {
   const full = points.find((p) => p.bucket === '100%');
-  return full ? full.value / Math.max(1, (points[0]?.value ?? 1)) : 0;
+  return full ? full.rate : null;
 }

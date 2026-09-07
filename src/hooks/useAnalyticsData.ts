@@ -56,6 +56,7 @@ import {
 } from '../lib/analytics/advanced';
 import { buildAlerts, type Alert } from '../lib/analytics/alerts';
 import { buildReport, productCsv, reportCsv, type ReportPeriod, type ReportSummary } from '../lib/analytics/reports';
+import { periodRange } from '../lib/analytics/metrics';
 
 const SHOP_ID = BUSINESS_CONFIG.name || 'default';
 export const POLL_INTERVAL_MS = 6000;
@@ -68,6 +69,7 @@ export interface AnalyticsData {
   refreshing: boolean;
   error: string | null;
   rows: number;
+  eventsInRange: number;
   eventsByType: EventCounts;
   stats: VisitorStats;
   products: ProductMetric[];
@@ -107,7 +109,10 @@ export interface AnalyticsData {
   lastUpdated: number | null;
 }
 
-export function useAnalyticsData(): AnalyticsData {
+export function useAnalyticsData(resolvers?: {
+  resolveProduct?: (id: string) => string;
+  resolveCategory?: (id: string) => string;
+}): AnalyticsData {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -204,8 +209,17 @@ export function useAnalyticsData(): AnalyticsData {
       intent,
       events: rows,
       range,
+      resolveProduct: resolvers?.resolveProduct,
+      resolveCategory: resolvers?.resolveCategory,
+    });    const alerts = buildAlerts({
+      events: rows,
+      range,
+      products,
+      feed,
+      search,
+      resolveProduct: resolvers?.resolveProduct,
+      resolveVideo: undefined,
     });
-    const alerts = buildAlerts({ events: rows, range, products, feed, search });
     const audience = computeAudience(rows, range);
     const timeAnalytics = computeTimeAnalytics(rows, range);
     const visitorWindows = computeVisitorWindows(rows, range, LIVE_WINDOW_MS);
@@ -213,8 +227,7 @@ export function useAnalyticsData(): AnalyticsData {
     const comparison = computeComparison({ events: rows, range, products, feed });
     const wishlist = computeWishlist(rows, range);
     const kpis = computeBusinessKpis({ events: rows, range, products, feed, categories, returningRate: stats.returningRate });
-    const report = buildReport(rows, range, products, categories, feed, 'weekly');
-    return {
+    const report = buildReport(rows, range, products, categories, feed, 'weekly');    return {
       stats,
       eventsByType,
       products,
@@ -244,14 +257,18 @@ export function useAnalyticsData(): AnalyticsData {
       kpis,
       report,
     };
-  }, [rows, range]);
+  }, [rows, range, resolvers]);
 
   const buildReportCsv = useCallback(
     (period: ReportPeriod) => {
-      const r = buildReport(rows, range, aggregate.products, aggregate.categories, aggregate.feed, period);
+      // Each export covers its own real window (daily = last 1 day, weekly =
+      // last 7, monthly = last 30, Asia/Tashkent) — previously every button
+      // exported the currently selected range with a different label.
+      const periodKey = period === 'daily' ? 'daily' : period === 'weekly' ? 'weekly' : 'monthly';
+      const r = buildReport(rows, periodRange(periodKey), aggregate.products, aggregate.categories, aggregate.feed, period);
       return reportCsv(r);
     },
-    [rows, range, aggregate]
+    [rows, aggregate]
   );
 
   const buildProductCsv = useCallback(() => productCsv(aggregate.products), [aggregate]);
@@ -261,6 +278,9 @@ export function useAnalyticsData(): AnalyticsData {
     refreshing,
     error,
     rows: rows.length,
+    // Total EVENTS inside the selected range (the `rows` count above is the
+    // unfiltered all-time fetch size — never mix them in one card row).
+    eventsInRange: Object.values(aggregate.eventsByType).reduce((s, n) => s + n, 0),
     eventsByType: aggregate.eventsByType,
     stats: aggregate.stats,
     products: aggregate.products,

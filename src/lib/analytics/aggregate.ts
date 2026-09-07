@@ -1,8 +1,23 @@
 // Pure aggregation over raw analytics events. No side effects, no I/O — these
 // functions are deterministic and safe to memoize. Every figure is computed from
 // the real raw events only; nothing is estimated or fabricated.
+//
+// Canonical semantics live in ./metrics.ts and are enforced here:
+// - Rates are UNIQUE-VISITOR based (numerator visitors / denominator visitors)
+//   so a numerator drawn from the same visitor set can never exceed 100%.
+//   rateUnique() returns null when the denominator is empty → UI shows "—".
+// - Wall-clock bucketing uses Asia/Tashkent (see eventDay()).
 
-import type { AnalyticsEvent, AnalyticsEventType } from '../../types/supabase-db';
+import type { AnalyticsEvent } from '../../types/supabase-db';
+import {
+  eventDay,
+  rateUnique,
+  tashkentParts,
+  tashkentToday,
+  collapseJourney,
+  journeyKey,
+  isIntentEvent,
+} from './metrics';
 
 export type InterestLevel = 'low' | 'medium' | 'high';
 
@@ -21,13 +36,12 @@ export type RangeKey = (typeof RANGE_PRESETS)[number]['key'];
 
 export function presetRange(key: RangeKey): DateRange {
   const days = RANGE_PRESETS.find((r) => r.key === key)?.days ?? 14;
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - (days - 1));
-  return {
-    from: startOfUtcDay(from).toISOString().slice(0, 10),
-    to: startOfUtcDay(to).toISOString().slice(0, 10),
-  };
+  // Day boundaries in Asia/Tashkent so "last 7 days" matches the owner's wall
+  // clock and the Tashkent-bucketed events (see eventDay/withinRange).
+  const to = tashkentToday();
+  const toMs = new Date(to + 'T00:00:00Z').getTime();
+  const from = new Date(toMs - (days - 1) * 86400000).toISOString().slice(0, 10);
+  return { from, to };
 }
 
 export function startOfUtcDay(d: Date): Date {
@@ -35,17 +49,10 @@ export function startOfUtcDay(d: Date): Date {
 }
 
 export function withinRange(ev: AnalyticsEvent, range: DateRange): boolean {
-  if (!ev.created_at) return false;
-  const day = ev.created_at.slice(0, 10);
+  const day = eventDay(ev); // yyyy-mm-dd in Asia/Tashkent, '' when unparseable
+  if (!day) return false;
   return day >= range.from && day <= range.to;
 }
-
-const INTENT_ACTIONS: AnalyticsEventType[] = [
-  'telegram_click',
-  'phone_click',
-  'directions_click',
-  'contact_click',
-];
 
 function visitNumber(ev: AnalyticsEvent): number {
   const n = Number(ev.metadata?.session_visit);
@@ -100,6 +107,12 @@ export function computeVisitorStats(events: AnalyticsEvent[], range: DateRange):
     lastBySession.size > 0 ? Math.round(totalSessionMs / lastBySession.size / 1000) : 0;
 
   const pageViews = inRange.filter((e) => e.event_type === 'page_view').length;
+  // Denominator = sessions that actually opened at least one page. Sessions
+  // built only from non-page events (e.g. a lone feed_like) must not dilute
+  // the average — previously they did, systematically underestimating it.
+  const sessionsWithPageView = new Set(
+    inRange.filter((e) => e.event_type === 'page_view').map((e) => e.session_id)
+  ).size;
 
   return {
     uniqueVisitors,
@@ -107,7 +120,7 @@ export function computeVisitorStats(events: AnalyticsEvent[], range: DateRange):
     newVisitors: uniqueVisitors - returning.size,
     returningRate: uniqueVisitors > 0 ? returning.size / uniqueVisitors : 0,
     uniqueSessions,
-    avgPagesPerSession: uniqueSessions > 0 ? pageViews / uniqueSessions : 0,
+    avgPagesPerSession: sessionsWithPageView > 0 ? pageViews / sessionsWithPageView : 0,
     avgSessionLengthSec,
     totalPageViews: pageViews,
   };
@@ -163,15 +176,23 @@ export interface ProductMetric {
   firstSeen: string | null;
   lastSeen: string | null;
   interest: InterestLevel;
-  engagementRate: number; // (saves+telegram+phone+map+feed clicks) / views
+  // Visitor-based rates (uniqueVisitors(action) / uniqueViewers). Numerators
+  // are visitor SETS, so values are bounded 0..1; null = no viewers in range
+  // (UI shows "—"). Event totals (saves, telegramClicks, …) stay as counts.
+  engagementRate: number | null;
   isTrending: boolean; // rising view activity in the recent half of the range
   feedLikes: number;
   uniqueLikers: number;
-  wishlistRate: number; // saves / views
-  clickThroughRate: number; // (telegram+phone+map+feed clicks) / views
+  uniqueIntentVisitors: number; // visitors with telegram/phone/map/feed-click
+  uniqueSharers: number;
+  uniqueEngaged: number; // visitors with any save/intent/share/feed-click/like
+  wishlistRate: number | null; // uniqueSavers / uniqueViewers
+  clickThroughRate: number | null; // uniqueIntentVisitors / uniqueViewers
   averageViewTimeSec: number;
   scrollDepthPct: number;
-  conversionFunnelConversion: number; // views -> saves -> telegram -> map
+  // Visitors who both saved AND contacted (save→contact affinity). Coarse:
+  // no temporal order enforced — documented, not a true ordered funnel.
+  conversionFunnelConversion: number | null;
   popularityRank: number;
   trendScore: number;
   trafficSources: Record<string, number>;
@@ -210,6 +231,26 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
         const feedProductClicks = list.filter((e) => e.event_type === 'feed_product_click').length;
         const feedLikes = list.filter((e) => e.event_type === 'feed_like').length;
         const uniqueLikers = new Set(list.filter((e) => e.event_type === 'feed_like').map((e) => e.visitor_id)).size;
+        // Visitor sets for bounded rates (numerator ⊆ denominator by construction).
+        const intentVisitors = new Set(
+          list
+            .filter((e) =>
+              e.event_type === 'telegram_click' ||
+              e.event_type === 'phone_click' ||
+              e.event_type === 'directions_click' ||
+              e.event_type === 'feed_product_click'
+            )
+            .map((e) => e.visitor_id)
+        );
+        const sharerVisitors = new Set(
+          list.filter((e) => e.event_type === 'product_share').map((e) => e.visitor_id)
+        );
+        const engagedVisitors = new Set([
+          ...saverSet,
+          ...intentVisitors,
+          ...sharerVisitors,
+          ...new Set(list.filter((e) => e.event_type === 'feed_like').map((e) => e.visitor_id)),
+        ]);
 
         // Sorted view event timestamps (real metadata), used for firstSeen/lastSeen.
         const times = list
@@ -233,11 +274,11 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
         const isTrending =
           recentViews >= Math.max(2, Math.ceil(earlierViews * 1.5)) && views > 0;
 
-        // Wishlist rate: saves / views
-        const wishlistRate = views > 0 ? saves / views : 0;
+        // Wishlist rate: uniqueSavers / uniqueViewers (bounded 0..1).
+        const wishlistRate = rateUnique(saverSet.size, viewerSet.size);
 
-        // Click through rate: (telegram+phone+map+feed clicks) / views
-        const clickThroughRate = views > 0 ? (telegramClicks + phoneClicks + mapClicks + feedProductClicks) / views : 0;
+        // Click-through: visitors who contacted / uniqueViewers (bounded 0..1).
+        const clickThroughRate = rateUnique(intentVisitors.size, viewerSet.size);
 
         // Average viewing time from product_dwell events
         const averageViewTimeSec = avgDwellSec;
@@ -246,10 +287,16 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
         // If no scroll metadata available, default to 0
         const scrollDepthPct = 0; // Would require additional client-side tracking
 
-        // Conversion funnel conversion: views -> saves -> telegram -> map
+        // Save→contact affinity: visitors with BOTH a save and a contact
+        // action, over unique viewers. No temporal order enforced.
         const saveVisitors = new Set(list.filter((e) => e.event_type === 'product_save').map((e) => e.visitor_id));
-        const telegramFromSaves = list.filter((e) => e.event_type === 'telegram_click' && saveVisitors.has(e.visitor_id)).length;
-        const conversionFunnelConversion = views > 0 ? telegramFromSaves / views : 0;
+        const contactVisitors = new Set(
+          list
+            .filter((e) => e.event_type === 'telegram_click' || e.event_type === 'phone_click' || e.event_type === 'directions_click')
+            .map((e) => e.visitor_id)
+        );
+        const saveAndContact = [...saveVisitors].filter((v) => contactVisitors.has(v)).length;
+        const conversionFunnelConversion = rateUnique(saveAndContact, viewerSet.size);
 
         // Popularity rank (1 = most viewed)
         // We'll compute this later after all products are sorted
@@ -287,12 +334,16 @@ export function computeProducts(events: AnalyticsEvent[], range: DateRange): Pro
           firstSeen: times[0] ?? null,
           lastSeen: times[times.length - 1] ?? null,
           interest,
-          engagementRate: views > 0 ? (saves + telegramClicks + phoneClicks + mapClicks + feedProductClicks) / views : 0,
+          // Engagement: engaged visitors / unique viewers (bounded 0..1).
+          engagementRate: rateUnique(engagedVisitors.size, viewerSet.size),
           isTrending,
           popularityRank: 0,
           trendScore: 0,
           trafficSources: {} as Record<string, number>,
           deviceBreakdown: {} as Record<string, number>,
+          uniqueIntentVisitors: intentVisitors.size,
+          uniqueSharers: sharerVisitors.size,
+          uniqueEngaged: engagedVisitors.size,
         });
       }
   // Assign popularity ranks (1 = most views)
@@ -314,7 +365,7 @@ export function leastEngagedProducts(products: ProductMetric[], n = 8): ProductM
   // Products with real views but low engagement; the shop owner can act on these.
   return [...products]
     .filter((p) => p.views > 0)
-    .sort((a, b) => a.engagementRate - b.engagementRate || a.views - b.views)
+    .sort((a, b) => (a.engagementRate ?? 0) - (b.engagementRate ?? 0) || a.views - b.views)
     .slice(0, n);
 }
 
@@ -326,8 +377,8 @@ export function trendingProducts(products: ProductMetric[], n = 8): ProductMetri
 export function lowestEngagementProducts(products: ProductMetric[], n = 8): ProductMetric[] {
   // Products with views but very low engagement rate
   return [...products]
-    .filter((p) => p.views > 0 && p.engagementRate < 0.1)
-    .sort((a, b) => a.engagementRate - b.engagementRate)
+    .filter((p) => p.views > 0 && (p.engagementRate ?? 1) < 0.1)
+    .sort((a, b) => (a.engagementRate ?? 0) - (b.engagementRate ?? 0))
     .slice(0, n);
 }
 
@@ -341,24 +392,28 @@ export function productsByRank(products: ProductMetric[], rank: number): Product
 
 export interface CategoryMetric {
   id: string;
-  views: number;
-  uniqueVisitors: number;
-  productOpens: number;
+  views: number; // category_view events (category page/card opens)
+  uniqueVisitors: number; // visitors with category_view OR product_view OR save OR intent in this category
+  productOpens: number; // product_view events carrying this category_id
   favorites: number;
   uniqueSavers: number;
-  conversions: number;
-  engagementRate: number;
+  conversions: number; // intent events carrying this category_id
+  // Engaged visitors (any open/save/intent) / uniqueVisitors — bounded 0..1,
+  // null when nobody interacted. Previously (opens+favs+conv)/category_views,
+  // which routinely exceeded 100% because direct product opens rarely fire a
+  // category_view first.
+  engagementRate: number | null;
   trending: boolean;
   popularityRank: number;
   trafficSources: Record<string, number>;
-  topProductId: string | null;
+  topProductId: string | null; // product_id with most product_views in category
   topProductViews: number;
 }
 
 export function computeCategories(events: AnalyticsEvent[], range: DateRange): CategoryMetric[] {
   const map = new Map<
     string,
-    { id: string; views: number; unique: Set<string>; opens: number; favs: number; savers: Set<string>; conv: number; productViewsById: Map<string, number> }
+    { id: string; views: number; unique: Set<string>; engaged: Set<string>; opens: number; favs: number; savers: Set<string>; conv: number; productViewsById: Map<string, number> }
   >();
 
   for (const ev of events) {
@@ -367,23 +422,29 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
     if (!catId) continue;
     let m = map.get(catId);
     if (!m) {
-      m = { id: catId, views: 0, unique: new Set(), opens: 0, favs: 0, savers: new Set(), conv: 0, productViewsById: new Map() };
+      m = { id: catId, views: 0, unique: new Set(), engaged: new Set(), opens: 0, favs: 0, savers: new Set(), conv: 0, productViewsById: new Map() };
       map.set(catId, m);
     }
     if (ev.event_type === 'category_view') {
       m.views += 1;
       m.unique.add(ev.visitor_id);
+      m.engaged.add(ev.visitor_id);
     } else if (ev.event_type === 'product_view') {
       m.opens += 1;
       m.unique.add(ev.visitor_id);
+      m.engaged.add(ev.visitor_id);
       // Track product views within category
       const pv = m.productViewsById.get(ev.product_id ?? 'unknown') ?? 0;
       m.productViewsById.set(ev.product_id ?? 'unknown', pv + 1);
     } else if (ev.event_type === 'product_save') {
       m.favs += 1;
       m.savers.add(ev.visitor_id);
-    } else if (INTENT_ACTIONS.includes(ev.event_type)) {
+      m.unique.add(ev.visitor_id);
+      m.engaged.add(ev.visitor_id);
+    } else if (isIntentEvent(ev.event_type)) {
       m.conv += 1;
+      m.unique.add(ev.visitor_id);
+      m.engaged.add(ev.visitor_id);
     }
   }
 
@@ -391,9 +452,16 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
   const rankMap = new Map<string, number>();
   // First pass: compute all metrics and rank by views
   for (const [id, m] of map.entries()) {
-    const topProduct: [string, number] | undefined = m.productViewsById.entries().next().value;
-    const topProductId: string | null = topProduct ? (topProduct[0] === 'unknown' ? null : topProduct[0]) : null;
-    const topProductViews: number = topProduct ? topProduct[1] : 0;
+    // Top product = MAX product_views, not first-seen (previous code took the
+    // first map entry, mislabeling an arbitrary product as "top").
+    let topProductId: string | null = null;
+    let topProductViews = 0;
+    for (const [pid, pv] of m.productViewsById.entries()) {
+      if (pid !== 'unknown' && pv > topProductViews) {
+        topProductViews = pv;
+        topProductId = pid;
+      }
+    }
     rankMap.set(id, topProductViews);
     metrics.push({
       id: m.id,
@@ -403,7 +471,7 @@ export function computeCategories(events: AnalyticsEvent[], range: DateRange): C
       favorites: m.favs,
       uniqueSavers: m.savers.size,
       conversions: m.conv,
-      engagementRate: m.views > 0 ? (m.opens + m.favs + m.conv) / m.views : 0,
+      engagementRate: rateUnique(m.engaged.size, m.unique.size),
       trending: false, // will be set below
       popularityRank: 0,
       topProductId,
@@ -463,23 +531,29 @@ export function weakestCategory(categories: CategoryMetric[]): CategoryMetric | 
 
 export interface FeedMetric {
   id: string;
-  views: number;
-  uniqueViewers: number;
+  views: number; // feed_view events
+  uniqueViewers: number; // visitors with a feed_view
   likes: number;
   uniqueLikers: number;
   shares: number;
   productClicks: number;
+  uniqueClickers: number;
   telegramClicks: number;
   watchEvents: number;
-  totalWatchSec: number;
+  totalWatchSec: number; // summed feed_watch durationSec (real measured seconds)
   avgWatchSec: number;
-  feedProductConversion: number; // productClicks / views
-  comments: number;
-  uniqueCommenters: number;
-  engagementScore: number; // composite score based on available metrics
+  // Unique clickers / unique viewers (bounded 0..1, null when no viewers).
+  feedProductConversion: number | null;
+  comments: number; // feed_comment_submit only — drawer OPENS are not comments
+  uniqueCommenters: number; // visitors who submitted a comment
+  // Unique engaged visitors (like/share/click/telegram/save) / unique viewers.
+  engagementScore: number | null;
   videoStarts: number;
+  uniqueStarters: number;
   videoCompletes: number;
-  completionRate: number; // completes / starts, 0 if no starts
+  uniqueCompleters: number;
+  // Unique completers / unique starters (bounded 0..1, null when no starts).
+  completionRate: number | null;
   favorites: number; // feed_favorite with action=save
   unfavorites: number; // feed_favorite with action=unsave
   retentions: RetentionPoint[]; // per-video retention curve from feed_video_retention events
@@ -488,7 +562,8 @@ export interface FeedMetric {
 export interface RetentionPoint {
   bucket: string; // e.g. '3s','5s','10s','25%','50%','75%','100%'
   count: number;
-  rate: number; // count / video starts, 0 if no starts
+  uniqueVisitors: number;
+  rate: number | null; // unique bucket visitors / unique starters, null if none
 }
 
 export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMetric[] {
@@ -502,16 +577,21 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
       uniqueLikers: Set<string>;
       shares: number;
       productClicks: number;
+      clickers: Set<string>;
       telegramClicks: number;
+      telegramVisitors: Set<string>;
       watchEvents: number;
       totalWatchSec: number;
       comments: number;
-      commenterSessions: Set<string>;
+      commenters: Set<string>;
       videoStarts: number;
+      starters: Set<string>;
       videoCompletes: number;
+      completers: Set<string>;
       favorites: number;
+      favoriteVisitors: Set<string>;
       unfavorites: number;
-      retentions: Map<string, number>;
+      retentions: Map<string, { count: number; visitors: Set<string> }>;
     }
   >();
 
@@ -519,7 +599,7 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
     if (!withinRange(ev, range) || !ev.feed_id) continue;
     let m = map.get(ev.feed_id);
     if (!m) {
-      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, uniqueLikers: new Set(), shares: 0, productClicks: 0, telegramClicks: 0, watchEvents: 0, totalWatchSec: 0, comments: 0, commenterSessions: new Set(), videoStarts: 0, videoCompletes: 0, favorites: 0, unfavorites: 0, retentions: new Map<string, number>() };
+      m = { id: ev.feed_id, views: 0, viewers: new Set(), likes: 0, uniqueLikers: new Set(), shares: 0, productClicks: 0, clickers: new Set(), telegramClicks: 0, telegramVisitors: new Set(), watchEvents: 0, totalWatchSec: 0, comments: 0, commenters: new Set(), videoStarts: 0, starters: new Set(), videoCompletes: 0, completers: new Set(), favorites: 0, favoriteVisitors: new Set(), unfavorites: 0, retentions: new Map() };
       map.set(ev.feed_id, m);
     }
     switch (ev.event_type) {
@@ -536,9 +616,11 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
         break;
       case 'feed_product_click':
         m.productClicks += 1;
+        m.clickers.add(ev.visitor_id);
         break;
       case 'telegram_click':
         m.telegramClicks += 1;
+        m.telegramVisitors.add(ev.visitor_id);
         break;
       case 'feed_watch':
         m.watchEvents += 1;
@@ -547,27 +629,37 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
         break;
       case 'feed_video_start':
         m.videoStarts += 1;
+        m.starters.add(ev.visitor_id);
         break;
       case 'feed_video_complete':
         m.videoCompletes += 1;
+        m.completers.add(ev.visitor_id);
         break;
       case 'feed_favorite':
         if (ev.metadata?.action === 'unsave') m.unfavorites += 1;
-        else m.favorites += 1;
+        else {
+          m.favorites += 1;
+          m.favoriteVisitors.add(ev.visitor_id);
+        }
         break;
       case 'feed_video_retention': {
         const bucket = String(ev.metadata?.bucket ?? '');
-        if (bucket) m.retentions.set(bucket, (m.retentions.get(bucket) ?? 0) + 1);
+        if (bucket) {
+          let r = m.retentions.get(bucket);
+          if (!r) {
+            r = { count: 0, visitors: new Set() };
+            m.retentions.set(bucket, r);
+          }
+          r.count += 1;
+          r.visitors.add(ev.visitor_id);
+        }
         break;
       }
-      case 'feed_comment_open':
-        m.comments += 1;
-        // We don't have a visitor_id in the comment_open event itself,
-        // but we track sessions that opened the comment modal
-        break;
+      // NOTE: feed_comment_open (drawer opens) intentionally NOT counted as a
+      // comment — only submitted comments are comments.
       case 'feed_comment_submit':
         m.comments += 1;
-        m.commenterSessions.add(ev.session_id);
+        m.commenters.add(ev.visitor_id);
         break;
       default:
         break;
@@ -577,11 +669,21 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
   const ORDER: string[] = ['start', '3s', '5s', '10s', '25%', '50%', '75%', '100%'];
 
   return Array.from(map.values()).map((m) => {
-    const retentions: RetentionPoint[] = ORDER.filter((b) => m.retentions.has(b)).map((b) => ({
-      bucket: b,
-      count: m.retentions.get(b) ?? 0,
-      rate: m.videoStarts > 0 ? (m.retentions.get(b) ?? 0) / m.videoStarts : 0,
-    }));
+    const retentions: RetentionPoint[] = ORDER.filter((b) => m.retentions.has(b)).map((b) => {
+      const r = m.retentions.get(b)!;
+      return {
+        bucket: b,
+        count: r.count,
+        uniqueVisitors: r.visitors.size,
+        rate: rateUnique(r.visitors.size, m.starters.size),
+      };
+    });
+    const engaged = new Set([
+      ...m.uniqueLikers,
+      ...m.clickers,
+      ...m.telegramVisitors,
+      ...m.favoriteVisitors,
+    ]);
     return {
       id: m.id,
       views: m.views,
@@ -590,17 +692,20 @@ export function computeFeed(events: AnalyticsEvent[], range: DateRange): FeedMet
       uniqueLikers: m.uniqueLikers.size,
       shares: m.shares,
       productClicks: m.productClicks,
+      uniqueClickers: m.clickers.size,
       telegramClicks: m.telegramClicks,
       watchEvents: m.watchEvents,
       totalWatchSec: m.totalWatchSec,
       avgWatchSec: m.watchEvents > 0 ? Math.round(m.totalWatchSec / m.watchEvents) : 0,
-      feedProductConversion: m.views > 0 ? m.productClicks / m.views : 0,
+      feedProductConversion: rateUnique(m.clickers.size, m.viewers.size),
       comments: m.comments,
-      uniqueCommenters: m.commenterSessions.size,
-      engagementScore: m.views > 0 ? Math.round((m.likes + m.shares + m.productClicks + m.telegramClicks) / m.views * 100) / 100 : 0,
+      uniqueCommenters: m.commenters.size,
+      engagementScore: rateUnique(engaged.size, m.viewers.size),
       videoStarts: m.videoStarts,
+      uniqueStarters: m.starters.size,
       videoCompletes: m.videoCompletes,
-      completionRate: m.videoStarts > 0 ? m.videoCompletes / m.videoStarts : 0,
+      uniqueCompleters: m.completers.size,
+      completionRate: rateUnique(m.completers.size, m.starters.size),
       favorites: m.favorites,
       unfavorites: m.unfavorites,
       retentions,
@@ -618,13 +723,14 @@ export function topFeed(feed: FeedMetric[], n = 8): FeedMetric[] {
 
 export interface FeedOverview {
   impressions: number; // feed_view count
-  uniqueViewers: number;
+  uniqueViewers: number; // visitors with at least one feed_view (NOT any feed event)
   videoStarts: number;
   videoCompletes: number;
   averageWatchSec: number; // weighted by watch events
-  totalWatchSec: number;
-  completionRate: number; // completes / starts
-  engagementRate: number; // (likes + shares + productClicks + telegram + favorites) / impressions
+  totalWatchSec: number; // summed feed_watch durationSec (real measured seconds)
+  completionRate: number | null; // unique completers / unique starters
+  // Unique engaged visitors / unique viewers (bounded 0..1, null if none).
+  engagementRate: number | null;
   likes: number;
   comments: number; // comment_submit events
   shares: number;
@@ -638,6 +744,9 @@ export function computeFeedOverview(events: AnalyticsEvent[], range: DateRange):
   const inRange = events.filter((e) => withinRange(e, range) && e.feed_id);
   const feedIds = new Set<string>();
   const viewers = new Set<string>();
+  const starters = new Set<string>();
+  const completers = new Set<string>();
+  const engaged = new Set<string>();
   let impressions = 0;
   let starts = 0;
   let completes = 0;
@@ -653,32 +762,30 @@ export function computeFeedOverview(events: AnalyticsEvent[], range: DateRange):
   for (const ev of inRange) {
     if (!ev.feed_id) continue;
     feedIds.add(ev.feed_id);
-    viewers.add(ev.visitor_id);
     switch (ev.event_type) {
-      case 'feed_view': impressions += 1; break;
-      case 'feed_video_start': starts += 1; break;
-      case 'feed_video_complete': completes += 1; break;
+      case 'feed_view': impressions += 1; viewers.add(ev.visitor_id); break;
+      case 'feed_video_start': starts += 1; starters.add(ev.visitor_id); break;
+      case 'feed_video_complete': completes += 1; completers.add(ev.visitor_id); break;
       case 'feed_watch': {
         watchEvents += 1;
         const s = Number(ev.metadata?.durationSec);
         if (Number.isFinite(s)) totalWatchSec += s;
         break;
       }
-      case 'feed_like': likes += 1; break;
-      case 'feed_share': shares += 1; break;
-      case 'feed_product_click': productClicks += 1; break;
-      case 'telegram_click': telegramClicks += 1; break;
+      case 'feed_like': likes += 1; engaged.add(ev.visitor_id); break;
+      case 'feed_share': shares += 1; engaged.add(ev.visitor_id); break;
+      case 'feed_product_click': productClicks += 1; engaged.add(ev.visitor_id); break;
+      case 'telegram_click': telegramClicks += 1; engaged.add(ev.visitor_id); break;
       case 'feed_comment_submit': comments += 1; break;
       case 'feed_favorite':
-        if (ev.metadata?.action !== 'unsave') favorites += 1;
+        if (ev.metadata?.action !== 'unsave') {
+          favorites += 1;
+          engaged.add(ev.visitor_id);
+        }
         break;
       default: break;
     }
   }
-
-  const engagementRate = impressions > 0
-    ? (likes + shares + productClicks + telegramClicks + favorites) / impressions
-    : 0;
 
   return {
     impressions,
@@ -687,8 +794,8 @@ export function computeFeedOverview(events: AnalyticsEvent[], range: DateRange):
     videoCompletes: completes,
     averageWatchSec: watchEvents > 0 ? Math.round(totalWatchSec / watchEvents) : 0,
     totalWatchSec,
-    completionRate: starts > 0 ? completes / starts : 0,
-    engagementRate,
+    completionRate: rateUnique(completers.size, starters.size),
+    engagementRate: rateUnique(engaged.size, viewers.size),
     likes,
     comments,
     shares,
@@ -774,7 +881,7 @@ export function computeFeedActivityTrend(events: AnalyticsEvent[], range: DateRa
   }
   for (const ev of inRange) {
     if (!ev.feed_id) continue;
-    const day = ev.created_at.slice(0, 10);
+    const day = eventDay(ev); // Tashkent day — matches range buckets
     const p = map.get(day);
     if (!p) continue;
     switch (ev.event_type) {
@@ -816,7 +923,7 @@ export function computeFeedLikeTrend(events: AnalyticsEvent[], range: DateRange)
   }
   for (const ev of inRange) {
     if (!ev.feed_id) continue;
-    const day = ev.created_at.slice(0, 10);
+    const day = eventDay(ev); // Tashkent day — matches range buckets
     const p = map.get(day);
     if (!p) continue;
     if (ev.event_type === 'feed_like') p.likes += 1;
@@ -828,17 +935,22 @@ export function computeFeedLikeTrend(events: AnalyticsEvent[], range: DateRange)
 export interface FeedProductMetric {
   productId: string;
   feedClicks: number; // feed_product_click where product_id set
+  uniqueClickers: number;
   labelClicks: number; // clicks without product id (impressions of a product-less card)
   impressions: number; // feed_view where a product is linked (from metadata productId if present)
   favorites: number; // feed_favorite (product_id set)
-  productViews: number; // product_view events for that product (post-click)
-  conversionRate: number; // productViews / feedClicks
+  productViews: number; // product_view events for that product (ALL views, not only post-click)
+  uniqueProductViewers: number;
+  // Unique product viewers among clickers / unique clickers. Coarse affinity
+  // (no click→view session join): productViews counts every organic view too,
+  // so this is an upper-bound affinity signal, null when nobody clicked.
+  conversionRate: number | null;
 }
 
 export function computeFeedProductPerformance(events: AnalyticsEvent[], range: DateRange): FeedProductMetric[] {
   const map = new Map<
     string,
-    { feedClicks: number; labelClicks: number; favorites: number; productViews: number }
+    { feedClicks: number; clickers: Set<string>; labelClicks: number; favorites: number; productViews: number; viewers: Set<string>; clickerViewers: Set<string> }
   >();
   for (const ev of events) {
     if (!withinRange(ev, range)) continue;
@@ -846,26 +958,35 @@ export function computeFeedProductPerformance(events: AnalyticsEvent[], range: D
     if (!pid) continue;
     let m = map.get(pid);
     if (!m) {
-      m = { feedClicks: 0, labelClicks: 0, favorites: 0, productViews: 0 };
+      m = { feedClicks: 0, clickers: new Set(), labelClicks: 0, favorites: 0, productViews: 0, viewers: new Set(), clickerViewers: new Set() };
       map.set(pid, m);
     }
     switch (ev.event_type) {
-      case 'feed_product_click': m.feedClicks += 1; break;
+      case 'feed_product_click':
+        m.feedClicks += 1;
+        m.clickers.add(ev.visitor_id);
+        break;
       case 'feed_favorite':
         if (ev.metadata?.action !== 'unsave') m.favorites += 1;
         break;
-      case 'product_view': m.productViews += 1; break;
+      case 'product_view':
+        m.productViews += 1;
+        m.viewers.add(ev.visitor_id);
+        if (m.clickers.has(ev.visitor_id)) m.clickerViewers.add(ev.visitor_id);
+        break;
       default: break;
     }
   }
   return Array.from(map.entries()).map(([productId, m]) => ({
     productId,
     feedClicks: m.feedClicks,
+    uniqueClickers: m.clickers.size,
     labelClicks: 0,
     impressions: 0,
     favorites: m.favorites,
     productViews: m.productViews,
-    conversionRate: m.feedClicks > 0 ? m.productViews / m.feedClicks : 0,
+    uniqueProductViewers: m.viewers.size,
+    conversionRate: rateUnique(m.clickerViewers.size, m.clickers.size),
   }));
 }
 
@@ -875,11 +996,12 @@ export function computeFeedProductPerformance(events: AnalyticsEvent[], range: D
 
 export interface SearchMetric {
   query: string;
-  count: number;
-  uniqueVisitors: number;
+  count: number; // total search events for this query
+  uniqueVisitors: number; // UNIQUE VISITORS who searched (was: sessions)
+  uniqueSearchers: number;
   noResults: boolean;
   noResultCount: number;
-  ledToProductView: boolean;
+  ledToProductView: boolean; // same-visitor correlation, no order enforced
   ledToFavorite: boolean;
   ledToTelegram: boolean;
 }
@@ -887,9 +1009,13 @@ export interface SearchMetric {
 export interface SearchSummary {
   topSearches: SearchMetric[];
   noResultSearches: SearchMetric[];
-  totalSearches: number;
-  withResults: number;
-  searchConversionRate: number; // searches leading to a product view
+  totalSearches: number; // search events
+  uniqueSearchers: number; // unique visitors who searched at least once
+  withResults: number; // search EVENTS whose own metadata says results existed
+  withoutResults: number;
+  // Unique searchers who also viewed a product / unique searchers.
+  // Coarse same-range affinity (no before/after order enforced).
+  searchConversionRate: number | null;
 }
 
 export function computeSearch(events: AnalyticsEvent[], range: DateRange): SearchSummary {
@@ -901,11 +1027,12 @@ export function computeSearch(events: AnalyticsEvent[], range: DateRange): Searc
       query: string;
       count: number;
       sessions: Set<string>;
-      noResults: boolean;
-      noResultCount: number;
-      viewedSessions: Set<string>;
-      favSessions: Set<string>;
-      tgSessions: Set<string>;
+      visitors: Set<string>;
+      withResults: number;
+      withoutResults: number;
+      viewedVisitors: Set<string>;
+      favVisitors: Set<string>;
+      tgVisitors: Set<string>;
     }
   >();
 
@@ -914,37 +1041,53 @@ export function computeSearch(events: AnalyticsEvent[], range: DateRange): Searc
     if (!q) continue;
     let m = map.get(q);
     if (!m) {
-      m = { query: q, count: 0, sessions: new Set(), noResults: false, noResultCount: 0, viewedSessions: new Set(), favSessions: new Set(), tgSessions: new Set() };
+      m = { query: q, count: 0, sessions: new Set(), visitors: new Set(), withResults: 0, withoutResults: 0, viewedVisitors: new Set(), favVisitors: new Set(), tgVisitors: new Set() };
       map.set(q, m);
     }
     m.count += 1;
     m.sessions.add(ev.session_id);
-    if (ev.metadata?.noResults) {
-      m.noResults = true;
-      m.noResultCount += 1;
-    }
+    m.visitors.add(ev.visitor_id);
+    // Per-EVENT result flag: a query with 1 failure + 9 successes counts 9
+    // with-results (previously the whole query was marked resultless).
+    if (ev.metadata?.noResults) m.withoutResults += 1;
+    else m.withResults += 1;
   }
 
-  // Correlate outcomes within the same session (real derived data).
+  // Correlate outcomes within the same VISITOR in range (coarse affinity, no
+  // before/after order enforced — documented, not causal proof).
+  const queryVisitors = new Map<string, Set<string>>();
+  for (const ev of searchEvents) {
+    const q = (ev.search_query || '').trim();
+    if (!q) continue;
+    let s = queryVisitors.get(q);
+    if (!s) {
+      s = new Set();
+      queryVisitors.set(q, s);
+    }
+    s.add(ev.visitor_id);
+  }
   for (const ev of inRange) {
     if (ev.event_type === 'search') continue;
-    for (const m of map.values()) {
-      if (!m.sessions.has(ev.session_id)) continue;
-      if (ev.event_type === 'product_view') m.viewedSessions.add(ev.session_id);
-      if (ev.event_type === 'product_save') m.favSessions.add(ev.session_id);
-      if (ev.event_type === 'telegram_click') m.tgSessions.add(ev.session_id);
+    for (const [q, visitors] of queryVisitors) {
+      if (!visitors.has(ev.visitor_id)) continue;
+      const m = map.get(q);
+      if (!m) continue;
+      if (ev.event_type === 'product_view') m.viewedVisitors.add(ev.visitor_id);
+      if (ev.event_type === 'product_save') m.favVisitors.add(ev.visitor_id);
+      if (isIntentEvent(ev.event_type)) m.tgVisitors.add(ev.visitor_id);
     }
   }
 
   const metrics: SearchMetric[] = Array.from(map.values()).map((m) => ({
     query: m.query,
     count: m.count,
-    uniqueVisitors: m.sessions.size,
-    noResults: m.noResults,
-    noResultCount: m.noResultCount,
-    ledToProductView: m.viewedSessions.size > 0,
-    ledToFavorite: m.favSessions.size > 0,
-    ledToTelegram: m.tgSessions.size > 0,
+    uniqueVisitors: m.visitors.size,
+    uniqueSearchers: m.visitors.size,
+    noResults: m.withoutResults > 0,
+    noResultCount: m.withoutResults,
+    ledToProductView: m.viewedVisitors.size > 0,
+    ledToFavorite: m.favVisitors.size > 0,
+    ledToTelegram: m.tgVisitors.size > 0,
   }));
 
   const totalSearches = metrics.reduce((sum, m) => sum + m.count, 0);
@@ -953,14 +1096,21 @@ export function computeSearch(events: AnalyticsEvent[], range: DateRange): Searc
     .filter((m) => m.noResults)
     .sort((a, b) => b.noResultCount - a.noResultCount)
     .slice(0, 8);
-  const convertedSearches = metrics.reduce((sum, m) => sum + (m.ledToProductView ? m.count : 0), 0);
+  const allSearchers = new Set<string>();
+  const convertingSearchers = new Set<string>();
+  for (const m of map.values()) {
+    for (const v of m.visitors) allSearchers.add(v);
+    for (const v of m.viewedVisitors) convertingSearchers.add(v);
+  }
 
   return {
     topSearches,
     noResultSearches,
     totalSearches,
-    withResults: metrics.reduce((sum, m) => sum + (m.noResults ? 0 : m.count), 0),
-    searchConversionRate: totalSearches > 0 ? convertedSearches / totalSearches : 0,
+    uniqueSearchers: allSearchers.size,
+    withResults: Array.from(map.values()).reduce((s, m) => s + m.withResults, 0),
+    withoutResults: Array.from(map.values()).reduce((s, m) => s + m.withoutResults, 0),
+    searchConversionRate: rateUnique(convertingSearchers.size, allSearchers.size),
   };
 }
 
@@ -1011,7 +1161,7 @@ export function trafficSeries(events: AnalyticsEvent[], range: DateRange): Traff
   const byDay = new Map<string, { views: number; visitors: Set<string> }>();
   for (const ev of events) {
     if (!withinRange(ev, range) || ev.event_type !== 'page_view') continue;
-    const day = ev.created_at?.slice(0, 10) ?? '';
+    const day = eventDay(ev); // Tashkent day — matches range buckets
     if (!day) continue;
     let p = byDay.get(day);
     if (!p) {
@@ -1082,36 +1232,56 @@ export function hourlyActivity(events: AnalyticsEvent[], range: DateRange): Hour
   const buckets: HourBucket[] = Array.from({ length: 24 }, (_, h) => ({ hour: h, count: 0 }));
   for (const ev of events) {
     if (!withinRange(ev, range) || !ev.created_at) continue;
-    buckets[new Date(ev.created_at).getUTCHours()].count += 1;
+    // Asia/Tashkent hour — owner reads "18:00" as local evening.
+    buckets[tashkentParts(ev.created_at).hour].count += 1;
   }
   return buckets;
 }
 
 export interface BreakdownRow {
   label: string;
-  value: number;
+  value: number; // UNIQUE VISITORS with this attribute (see below)
+  events: number; // total events carrying this attribute
+}
+
+/**
+ * Visitor-basis breakdowns. The previous event-count version labeled
+ * "678 desktop + 107 mobile" next to "55 visitors" — heavy users dominated
+ * and totals could not reconcile. Now: unique visitors per attribute value;
+ * a visitor seen on two devices counts in both (disclosed in UI subtitle).
+ * The raw event count rides along for transparency.
+ */
+function visitorBreakdown(
+  events: AnalyticsEvent[],
+  range: DateRange,
+  pick: (e: AnalyticsEvent) => string
+): BreakdownRow[] {
+  const visitors = new Map<string, Set<string>>();
+  const eventCounts = new Map<string, number>();
+  for (const ev of events) {
+    if (!withinRange(ev, range)) continue;
+    const k = pick(ev);
+    eventCounts.set(k, (eventCounts.get(k) ?? 0) + 1);
+    let s = visitors.get(k);
+    if (!s) {
+      s = new Set();
+      visitors.set(k, s);
+    }
+    s.add(ev.visitor_id);
+  }
+  return Array.from(visitors.entries())
+    .map(([label, s]) => ({ label, value: s.size, events: eventCounts.get(label) ?? 0 }))
+    .sort((a, b) => b.value - a.value);
 }
 
 export function deviceBreakdown(events: AnalyticsEvent[], range: DateRange): BreakdownRow[] {
-  const counts = new Map<string, number>();
-  for (const ev of events) {
-    if (!withinRange(ev, range)) continue;
-    const device = typeof ev.metadata?.device === 'string' ? ev.metadata.device : 'unknown';
-    counts.set(device, (counts.get(device) ?? 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value);
+  return visitorBreakdown(events, range, (e) =>
+    typeof e.metadata?.device === 'string' ? e.metadata.device : 'unknown'
+  );
 }
 
 export function sourceBreakdown(events: AnalyticsEvent[], range: DateRange): BreakdownRow[] {
-  const counts = new Map<string, number>();
-  for (const ev of events) {
-    if (!withinRange(ev, range)) continue;
-    const source = typeof ev.metadata?.source === 'string' ? ev.metadata.source : 'unknown';
-    counts.set(source, (counts.get(source) ?? 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .map(([label, value]) => ({ label, value }))
-    .sort((a, b) => b.value - a.value);
+  return visitorBreakdown(events, range, (e) =>
+    typeof e.metadata?.source === 'string' ? e.metadata.source : 'unknown'
+  );
 }

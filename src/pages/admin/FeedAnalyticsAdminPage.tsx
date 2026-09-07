@@ -28,7 +28,8 @@ import { useVideoFeed } from '../../context/VideoContext';
 import { KpiCard } from '../../components/admin/analytics/KpiCard';
 import { SectionCard } from '../../components/admin/analytics/SectionCard';
 import { RANGE_PRESETS } from '../../lib/analytics/aggregate';
-import { formatDuration, percent } from '../../components/admin/analytics/util';
+import { formatDuration } from '../../components/admin/analytics/util';
+import { formatRate, REMOVED_VIDEO_LABEL, resolveName } from '../../lib/analytics/metrics';
 import type { FeedMetric } from '../../lib/analytics/aggregate';
 
 export const FeedAnalyticsAdminPage: React.FC = () => {
@@ -37,7 +38,8 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
 
   const feedName = useMemo(() => {
     const map = new Map(videos.map((v) => [v.id, v.title]));
-    return (id: string) => map.get(id) ?? id;
+    // Never leak raw feed IDs to the owner — removed videos get a plain label.
+    return (id: string) => resolveName(id, (key) => map.get(key), REMOVED_VIDEO_LABEL);
   }, [videos]);
 
   const o = data.feedOverview;
@@ -51,11 +53,14 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
     () =>
       [...data.feed]
         .filter((f) => f.views > 0)
-        .sort((a, b) => a.engagementScore - b.engagementScore || a.views - b.views)
+        .sort((a, b) => (a.engagementScore ?? 0) - (b.engagementScore ?? 0) || a.views - b.views)
         .slice(0, 5),
     [data.feed]
   );
 
+  // Cross-video retention totals are event counts (unique visitors cannot be
+  // unioned across videos from per-video sets). Rates here are event shares
+  // vs all starts; per-video unique-based rates live on each FeedMetric.
   const retentionPoints = useMemo(() => {
     const order = ['start', '3s', '5s', '10s', '25%', '50%', '75%', '100%'];
     const totals = new Map<string, number>();
@@ -69,7 +74,7 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
     return order.map((b) => ({
       bucket: b,
       value: totals.get(b) ?? 0,
-      rate: starts > 0 ? (totals.get(b) ?? 0) / starts : 0,
+      rate: starts > 0 ? (totals.get(b) ?? 0) / starts : null,
     }));
   }, [data.feed]);
 
@@ -89,7 +94,7 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl">
               Feed ko'rinishlari, video boshqalari, tomosha vaqti, ushlab turish va konversiyalar —
-              barchasi real 'analytics_events' ma'lumotlaridan hisoblanadi.
+              Barchasi real mijoz harakatlaridan hisoblanadi (tashrifchilar — noyob qurilmalar, foizlar — tashrifchilar ulushi).
             </p>
           </div>
           <div className="flex flex-col items-start sm:items-end gap-3 shrink-0">
@@ -145,8 +150,8 @@ export const FeedAnalyticsAdminPage: React.FC = () => {
             <KpiCard label="Video boshlandi" value={o.videoStarts} icon={Play} accent="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" />
             <KpiCard label="To'liq ko'rildi" value={o.videoCompletes} icon={CheckCircle2} accent="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" />
             <KpiCard label="O'rt. tomosha vaqti" value={formatDuration(o.averageWatchSec)} icon={Clock} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
-            <KpiCard label="Tugallash darajasi" value={percent(o.completionRate)} icon={Gauge} accent="bg-purple-500/10 text-purple-600 dark:text-purple-400" />
-            <KpiCard label="Faollik darajasi" value={percent(o.engagementRate)} icon={Activity} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" />
+            <KpiCard label="Tugallash darajasi" value={formatRate(o.completionRate)} icon={Gauge} accent="bg-purple-500/10 text-purple-600 dark:text-purple-400" />
+            <KpiCard label="Faollik darajasi" value={formatRate(o.engagementRate)} icon={Activity} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" />
           </div>
 
           {/* Engagement strip */}
@@ -258,7 +263,7 @@ const FeedFunnel: React.FC<{ stages: { label: string; value: number; rate: numbe
   );
 };
 
-const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number }[] }> = ({ points }) => {
+const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: number | null }[] }> = ({ points }) => {
   const max = Math.max(1, ...points.map((p) => p.value));
   if (points.every((p) => p.value === 0)) {
     return <p className="text-xs text-muted-foreground text-center py-6">Retention ma'lumoti hali to'planmagan</p>;
@@ -274,14 +279,14 @@ const RetentionChart: React.FC<{ points: { bucket: string; value: number; rate: 
             <div
               className="w-full rounded-md bg-gradient-to-t from-teal-600 to-teal-400 dark:from-teal-700 dark:to-teal-500 group-hover:opacity-80 transition-opacity"
               style={{ height: `${Math.max(3, (p.value / max) * 106)}px` }}
-              title={`${p.bucket} — ${p.value} marta (${Math.round(p.rate * 100)}%)`}
+              title={`${p.bucket} — ${p.value} marta (${formatRate(p.rate)})`}
             />
             <span className="text-[9px] font-bold text-muted-foreground">{p.bucket}</span>
           </div>
         ))}
       </div>
       <p className="text-[10px] text-muted-foreground mt-2 text-center">
-        Video boshqasiga nisbatan har bir bosqichda nechta mijoz qolgan
+        Video boshlanishlariga nisbatan har bir bosqichda qolgan ulush (hodisalar bo‘yicha)
       </p>
     </div>
   );
@@ -321,7 +326,7 @@ const VideoRanking: React.FC<{ metrics: FeedMetric[]; name: (id: string) => stri
           <div className="min-w-0 flex-1">
             <div className="text-xs font-black text-foreground truncate">{name(f.id)}</div>
             <div className="text-[10px] text-muted-foreground">
-              {f.views} ko'rinish · {f.videoStarts} boshlash · {f.likes} yoqtirish · {Math.round(f.engagementScore * 100)}% faollik
+              {f.views} ko'rinish · {f.videoStarts} boshlash · {f.likes} yoqtirish · {formatRate(f.engagementScore)} faollik
             </div>
           </div>
           <span className="text-xs font-black text-foreground shrink-0">{f.views}</span>
@@ -369,7 +374,7 @@ const AllVideosTable: React.FC<{ metrics: FeedMetric[]; name: (id: string) => st
               <td className="px-2 py-2.5 text-right text-blue-600 dark:text-blue-400">{f.productClicks}</td>
               <td className="px-2 py-2.5 text-right text-sky-600 dark:text-sky-400">{f.telegramClicks}</td>
               <td className="px-2 py-2.5 text-right text-amber-600 dark:text-amber-400">{f.favorites}</td>
-              <td className="px-2 py-2.5 text-right font-black text-teal-600 dark:text-teal-400">{Math.round(f.engagementScore * 100)}%</td>
+              <td className="px-2 py-2.5 text-right font-black text-teal-600 dark:text-teal-400">{formatRate(f.engagementScore)}</td>
             </tr>
           ))}
         </tbody>

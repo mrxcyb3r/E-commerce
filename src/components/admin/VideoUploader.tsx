@@ -35,15 +35,17 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
   onPosterChange,
   bucket,
   scope,
-  label = 'Video fayl',
-  helperText = 'MP4 yoki WebM, hajmi 100 MB gacha. E\'lon fayl yuklab saqlash orqali yuklanadi.',
+  label = 'Video',
+  helperText = 'Tavsiya: YouTube yoki to‘g‘ridan-to‘g‘ri video havolasi (URL) qo‘ying — katta fayllar omborni to‘ldiradi.',
   showPoster = true,
   disabled = false,
   onUploaded,
 }) => {
   const [upload, setUpload] = useState<UploadState | null>(null);
   const [posterUpload, setPosterUpload] = useState<UploadState | null>(null);
-  const [showUrlInput, setShowUrlInput] = useState(false);
+  // URL-first: the URL panel is the primary path (external/YouTube links cost
+  // no storage); file upload stays as a secondary fallback.
+  const [showUrlInput, setShowUrlInput] = useState(true);
   const [urlInput, setUrlInput] = useState('');
   const videoInputRef = useRef<HTMLInputElement>(null);
   const posterInputRef = useRef<HTMLInputElement>(null);
@@ -194,40 +196,39 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
           </div>
         </div>
       ) : (
-        <div
-          onClick={() => !disabled && videoInputRef.current?.click()}
-          className="rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors p-6 flex flex-col items-center justify-center gap-2 cursor-pointer bg-white dark:bg-neutral-900"
-        >
-          <Video className="w-7 h-7 text-neutral-400" />
-          <p className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">Video fayl tanlang (MP4/WebM)</p>
-          <p className="text-[11px] text-neutral-400">Hajmi 100 MB gacha · Yuklangan video do\'konda ko\'rsatiladi</p>
-        </div>
-      )}
-
-      {showUrlInput && !value && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 p-3 space-y-2 bg-neutral-50 dark:bg-neutral-800/60">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">Mavjud video URL manzilini import qilish (oldingi URL asosidagi videolar uchun).</p>
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddUrl();
-                }
-              }}
-              className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white text-xs"
-              placeholder="https://..."
-            />
-            <button
-              type="button"
-              onClick={handleAddUrl}
-              className="px-3 py-2 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-400 text-neutral-950 whitespace-nowrap"
-            >
-              Qo'shish
-            </button>
+        <div className="space-y-2">
+          <div className="rounded-xl border border-neutral-200 dark:border-neutral-700 p-3 space-y-2 bg-neutral-50 dark:bg-neutral-800/60">
+            <p className="text-xs font-bold text-neutral-700 dark:text-neutral-200">Video havolasi (tavsiya etiladi)</p>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">YouTube yoki to‘g‘ridan-to‘g‘ri MP4/WebM havolasi — ombor sarflanmaydi.</p>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddUrl();
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white text-xs"
+                placeholder="https://youtube.com/watch?v=... yoki https://.../video.mp4"
+              />
+              <button
+                type="button"
+                onClick={handleAddUrl}
+                className="px-3 py-2 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-400 text-neutral-950 whitespace-nowrap"
+              >
+                Qo'shish
+              </button>
+            </div>
+          </div>
+          <div
+            onClick={() => !disabled && videoInputRef.current?.click()}
+            className="rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors p-4 flex flex-col items-center justify-center gap-1 cursor-pointer bg-white dark:bg-neutral-900"
+          >
+            <Video className="w-5 h-5 text-neutral-400" />
+            <p className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400">yoki fayl yuklang (MP4/WebM, 100 MB gacha)</p>
           </div>
         </div>
       )}

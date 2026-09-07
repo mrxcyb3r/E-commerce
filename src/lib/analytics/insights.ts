@@ -12,6 +12,7 @@ import type {
   DateRange,
 } from './aggregate';
 import type { AnalyticsEvent } from '../../types/supabase-db';
+import { eventDay, tashkentParts } from './metrics';
 
 export interface Insight {
   text: string;
@@ -27,6 +28,9 @@ interface InsightInput {
   intent: IntentMetric;
   events: AnalyticsEvent[];
   range: DateRange;
+  /** Owner-facing name resolvers — insights must never print raw prod- IDs. */
+  resolveProduct?: (id: string) => string;
+  resolveCategory?: (id: string) => string;
 }
 
 const fmt = (n: number): string => n.toLocaleString('uz-UZ');
@@ -34,21 +38,28 @@ const fmt = (n: number): string => n.toLocaleString('uz-UZ');
 export function buildInsights(input: InsightInput): Insight[] {
   const insights: Insight[] = [];
   const { stats, products, categories, feed, search, intent, events, range } = input;
+  const pName = input.resolveProduct ?? ((id: string) => id);
+  const cName = input.resolveCategory ?? ((id: string) => id);
 
-  const totalEvents = events.filter((e) => e.created_at && e.created_at.slice(0, 10) >= range.from && e.created_at.slice(0, 10) <= range.to).length;
+  const totalEvents = events.filter((e) => {
+    const day = eventDay(e);
+    return day !== '' && day >= range.from && day <= range.to;
+  }).length;
   if (totalEvents === 0) return insights;
 
-  // Visitor health
+  // Visitor health — only claim "returning is growing" when the returning
+  // calculation has real support (≥5 returning visitors); otherwise stay quiet
+  // instead of manufacturing advice.
   if (stats.uniqueVisitors > 0) {
-    if (stats.returningRate >= 0.2) {
+    if (stats.returningRate >= 0.2 && stats.returningVisitors >= 5) {
       insights.push({
         kind: 'good',
         text: `${fmt(stats.uniqueVisitors)} noyob tashrifchidan ${fmt(stats.returningVisitors)} tasi qayta kelgan (${Math.round(stats.returningRate * 100)}%) — do'konga qaytib kelayotganlar ko'paymoqda.`,
       });
-    } else {
+    } else if (stats.uniqueVisitors >= 5) {
       insights.push({
         kind: 'info',
-        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchi qayd etildi. Qayta tashriflar hali kam — Telegram orqali xabar yuborib chaqirish mumkin.`,
+        text: `${fmt(stats.uniqueVisitors)} noyob tashrifchi qayd etildi.`,
       });
     }
   }
@@ -59,7 +70,7 @@ export function buildInsights(input: InsightInput): Insight[] {
     const [top] = [...productsWithViews].sort((a, b) => b.views - a.views);
     insights.push({
       kind: 'good',
-      text: `Eng ko'p e'tibor: "${top.id}" — ${fmt(top.views)} ko'rish, ${fmt(top.uniqueViewers)} noyob tomoshabin, ${fmt(top.saves)} marta saqlangan.`,
+      text: `Eng ko'p e'tibor: "${pName(top.id)}" — ${fmt(top.views)} ko'rish, ${fmt(top.uniqueViewers)} noyob tomoshabin, ${fmt(top.saves)} marta saqlangan.`,
     });
   }
 
@@ -69,7 +80,7 @@ export function buildInsights(input: InsightInput): Insight[] {
     const t = trending[0];
     insights.push({
       kind: 'good',
-      text: `Trenddagi mahsulot: "${t.id}" — so'nggi davrda ko'rishlar oshib bormoqda (${fmt(t.views)} ko'rish).`,
+      text: `Trenddagi mahsulot: "${pName(t.id)}" — so'nggi davrda ko'rishlar oshib bormoqda (${fmt(t.views)} ko'rish).`,
     });
   }
 
@@ -81,20 +92,22 @@ export function buildInsights(input: InsightInput): Insight[] {
     const d = dwellers[0];
     insights.push({
       kind: 'info',
-      text: `Mijozlar "${d.id}" sahifasida uzoq qolmoqda (o'rtacha ${fmt(d.avgDwellSec)} soniya) — tavsif va rasmlar diqqatni tortmoqda.`,
+      text: `Mijozlar "${pName(d.id)}" sahifasida uzoq qolmoqda (o'rtacha ${fmt(d.avgDwellSec)} soniya) — tavsif va rasmlar diqqatni tortmoqda.`,
     });
   }
 
-  // Products with views but low engagement (actionable)
+  // Products with views but low engagement (actionable) — engagementRate is
+  // visitor-based and bounded, so the % shown is always honest.
   const lowEngagement = [...productsWithViews]
-    .filter((p) => p.views >= 2 && p.engagementRate < 0.15)
-    .sort((a, b) => a.engagementRate - b.engagementRate)
+    .filter((p) => p.views >= 2 && (p.engagementRate ?? 1) < 0.15)
+    .sort((a, b) => (a.engagementRate ?? 0) - (b.engagementRate ?? 0))
     .slice(0, 1);
   if (lowEngagement.length > 0) {
     const p = lowEngagement[0];
+    const rate = p.engagementRate === null ? '—' : `${Math.round(p.engagementRate * 100)}%`;
     insights.push({
       kind: 'warn',
-      text: `"${p.id}" ${fmt(p.views)} marta ko'rildi, lekin kam ishtirok (${Math.round(p.engagementRate * 100)}%) — narx yoki tavsifni qayta ko'rib chiqish foydali bo'lishi mumkin.`,
+      text: `"${pName(p.id)}" ${fmt(p.views)} marta ko'rildi, lekin kam ishtirok (${rate}) — narx yoki tavsifni qayta ko'rib chiqish foydali bo'lishi mumkin.`,
     });
   }
 
@@ -116,22 +129,28 @@ export function buildInsights(input: InsightInput): Insight[] {
     });
   }
 
-  // Category strength
+  // Category strength — only when category tracking has real support
+  // (≥1 category view); "strongest: 0 views" helps nobody.
   if (categories.length > 0) {
     const best = [...categories].sort((a, b) => b.views - a.views)[0];
-    insights.push({
-      kind: 'good',
-      text: `Eng kuchli toifa: ${fmt(best.views)} ko'rish, ${fmt(best.productOpens)} mahsulot ochilishi, ${fmt(best.conversions)} aloqa qilish.`,
-    });
+    if (best.views > 0) {
+      insights.push({
+        kind: 'good',
+        text: `Eng kuchli toifa: "${cName(best.id)}" — ${fmt(best.views)} ko'rish, ${fmt(best.productOpens)} mahsulot ochilishi, ${fmt(best.conversions)} aloqa harakati.`,
+      });
+    }
   }
 
-  // Time of day
+  // Time of day — Asia/Tashkent hours and Tashkent day buckets.
   const hourly = Array.from({ length: 24 }, (_, h) => h);
   const countByHour = hourly.map((h) => ({
     h,
     c: events.filter(
-      (e) => e.created_at && new Date(e.created_at).getUTCHours() === h &&
-        e.created_at.slice(0, 10) >= range.from && e.created_at.slice(0, 10) <= range.to
+      (e) => {
+        if (!e.created_at) return false;
+        const day = eventDay(e);
+        return tashkentParts(e.created_at).hour === h && day >= range.from && day <= range.to;
+      }
     ).length,
   }));
   const evening = countByHour.filter((x) => x.h >= 18 && x.h <= 23).reduce((s, x) => s + x.c, 0);

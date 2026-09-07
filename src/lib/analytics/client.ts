@@ -66,6 +66,13 @@ let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 const BATCH_MAX_DELAY_MS = 1500;
 
+// Guard against duplicate page_view rows from React StrictMode double-fire,
+// AnimatePresence remounts, or query-only navigations: identical path within
+// a short window carries no new information and poisons customer-path data
+// (Bosh sahifa → Bosh sahifa → Bosh sahifa).
+const PAGE_VIEW_DEDUPE_MS = 2000;
+let lastPageView: { path: string; at: number } | null = null;
+
 /**
  * Non-blocking, batched event write. Never throws and never blocks the UI.
  * Multiple events are coalesced and sent to Supabase in batches to avoid one
@@ -81,6 +88,17 @@ export function track(
     if (deduped.has(dedupeKey)) return Promise.resolve();
     deduped.add(dedupeKey);
     persistDeduped();
+  }
+
+  // Collapse rapid identical page_views (double-fire / remount). A genuine
+  // reload seconds later still records normally.
+  if (eventType === 'page_view' && typeof window !== 'undefined') {
+    const path = window.location.pathname + window.location.search;
+    const now = Date.now();
+    if (lastPageView && lastPageView.path === path && now - lastPageView.at < PAGE_VIEW_DEDUPE_MS) {
+      return Promise.resolve();
+    }
+    lastPageView = { path, at: now };
   }
 
   queue.push({ eventType, options });
@@ -137,7 +155,16 @@ async function flush(): Promise<void> {
       };
     });
 
-    await supabase.from('analytics_events').insert(rows);
+    const { error } = await supabase.from('analytics_events').insert(rows);
+    if (error) {
+      // Fallback: insert rows individually so a single rejected row (e.g. an
+      // event type outside the DB allowlist) cannot discard the whole batch —
+      // PostgREST bulk inserts are atomic. Never throws: analytics must never
+      // break the storefront.
+      await Promise.allSettled(
+        rows.map((row) => supabase.from('analytics_events').insert(row))
+      );
+    }
   } catch {
     // Analytics must never break the storefront.
   } finally {

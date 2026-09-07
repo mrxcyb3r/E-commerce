@@ -43,6 +43,15 @@ import { formatDuration, percent } from '../../components/admin/analytics/util';
 import { DonutChart } from '../../components/admin/analytics/DonutChart';
 import { Heatmap } from '../../components/admin/analytics/Heatmap';
 import { RANGE_PRESETS } from '../../lib/analytics/aggregate';
+import {
+  formatRate,
+  resolveName,
+  SOURCE_LABELS,
+  DEVICE_LABELS,
+  REMOVED_ENTITY_LABEL,
+  REMOVED_CATEGORY_LABEL,
+  REMOVED_VIDEO_LABEL,
+} from '../../lib/analytics/metrics';
 import type { ProductMetric, CategoryMetric, FeedMetric, InterestLevel } from '../../lib/analytics/aggregate';
 
 const LEVEL_LABEL: Record<InterestLevel, string> = {
@@ -58,7 +67,6 @@ const LEVEL_BADGE: Record<InterestLevel, string> = {
 };
 
 export const AnalyticsAdminPage: React.FC = () => {
-  const data = useAnalyticsData();
   const { products, categories } = useStore();
   const { publishedVideos } = useVideoFeed();
 
@@ -71,14 +79,27 @@ export const AnalyticsAdminPage: React.FC = () => {
     const bySlug = new Map(categories.map((c) => [c.slug, c]));
     return (id: string) => map.get(id) ?? bySlug.get(id);
   }, [categories]);
-  const feedResolver = useMemo(() => {
-    const map = new Map(publishedVideos.map((v) => [v.id, v]));
-    return (id: string) => map.get(id);
+  // Owner-facing names — raw prod-/feed- IDs must never reach the UI.
+  const pName = useMemo(() => {
+    const map = new Map(products.map((p) => [p.id, p.name]));
+    return (id: string) => resolveName(id, (key) => map.get(key), REMOVED_ENTITY_LABEL);
+  }, [products]);
+  const cName = useMemo(() => {
+    const map = new Map(categories.map((c) => [c.id, c.name]));
+    const bySlug = new Map(categories.map((c) => [c.slug, c.name]));
+    return (id: string) => resolveName(id, (key) => map.get(key) ?? bySlug.get(key), REMOVED_CATEGORY_LABEL);
+  }, [categories]);
+  const fName = useMemo(() => {
+    const map = new Map(publishedVideos.map((v) => [v.id, v.title]));
+    return (id: string) => resolveName(id, (key) => map.get(key), REMOVED_VIDEO_LABEL);
   }, [publishedVideos]);
 
-  const pName = (id: string) => productResolver(id)?.name ?? id;
-  const cName = (id: string) => categoryResolver(id)?.name ?? id;
-  const fName = (id: string) => feedResolver(id)?.title ?? id;
+  const data = useAnalyticsData(
+    useMemo(
+      () => ({ resolveProduct: pName, resolveCategory: cName }),
+      [pName, cName]
+    )
+  );
 
   const totalEvents = data.rows;
   const hasData = totalEvents > 0;
@@ -109,7 +130,8 @@ export const AnalyticsAdminPage: React.FC = () => {
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl">
               Haqiqiy mijozlar harakatlaridan yig'ilgan ma'lumotlar asosida tayyorlangan
-              tahlil. Har bir ko'rsatkich real 'analytics_events' ma'lumotlaridan hisoblanadi.
+              tahlil. Sanoqlar — hodisalar soni, foizlar — noyob tashrifchilar ulushi;
+              ma'lumot yetarli bo'lmasa “—” ko'rsatiladi. Vaqtlar Toshkent vaqti bilan.
             </p>
           </div>
           <div className="flex flex-col items-start sm:items-end gap-3 shrink-0">
@@ -195,15 +217,15 @@ export const AnalyticsAdminPage: React.FC = () => {
 
       {hasData && (
         <>
-          {/* KPI Cards */}
+          {/* KPI Cards — counts are in-range EVENT totals; visitor cards are people */}
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-7 gap-4">
             <KpiCard label="Noyob tashrifchilar" value={stats.uniqueVisitors} icon={Users} accent="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" sub={stats.returningVisitors > 0 ? `${stats.returningVisitors} qayta` : undefined} />
             <KpiCard label="Sessiyalar" value={stats.uniqueSessions} icon={Radio} accent="bg-purple-500/10 text-purple-600 dark:text-purple-400" />
-            <KpiCard label="Mahsulot ko'rishlar" value={data.eventsByType.product_view ?? 0} icon={Eye} accent="bg-blue-500/10 text-blue-600 dark:text-blue-400" />
-            <KpiCard label="Saqlanganlar" value={data.eventsByType.product_save ?? 0} icon={Heart} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" />
-            <KpiCard label="Qidiruvlar" value={search.totalSearches} icon={Search} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
-            <KpiCard label="Telegram" value={intent.telegram} icon={Send} accent="bg-blue-500/10 text-blue-600 dark:text-blue-400" />
-            <KpiCard label="Manzil ko'rish" value={intent.directions} icon={MapPin} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" />
+            <KpiCard label="Mahsulot ko'rishlar" value={data.eventsByType.product_view ?? 0} icon={Eye} accent="bg-blue-500/10 text-blue-600 dark:text-blue-400" sub="hodisalar" />
+            <KpiCard label="Saqlanganlar" value={data.eventsByType.product_save ?? 0} icon={Heart} accent="bg-rose-500/10 text-rose-600 dark:text-rose-400" sub="hodisalar" />
+            <KpiCard label="Qidiruvlar" value={search.totalSearches} icon={Search} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" sub={`${search.uniqueSearchers} kishi`} />
+            <KpiCard label="Telegram bosishlari" value={intent.telegram} icon={Send} accent="bg-blue-500/10 text-blue-600 dark:text-blue-400" sub="hodisalar" />
+            <KpiCard label="Jami voqealar" value={data.eventsInRange} icon={BarChart3} accent="bg-amber-500/10 text-amber-600 dark:text-amber-400" sub="tanlangan davrda" />
           </div>
 
           {/* Live visitors strip */}
@@ -216,18 +238,18 @@ export const AnalyticsAdminPage: React.FC = () => {
 
           {/* Visitor insights strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <MiniStat label="Sahifa/sessiya" value={stats.avgPagesPerSession.toFixed(1)} icon={Gauge} />
-            <MiniStat label="O'rtacha sessiya" value={formatDuration(stats.avgSessionLengthSec)} icon={Clock} />
-            <MiniStat label="Qaytish darajasi" value={percent(stats.returningRate)} icon={TrendingUp} />
-            <MiniStat label="Sakrash" value={percent(data.audience.bounceRate)} icon={Activity} />
+            <MiniStat label="Sahifa/sessiya" value={stats.avgPagesPerSession.toFixed(1)} icon={Gauge} hint="Sahifa ochgan sessiyalardagi o'rtacha sahifa soni" />
+            <MiniStat label="O'rtacha sessiya" value={formatDuration(stats.avgSessionLengthSec)} icon={Clock} hint="Birinchi va oxirgi harakat orasidagi vaqt" />
+            <MiniStat label="Qayta tashriflar" value={percent(stats.returningRate)} icon={TrendingUp} hint="Qayta kelgan tashrifchilar / barcha tashrifchilar" />
+            <MiniStat label="Sakrash darajasi" value={percent(data.audience.bounceRate)} icon={Activity} hint="Faqat 1 sahifa ochgan sessiyalar / sahifa ochgan sessiyalar" />
           </div>
 
           {/* Traffic + funnel + hourly */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <SectionCard title="Traffik" icon={CalendarDays} subtitle={`${RANGE_PRESETS.find((r) => r.key === data.range)?.label ?? ''} — kunlik sahifa ochilishlari`} action={data.traffic.length > 1 ? <TrendCompare traffic={data.traffic} /> : undefined}>
+            <SectionCard title="Traffik" icon={CalendarDays} subtitle={`${RANGE_PRESETS.find((r) => r.key === data.range)?.label ?? ''} — kunlik sahifa ochilishlari (hodisalar)`}>
               <SimpleBarChart data={data.traffic} />
             </SectionCard>
-            <SectionCard title="Xaridor yo'li" icon={Filter} subtitle="Noyob foydalanuvchilar va har bosqich o'tish darajasi">
+            <SectionCard title="Xaridor yo'li" icon={Filter} subtitle="Har bosqichdagi noyob tashrifchilar (mustaqil guruhlar — ketma-ket voronka emas)">
               <FunnelView stages={data.advancedFunnel} />
             </SectionCard>
           </div>
@@ -251,13 +273,13 @@ export const AnalyticsAdminPage: React.FC = () => {
             <IntentSection intent={intent} />
           </div>
 
-          {/* Audience breakdown */}
+          {/* Audience breakdown — visitor basis, Uzbek labels */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <SectionCard title="Qurilmalar" icon={MonitorSmartphone}>
-              <BreakdownList rows={data.devices} />
+            <SectionCard title="Qurilmalar" icon={MonitorSmartphone} subtitle="Noyob tashrifchilar (bitta kishi ikki qurilmada bo'lsa, ikkalasida ham sanaladi)">
+              <BreakdownList rows={data.devices} labelMap={DEVICE_LABELS} />
             </SectionCard>
-            <SectionCard title="Trafik manbai" icon={Globe}>
-              <BreakdownList rows={data.sources} />
+            <SectionCard title="Trafik manbai" icon={Globe} subtitle="Noyob tashrifchilar (manba topilmasa — to‘g‘ridan-to‘g‘ri tashrif)">
+              <BreakdownList rows={data.sources} labelMap={SOURCE_LABELS} />
             </SectionCard>
           </div>
 
@@ -276,7 +298,7 @@ export const AnalyticsAdminPage: React.FC = () => {
           {/* Journeys + Wishlist */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <JourneySection data={data} />
-            <WishlistSection data={data} />
+            <WishlistSection data={data} pName={pName} />
           </div>
 
           {/* Alerts + Reports */}
@@ -317,8 +339,8 @@ export const AnalyticsAdminPage: React.FC = () => {
   );
 };
 
-const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }>; live?: boolean }> = ({ label, value, icon: Icon, live }) => (
-  <div className="p-3 rounded-2xl bg-card border border-border shadow-xs">
+const MiniStat: React.FC<{ label: string; value: number | string; icon: React.ComponentType<{ className?: string }>; live?: boolean; hint?: string }> = ({ label, value, icon: Icon, live, hint }) => (
+  <div className="p-3 rounded-2xl bg-card border border-border shadow-xs" title={hint}>
     <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
       {live && (
         <span className="relative flex h-2 w-2">
@@ -332,18 +354,6 @@ const MiniStat: React.FC<{ label: string; value: number | string; icon: React.Co
     <div className="text-lg font-black text-foreground">{typeof value === 'number' ? value.toLocaleString('uz-UZ') : value}</div>
   </div>
 );
-
-const TrendCompare: React.FC<{ traffic: { views: number }[] }> = ({ traffic }) => {
-  if (traffic.length < 2) return null;
-  const window1 = traffic.slice(0, Math.floor(traffic.length / 2));
-  const window2 = traffic.slice(Math.floor(traffic.length / 2));
-  const sum = (arr: { views: number }[]) => arr.reduce((s, x) => s + x.views, 0);
-  const a = sum(window1);
-  const b = sum(window2);
-  if (a === 0) return null;
-  const change = ((b - a) / a) * 100;
-  return <TrendBadge value={change} />;
-};
 
 const EmptyState: React.FC = () => (
   <div className="rounded-3xl border border-dashed border-border p-10 text-center space-y-4">
@@ -363,7 +373,7 @@ const EmptyState: React.FC = () => (
   </div>
 );
 
-const BreakdownList: React.FC<{ rows: { label: string; value: number }[] }> = ({ rows }) => {
+const BreakdownList: React.FC<{ rows: { label: string; value: number }[]; labelMap?: Record<string, string> }> = ({ rows, labelMap }) => {
   const total = rows.reduce((s, r) => s + r.value, 0);
   if (total === 0) return <p className="text-xs text-muted-foreground text-center py-6">Ma'lumot yo'q</p>;
   return (
@@ -371,8 +381,8 @@ const BreakdownList: React.FC<{ rows: { label: string; value: number }[] }> = ({
       {rows.map((r) => (
         <div key={r.label} className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-foreground capitalize">{r.label}</span>
-            <span className="font-black text-foreground">{r.value}</span>
+            <span className="font-semibold text-foreground capitalize">{labelMap?.[r.label] ?? r.label}</span>
+            <span className="font-black text-foreground">{r.value} kishi</span>
           </div>
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(r.value / total) * 100}%` }} />
@@ -410,7 +420,7 @@ const ProductsSection: React.FC<{
       title="Mahsulot tahlili"
       icon={ShoppingBag}
       accent="text-amber-500"
-      subtitle="Har bir mahsulot bo'yicha noyob tashrifchilar va faollik ko'rsatkichlari"
+      subtitle="Ko'rish/saqlash/bosish — hodisalar soni; Noyob — kishi soni"
     >
       {top.length === 0 ? (
         <p className="text-xs text-muted-foreground text-center py-6">Hali mahsulot ko'rishlari yo'q</p>
@@ -447,7 +457,7 @@ const ProductsSection: React.FC<{
               <span key={p.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-muted text-[11px] font-bold text-foreground">
                 {pName(p.id)}
                 <span className="text-blue-600 dark:text-blue-400">{p.views} ko'r</span>
-                <span className="text-amber-600 dark:text-amber-400">{Math.round(p.engagementRate * 100)}%</span>
+                <span className="text-amber-600 dark:text-amber-400">{formatRate(p.engagementRate)}</span>
               </span>
             ))}
           </div>
@@ -491,6 +501,12 @@ const ProductRow: React.FC<{ metric: ProductMetric; name: string; price: string;
       <ProductStat label="Ulashish" value={p.shareClicks} />
       <ProductStat label="Feed→Mah" value={p.feedProductClicks} />
     </div>
+    {(p.wishlistRate !== null || p.clickThroughRate !== null) && (
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+        {p.wishlistRate !== null && <span>Saqlash ulushi: <span className="font-black text-foreground">{formatRate(p.wishlistRate)}</span> <span className="opacity-70">(saqlaganlar / ko‘rganlar)</span></span>}
+        {p.clickThroughRate !== null && <span>Aloqa ulushi: <span className="font-black text-foreground">{formatRate(p.clickThroughRate)}</span> <span className="opacity-70">(bog‘langanlar / ko‘rganlar)</span></span>}
+      </div>
+    )}
   </div>
 );
 
@@ -513,22 +529,22 @@ const CategoriesSection: React.FC<{ metrics: CategoryMetric[]; cName: (id: strin
     return <SectionCard title="Kategoriyalar" icon={Activity}><p className="text-xs text-muted-foreground text-center py-6">Ma'lumot yo'q</p></SectionCard>;
   }
   return (
-    <SectionCard title="Kategoriyalar" icon={Activity} accent="text-purple-500" subtitle="Toifa bo'yicha tashriflar va saqlashlar">
+    <SectionCard title="Kategoriyalar" icon={Activity} accent="text-purple-500" subtitle="Ko'rish — toifa sahifasi ochilishlari (hodisalar); ochilish — shu toifadagi mahsulot ko'rishlari">
       <div className="space-y-3">
         {sorted.map((c) => (
           <div key={c.id} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-foreground truncate">{cName(c.id)}</span>
-              <span className="font-black text-foreground shrink-0">{c.views} ko'rish</span>
+              <span className="font-black text-foreground shrink-0">{c.views} ko'rish · {c.uniqueVisitors} kishi</span>
             </div>
             <div className="h-2.5 rounded-full bg-muted overflow-hidden">
               <div className="h-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-500" style={{ width: `${(c.views / max) * 100}%` }} />
             </div>
             <div className="flex gap-3 text-[10px] text-muted-foreground">
               <span>{c.productOpens} ochilish</span>
-              <span>{c.favorites} saqlash</span>
+              <span>{c.favorites} saqlash ({c.uniqueSavers} kishi)</span>
               <span>{c.conversions} bog'lanish</span>
-              <span className="ml-auto">{Math.round(c.engagementRate * 100)}% faollik</span>
+              <span className="ml-auto">Faollik: {formatRate(c.engagementRate)}</span>
             </div>
           </div>
         ))}
@@ -544,7 +560,7 @@ const CategoriesSection: React.FC<{ metrics: CategoryMetric[]; cName: (id: strin
 const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => string }> = ({ metrics, fName }) => {
   const sorted = useMemo(() => [...metrics].sort((a, b) => b.views - a.views), [metrics]);
   return (
-    <SectionCard title="Videolar" icon={Film} accent="text-teal-500" subtitle="Video ko'rishlar va mahsulotga o'tishlar">
+    <SectionCard title="Videolar" icon={Film} accent="text-teal-500" subtitle="Ko'rishlar — hodisalar; Noyob — videoni ko'rgan kishilar; vaqt — o'lchangan tomosha soniyalari">
       {sorted.length === 0 ? (
         <p className="text-xs text-muted-foreground text-center py-6">Feed faolligi yo'q</p>
       ) : (
@@ -562,11 +578,13 @@ const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => stri
                 <ProductStat label="Ulashish" value={f.shares} />
                 <ProductStat label="Ko'rish vaqti" value={formatDuration(f.avgWatchSec)} />
               </div>
-              {f.views > 0 && (
-                <div className="mt-2 text-[10px] text-muted-foreground">
-                  Feed → mahsulot o'tishi: <span className="font-black text-foreground">{percent(f.feedProductConversion)}</span>
-                </div>
-              )}
+              <div className="mt-2 text-[10px] text-muted-foreground">
+                Feed → mahsulot o'tishi: <span className="font-black text-foreground">{formatRate(f.feedProductConversion)}</span>
+                <span className="opacity-70"> (o‘tganlar / ko‘rganlar)</span>
+                {f.comments > 0 && (
+                  <> · Izohlar: <span className="font-black text-foreground">{f.comments}</span> <span className="opacity-70">({f.uniqueCommenters} kishi)</span></>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -580,7 +598,7 @@ const FeedSection: React.FC<{ metrics: FeedMetric[]; fName: (id: string) => stri
 // ---------------------------------------------------------------------------
 
 const SearchSection: React.FC<{ summary: ReturnType<typeof useAnalyticsData>['search'] }> = ({ summary }) => (
-  <SectionCard title="Qidiruv tahlili" icon={Search} accent="text-amber-500" subtitle={`${summary.totalSearches} ta qidiruv, mahsulotga o'tish ${percent(summary.searchConversionRate)}`}>
+  <SectionCard title="Qidiruv tahlili" icon={Search} accent="text-amber-500" subtitle={`${summary.totalSearches} ta qidiruv (${summary.uniqueSearchers} kishi) · natijalilar: ${summary.withResults} · mahsulotga o'tish ${formatRate(summary.searchConversionRate)}`}>
     <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground mb-2">Eng keng tarqalgan</p>
     <div className="flex flex-wrap gap-2 mb-5">
       {summary.topSearches.length === 0 && <p className="text-xs text-muted-foreground py-1">Qidiruvlar yo'q</p>}
@@ -625,7 +643,7 @@ const IntentSection: React.FC<{ intent: ReturnType<typeof useAnalyticsData>['int
     { label: 'Aloqa', value: intent.contact, icon: MessageCircle, color: 'text-purple-500 bg-purple-500/10' },
   ];
   return (
-    <SectionCard title="Aloqa harakatlari" icon={MousePointerClick} accent="text-purple-500" subtitle={`${intent.uniqueIntentVisitors} noyob tashrifchi do'kon bilan bog'langan`}>
+    <SectionCard title="Aloqa harakatlari" icon={MousePointerClick} accent="text-purple-500" subtitle={`${intent.uniqueIntentVisitors} noyob tashrifchi · kartochkalardagi sonlar — bosishlar (hodisalar)`}>
       <div className="grid grid-cols-2 gap-3 mb-3">
         {cards.map((card) => {
           const Icon = card.icon;
@@ -641,9 +659,9 @@ const IntentSection: React.FC<{ intent: ReturnType<typeof useAnalyticsData>['int
         })}
       </div>
       <div className="rounded-xl p-3 bg-gradient-to-r from-muted to-muted dark:from-muted/50 dark:to-muted/30 border border-border text-xs">
-        <div className="font-black text-foreground mb-1">Jami aloqa harakatlari</div>
+        <div className="font-black text-foreground mb-1">Jami aloqa bosishlari</div>
         <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{intent.total.toLocaleString('uz-UZ')}</div>
-        <p className="text-[10px] text-muted-foreground mt-1">Telegram + Qo'ng'iroq + Manzil + Aloqa</p>
+        <p className="text-[10px] text-muted-foreground mt-1">Telegram + Qo'ng'iroq + Manzil + Aloqa formasi</p>
       </div>
     </SectionCard>
   );
@@ -673,7 +691,7 @@ const AudienceSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
     ...data.devices.filter((d) => d.label !== 'unknown'),
   ];
   return (
-    <SectionCard title="Auditoriya tarkibi" icon={Users} accent="text-indigo-500" subtitle="Qurilma, brauzer, tizim, til va kun/rejim">
+    <SectionCard title="Auditoriya tarkibi" icon={Users} accent="text-indigo-500" subtitle="Noyob tashrifchilar bo'yicha: qurilma, brauzer, tizim, til va rejim">
 
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2 sm:col-span-1">
@@ -734,17 +752,16 @@ const MiniBox: React.FC<{ label: string; rows: { label: string; value: number }[
 const TimeSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const { timeAnalytics: ta } = data;
   const activeDayName = ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'][ta.activeDay];
-  const total = ta.eveningCount + ta.morningCount;
   return (
-  <SectionCard title="Vaqt tahlili" icon={Timer} accent="text-emerald-500" subtitle="Mijozlar qachon faol">
+  <SectionCard title="Vaqt tahlili" icon={Timer} accent="text-emerald-500" subtitle="Mijozlar qachon faol (Toshkent vaqti bilan)">
 
       <div className="grid grid-cols-2 gap-2 mb-3">
         <MiniStat label="Eng faol soat" value={`${ta.activeHour}:00`} icon={Clock} />
         <MiniStat label="Eng faol kun" value={activeDayName} icon={CalendarDays} />
-        <MiniStat label="Dam olish (shb/sha)" value={percent(ta.weekendShare)} icon={Gauge} />
-        <MiniStat label="Kechki faollik" value={total > 0 ? `${Math.round((ta.eveningCount / total) * 100)}%` : '—'} icon={TrendingUp} />
+        <MiniStat label="Dam olish (shb/yak)" value={formatRate(ta.totalEvents > 0 ? ta.weekendShare : null)} icon={Gauge} />
+        <MiniStat label="Kechki faollik" value={ta.totalEvents > 0 ? formatRate(ta.eveningCount / ta.totalEvents) : '—'} icon={TrendingUp} hint="18:00 dan keyingi hodisalar / barcha hodisalar" />
       </div>
-      <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Hafta va soat xaritasi</p>
+      <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Hafta va soat xaritasi (Toshkent)</p>
       <Heatmap data={ta.weekdayHourly} />
     </SectionCard>
   );
@@ -753,7 +770,7 @@ const TimeSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 const GrowthSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const comps = Object.values(data.comparison);
   return (
-    <SectionCard title="O'sish (oldingi davr bilan)" icon={TrendingUp} accent="text-emerald-500" subtitle={`${data.rangeDate.from} → ${data.rangeDate.to}`}>
+    <SectionCard title="O'sish (oldingi davr bilan)" icon={TrendingUp} accent="text-emerald-500" subtitle={`Hozir: ${data.rangeDate.from} → ${data.rangeDate.to} · qiyos: undan oldingi teng davr`}>
       {comps.every((c) => c.current === 0 && c.previous === 0) ? (
         <p className="text-xs text-muted-foreground text-center py-6">Ma'lumot yo'q</p>
       ) : (
@@ -763,8 +780,14 @@ const GrowthSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
               <span className="font-bold text-foreground">{c.label}</span>
               <div className="flex items-center gap-2">
                 <span className="font-black text-foreground">{c.current.toLocaleString('uz-UZ')}</span>
-                {c.previous > 0 && <span className="text-[10px] text-muted-foreground">avval {c.previous.toLocaleString('uz-UZ')}</span>}
-                {c.previous > 0 && <TrendBadge value={c.changePct} />}
+                {c.hasPrevious && <span className="text-[10px] text-muted-foreground">avval {c.previous.toLocaleString('uz-UZ')}</span>}
+                {c.hasPrevious && c.changePct !== null && <TrendBadge value={c.changePct} />}
+                {!c.hasPrevious && c.current > 0 && (
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">yangi</span>
+                )}
+                {!c.hasPrevious && c.current === 0 && (
+                  <span className="text-[10px] font-black text-muted-foreground">—</span>
+                )}
               </div>
             </div>
           ))}
@@ -777,18 +800,18 @@ const GrowthSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 const KpiSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const k = data.kpis;
   const cards = [
-    { label: 'Mahsulotga o\'tish', value: percent(k.conversionRate) },
-    { label: 'Jami voqealar', value: data.rows.toLocaleString('uz-UZ') },
-    { label: 'Saqlash darajasi', value: percent(k.favoriteRate) },
-    { label: 'Mahsulot bosish', value: percent(k.productCtr) },
-    { label: 'Video bosish', value: percent(k.feedCtr) },
-    { label: 'Qaytish darajasi', value: percent(k.returningRate) },
+    { label: 'Aloqa niyati', hint: 'Bog‘langan noyob tashrifchilar / barcha tashrifchilar', value: formatRate(k.conversionRate) },
+    { label: 'Jami voqealar', hint: 'Tanlangan davrdagi barcha hodisalar', value: data.eventsInRange.toLocaleString('uz-UZ') },
+    { label: 'Saqlash ulushi', hint: 'Saqlaganlar / mahsulot ko‘rganlar (kishilar)', value: formatRate(k.favoriteRate) },
+    { label: 'Mahsulot aloqa ulushi', hint: 'Mahsulot ko‘rib bog‘langanlar / mahsulot ko‘rganlar', value: formatRate(k.productCtr) },
+    { label: 'Video o‘tish ulushi', hint: 'Videodan mahsulotga o‘tganlar / video ko‘rganlar', value: formatRate(k.feedCtr) },
+    { label: 'Qayta tashriflar', hint: 'Qayta kelganlar / barcha tashrifchilar', value: percent(k.returningRate) },
   ];
   return (
-    <SectionCard title="Asosiy ko'rsatkichlar" icon={BarChart3} accent="text-blue-500" subtitle="Sotish va foydalanuvchi faolligi">
+    <SectionCard title="Asosiy ko'rsatkichlar" icon={BarChart3} accent="text-blue-500" subtitle="Foizlar — tashrifchilar ulushi; “—” = ma'lumot yetarli emas">
       <div className="grid grid-cols-2 gap-2 mb-3">
         {cards.map((c) => (
-          <div key={c.label} className="p-3 rounded-xl bg-muted dark:bg-muted/50 border border-border">
+          <div key={c.label} className="p-3 rounded-xl bg-muted dark:bg-muted/50 border border-border" title={c.hint}>
             <div className="text-lg font-black text-blue-600 dark:text-blue-400">{c.value}</div>
             <p className="text-[10px] font-bold text-muted-foreground">{c.label}</p>
           </div>
@@ -804,7 +827,7 @@ const KpiSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
 };
 
 const JourneySection: React.FC<{ data: AnalyticsData }> = ({ data }) => (
-    <SectionCard title="Mijozlar manzillari" icon={Filter} accent="text-purple-500" subtitle="Eng ko'p ko'rilgan sahifalar ketma-ketligi">
+    <SectionCard title="Mijozlar yo'nalishlari" icon={Filter} accent="text-purple-500" subtitle="Sessiya ichidagi sahifalar ketma-ketligi (takroriy qadamlar birlashtirilgan)">
     {data.journeys.length === 0 ? (
       <p className="text-xs text-muted-foreground text-center py-6">Yo'nalishlar yo'q</p>
     ) : (
@@ -839,19 +862,20 @@ const pathLabel = (p: string): string => {
   return segs[0] ?? path;
 };
 
-const WishlistSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
+const WishlistSection: React.FC<{ data: AnalyticsData; pName: (id: string) => string }> = ({ data, pName }) => {
   const w = data.wishlist;
   return (
-    <SectionCard title="Sevimlilar" icon={Heart} accent="text-rose-500" subtitle="Saqlash va o'chirish holatlari">
+    <SectionCard title="Sevimlilar" icon={Heart} accent="text-rose-500" subtitle="Saqlash hodisalari (bosishlar) — hozirgi sevimlilar ro‘yxati emas">
       <div className="grid grid-cols-2 gap-2 mb-3">
         <MiniStat label="Noyob mijozlar" value={w.uniqueSavers} icon={Users} />
         <MiniStat label="Jami saqlashlar" value={w.totalSaves} icon={Heart} />
-        <MiniStat label="Takroriy saqlashlar" value={w.repeatedSaves} icon={TrendingUp} />
+        <MiniStat label="Takroriy saqlashlar" value={w.repeatedSaves} icon={TrendingUp} hint="Bir kishi bir mahsulotni qayta saqlagan hodisalar" />
         <MiniStat label="O'chirilgan" value={w.removedCount} icon={AlertTriangle} />
       </div>
       <div className="rounded-xl p-3 bg-gradient-to-r from-rose-50 to-muted dark:from-rose-950/20 dark:to-muted/30 border border-rose-100 dark:border-rose-900/40 text-xs mb-3">
-        <span className="font-black text-foreground">Saqlash o'sishi:</span>{' '}
+        <span className="font-black text-foreground">Saqlash balansi:</span>{' '}
         <span className={w.saveGrowth >= 0 ? 'text-emerald-600 dark:text-emerald-400 font-black' : 'text-rose-500 font-black'}>{w.saveGrowth >= 0 ? '+' : ''}{w.saveGrowth}</span>
+        <span className="text-muted-foreground"> (saqlashlar − o‘chirishlar)</span>
       </div>
       <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Eng ko'p saqlangan</p>
       <div className="space-y-1.5">
@@ -860,7 +884,7 @@ const WishlistSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
         ) : (
           w.mostSaved.slice(0, 5).map((r) => (
             <div key={r.label} className="flex items-center justify-between text-[11px]">
-              <span className="text-foreground truncate">{r.label}</span>
+              <span className="text-foreground truncate">{pName(r.label)}</span>
               <span className="font-black text-foreground shrink-0">{r.value}</span>
             </div>
           ))
@@ -903,7 +927,7 @@ const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
     void label;
   };
   return (
-    <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="Ma'lumotlarni yuklab olish (kunlik/haftalik/oylik)">
+    <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="Har bir tugma o'z davrini yuklaydi (kunlik = oxirgi 1 kun, haftalik = 7 kun, oylik = 30 kun)">
       <div className="grid grid-cols-1 gap-2 mb-3">
         <button type="button" onClick={() => download('daily', "Kunlik")} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-muted border border-border text-xs font-bold hover:bg-muted/80 transition-colors">
           <span>Kunlik hisobot</span>
@@ -926,7 +950,7 @@ const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
         <Download className="w-4 h-4" />
         Mahsulotlar CSV
       </button>
-      <p className="text-[10px] text-muted-foreground mt-2">Hozirgi tanlangan davr bo'yicha.</p>
+      <p className="text-[10px] text-muted-foreground mt-2">Mahsulotlar CSV — hozirgi tanlangan davr bo'yicha.</p>
     </SectionCard>
   );
 };

@@ -40,7 +40,10 @@ function summarize(
     productViews: counts('product_view'),
     saves: counts('product_save'),
     searches: counts('search'),
-    intent: counts('telegram_click') + counts('phone_click') + counts('directions_click'),
+    // Canonical intent set (telegram + phone + directions + contact) — matches
+    // computeIntent and computeComparison. Previously contact_click was
+    // excluded here, producing a third, conflicting "intent" number.
+    intent: counts('telegram_click') + counts('phone_click') + counts('directions_click') + counts('contact_click'),
     topProduct: products.length ? [...products].sort((a, b) => b.views - a.views)[0]?.id ?? null : null,
     topCategory: categories.length ? [...categories].sort((a, b) => b.views - a.views)[0]?.id ?? null : null,
     topFeed: feed.length ? [...feed].sort((a, b) => b.views - a.views)[0]?.id ?? null : null,

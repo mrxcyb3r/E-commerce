@@ -76,7 +76,7 @@ export const FeedAdminPage: React.FC = () => {
   const validateForm = useCallback((): boolean => {
     const errors: Record<string, string> = {};
     if (!title.trim()) errors.title = "Video sarlavhasi kiritilishi shart";
-    if (!videoUrl.trim()) errors.videoUrl = "Video fayli yuklanishi shart";
+    if (!videoUrl.trim()) errors.videoUrl = "Video kiritilishi shart (URL yoki fayl)";
     if (!posterUrl.trim()) errors.posterUrl = "Poster rasmi yuklanishi shart";
 
     setFieldErrors(errors);
@@ -330,7 +330,7 @@ export const FeedAdminPage: React.FC = () => {
                 </div>
               </div>
 
-              <VideoUploader value={videoUrl || undefined} onChange={(url) => setVideoUrl(url || '')} poster={posterUrl || undefined} onPosterChange={(url) => setPosterUrl(url || '')} bucket={MEDIA_BUCKETS.FEED_MEDIA} scope={pendingFeedId} label="Video fayl *" helperText="MP4 yoki WebM (100 MB gacha)." onUploaded={recordUploaded} />
+              <VideoUploader value={videoUrl || undefined} onChange={(url) => setVideoUrl(url || '')} poster={posterUrl || undefined} onPosterChange={(url) => setPosterUrl(url || '')} bucket={MEDIA_BUCKETS.FEED_MEDIA} scope={pendingFeedId} label="Video *" helperText="Video havolasi (YouTube/to‘g‘ridan-to‘g‘ri URL tavsiya etiladi) yoki fayl (MP4/WebM, 100 MB gacha)." onUploaded={recordUploaded} />
               {fieldErrors.videoUrl && <p className="text-[10px] text-destructive" role="alert">{fieldErrors.videoUrl}</p>}
 
               <div>

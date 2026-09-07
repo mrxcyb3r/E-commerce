@@ -9,7 +9,10 @@ export const FunnelView: React.FC<{ stages: AdvancedFunnelStage[] }> = ({ stages
   return (
     <div className="space-y-3">
       {stages.map((stage, i) => {
-        const width = Math.max(8, (stage.value / first) * 100);
+        // Bars are capped at 100%: later stages CAN exceed earlier ones
+        // (independent visitor sets, not a sequential cohort) — the % label
+        // below stays honest instead of overflowing the track.
+        const width = Math.max(8, Math.min(100, (stage.value / first) * 100));
         const overallDrop = i > 0 ? Math.round(((first - stage.value) / first) * 100) : 0;
         const conv =
           stage.conversionFromPrev != null ? Math.round(stage.conversionFromPrev * 100) : null;
@@ -19,10 +22,12 @@ export const FunnelView: React.FC<{ stages: AdvancedFunnelStage[] }> = ({ stages
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-neutral-700 dark:text-neutral-300">{stage.label}</span>
               <div className="flex items-center gap-2">
-                {conv != null && (
+                {conv != null ? (
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black">
-                    {conv}% o'tdi
+                    {conv}% o‘tdi
                   </span>
+                ) : (
+                  <span className="text-[10px] text-neutral-400 font-black">—</span>
                 )}
                 <span className="font-black text-neutral-900 dark:text-white">{stage.value}</span>
                 {drop != null && drop > 0 && (
