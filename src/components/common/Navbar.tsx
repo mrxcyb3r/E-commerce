@@ -134,10 +134,7 @@ export const Navbar: React.FC = () => {
    */
   const programmaticScrollRef = useRef(false);
 
-  const scrollTimeoutRef =
-    useRef<ReturnType<typeof window.setTimeout> | null>(
-      null,
-    );
+  const scrollTimeoutRef = useRef<number | null>(null);
 
   const isHomePage = location.pathname === '/';
 
