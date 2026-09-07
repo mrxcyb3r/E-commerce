@@ -33,7 +33,7 @@ export const AdminLayout: React.FC = () => {
           onOpenNotifications={() => setNotificationsOpen(true)}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto min-w-0 overflow-x-clip">
-          <Suspense fallback={<TableSkeleton rows={6} />}>
+          <Suspense fallback={<TableSkeleton columns={5} rows={6} />}>
             <AdminPageTransition>
               <Outlet />
             </AdminPageTransition>

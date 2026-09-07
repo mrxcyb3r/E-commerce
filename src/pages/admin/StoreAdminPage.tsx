@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
+import { SaveIndicator } from '../../components/admin/SaveIndicator';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 
 export const StoreAdminPage: React.FC = () => {
@@ -64,6 +65,8 @@ export const StoreAdminPage: React.FC = () => {
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -95,6 +98,7 @@ export const StoreAdminPage: React.FC = () => {
 
     setIsSaving(true);
     setSavedSuccess(false);
+    setSaveError(false);
     setErrorMessage(null);
 
     try {
@@ -140,9 +144,11 @@ export const StoreAdminPage: React.FC = () => {
       });
 
       setSavedSuccess(true);
+      setLastSavedAt(Date.now());
       setTimeout(() => setSavedSuccess(false), 2500);
     } catch (err) {
       console.error('Failed to save store info:', err);
+      setSaveError(true);
       setErrorMessage(err instanceof Error ? err.message : 'Saqlashda xatolik yuz berdi');
     } finally {
       setIsSaving(false);
@@ -160,6 +166,11 @@ export const StoreAdminPage: React.FC = () => {
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             Do'kon nomi, telefonlari, manzili va ijtimoiy tarmoqlarini yangilang
           </p>
+          <SaveIndicator
+            status={isSaving ? 'saving' : saveError ? 'error' : savedSuccess || lastSavedAt ? 'saved' : 'idle'}
+            lastSavedAt={lastSavedAt}
+            className="mt-1"
+          />
         </div>
 
         <button

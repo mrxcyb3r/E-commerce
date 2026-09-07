@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { useTableState } from '../../hooks/useTableState';
 import { Product } from '../../types/product';
 import { formatPrice } from '../../lib/utils';
 
@@ -71,6 +72,26 @@ export const ProductsListPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'name' | 'updated'>('newest');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Remember search / sorting / page across visits (localStorage, no new table system).
+  const persistedTable = useTableState('products-list');
+  const hydratedRef = useRef(false);
+  useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
+    if (persistedTable.query) setSearchQuery(persistedTable.query);
+    if (persistedTable.page > 1) setCurrentPage(persistedTable.page);
+    const sorts = ['newest', 'price-asc', 'price-desc', 'name', 'updated'] as const;
+    if (persistedTable.sortBy && (sorts as readonly string[]).includes(persistedTable.sortBy)) {
+      setSortBy(persistedTable.sortBy as typeof sortBy);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    persistedTable.update({ query: searchQuery, sortBy, page: currentPage });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, sortBy, currentPage]);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkConfirm, setBulkConfirm] = useState<BulkAction | null>(null);
@@ -178,6 +199,7 @@ export const ProductsListPage: React.FC = () => {
     setSearchQuery(''); setSelectedCategory('all'); setSelectedBrand('all');
     setMinPrice(''); setMaxPrice(''); setRecencyFilter('all');
     setStockFilter('all'); setBadgeFilter('all'); setStatusFilter('all');
+    persistedTable.reset();
   };
 
   useEffect(() => {
