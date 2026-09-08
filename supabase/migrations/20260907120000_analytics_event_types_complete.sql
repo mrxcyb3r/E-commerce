@@ -1,19 +1,23 @@
 -- Supabase Migration: complete analytics event allowlist
 --
 -- ROOT CAUSE (analytics trustworthiness audit):
--- The TypeScript client (src/types/supabase-db.ts AnalyticsEventType, 32 values)
+-- The TypeScript client (src/types/supabase-db.ts AnalyticsEventType, 31 values)
 -- fires feed_video_start, feed_video_complete, feed_video_retention,
--- feed_favorite, feed_unlike and all feed_comment_* events, but the database
--- CHECK constraint + anon INSERT policy only allow 20 values. Supabase
--- PostgREST bulk inserts are ATOMIC: a single batch containing one disallowed
--- event rejects the ENTIRE batch, silently discarding neighbouring page_view /
--- product_view / feed_view rows (the client ignores insert results by design so
--- the storefront never breaks). This is the dominant mechanism behind
--- "0 views but N shares" and other undercounted metrics.
+-- feed_favorite, feed_unlike and all feed_comment_* events, but the repository
+-- migration chain only allowed 20 values. Supabase PostgREST bulk inserts are
+-- ATOMIC: a single batch containing one disallowed event rejects the ENTIRE
+-- batch, silently discarding neighbouring page_view / product_view / feed_view
+-- rows (the client ignores insert results by design so the storefront never
+-- breaks). Live-DB probes (Sep 2026) showed production already accepts several
+-- of the newer types, so this migration CONVERGES the allowlist to exactly the
+-- TS union rather than assuming the old 20-value state. Verify with the guard
+-- queries in docs/MIGRATIONS.md before applying if the remote state is unknown.
 --
--- This migration widens the allowlist to exactly the 32 values of the TS union.
+-- This migration widens the allowlist to exactly the 31 values of the TS union.
 -- No tables created, no RLS semantics changed (anon INSERT-only, authenticated
--- full manage stays as-is).
+-- full manage stays as-is). Re-runnable (DROP IF EXISTS guards). Rollback =
+-- re-apply the previous allowlist file, accepting that newer event types will
+-- be rejected again afterwards.
 
 alter table public.analytics_events
   drop constraint if exists analytics_events_event_type_check;

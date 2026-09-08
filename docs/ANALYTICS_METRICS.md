@@ -4,7 +4,7 @@ Code source of truth: `src/lib/analytics/metrics.ts`.
 Aggregations: `src/lib/analytics/aggregate.ts`, `src/lib/analytics/advanced.ts`.
 Tracking client: `src/lib/analytics/client.ts` (+ `session.ts`, `enrich.ts`).
 Schema: `supabase/migrations/20260903120000_analytics_events.sql` +
-`20260907120000_analytics_event_types_complete.sql` (32 event types).
+`20260907120000_analytics_event_types_complete.sql` (31 event types — exact TS union).
 
 ## Identity
 

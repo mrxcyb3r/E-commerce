@@ -123,6 +123,8 @@ export const EVENT_LABELS: Record<AnalyticsEventType, string> = {
   price_offer: 'Narx taklifi',
   contact_click: 'Aloqa formasi',
   feedback_submit: 'Fikr yuborilishi',
+  buy_list_add: 'Xarid ro‘yxatiga qo‘shish',
+  buy_list_remove: 'Xarid ro‘yxatidan o‘chirish',
 };
 
 /** Owner-friendly traffic-source labels for raw metadata values. */

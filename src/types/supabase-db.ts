@@ -219,7 +219,9 @@ export type AnalyticsEventType =
   | 'ai_question'
   | 'price_offer'
   | 'contact_click'
-  | 'feedback_submit';
+  | 'feedback_submit'
+  | 'buy_list_add'
+  | 'buy_list_remove';
 
 export type AnalyticsEvent = {
   id: number;
