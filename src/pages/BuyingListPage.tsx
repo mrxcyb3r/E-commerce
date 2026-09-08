@@ -32,23 +32,27 @@ export const BuyingListPage: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl font-black text-foreground font-display tracking-tighter">
             {t('pages', 'buyList.title')}
           </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal">
-            {totalCount > 0
-              ? t('pages', 'buyList.count', totalCount, formatPrice(totalSum))
-              : t('pages', 'buyList.emptyDesc')}
-          </p>
-        </div>
+<p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal">
+              {totalCount > 0
+                ? t('pages', 'buyList.count', totalCount, formatPrice(totalSum))
+                : t('pages', 'buyList.emptyDesc')}
+            </p>
+          </div>
 
-        {totalCount > 0 && (
-          <button
-            type="button"
-            onClick={clearList}
-            className="self-start sm:self-auto inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors uppercase tracking-wider"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>{t('pages', 'buyList.clear')}</span>
-          </button>
-        )}
+          {/* Action Section */}
+          <div className="mt-4 space-y-3">
+            {totalCount > 0 && (
+              <button
+                type="button"
+                onClick={clearList}
+                aria-label="Ro'yxatni tozalash"
+                className="self-start sm:self-auto inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-amber-200 dark:border-amber-800 transition-colors uppercase tracking-wider"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Tozalash</span>
+              </button>
+            )}
+          </div>
       </div>
 
       {totalCount === 0 ? (
