@@ -10,6 +10,8 @@ import { Product } from '../types/product';
 import { useStore } from './StoreContext';
 import { track } from '../lib/analytics/client';
 import { getVisitorId } from '../lib/analytics/session';
+import { createBuySession, encodeSessionForQR, type BuySessionItem, type BuySession } from '../types/buySession';
+import { BUSINESS_CONFIG } from '../config/business';
 
 /**
  * "Save to Buy" — independent from Favorites (likes).
@@ -30,6 +32,7 @@ export interface BuyListItem {
   qty: number;
   size?: string;
   color?: string;
+  notes?: string;
 }
 
 export interface BuyListLine extends BuyListItem {
@@ -45,11 +48,15 @@ interface SaveToBuyContextType {
   isSaved: (id: string) => boolean;
   toggleSave: (product: Product, variant?: { size?: string; color?: string }) => void;
   setQty: (id: string, qty: number) => void;
+  setNotes: (id: string, notes: string) => void;
   removeItem: (id: string) => void;
   clearList: () => void;
+  moveToFavorites: (product: Product) => void;
   hydrated: boolean;
   /** Portable share payload (base64url JSON) — future QR / staff lookup. */
   shareToken: () => string;
+  /** Generate a Buy Session for in-store shopping */
+  createBuySession: () => { session: BuySession; qrPayload: string };
 }
 
 const SaveToBuyContext = createContext<SaveToBuyContextType | undefined>(undefined);
@@ -124,6 +131,13 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, qty: next } : i)));
   }, []);
 
+  const setNotes = useCallback((id: string, notes: string) => {
+    if (!id) return;
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, notes: notes.trim() || undefined } : i))
+    );
+  }, []);
+
   const removeItem = useCallback((id: string) => {
     if (!id) return;
     setItems((prev) => {
@@ -134,6 +148,39 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const clearList = useCallback(() => setItems([]), []);
+
+  const moveToFavorites = useCallback(
+    (product: Product) => {
+      if (!product?.id) return;
+      // Add to favorites
+      // We'll use a custom event to trigger the favorites context
+      window.dispatchEvent(new CustomEvent('move-to-favorites', { detail: product }));
+      // Remove from buy list
+      removeItem(product.id);
+      track('buy_list_move_to_favorites', { productId: product.id });
+    },
+    [removeItem]
+  );
+
+  const createBuySessionFn = useCallback(() => {
+    const sessionItems: BuySessionItem[] = items.map(({ id, qty, size, color, notes }) => ({
+      id,
+      qty,
+      size,
+      color,
+      notes,
+    }));
+    const session = createBuySession(sessionItems, BUSINESS_CONFIG.name || 'default');
+    const qrPayload = encodeSessionForQR(session);
+    track('buy_session_created', {
+      metadata: {
+        itemCount: items.length,
+        totalQty: totalCount,
+        totalSum,
+      },
+    });
+    return { session, qrPayload };
+  }, [items, totalCount, totalSum]);
 
   const lines = useMemo<BuyListLine[]>(() => {
     const map = new Map(products.map((p) => [p.id, p]));
@@ -154,7 +201,7 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const payload = {
       v: 1,
       ts: Date.now(),
-      items: items.map(({ id, qty, size, color }) => ({ id, qty, size, color })),
+      items: items.map(({ id, qty, size, color, notes }) => ({ id, qty, size, color, notes })),
     };
     const json = JSON.stringify(payload);
     return btoa(unescape(encodeURIComponent(json)))
@@ -173,10 +220,13 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isSaved,
         toggleSave,
         setQty,
+        setNotes,
         removeItem,
         clearList,
+        moveToFavorites,
         hydrated,
         shareToken,
+        createBuySession: createBuySessionFn,
       }}
     >
       {children}
