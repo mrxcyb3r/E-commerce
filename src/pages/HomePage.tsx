@@ -6,16 +6,13 @@ import { CategoriesSection } from '../components/sections/CategoriesSection';
 import { VideoDiscoverySection } from '../components/sections/VideoDiscoverySection';
 import { StoreLocation } from '../components/sections/StoreLocation';
 import { ContactSection } from '../components/sections/ContactSection';
+import { useStore } from '../context/StoreContext';
 import { track } from '../lib/analytics/client';
 
 export const HomePage: React.FC = () => {
   const { storeInfo } = useStore();
   useEffect(() => {
-    track('homepage_view', {
-      hasAddress: !!storeInfo.address,
-      hasPhone: !!storeInfo.phone,
-      hasTelegram: !!storeInfo.telegramUsername,
-    });
+    track('homepage_view', { metadata: { hasAddress: !!storeInfo.address, hasPhone: !!storeInfo.phone, hasTelegram: !!storeInfo.telegramUsername } });
   }, [storeInfo]);
   return (
     <main className="flex-grow space-y-0">

@@ -17,7 +17,7 @@ export const BuyingListPage: React.FC = () => {
 
   // Track buying list open
   useEffect(() => {
-    track('buy_list_open', { totalItems: totalCount, totalSum });
+    track('buy_list_open', { metadata: { totalItems: totalCount, totalSum } });
   }, []);
 
   return (
