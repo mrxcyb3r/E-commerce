@@ -6,6 +6,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import { VideoProvider } from './context/VideoContext';
 import { StoreProvider } from './context/StoreContext';
 import { AuthProvider } from './context/AuthContext';
+import { BuySessionProvider } from './context/BuySessionContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { ScrollToTop } from './components/common/ScrollToTop';
@@ -22,6 +23,7 @@ const ProductDetailPage = lazyNamed(() => import('./pages/ProductDetailPage'), '
 const FeedPage = lazyNamed(() => import('./pages/FeedPage'), 'FeedPage');
 const FavoritesPage = lazyNamed(() => import('./pages/FavoritesPage'), 'FavoritesPage');
 const BuyingListPage = lazyNamed(() => import('./pages/BuyingListPage'), 'BuyingListPage');
+const BuySessionPage = lazyNamed(() => import('./pages/BuySessionPage'), 'BuySessionPage');
 const AboutPage = lazyNamed(() => import('./pages/AboutPage'), 'AboutPage');
 const LocationPage = lazyNamed(() => import('./pages/LocationPage'), 'LocationPage');
 const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
@@ -46,11 +48,13 @@ const HomepageCmsPage = lazyNamed(() => import('./pages/admin/HomepageCmsPage'),
 const TestimonialsAdminPage = lazyNamed(() => import('./pages/admin/TestimonialsAdminPage'), 'TestimonialsAdminPage');
 const FaqAdminPage = lazyNamed(() => import('./pages/admin/FaqAdminPage'), 'FaqAdminPage');
 const StoreAdminPage = lazyNamed(() => import('./pages/admin/StoreAdminPage'), 'StoreAdminPage');
+const OnboardingPage = lazyNamed(() => import('./pages/admin/OnboardingPage'), 'OnboardingPage');
 const AboutAdminPage = lazyNamed(() => import('./pages/admin/AboutAdminPage'), 'AboutAdminPage');
 const ContactAdminPage = lazyNamed(() => import('./pages/admin/ContactAdminPage'), 'ContactAdminPage');
 const SettingsAdminPage = lazyNamed(() => import('./pages/admin/SettingsAdminPage'), 'SettingsAdminPage');
 const OrdersListPage = lazyNamed(() => import('./pages/admin/OrdersListPage'), 'OrdersListPage');
 const OrderDetailPage = lazyNamed(() => import('./pages/admin/OrderDetailPage'), 'OrderDetailPage');
+const InStoreSaleAdminPage = lazyNamed(() => import('./pages/admin/InStoreSaleAdminPage'), 'InStoreSaleAdminPage');
 const AnalyticsAdminPage = lazyNamed(() => import('./pages/admin/AnalyticsAdminPage'), 'AnalyticsAdminPage');
 const CommentsAdminPage = lazyNamed(() => import('./pages/admin/CommentsAdminPage'), 'CommentsAdminPage');
 const FeedAnalyticsAdminPage = lazyNamed(() => import('./pages/admin/FeedAnalyticsAdminPage'), 'FeedAnalyticsAdminPage');
@@ -93,6 +97,7 @@ const AnimatedRoutes: React.FC = () => {
           <Route path="/prompts" element={<PromptLibraryPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/buy-list" element={<BuyingListPage />} />
+          <Route path="/buy-session/:code" element={<BuySessionPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/location" element={<LocationPage />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -130,11 +135,12 @@ export default function App() {
         <AuthProvider>
           <FavoritesProvider>
             <VideoProvider>
-              <BrowserRouter>
-                <ScrollToTop />
-                <AnalyticsTracker />
-                <SeoMetaManager />
-                <Routes>
+              <BuySessionProvider>
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <AnalyticsTracker />
+                  <SeoMetaManager />
+                  <Routes>
                   {/* Public Store Routes */}
                   <Route
                     path="/*"
@@ -190,16 +196,19 @@ export default function App() {
                     <Route path="testimonials" element={<TestimonialsAdminPage />} />
                     <Route path="faq" element={<FaqAdminPage />} />
                     <Route path="store" element={<StoreAdminPage />} />
+                    <Route path="onboarding" element={<OnboardingPage />} />
                     <Route path="about" element={<AboutAdminPage />} />
                     <Route path="contact" element={<ContactAdminPage />} />
                     <Route path="settings" element={<SettingsAdminPage />} />
                     <Route path="analytics" element={<AnalyticsAdminPage />} />
                     <Route path="orders" element={<OrdersListPage />} />
                     <Route path="orders/:id" element={<OrderDetailPage />} />
+                    <Route path="in-store-sale" element={<InStoreSaleAdminPage />} />
                     <Route path="comments" element={<CommentsAdminPage />} />
                   </Route>
                 </Routes>
-              </BrowserRouter>
+                </BrowserRouter>
+              </BuySessionProvider>
             </VideoProvider>
           </FavoritesProvider>
         </AuthProvider>

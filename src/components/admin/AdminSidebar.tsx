@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Send,
   ShoppingCart,
+  ScanLine,
   Boxes,
   MessageSquare,
   Sparkles,
@@ -22,6 +23,7 @@ import {
   HelpCircle,
   Info,
   Phone,
+  Rocket,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -68,6 +70,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       title: 'UMUMIY',
       items: [
         { label: 'Boshqaruv', path: '/admin', icon: LayoutDashboard, end: true, description: 'Asosiy overview' },
+        { label: 'Sozlash', path: '/admin/onboarding', icon: Rocket, description: '10 daqiqada' },
       ],
     },
     {
@@ -84,6 +87,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       defaultOpen: true,
       items: [
         { label: 'Buyurtmalar', path: '/admin/orders', icon: ShoppingCart },
+        { label: 'Do\'konda sotuv', path: '/admin/in-store-sale', icon: ScanLine },
         { label: 'Izohlar', path: '/admin/comments', icon: MessageSquare },
       ],
     },

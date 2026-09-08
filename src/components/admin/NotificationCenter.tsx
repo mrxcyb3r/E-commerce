@@ -14,10 +14,18 @@ import {
   XCircle,
   FolderTree,
   ArrowRight,
+  Rocket,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useVideoFeed } from '../../context/VideoContext';
 import { relativeTime } from '../../lib/admin/relativeTime';
 import { ADMIN_SHORTCUT_OPEN_NOTIFICATIONS } from '../../hooks/useAdminShortcuts';
+import { track } from '../../lib/analytics/client';
+import {
+  computeStoreReadiness,
+  onboardingDismissed,
+  onboardingCompleted,
+} from '../../lib/admin/readiness';
 
 const READ_KEY = 'admin-notifications-read-at';
 
@@ -48,7 +56,8 @@ export const NotificationCenter: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-  const { products, categories, storeInfo, homepageSlides, activityLogs } = useStore();
+  const { products, categories, storeInfo, homepageSlides, activityLogs, homepageCms } = useStore();
+  const { videos } = useVideoFeed();
   const [readAt, setReadAt] = useState<number>(() => readStored());
 
   useEffect(() => {
@@ -71,6 +80,24 @@ export const NotificationCenter: React.FC<{
 
   const notices: Notice[] = useMemo(() => {
     const list: Notice[] = [];
+    const readiness = computeStoreReadiness({
+      products,
+      categories,
+      storeInfo,
+      homepageCms,
+      homepageSlides,
+      videos,
+    });
+    if (readiness.score < 100 && !onboardingCompleted() && !onboardingDismissed()) {
+      list.push({
+        id: 'onboarding-hint',
+        title: `${readiness.score}% — do‘kon sozlanmagan`,
+        desc: 'Qolgan qadamlarni bajaring: sozlash bo‘yicha ko‘rsatma ochiq',
+        href: '/admin/onboarding',
+        icon: Rocket,
+        tone: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+      });
+    }
     const missingImages = products.filter((p) => !p.images || p.images.length === 0);
     const outOfStock = products.filter(
       (p) => !p.inStock || (p.stockCount !== undefined && p.stockCount <= 0)
@@ -172,7 +199,7 @@ export const NotificationCenter: React.FC<{
     });
 
     return list.slice(0, 12);
-  }, [products, categories, storeInfo, homepageSlides, activityLogs]);
+  }, [products, categories, storeInfo, homepageSlides, homepageCms, activityLogs, videos]);
 
   const markAllRead = () => {
     const now = Date.now();
@@ -243,7 +270,10 @@ export const NotificationCenter: React.FC<{
                     <Link
                       key={n.id}
                       to={n.href}
-                      onClick={onClose}
+                      onClick={() => {
+                        track('notification_clicked', { metadata: { notice: n.id } });
+                        onClose();
+                      }}
                       className="flex items-start gap-2.5 p-2.5 rounded-xl bg-muted/40 border border-border/50 hover:border-primary/30 hover:bg-muted/70 transition-all group"
                     >
                       <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${n.tone}`}>
@@ -272,9 +302,19 @@ export const NotificationCenter: React.FC<{
 };
 
 export function useNotificationCount(): number {
-  const { products, categories, storeInfo, homepageSlides } = useStore();
+  const { products, categories, storeInfo, homepageSlides, homepageCms } = useStore();
+  const { videos } = useVideoFeed();
   return useMemo(() => {
     let n = 0;
+    const readiness = computeStoreReadiness({
+      products,
+      categories,
+      storeInfo,
+      homepageCms,
+      homepageSlides,
+      videos,
+    });
+    if (readiness.score < 100 && !onboardingCompleted() && !onboardingDismissed()) n += 1;
     if (products.some((p) => !p.images || p.images.length === 0)) n += 1;
     if (products.some((p) => !p.inStock || (p.stockCount ?? 1) <= 0)) n += 1;
     if (products.some((p) => p.inStock && (p.stockCount ?? 0) > 0 && (p.stockCount ?? 0) <= 3)) n += 1;
@@ -284,7 +324,7 @@ export function useNotificationCount(): number {
     if (!storeInfo.phoneNumbers?.[0] && !storeInfo.phone) n += 1;
     if (!storeInfo.address) n += 1;
     return n;
-  }, [products, categories, storeInfo, homepageSlides]);
+  }, [products, categories, storeInfo, homepageSlides, homepageCms, videos]);
 }
 
 export default NotificationCenter;

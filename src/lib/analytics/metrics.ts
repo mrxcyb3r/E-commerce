@@ -126,8 +126,23 @@ export const EVENT_LABELS: Record<AnalyticsEventType, string> = {
   buy_list_add: 'Xarid ro‘yxatiga qo‘shish',
   buy_list_remove: 'Xarid ro‘yxatidan o‘chirish',
   buy_list_open: 'Savatcha ochildi',
+  buy_list_move_to_favorites: 'Sevimlilarga o\'tkazish',
+  buy_session_created: 'Xarid sessiyasi yaratildi',
+  buy_session_regenerated: 'Xarid sessiyasi qayta yaratildi',
+  buy_session_shared: 'Xarid sessiyasi ulashildi',
+  buy_session_copied: 'Xarid sessiyasi nusxalandi',
+  buy_session_expired: 'Xarid sessiyasi muddati tugadi',
+  buy_session_opened: 'Xarid sessiyasi ochildi',
   homepage_view: 'Bosqich boshlandi',
   related_product_click: 'Olikka tegishli mahsulot bosilishi',
+  onboarding_started: 'Sozlash boshlandi',
+  onboarding_completed: 'Sozlash yakunlandi',
+  product_created: 'Mahsulot yaratildi',
+  video_uploaded: 'Video yuklandi',
+  homepage_published: 'Bosh sahifa nashr qilindi',
+  store_completed: "Do'kon to'liq sozlandi",
+  dashboard_quick_action: 'Tezkor amal bosildi',
+  notification_clicked: 'Bildirishnoma bosildi',
 };
 
 /** Owner-friendly traffic-source labels for raw metadata values. */

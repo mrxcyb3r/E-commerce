@@ -162,6 +162,19 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     [removeItem]
   );
 
+  const lines = useMemo<BuyListLine[]>(() => {
+    const map = new Map(products.map((p) => [p.id, p]));
+    return items.flatMap((item) => {
+      const product = map.get(item.id);
+      if (!product) return [];
+      const price = typeof product.price === 'number' ? product.price : 0;
+      return [{ ...item, product, lineTotal: price * item.qty }];
+    });
+  }, [items, products]);
+
+  const totalCount = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
+  const totalSum = useMemo(() => lines.reduce((s, l) => s + l.lineTotal, 0), [lines]);
+
   const createBuySessionFn = useCallback(() => {
     const sessionItems: BuySessionItem[] = items.map(({ id, qty, size, color, notes }) => ({
       id,
@@ -181,19 +194,6 @@ export const SaveToBuyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
     return { session, qrPayload };
   }, [items, totalCount, totalSum]);
-
-  const lines = useMemo<BuyListLine[]>(() => {
-    const map = new Map(products.map((p) => [p.id, p]));
-    return items.flatMap((item) => {
-      const product = map.get(item.id);
-      if (!product) return [];
-      const price = typeof product.price === 'number' ? product.price : 0;
-      return [{ ...item, product, lineTotal: price * item.qty }];
-    });
-  }, [items, products]);
-
-  const totalCount = useMemo(() => items.reduce((s, i) => s + i.qty, 0), [items]);
-  const totalSum = useMemo(() => lines.reduce((s, l) => s + l.lineTotal, 0), [lines]);
 
   const shareToken = useCallback(() => {
     // v1 envelope: versioned, self-describing, QR-encodable later.

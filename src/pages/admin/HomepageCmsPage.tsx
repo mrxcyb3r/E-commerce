@@ -28,6 +28,7 @@ import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { HomepageSlide } from '../../types/cms';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { track } from '../../lib/analytics/client';
 
 export const HomepageCmsPage: React.FC = () => {
   const { homepageCms, updateHomepageCms, homepageSlides, publishHomepageSlides } = useStore();
@@ -253,6 +254,7 @@ export const HomepageCmsPage: React.FC = () => {
       });
 
       publishHomepageSlides(slides);
+      track('homepage_published', { metadata: { slides: slides.length } });
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 2500);
     } catch (err) {

@@ -223,8 +223,23 @@ export type AnalyticsEventType =
   | 'buy_list_add'
   | 'buy_list_remove'
   | 'buy_list_open'
+  | 'buy_list_move_to_favorites'
+  | 'buy_session_created'
+  | 'buy_session_regenerated'
+  | 'buy_session_shared'
+  | 'buy_session_copied'
+  | 'buy_session_expired'
+  | 'buy_session_opened'
   | 'homepage_view'
-  | 'related_product_click';
+  | 'related_product_click'
+  | 'onboarding_started'
+  | 'onboarding_completed'
+  | 'product_created'
+  | 'video_uploaded'
+  | 'homepage_published'
+  | 'store_completed'
+  | 'dashboard_quick_action'
+  | 'notification_clicked';
 
 export type AnalyticsEvent = {
   id: number;

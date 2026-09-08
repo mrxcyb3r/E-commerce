@@ -21,6 +21,7 @@ import {
 import { useVideoFeed } from '../../context/VideoContext';
 import { useStore } from '../../context/StoreContext';
 import { VideoItem } from '../../types/video';
+import { track } from '../../lib/analytics/client';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { VideoUploader } from '../../components/admin/VideoUploader';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
@@ -92,7 +93,10 @@ export const FeedAdminPage: React.FC = () => {
     try {
       if (isCreating) {
         const ok = await addVideo({ title: title.trim(), description: description.trim(), videoUrl: videoUrl.trim() || undefined, posterUrl: posterUrl.trim() || undefined, author: author.trim() || undefined, productId: productId || undefined, badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined, category: category || 'all', published, order: videos.length + 1 }, pendingFeedId);
-        if (ok) { pendingUploadsRef.current = []; setIsCreating(false); setSavedSuccess(true); setTimeout(() => setSavedSuccess(false), 2000); } else { cleanupPendingUploads(); }
+        if (ok) {
+          track('video_uploaded', { feedId: pendingFeedId, metadata: { title: title.trim() } });
+          pendingUploadsRef.current = []; setIsCreating(false); setSavedSuccess(true); setTimeout(() => setSavedSuccess(false), 2000);
+        } else { cleanupPendingUploads(); }
       } else if (editingVideo) {
         const ok = await updateVideo(editingVideo.id, { title: title.trim(), description: description.trim(), videoUrl: videoUrl.trim() || undefined, posterUrl: posterUrl.trim() || undefined, author: author.trim() || undefined, productId: productId || undefined, badge: badge.trim() ? { text: badge.trim(), type: 'new' } : undefined, category: category || 'all', published });
         if (ok) { pendingUploadsRef.current = []; setEditingVideo(null); setSavedSuccess(true); setTimeout(() => setSavedSuccess(false), 2000); } else { cleanupPendingUploads(); }

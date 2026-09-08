@@ -29,6 +29,7 @@ import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
 import { useTableState } from '../../hooks/useTableState';
 import { Product } from '../../types/product';
 import { formatPrice } from '../../lib/utils';
+import { productHealth } from '../../lib/admin/readiness';
 
 type BulkAction =
   | 'publish'
@@ -671,6 +672,7 @@ export const ProductsListPage: React.FC = () => {
                   <th className="py-2.5 px-3">Narx</th>
                   <th className="py-2.5 px-3 hidden md:table-cell">Zaxira</th>
                   <th className="py-2.5 px-3 text-center hidden lg:table-cell">Belgilar</th>
+                  <th className="py-2.5 px-3 text-center hidden md:table-cell">Sog‘liq</th>
                   <th className="py-2.5 px-3 text-center">Holat</th>
                   <th className="py-2.5 px-3 hidden xl:table-cell text-right">Yangilangan</th>
                   <th className="py-2.5 pr-4 pl-3 text-right">Amallar</th>
@@ -680,6 +682,7 @@ export const ProductsListPage: React.FC = () => {
                 {paginatedProducts.map((p) => {
                   const isPublished = p.published !== false;
                   const checked = selectedIds.includes(p.id);
+                  const health = productHealth(p);
                   return (
                     <tr key={p.id} className={`admin-table-row ${!isPublished ? 'opacity-60' : ''} ${checked ? 'bg-muted/30' : ''}`}>
                       <td className="py-2.5 pl-4 pr-2">
@@ -735,6 +738,10 @@ export const ProductsListPage: React.FC = () => {
                             <Sparkle className="w-3 h-3" />
                           </button>
                         </div>
+                      </td>
+
+                      <td className="py-2.5 px-3 text-center hidden md:table-cell">
+                        <HealthBadge score={health.score} issues={health.issues} />
                       </td>
 
                       <td className="py-2.5 px-3 text-center">
@@ -845,3 +852,21 @@ export const ProductsListPage: React.FC = () => {
 };
 
 export default ProductsListPage;
+
+function HealthBadge({ score, issues }: { score: number; issues: string[] }) {
+  const tone =
+    score >= 75
+      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+      : score >= 50
+        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+        : 'bg-red-500/10 text-red-700 dark:text-red-300';
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold tabular-nums ${tone}`}
+      title={issues.length > 0 ? `Yetishmayotgan: ${issues.join(', ')}` : 'Ajoyib holat'}
+    >
+      {score}%
+      {issues.length > 0 && <span className="w-1 h-1 rounded-full bg-current opacity-60" aria-hidden="true" />}
+    </span>
+  );
+}

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Store,
   MapPin,
@@ -15,14 +16,24 @@ import {
   Loader2,
   AlertCircle,
   Eye,
+  ArrowRight,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useVideoFeed } from '../../context/VideoContext';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { SaveIndicator } from '../../components/admin/SaveIndicator';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
+import { computeStoreReadiness } from '../../lib/admin/readiness';
 
 export const StoreAdminPage: React.FC = () => {
-  const { storeInfo, updateStoreInfo } = useStore();
+  const { storeInfo, updateStoreInfo, products, categories, homepageCms, homepageSlides } = useStore();
+  const { videos } = useVideoFeed();
+
+  const readiness = React.useMemo(
+    () =>
+      computeStoreReadiness({ products, categories, storeInfo, homepageCms, homepageSlides, videos }),
+    [products, categories, storeInfo, homepageCms, homepageSlides, videos]
+  );
 
   const [name, setName] = useState(storeInfo.businessName);
   const [tagline, setTagline] = useState(storeInfo.tagline);
@@ -202,6 +213,23 @@ export const StoreAdminPage: React.FC = () => {
           <AlertCircle className="w-4 h-4 shrink-0" />
           {errorMessage}
         </div>
+      )}
+
+      {/* Readiness banner */}
+      {readiness.score < 100 && (
+        <Link
+          to="/admin/onboarding"
+          className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 hover:border-amber-500/40 transition-all group"
+        >
+          <span className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${readiness.score >= 50 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+            {readiness.score}%
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs font-bold">Do‘kon tayyorligi: {readiness.done}/{readiness.total} band</span>
+            <span className="block text-[11px] text-muted-foreground">10 daqiqalik sozlash qo‘llanmasini davom ettiring</span>
+          </span>
+          <ArrowRight className="w-4 h-4 text-amber-500 group-hover:translate-x-0.5 transition-transform shrink-0" />
+        </Link>
       )}
 
       {/* Brand preview */}

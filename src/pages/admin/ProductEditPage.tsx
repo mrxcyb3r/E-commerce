@@ -21,6 +21,7 @@ import { ImageUploader } from '../../components/admin/ImageUploader';
 import { VideoUploader } from '../../components/admin/VideoUploader';
 import { deleteMediaObjects, MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { Product } from '../../types/product';
+import { track } from '../../lib/analytics/client';
 
 const PRESET_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '38', '39', '40', '41', '42', '43', '44', '45', 'Standart'];
 const PRESET_COLORS = ['Qora', 'Oq', "To'q ko'k", 'Kulrang', 'Jigarrang', 'Havorang', 'Bej', 'Yashil', 'Qizil', 'Xaki', 'Bordo'];
@@ -179,6 +180,7 @@ export const ProductEditPage: React.FC = () => {
 
       if (isNew) {
         const created = addProduct(payload, storageScope);
+        track('product_created', { productId: created.id, metadata: { name: created.name } });
         savedRef.current = true;
         pendingUploadsRef.current = [];
         setSavedSuccess(true);
