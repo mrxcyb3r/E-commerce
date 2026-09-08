@@ -21,6 +21,7 @@ const ProductsPage = lazyNamed(() => import('./pages/ProductsPage'), 'ProductsPa
 const ProductDetailPage = lazyNamed(() => import('./pages/ProductDetailPage'), 'ProductDetailPage');
 const FeedPage = lazyNamed(() => import('./pages/FeedPage'), 'FeedPage');
 const FavoritesPage = lazyNamed(() => import('./pages/FavoritesPage'), 'FavoritesPage');
+const BuyingListPage = lazyNamed(() => import('./pages/BuyingListPage'), 'BuyingListPage');
 const AboutPage = lazyNamed(() => import('./pages/AboutPage'), 'AboutPage');
 const LocationPage = lazyNamed(() => import('./pages/LocationPage'), 'LocationPage');
 const ContactPage = lazyNamed(() => import('./pages/ContactPage'), 'ContactPage');
@@ -91,6 +92,7 @@ const AnimatedRoutes: React.FC = () => {
           <Route path="/videos" element={<FeedPage />} />
           <Route path="/prompts" element={<PromptLibraryPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/buy-list" element={<BuyingListPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/location" element={<LocationPage />} />
           <Route path="/contact" element={<ContactPage />} />

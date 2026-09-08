@@ -125,6 +125,8 @@ export const EVENT_LABELS: Record<AnalyticsEventType, string> = {
   feedback_submit: 'Fikr yuborilishi',
   buy_list_add: 'Xarid ro‘yxatiga qo‘shish',
   buy_list_remove: 'Xarid ro‘yxatidan o‘chirish',
+  homepage_view: 'Bosqich boshlandi',
+  related_product_click: 'Olikka tegishli mahsulot bosilishi',
 };
 
 /** Owner-friendly traffic-source labels for raw metadata values. */

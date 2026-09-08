@@ -57,6 +57,9 @@ export const CategoriesSection: React.FC = () => {
   const { publishedCategories } = useStore();
   const { name: storeName } = useBrand();
 
+  // If no categories, hide gracefully (like ProductsSection does)
+  if (publishedCategories.length === 0) return null;
+
   const categoryTiles = publishedCategories.map((cat) => ({
     id: cat.id,
     name: cat.name,

@@ -10,12 +10,14 @@ interface ProductCardProps {
   product: Product;
   index?: number;
   variant?: 'default' | 'featured' | 'compact' | 'editorial';
+  onProductClick?: () => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   index = 0,
   variant = 'default',
+  onProductClick,
 }) => {
   const { t } = useI18n();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -52,6 +54,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 loading="lazy"
                 referrerPolicy="no-referrer"
                 onError={() => setImgError(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onProductClick?.();
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-muted-foreground">

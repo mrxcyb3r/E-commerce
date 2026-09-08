@@ -221,7 +221,9 @@ export type AnalyticsEventType =
   | 'contact_click'
   | 'feedback_submit'
   | 'buy_list_add'
-  | 'buy_list_remove';
+  | 'buy_list_remove'
+  | 'homepage_view'
+  | 'related_product_click';
 
 export type AnalyticsEvent = {
   id: number;

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { formatPrice, generateTelegramProductLink } from '../lib/utils';
 import { useFavorites } from '../hooks/useFavorites';
+import { useSaveToBuy } from '../context/SaveToBuyContext';
 import { track } from '../lib/analytics/client';
 import { ProductGallery } from '../components/products/ProductGallery';
 import { StoreVisitModal } from '../components/products/StoreVisitModal';
@@ -16,6 +17,7 @@ import {
   Heart, 
   Send, 
   Store, 
+  Save, 
   CheckCircle2, 
   AlertTriangle,
   PackageX,
@@ -55,6 +57,7 @@ export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { products, storeInfo } = useStore();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isSaved, toggleSave } = useSaveToBuy();
   const { t } = useI18n();
 
   const product = products.find((p) => (p.id === id || p.slug === id) && p.published !== false);
@@ -255,18 +258,31 @@ export const ProductDetailPage: React.FC = () => {
                 >
                   <Share2 className="w-4 h-4" />
                 </button>
-                <button
+<button
                   type="button"
                   onClick={() => toggleFavorite(product)}
                   className={`p-2.5 rounded-xl border transition-colors ${
                     favorite
                       ? 'bg-rose-50 border-rose-200 text-rose-500 dark:bg-rose-950/40 dark:border-rose-800'
-                      : 'border-border text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                      : 'border-border text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'}
                   }`}
                   title={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
                   aria-label={favorite ? t('product', 'removeFav') : t('product', 'addFav')}
                 >
                   <Heart className={`w-4 h-4 ${favorite ? 'fill-rose-500' : ''}`} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleSave(product, { size: selectedSize, color: selectedColor });
+                  }}
+                  className={`p-2.5 rounded-xl border transition-colors ${
+                    isSaved(product.id) ? 'bg-amber-50 border-amber-200 text-amber-500 dark:bg-amber-950/40 dark:border-amber-800' : 'border-border text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'}
+                  }`}
+                  title={isSaved(product.id) ? t('product', 'removedFromBuyList') : t('product', 'saveToBuyList')}
+                  aria-label={isSaved(product.id) ? t('product', 'removedFromBuyList') : t('product', 'saveToBuyList')}
+                >
+                  <Save className={`w-4 h-4 ${isSaved(product.id) ? 'fill-amber-500' : ''}`} />
                 </button>
               </div>
             </div>
@@ -486,7 +502,7 @@ export const ProductDetailPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedProducts.map((p, idx) => (
-              <ProductCard key={p.id} product={p} index={idx} />
+              <ProductCard key={p.id} product={p} index={idx} onProductClick={() => track('related_product_click', { productId: p.id, categoryId: p.category })} />
             ))}
           </div>
         </div>
