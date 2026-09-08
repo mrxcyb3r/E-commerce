@@ -3,8 +3,12 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, blocked } = useAuth();
   const location = useLocation();
+
+  if (blocked) {
+    return <Navigate to="/login?denied=1" state={{ from: location }} replace />;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -12,3 +16,5 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return <>{children}</>;
 };
+
+export default AdminRoute;

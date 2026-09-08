@@ -30,9 +30,12 @@ import {
   Activity,
   TrendingUp,
   Users,
+  ShieldCheck,
+  ScrollText,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
+import { can, Capability } from '../../lib/admin/permissions';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -45,6 +48,7 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   end?: boolean;
   description?: string;
+  requires?: Capability;
 }
 
 interface NavSection {
@@ -133,6 +137,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         { label: 'Sozlamalar', path: '/admin/settings', icon: Settings },
       ],
     },
+    {
+      title: 'XAVFSIZLIK',
+      items: [
+        { label: 'Xodimlar va takliflar', path: '/admin/users', icon: Users, requires: 'users' },
+        { label: 'Hisob xavfsizligi', path: '/admin/security', icon: ShieldCheck, requires: 'settings' },
+        { label: 'Audit jurnali', path: '/admin/audit', icon: ScrollText, requires: 'settings' },
+      ],
+    },
   ];
 
   return (
@@ -189,7 +201,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin" aria-label="Admin navigation">
           {navSections.map((section) => {
             const isOpen = openSections[section.title] ?? section.defaultOpen ?? false;
-            const hasItems = section.items.length > 0;
+            const items = section.items.filter((i) => !i.requires || can(user?.role, i.requires));
+            const hasItems = items.length > 0;
+            if (!hasItems) return null;
 
             return (
               <div key={section.title}>
@@ -207,7 +221,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 </button>
                 {isOpen && (
                   <div className="space-y-0.5">
-                    {section.items.map((item) => {
+                    {items.map((item) => {
                       const Icon = item.icon;
                       return (
                         <NavLink
@@ -244,7 +258,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                 <p className="text-xs font-semibold text-foreground truncate leading-tight">
                   {user?.username || 'admin'}
                 </p>
-                <p className="text-[10px] text-muted-foreground truncate leading-tight">Administrator</p>
+                <p className="text-[10px] text-muted-foreground truncate leading-tight">
+                  {user?.isOwner ? 'Platforma egasi' : 'Administrator'}
+                </p>
               </div>
             </div>
 

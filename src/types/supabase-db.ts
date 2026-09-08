@@ -455,14 +455,94 @@ type StoreSettings = {
 };
 
 // Root state types
+export type StaffRole = 'owner' | 'admin' | 'editor' | 'viewer' | 'manager' | 'staff' | 'support';
+
 type Profile = {
   id: string;
   username: string;
-  role: 'admin' | 'user';
+  role: StaffRole;
   full_name: string | null;
   avatar_url: string | null;
+  email: string;
+  is_suspended: boolean;
+  last_login_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+type AllowedAdminEmail = {
+  id: string;
+  email: string;
+  store_id: string;
+  status: 'pending' | 'used' | 'revoked';
+  created_by: string | null;
+  created_at: string;
+  used_at: string | null;
+  used_by: string | null;
+};
+
+export type AuditEventType =
+  | 'login_success'
+  | 'login_failure'
+  | 'otp_request'
+  | 'otp_verify'
+  | 'otp_resend'
+  | 'password_reset'
+  | 'password_changed'
+  | 'logout'
+  | 'oauth_login'
+  | 'new_device'
+  | 'signup_blocked'
+  | 'session_expired'
+  | 'session_revoked';
+
+type AuthAuditLog = {
+  id: number;
+  actor_id: string | null;
+  actor_email: string;
+  action: string;
+  entity: string;
+  entity_id: string | null;
+  metadata: Record<string, unknown>;
+  ip: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
+
+type LoginHistory = {
+  id: number;
+  user_id: string | null;
+  email: string;
+  event_type: AuditEventType;
+  ip: string | null;
+  user_agent: string | null;
+  device_signature: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+type AuthRateLimit = {
+  id: number;
+  bucket: string;
+  ip: string;
+  created_at: string;
+};
+
+type PlatformConfig = {
+  key: string;
+  value: string;
+};
+
+type MyProfile = {
+  id: string;
+  email: string | null;
+  username: string;
+  full_name: string | null;
+  role: StaffRole | null;
+  is_owner: boolean;
+  is_suspended: boolean;
+  last_login_at: string | null;
+  is_approved: boolean;
 };
 
 // Group all tables
@@ -589,9 +669,71 @@ export type Database = {
         Insert: Omit<OrderStatusHistory, 'id' | 'created_at'>;
         Update: Partial<Omit<OrderStatusHistory, 'id' | 'created_at'>>;
       };
+      allowed_admin_emails: {
+        Row: AllowedAdminEmail;
+        Insert: Omit<AllowedAdminEmail, 'id' | 'created_at'>;
+        Update: Partial<Omit<AllowedAdminEmail, 'id' | 'created_at'>>;
+      };
+      auth_audit_log: {
+        Row: AuthAuditLog;
+        Insert: Omit<AuthAuditLog, 'id' | 'created_at'>;
+        Update: Partial<Omit<AuthAuditLog, 'id' | 'created_at'>>;
+      };
+      login_history: {
+        Row: LoginHistory;
+        Insert: Omit<LoginHistory, 'id' | 'created_at'>;
+        Update: Partial<Omit<LoginHistory, 'id' | 'created_at'>>;
+      };
+      auth_rate_limits: {
+        Row: AuthRateLimit;
+        Insert: Omit<AuthRateLimit, 'id' | 'created_at'>;
+        Update: Partial<Omit<AuthRateLimit, 'id' | 'created_at'>>;
+      };
+      platform_config: {
+        Row: PlatformConfig;
+        Insert: Omit<PlatformConfig, never>;
+        Update: Partial<Omit<PlatformConfig, never>>;
+      };
     };
     Views: {};
     Functions: {
+      // Phase 15 auth RPCs
+      rpc_my_profile: {
+        Args: Record<PropertyKey, never>;
+        Returns: MyProfile | null;
+      };
+      rpc_auth_log: {
+        Args: {
+          p_event_type: string;
+          p_metadata?: Record<string, unknown>;
+          p_user_agent?: string | null;
+          p_email?: string | null;
+          p_device_signature?: string | null;
+        };
+        Returns: undefined;
+      };
+      rpc_auth_audit: {
+        Args: {
+          p_action: string;
+          p_entity?: string;
+          p_entity_id?: string | null;
+          p_metadata?: Record<string, unknown>;
+          p_user_agent?: string | null;
+        };
+        Returns: undefined;
+      };
+      rpc_auth_try_attempt: {
+        Args: {
+          p_bucket: string;
+          p_window_seconds?: number;
+          p_max?: number;
+        };
+        Returns: Record<string, unknown>;
+      };
+      rpc_auth_record_attempt: {
+        Args: { p_bucket: string };
+        Returns: undefined;
+      };
       // Auth functions
       signin: {
         Args: { email: string; password: string };

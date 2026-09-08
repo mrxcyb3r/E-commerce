@@ -32,6 +32,7 @@ const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPa
 
 // Admin pages
 import { LoginPage } from './pages/LoginPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { AdminRoute } from './components/admin/AdminRoute';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ToastProvider } from './components/common/ToastProvider';
@@ -48,6 +49,9 @@ const CustomerInterestPage = lazyNamed(() => import('./pages/admin/CustomerInter
 const BuySessionsPage = lazyNamed(() => import('./pages/admin/BuySessionsPage'), 'BuySessionsPage');
 const CampaignsPage = lazyNamed(() => import('./pages/admin/CampaignsPage'), 'CampaignsPage');
 const ActivityPage = lazyNamed(() => import('./pages/admin/ActivityPage'), 'ActivityPage');
+const AdminsPage = lazyNamed(() => import('./pages/admin/AdminsPage'), 'AdminsPage');
+const SecurityPage = lazyNamed(() => import('./pages/admin/SecurityPage'), 'SecurityPage');
+const AuditLogPage = lazyNamed(() => import('./pages/admin/AuditLogPage'), 'AuditLogPage');
 const FeedAdminPage = lazyNamed(() => import('./pages/admin/FeedAdminPage'), 'FeedAdminPage');
 const PromptsAdminPage = lazyNamed(() => import('./pages/admin/PromptsAdminPage'), 'PromptsAdminPage');
 const HomepageCmsPage = lazyNamed(() => import('./pages/admin/HomepageCmsPage'), 'HomepageCmsPage');
@@ -170,6 +174,7 @@ export default function App() {
 
                   {/* Admin Login */}
                   <Route path="/login" element={<LoginPage />} />
+                  <Route path="/login/callback" element={<AuthCallbackPage />} />
 
                   {/* Protected Admin CMS Area */}
                   <Route
@@ -217,6 +222,9 @@ export default function App() {
                     <Route path="campaigns" element={<CampaignsPage />} />
                     <Route path="activity" element={<ActivityPage />} />
                     <Route path="comments" element={<CommentsAdminPage />} />
+                    <Route path="users" element={<AdminsPage />} />
+                    <Route path="security" element={<SecurityPage />} />
+                    <Route path="audit" element={<AuditLogPage />} />
                   </Route>
                 </Routes>
                 </BrowserRouter>

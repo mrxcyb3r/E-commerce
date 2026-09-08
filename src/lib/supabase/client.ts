@@ -22,6 +22,11 @@ export const supabase: SupabaseClient = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!,
   {
+    auth: {
+      // PKCE keeps the OAuth callback safe (no tokens in the URL) and does not
+      // affect email-OTP / password flows.
+      flowType: 'pkce',
+    },
     global: {
       headers: {
         'x-visitor-id': getVisitorIdForHeader(),

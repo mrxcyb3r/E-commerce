@@ -1,170 +1,392 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { supabase } from '../lib/supabase/client';
-import { BUSINESS_CONFIG } from '../config/business';
+import { AUTH_CONFIG, rateBucket } from '../lib/auth/config';
+import {
+  deviceSignature,
+  isNewDevice,
+  logAuthEvent,
+  logBusinessAudit,
+  authTryAttempt,
+  authRecordAttempt,
+  localCooldownMs,
+} from '../lib/auth/security';
+import { postChannel, listenAuthChannel, AuthChannelMessage } from '../lib/auth/session';
+import { StaffRole } from '../types/supabase-db';
 import { useStore } from './StoreContext';
 
 export interface AdminUser {
+  id: string;
+  email: string;
   username: string;
-  role: 'owner' | 'admin' | 'editor' | 'viewer';
   name: string;
+  role: StaffRole;
+  isOwner: boolean;
+  isSuspended: boolean;
+  lastLoginAt: string | null;
+}
+
+export interface AuthResult {
+  success: boolean;
+  error?: string;
+  /** Rate limit: seconds to wait before retrying. */
+  retryAfter?: number;
 }
 
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: AdminUser | null;
   adminUsername: string;
-  role: 'owner' | 'admin' | 'editor' | 'viewer' | null;
-  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  role: StaffRole | null;
+  /** True when the browser holds a session the DB did not authorize. */
+  blocked: boolean;
+  /** Countdown warning state for the soon-to-expire session. */
+  sessionWarning: boolean;
+  sessionExpiresAt: number | null;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  loginOtp: (email: string) => Promise<AuthResult>;
+  verifyOtp: (email: string, code: string) => Promise<AuthResult>;
+  resendOtp: (email: string) => Promise<AuthResult>;
+  loginGoogle: () => Promise<AuthResult>;
   logout: () => void;
   updateCredentials: (newUsername: string, newPassword: string) => void;
   changeCredentials: (currentPassword: string, newUsername?: string, newPassword?: string) => Promise<boolean>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const toAdminUser = (email: string | undefined, adminName: string, role: 'owner' | 'admin' | 'editor' | 'viewer' = 'viewer'): AdminUser => ({
-  username: email ? email.split('@')[0] : 'admin',
-  role,
-  name: adminName,
+const toAdminUser = (p: {
+  id: string;
+  email: string | null;
+  username: string;
+  full_name: string | null;
+  role: StaffRole | null;
+  is_owner: boolean;
+  is_suspended: boolean;
+  last_login_at: string | null;
+  is_approved: boolean;
+}): AdminUser => ({
+  id: p.id,
+  email: p.email ?? p.username,
+  username: p.username,
+  name: p.full_name || p.username,
+  role: p.role ?? 'viewer',
+  isOwner: p.is_owner,
+  isSuspended: p.is_suspended,
+  lastLoginAt: p.last_login_at,
 });
-
-export const I18nContext = createContext({});
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { storeInfo } = useStore();
-  const adminEmail = useMemo(
-    () => storeInfo.adminEmail || BUSINESS_CONFIG.adminEmail || 'admin@dokon.uz',
-    [storeInfo.adminEmail],
-  );
-  const adminName = useMemo(
-    () => storeInfo.adminName || BUSINESS_CONFIG.adminName || "Do'kon Administratori",
-    [storeInfo.adminName],
-  );
-
   const [user, setUser] = useState<AdminUser | null>(null);
-  const [role, setRole] = useState<'owner' | 'admin' | 'editor' | 'viewer' | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
+  const [sessionWarning, setSessionWarning] = useState(false);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<number | null>(null);
+  const busy = useRef(false);
 
-  useEffect(() => {
-    setSessionChecked(false);
-    setUser(null);
-    setRole(null);
+  const loadSession = useCallback(async () => {
+    if (busy.current) return;
+    busy.current = true;
+    try {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session?.user) {
+        setUser(null);
+        setBlocked(false);
+        setSessionExpiresAt(null);
+        setSessionChecked(true);
+        return;
+      }
+
+      const { data: profile, error } = await supabase.rpc('rpc_my_profile');
+      if (error) {
+        console.warn('rpc_my_profile failed:', error);
+        setUser(null);
+        setBlocked(false);
+        setSessionChecked(true);
+        return;
+      }
+      if (!profile || profile.is_suspended === true) {
+        // Session exists but the DB did not authorize it → access denied.
+        setUser(null);
+        setBlocked(true);
+        setSessionChecked(true);
+        return;
+      }
+
+      const adminUser = toAdminUser(profile);
+      const expiresAt = session.expires_at;
+      const isNew = profile.is_owner === false && isNewDevice();
+      setUser(adminUser);
+      setBlocked(false);
+      setSessionExpiresAt(expiresAt ?? null);
+      setSessionChecked(true);
+      if (isNew) {
+        void logAuthEvent('new_device', {}, adminUser.email);
+      }
+    } catch (e) {
+      console.warn('loadSession failed:', e);
+      setUser(null);
+      setSessionChecked(true);
+    } finally {
+      busy.current = false;
+    }
   }, []);
 
-  const fetchProfileRole = useCallback(async (userId: string) => {
-    const { data: profileData } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
-    return profileData?.role || 'viewer';
-  }, []);
-
   useEffect(() => {
-    if (!adminEmail) return;
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user?.email === adminEmail) {
-        // Fetch profile role from profiles table using user ID (UUID)
-        const userId = data.session.user.id;
-        fetchProfileRole(userId).then((profileRole) => {
-          setRole(profileRole);
-          setUser(toAdminUser(adminEmail, adminName, profileRole));
-        });
-      } else {
-        setUser(null);
-        setRole(null);
-      }
-      setSessionChecked(true);
-    });
-  }, [adminEmail, fetchProfileRole]);
+    void loadSession();
+  }, [loadSession]);
 
+  // First-run OAuth/redirect handling happens automatically; this listens for
+  // every subsequent auth transition and re-resolves the DB identity.
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!adminEmail) return;
-      if (session?.user?.email === adminEmail) {
-        const userId = session.user.id;
-        fetchProfileRole(userId).then((profileRole) => {
-          setRole(profileRole);
-          setUser(toAdminUser(adminEmail, adminName, profileRole));
-        });
-      } else {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
         setUser(null);
-        setRole(null);
+        setBlocked(false);
+        setSessionExpiresAt(null);
+        setSessionWarning(false);
+        setSessionChecked(true);
+        return;
       }
-      setSessionChecked(true);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        setSessionExpiresAt(session?.expires_at ?? null);
+        void loadSession();
+      }
     });
+    return () => sub.subscription.unsubscribe();
+  }, [loadSession]);
 
-    return () => {
-      // subscription cleanup handled by supabase
+  // Cross-tab logout: another tab signed out → this tab signs out too.
+  useEffect(() => {
+    const apply = (msg: AuthChannelMessage) => {
+      if (msg.type === 'logout') {
+        if (typeof window !== 'undefined') window.location.reload();
+      }
     };
-  }, [adminEmail, fetchProfileRole]);
+    const unsubscribe = listenAuthChannel(apply);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key && e.key.includes('sb-')) apply({ type: 'logout' });
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      unsubscribe();
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
+  // Session expiry heartbeat: warn before, hard-stop after.
+  useEffect(() => {
+    if (!sessionExpiresAt) {
+      setSessionWarning(false);
+      return;
+    }
+    const warnAt = (sessionExpiresAt * 1000) - AUTH_CONFIG.sessionWarnMs;
+    const hardAt = sessionExpiresAt * 1000;
+    const tick = () => {
+      const now = Date.now();
+      if (now >= hardAt) {
+        setSessionWarning(false);
+        setUser(null);
+        void supabase.auth.signOut();
+        postChannel({ type: 'logout' });
+        return;
+      }
+      setSessionWarning(now >= warnAt && now < hardAt);
+    };
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, [sessionExpiresAt]);
 
   const login = useCallback(
-    async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
-      const cleanUser = username.trim();
-      const target = cleanUser.includes('@') ? cleanUser : adminEmail;
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email: target, password: password.trim() });
+    async (email: string, password: string): Promise<AuthResult> => {
+      const clean = email.trim();
+      const bucket = rateBucket('login_password', clean);
+      const gate = await authTryAttempt(bucket, 300, 5);
+      if (!gate.ok) {
+        void logAuthEvent('login_failure', { reason: 'rate_limited' }, clean);
+        return { success: false, error: "Juda ko'p urinish. Birozdan so'ng qayta urinib ko'ring.", retryAfter: gate.retryAfter };
+      }
+      await authRecordAttempt(bucket);
+      const { error } = await supabase.auth.signInWithPassword({ email: clean, password: password.trim() });
       if (error) {
-        return { success: false, error: "Login yoki parol noto'g'ri." };
+        void logAuthEvent('login_failure', { reason: error.message }, clean);
+        return { success: false, error: "Email yoki parol noto'g'ri." };
       }
-      // Fetch profile role after successful login using user ID
-      if (data.user) {
-        const profileRole = await fetchProfileRole(data.user.id);
-        setRole(profileRole);
-        setUser(toAdminUser(target, adminName, profileRole));
-      }
+      void logAuthEvent('login_success', {}, clean);
+      await loadSession();
       return { success: true };
     },
-    [adminEmail, adminName, fetchProfileRole],
+    [loadSession],
   );
 
-  const logout = useCallback(() => {
-    supabase.auth.signOut();
-    setUser(null);
-    setRole(null);
-  }, []);
+  const loginOtp = useCallback(async (email: string): Promise<AuthResult> => {
+    const clean = email.trim().toLowerCase();
+    if (!clean.includes('@')) return { success: false, error: "Email manzilini to'liq kiriting (masalan ism@domen.uz)." };
 
-  const updateCredentials = useCallback((_newUsername: string, _newPassword: string) => {
-    // Supabase Auth uses email managed in the dashboard; username is no longer stored locally.
-    // Kept for interface compatibility.
-  }, []);
+    const cooldown = localCooldownMs(`otp:${clean}`, 60_000);
+    if (cooldown > 0) {
+      void logAuthEvent('otp_request', { reason: 'cooldown' }, clean);
+      return { success: false, error: `Kodni qayta yuborish uchun kutish kerak (${Math.ceil(cooldown / 1000)}s).`, retryAfter: Math.ceil(cooldown / 1000) };
+    }
 
-  const changeCredentials = useCallback(async (currentPassword: string, _newUsername?: string, newPassword?: string): Promise<boolean> => {
-    if (!newPassword) return false;
+    const bucket = rateBucket('login_otp', clean);
+    const gate = await authTryAttempt(bucket, 300, 5);
+    if (!gate.ok) {
+      void logAuthEvent('otp_request', { reason: 'rate_limited' }, clean);
+      return { success: false, error: "Juda ko'p so'rov. OTP kodini keyinroq talab qiling.", retryAfter: gate.retryAfter };
+    }
+    await authRecordAttempt(bucket);
 
-    // Verify current password is valid for the admin account
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: adminEmail,
-      password: currentPassword.trim(),
+    const { error } = await supabase.auth.signInWithOtp({
+      email: clean,
+      options: { shouldCreateUser: true },
     });
-    if (verifyError) return false;
+    if (error) {
+      void logAuthEvent('otp_request', { reason: error.message }, clean);
+      return { success: false, error: "Kod yuborilmadi. SMTP sozlanmagan bo'lsa, parol bilan kiring." };
+    }
+    void logAuthEvent('otp_request', {}, clean);
+    return { success: true };
+  }, []);
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword.trim() });
-    if (error) return false;
-    return true;
-  }, [adminEmail]);
+  const verifyOtp = useCallback(
+    async (email: string, code: string): Promise<AuthResult> => {
+      const clean = email.trim().toLowerCase();
+      const { error } = await supabase.auth.verifyOtp({ email: clean, token: code.trim(), type: 'email' });
+      if (error) {
+        void logAuthEvent('otp_verify', { success: false, reason: error.message }, clean);
+        return { success: false, error: "Kod noto'g'ri yoki eskirgan." };
+      }
+      void logAuthEvent('otp_verify', { success: true }, clean);
+      await loadSession();
+      return { success: true };
+    },
+    [loadSession],
+  );
+
+  const resendOtp = useCallback(
+    async (email: string): Promise<AuthResult> => {
+      const clean = email.trim().toLowerCase();
+      const bucket = rateBucket('resend_otp', clean);
+      const gate = await authTryAttempt(bucket, 300, 3);
+      if (!gate.ok) {
+        void logAuthEvent('otp_resend', { reason: 'rate_limited' }, clean);
+        return { success: false, error: 'Ko‘p marta yuborish — birozdan so‘ng qayta urinib ko‘ring.', retryAfter: gate.retryAfter };
+      }
+      await authRecordAttempt(bucket);
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: clean,
+        options: { shouldCreateUser: true },
+      });
+      if (error) {
+        return { success: false, error: "Kod yuborilmadi. Bir daqiqadan so'ng qayta urinib ko'ring." };
+      }
+      void logAuthEvent('otp_resend', {}, clean);
+      return { success: true };
+    },
+    [],
+  );
+
+  const loginGoogle = useCallback(async (): Promise<AuthResult> => {
+    if (!AUTH_CONFIG.googleEnabled) {
+      return { success: false, error: 'Google kirish sozlanmagan.' };
+    }
+    const bucket = rateBucket('google_oauth', deviceSignature());
+    const gate = await authTryAttempt(bucket, 300, 5);
+    if (!gate.ok) {
+      return { success: false, error: 'Ko‘p urinish — birozdan so‘ng qayta urinib ko‘ring.', retryAfter: gate.retryAfter };
+    }
+    await authRecordAttempt(bucket);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/login/callback` },
+    });
+    if (error) {
+      void logAuthEvent('oauth_login', { success: false, reason: error.message });
+      return { success: false, error: 'Google bilan kirishda xatolik yuz berdi.' };
+    }
+    return { success: true };
+  }, []);
+
+  const logout = useCallback(() => {
+    void logAuthEvent('logout', {}, user?.email);
+    void supabase.auth.signOut();
+    setUser(null);
+    setBlocked(false);
+    setSessionExpiresAt(null);
+    setSessionWarning(false);
+    postChannel({ type: 'logout' });
+  }, [user?.email]);
+
+  const updateCredentials = useCallback(() => {
+    // Supabase manages auth identities; kept for interface compatibility.
+  }, []);
+
+  const changeCredentials = useCallback(
+    async (currentPassword: string, _newUsername?: string, newPassword?: string): Promise<boolean> => {
+      const email = user?.email;
+      if (!email || !newPassword) return false;
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword.trim(),
+      });
+      if (verifyError) return false;
+      const { error } = await supabase.auth.updateUser({ password: newPassword.trim() });
+      if (error) return false;
+      void logBusinessAudit('password_changed', 'auth', user?.id, { email });
+      return true;
+    },
+    [user?.email, user?.id],
+  );
+
+  const refreshProfile = useCallback(async () => {
+    await loadSession();
+  }, [loadSession]);
 
   const adminUsername = user?.username || 'admin';
 
-  return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated: sessionChecked && !!user,
-        user,
-        role,
-        adminUsername,
-        login,
-        logout,
-        updateCredentials,
-        changeCredentials,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo<AuthContextType>(
+    () => ({
+      isAuthenticated: sessionChecked && !!user && !user.isSuspended,
+      user,
+      adminUsername,
+      role: user?.role ?? null,
+      blocked,
+      sessionWarning,
+      sessionExpiresAt,
+      login,
+      loginOtp,
+      verifyOtp,
+      resendOtp,
+      loginGoogle,
+      logout,
+      updateCredentials,
+      changeCredentials,
+      refreshProfile,
+    }),
+    [sessionChecked, user, adminUsername, blocked, sessionWarning, sessionExpiresAt, login, loginOtp, verifyOtp, resendOtp, loginGoogle, logout, updateCredentials, changeCredentials, refreshProfile],
   );
+
+  // Expose the shared auth channel so other modules can trigger cross-tab sync.
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
