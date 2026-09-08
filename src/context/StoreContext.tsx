@@ -709,7 +709,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       description,
       timestamp: new Date().toISOString(),
     };
-    setActivityLogs((prev) => [newLog, ...prev.slice(0, 49)]); // keep latest 50
+    setActivityLogs((prev) => [newLog, ...prev.slice(0, 199)]); // keep latest 200
   };
 
   // Derived filtered items for customer site

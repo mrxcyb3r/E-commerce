@@ -239,7 +239,18 @@ export type AnalyticsEventType =
   | 'homepage_published'
   | 'store_completed'
   | 'dashboard_quick_action'
-  | 'notification_clicked';
+  | 'notification_clicked'
+  | 'sale_completed'
+  | 'sale_cancelled'
+  | 'sale_partial'
+  | 'buy_session_loaded'
+  | 'buy_session_searched'
+  | 'inventory_issue_fixed'
+  | 'campaign_created'
+  | 'campaign_started'
+  | 'campaign_finished'
+  | 'dashboard_task_completed'
+  | 'activity_opened';
 
 export type AnalyticsEvent = {
   id: number;

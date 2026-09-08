@@ -143,6 +143,17 @@ export const EVENT_LABELS: Record<AnalyticsEventType, string> = {
   store_completed: "Do'kon to'liq sozlandi",
   dashboard_quick_action: 'Tezkor amal bosildi',
   notification_clicked: 'Bildirishnoma bosildi',
+  sale_completed: 'Sotuv yakunlandi',
+  sale_cancelled: 'Sotuv bekor qilindi',
+  sale_partial: 'Sotuv qisman yakunlandi',
+  buy_session_loaded: 'Xarid sessiyasi ochildi (sotuvchi)',
+  buy_session_searched: 'Xarid sessiyasi qidirildi',
+  inventory_issue_fixed: 'E\'tibor masalasi tuzatildi',
+  campaign_created: 'Aktsiya yaratildi',
+  campaign_started: 'Aktsiya boshlandi',
+  campaign_finished: 'Aktsiya yakunlandi',
+  dashboard_task_completed: 'Vazifa bajarildi',
+  activity_opened: 'Faoliyat tarixi ochildi',
 };
 
 /** Owner-friendly traffic-source labels for raw metadata values. */

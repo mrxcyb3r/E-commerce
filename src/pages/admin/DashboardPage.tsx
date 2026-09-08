@@ -31,6 +31,7 @@ import {
   ScanLine,
   Sparkles,
   HandCoins,
+  Boxes,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useVideoFeed } from '../../context/VideoContext';
@@ -45,6 +46,31 @@ import {
   READINESS_GROUP_LABELS,
   ReadinessGroup,
 } from '../../lib/admin/readiness';
+import { computeDailyTasks, DailyTask, TaskKind } from '../../lib/admin/tasks';
+import { tashkentMidnight } from '../../lib/admin/ops';
+import { useAnalyticsData } from '../../hooks/useAnalyticsData';
+
+const TASK_ICONS: Record<TaskKind, React.ComponentType<{ className?: string }>> = {
+  readiness: Target,
+  catalog: FolderTree,
+  content: Film,
+  inventory: Boxes,
+  operations: Zap,
+};
+
+const TASK_TONES: Record<TaskKind, string> = {
+  readiness: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  catalog: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  content: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  inventory: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+  operations: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+};
+
+const PRIORITY_META: Record<DailyTask['priority'], { label: string; cls: string }> = {
+  high: { label: 'Muhim', cls: 'bg-red-500/10 text-red-600 dark:text-red-400' },
+  medium: { label: 'O‘rta', cls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
+  low: { label: 'Past', cls: 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400' },
+};
 
 interface TodayStats {
   orders: number;
@@ -106,6 +132,28 @@ export const DashboardPage: React.FC = () => {
   );
 
   const keyTasks = useMemo(() => topReadinessTasks(readiness, 4), [readiness]);
+
+  const analyticsEvents = useAnalyticsData();
+
+  const dailyTasks = useMemo(() => {
+    const viewedIds = new Set<string>();
+    const preparedIds = new Set<string>();
+    for (const e of analyticsEvents.events) {
+      if (!e.product_id) continue;
+      if (e.event_type === 'product_view') viewedIds.add(e.product_id);
+      else if (e.event_type === 'buy_list_add') preparedIds.add(e.product_id);
+    }
+    const postedToday = videos.some((v) => new Date(v.createdAt).getTime() >= tashkentMidnight(Date.now()));
+    return computeDailyTasks({
+      products,
+      videos,
+      readiness,
+      viewedIds,
+      preparedIds,
+      postedToday,
+      emptyCategoryCount: emptyCategories.length,
+    });
+  }, [analyticsEvents.events, products, videos, readiness, emptyCategories.length]);
   const groupsDone = useMemo(() => {
     const counts: Record<string, { done: number; total: number }> = {};
     for (const item of readiness.items) {
@@ -367,16 +415,35 @@ export const DashboardPage: React.FC = () => {
               </Link>
             ))}
           </div>
-          {keyTasks.length > 0 && (
-            <div className="mt-3 rounded-xl bg-amber-500/5 border border-amber-500/20 p-3">
-              <p className="text-xs font-bold mb-1.5">Bugun qiladigan ishlar:</p>
-              <ul className="space-y-1">
-                {keyTasks.map((s) => (
-                  <li key={s.key} className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Zap className="w-3 h-3 text-amber-500 shrink-0" />
-                    <Link to={s.href} className="hover:text-foreground hover:underline">{s.suggestion}</Link>
-                  </li>
-                ))}
+          {dailyTasks.length > 0 && (
+            <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+              <p className="text-xs font-bold mb-2">Bugungi topshiriqlar</p>
+              <ul className="space-y-1.5">
+                {dailyTasks.map((t) => {
+                  const Icon = TASK_ICONS[t.kind];
+                  const p = PRIORITY_META[t.priority];
+                  return (
+                    <li key={t.id}>
+                      <Link
+                        to={t.href}
+                        onClick={() => track('dashboard_task_completed', { metadata: { taskId: t.id, title: t.title } })}
+                        className="flex items-start gap-2 rounded-lg px-2 py-1.5 bg-background/60 border border-border/40 hover:border-amber-400/40 transition-colors group"
+                      >
+                        <span className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${TASK_TONES[t.kind]}`}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-bold text-foreground">{t.title}</span>
+                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${p.cls}`}>{p.label}</span>
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground">{t.description}</span>
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground mt-1 shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

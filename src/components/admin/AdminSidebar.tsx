@@ -24,6 +24,12 @@ import {
   Info,
   Phone,
   Rocket,
+  ListOrdered,
+  Megaphone,
+  Wrench,
+  Activity,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
@@ -80,6 +86,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         { label: 'Mahsulotlar', path: '/admin/products', icon: Package },
         { label: 'Kategoriyalar', path: '/admin/categories', icon: FolderTree },
         { label: 'Inventar', path: '/admin/inventory', icon: Boxes },
+        { label: 'E‘tibor markazi', path: '/admin/operations', icon: Wrench, description: 'holatlar' },
       ],
     },
     {
@@ -87,7 +94,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       defaultOpen: true,
       items: [
         { label: 'Buyurtmalar', path: '/admin/orders', icon: ShoppingCart },
-        { label: 'Do\'konda sotuv', path: '/admin/in-store-sale', icon: ScanLine },
+        { label: 'Do‘konda sotuv', path: '/admin/in-store-sale', icon: ScanLine },
+        { label: 'Xarid sessiyalari', path: '/admin/buy-sessions', icon: ListOrdered, description: 'boshqaruv' },
+        { label: 'Aktsiyalar', path: '/admin/campaigns', icon: Megaphone },
         { label: 'Izohlar', path: '/admin/comments', icon: MessageSquare },
       ],
     },
@@ -107,12 +116,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       title: 'ANALITIKA',
       items: [
         { label: 'Tahlil', path: '/admin/analytics', icon: BarChart3 },
+        { label: 'Mahsulot tahlili', path: '/admin/products/performance', icon: TrendingUp, description: '7/14/30 kun' },
+        { label: 'Xaridor qiziqishi', path: '/admin/analytics/interest', icon: Users },
       ],
     },
     {
       title: "DO'KON",
       items: [
         { label: "Do'kon sozlamalari", path: '/admin/store', icon: Store },
+        { label: 'Faoliyat tarixi', path: '/admin/activity', icon: Activity },
       ],
     },
     {

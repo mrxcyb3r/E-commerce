@@ -7,6 +7,7 @@ import React, {
   useMemo,
 } from 'react';
 import { BuySession, BuySessionDisplay, BuySessionItem, createBuySession } from '../types/buySession';
+import { registerBuySession, setSessionStatus } from '../lib/admin/ops';
 import { useStore } from './StoreContext';
 import { track } from '../lib/analytics/client';
 
@@ -48,6 +49,9 @@ export const BuySessionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object' && typeof parsed.exp === 'number' && parsed.exp > Date.now()) {
+          registerBuySession(parsed as BuySession);
+          setSession(parsed);
+        } else if (parsed && typeof parsed === 'object') {
           setSession(parsed);
         } else {
           localStorage.removeItem(SESSION_STORAGE_KEY);
@@ -77,6 +81,7 @@ export const BuySessionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const openSession = useCallback(
     (items: BuySessionItem[], storeId: string) => {
       const newSession = createBuySession(items, storeId);
+      registerBuySession(newSession);
       setSession(newSession);
       setIsOpen(true);
       return newSession;
@@ -91,6 +96,7 @@ export const BuySessionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const regenerateSession = useCallback(() => {
     if (!session) return;
     const newSession = createBuySession(session.items, session.storeId);
+    registerBuySession(newSession);
     setSession(newSession);
     track('buy_session_regenerated', {
       metadata: {
@@ -106,6 +112,7 @@ export const BuySessionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!display) return;
     const interval = setInterval(() => {
       if (display.timeRemaining <= 0) {
+        if (session?.code) setSessionStatus(session.code, 'expired');
         track('buy_session_expired', { metadata: { code: session?.code } });
         setSession(null);
         setIsOpen(false);

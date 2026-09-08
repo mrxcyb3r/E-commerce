@@ -129,8 +129,30 @@ export interface ContactCms {
 
 export interface AdminActivityLog {
   id: string;
-  action: 'create' | 'update' | 'delete' | 'publish' | 'setting';
-  entity: 'product' | 'category' | 'video' | 'prompt' | 'testimonial' | 'faq' | 'store';
+  action:
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'publish'
+    | 'setting'
+    | 'complete'
+    | 'cancel'
+    | 'expire'
+    | 'start'
+    | 'warning';
+  entity:
+    | 'product'
+    | 'category'
+    | 'video'
+    | 'prompt'
+    | 'testimonial'
+    | 'faq'
+    | 'store'
+    | 'buySession'
+    | 'sale'
+    | 'campaign'
+    | 'inventory'
+    | 'onboarding';
   description: string;
   timestamp: string;
 }

@@ -69,6 +69,8 @@ export interface AnalyticsData {
   refreshing: boolean;
   error: string | null;
   rows: number;
+  /** Raw all-time event rows (unfiltered fetch, capped by the RPC limit). */
+  events: AnalyticsEvent[];
   eventsInRange: number;
   eventsByType: EventCounts;
   stats: VisitorStats;
@@ -278,6 +280,7 @@ export function useAnalyticsData(resolvers?: {
     refreshing,
     error,
     rows: rows.length,
+    events: rows,
     // Total EVENTS inside the selected range (the `rows` count above is the
     // unfiltered all-time fetch size — never mix them in one card row).
     eventsInRange: Object.values(aggregate.eventsByType).reduce((s, n) => s + n, 0),

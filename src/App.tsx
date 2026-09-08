@@ -42,6 +42,12 @@ const BulkCreatePage = lazyNamed(() => import('./pages/admin/BulkCreatePage'), '
 const ProductImportPage = lazyNamed(() => import('./pages/admin/ProductImportPage'), 'ProductImportPage');
 const CategoriesPage = lazyNamed(() => import('./pages/admin/CategoriesPage'), 'CategoriesPage');
 const InventoryPage = lazyNamed(() => import('./pages/admin/InventoryPage'), 'InventoryPage');
+const OperationsHealthPage = lazyNamed(() => import('./pages/admin/OperationsHealthPage'), 'OperationsHealthPage');
+const ProductPerformancePage = lazyNamed(() => import('./pages/admin/ProductPerformancePage'), 'ProductPerformancePage');
+const CustomerInterestPage = lazyNamed(() => import('./pages/admin/CustomerInterestPage'), 'CustomerInterestPage');
+const BuySessionsPage = lazyNamed(() => import('./pages/admin/BuySessionsPage'), 'BuySessionsPage');
+const CampaignsPage = lazyNamed(() => import('./pages/admin/CampaignsPage'), 'CampaignsPage');
+const ActivityPage = lazyNamed(() => import('./pages/admin/ActivityPage'), 'ActivityPage');
 const FeedAdminPage = lazyNamed(() => import('./pages/admin/FeedAdminPage'), 'FeedAdminPage');
 const PromptsAdminPage = lazyNamed(() => import('./pages/admin/PromptsAdminPage'), 'PromptsAdminPage');
 const HomepageCmsPage = lazyNamed(() => import('./pages/admin/HomepageCmsPage'), 'HomepageCmsPage');
@@ -183,9 +189,11 @@ export default function App() {
                     <Route path="products/new" element={<ProductEditPage />} />
                     <Route path="products/bulk-create" element={<BulkCreatePage />} />
                     <Route path="products/import" element={<ProductImportPage />} />
+                    <Route path="products/performance" element={<ProductPerformancePage />} />
                     <Route path="products/:id" element={<ProductEditPage />} />
                     <Route path="categories" element={<CategoriesPage />} />
                     <Route path="inventory" element={<InventoryPage />} />
+                    <Route path="operations" element={<OperationsHealthPage />} />
                     <Route path="feed" element={<FeedAdminPage />} />
                     <Route path="feed/analytics" element={<FeedAnalyticsAdminPage />} />
                     <Route path="feed/likes" element={<FeedLikesAdminPage />} />
@@ -201,9 +209,13 @@ export default function App() {
                     <Route path="contact" element={<ContactAdminPage />} />
                     <Route path="settings" element={<SettingsAdminPage />} />
                     <Route path="analytics" element={<AnalyticsAdminPage />} />
+                    <Route path="analytics/interest" element={<CustomerInterestPage />} />
                     <Route path="orders" element={<OrdersListPage />} />
                     <Route path="orders/:id" element={<OrderDetailPage />} />
                     <Route path="in-store-sale" element={<InStoreSaleAdminPage />} />
+                    <Route path="buy-sessions" element={<BuySessionsPage />} />
+                    <Route path="campaigns" element={<CampaignsPage />} />
+                    <Route path="activity" element={<ActivityPage />} />
                     <Route path="comments" element={<CommentsAdminPage />} />
                   </Route>
                 </Routes>
