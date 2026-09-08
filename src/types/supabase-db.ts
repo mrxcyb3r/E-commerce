@@ -222,6 +222,7 @@ export type AnalyticsEventType =
   | 'feedback_submit'
   | 'buy_list_add'
   | 'buy_list_remove'
+  | 'buy_list_open'
   | 'homepage_view'
   | 'related_product_click';
 
