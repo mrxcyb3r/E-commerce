@@ -96,8 +96,8 @@ Everything below was verified in the codebase, not assumed.
 - `[~]` **Central permission system** — `permissions.ts` exists and is cohesive, but `canManage*` gates are applied in only 2 files. Apply consistently to every admin page (route-level gate or shared hook) so new roles map cleanly.
 - `[ ]` **`isPlatformOwner()` / `isAdmin()` helpers** — not exported; rely on `user.isOwner` / `role` fields directly. Add small helpers for consistency (trivial, low priority).
 - `[→]` **Store ownership checks** — single-store app; `store_id` exists only on `allowed_admin_emails` (`'default'`). No multi-tenant checks needed now.
-- `[~]` **Server-side authorization** — RPC-level checks exist for auth/audit/rate-limit and `rpc_my_profile` is security-definer. Business mutations rely on table RLS only (see §5 for the two role-blind tables).
-- `[~]` **Supabase RLS** — audit done in §5. Two Critical findings.
+- `[~]` **Server-side authorization** — RPC-level checks exist for auth/audit/rate-limit and `rpc_my_profile` is security-definer. Business mutations rely on table RLS; the previously role-blind tables (orders, analytics) and storage.objects writes are now role-aware (§5, fixed 2026-09-09).
+- `[x]` **Supabase RLS** — audit in §5; all Critical/High findings fixed 2026-09-09 (`20260909…_rls_harden_*`).
 - `[ ]` **Authorization denial handling** — pages mostly assume RLS success; RLS errors are swallowed as empty lists (`AdminsPage` sets a message on error, most pages do not). Surface RLS denials to the UI.
 - `[x]` **Preventing privilege escalation** — role escalation via "Profiles manage own role" removed; role CHECK narrowed; owner immutability triggers. Good.
 - `[x]` **Preventing client-side role manipulation** — roles never read from localStorage or JWT; only `rpc_my_profile()`.
@@ -131,18 +131,18 @@ Audit status of every admin-relevant surface. Notes:
 | `homepage_cms` / `about_cms` / `contact_cms` | public read; owner manage; admin manage | **role-aware** | `[x]` |
 | `homepage_slides` | public read active; admins manage | **role-aware** (per `admin` role) | `[x]` |
 | `store_settings` | public read; owner manage; admin manage | **role-aware** | `[x]` |
-| **`orders`** | `for all using (auth.role()='authenticated')` — **no profile role check** | **⛔ role-blind** | `[ ]` **CRITICAL** |
-| `order_items` | same as `orders` | **⛔ role-blind** | `[ ]` **CRITICAL** |
-| `order_status_history` | same as `orders` | **⛔ role-blind** | `[ ]` **CRITICAL** |
-| **`analytics_events`** | anon INSERT (intentional, whitelisted event types); authenticated `for all using(true) with check(true)` — **no profile role check** | **⛔ role-blind** | `[ ]` **CRITICAL** |
-| `storage.objects` | public read; authenticated INSERT/UPDATE/DELETE in `product-images`/`feed-media`/`store-assets`/`prompt-assets` (bucket-only check) | **⛔ role-blind** (`to authenticated`, no profile role, no per-folder owner check) | `[ ]` **HIGH** |
+| **`orders`** | owner manage + admin manage (`exists profiles.role in ('owner','admin')`) — fixed | **role-aware** | `[x]` (previously CRITICAL) |
+| `order_items` | owner manage + admin manage (same EXISTS pattern) — fixed | **role-aware** | `[x]` (previously CRITICAL) |
+| `order_status_history` | owner manage + admin manage; UPDATE/DELETE grants revoked (append-only) — fixed | **role-aware** | `[x]` (previously CRITICAL) |
+| **`analytics_events`** | anon INSERT (whitelisted) unchanged; owner/admin SELECT; authenticated INSERT (shape-guarded); UPDATE/DELETE grants revoked — fixed | **role-aware** | `[x]` (previously CRITICAL) |
+| `storage.objects` | public read unchanged; owner/admin INSERT/UPDATE/DELETE with bucket + top-level folder-prefix guard — fixed | **role-aware** | `[x]` (previously HIGH) |
 | `feed` likes/comments/saves (public social) | tables in `2026090317…`, `2026090514…` — need body re-read; public-write may be intentional | verify | `[~]` |
 | Legacy `admin_invitations` | "Owner manage admin invitations" — **superseded**, zero client refs | — | `[→]` drop |
 
 ### Critical / High actions (do first)
-- `[ ]` **Rewrite `orders` / `order_items` / `order_status_history` policies** to the `exists(select 1 from profiles p2 where p2.id=auth.uid() and p2.role in ('owner','admin'))` pattern (same as products). *Why:* any authenticated Supabase user (pre-existing accounts, OAuth edge cases, future consumer auth) currently gets full read/write over all orders.
-- `[ ]` **Rewrite `analytics_events`** admin policy to that same role check (read/manage only owner/admin; keep anon INSERT as-is with the whitelist `with check`). *Why:* the axe the roadmap asked about — admin read must stay protected; today any authenticated user can read/delete all analytics.
-- `[ ]` **Restrict `storage.objects` writes** to owner/admin and to the correct folder prefix (e.g., `bucket_id='feed-media' and (storage.foldername(name))[1]='feed-media'`), never bare `to authenticated` for write.
+- `[x]` **Rewrite `orders` / `order_items` / `order_status_history` policies** to the `exists(select 1 from profiles p2 where p2.id=auth.uid() and p2.role in ('owner','admin'))` pattern (same as products). *Done 2026-09-09 in `20260909050000_rls_harden_orders.sql`; `order_status_history` UPDATE/DELETE grants revoked (append-only).*
+- `[x]` **Rewrite `analytics_events`** admin policy to that same role check (owner/admin SELECT; anon INSERT unchanged; authenticated INSERT shape-guarded; UPDATE/DELETE grants revoked). *Done 2026-09-09 in `20260909060000_rls_harden_analytics.sql`, which also role-gates the SECURITY DEFINER reader `get_analytics_events` (previously anon-executable) and revokes its anon grant.*
+- `[x]` **Restrict `storage.objects` writes** to owner/admin with bucket + top-level folder-prefix guard. *Done 2026-09-09 in `20260909070000_rls_harden_storage.sql`; public read policy unchanged.*
 
 ### Data-governance gap (no DB table at all → no RLS)
 - `[~]` **Campaigns** (`listCampaigns()` in `src/lib/admin/ops.ts`), **buy sessions** (`BuySessionContext`), **in-store sale records**, and **activity logs** (`StoreContext.logActivity` → `activityLogs`) are **client-side only** (localStorage). They are admin-administered but have no DB row → no RLS, no cross-device truth, tamperable in localStorage, and invisible to the immutable audit. Move to Supabase tables when scheduling; medium priority (business continuity, not auth).
@@ -302,6 +302,8 @@ Checklist (verified where possible):
 ---
 
 ## 13. Next Recommended Phase
+
+> **STATUS: COMPLETE (2026-09-09).** The role-blind RLS hardening described below is done — `orders`, `order_items`, `order_status_history`, and `analytics_events` are role-aware, and `storage.objects` writes are owner/admin-only. Files: `20260909050000_rls_harden_orders.sql`, `20260909060000_rls_harden_analytics.sql` (also role-gates the `get_analytics_events` SECURITY DEFINER reader + revokes its anon grant), `20260909070000_rls_harden_storage.sql`. See §5. Remaining roadmap work now defaults to the §13 same-session follow-ups below.
 
 **Task: Fix the role-blind RLS policies on `orders`, `order_items`, `order_status_history`, and `analytics_events`; then tighten `storage.objects` writes. (Section 5 changes.)**
 
