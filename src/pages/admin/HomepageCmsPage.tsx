@@ -24,6 +24,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { logBusinessAudit } from '../../lib/auth/security';
 import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { HomepageSlide } from '../../types/cms';
@@ -255,6 +256,9 @@ export const HomepageCmsPage: React.FC = () => {
 
       publishHomepageSlides(slides);
       track('homepage_published', { metadata: { slides: slides.length } });
+      void logBusinessAudit('homepage_published', 'homepage_cms', null, {
+        slides: slides.length,
+      });
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 2500);
     } catch (err) {

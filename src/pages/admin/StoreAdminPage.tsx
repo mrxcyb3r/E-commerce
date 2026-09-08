@@ -24,6 +24,7 @@ import { SingleImageUpload } from '../../components/admin/SingleImageUpload';
 import { SaveIndicator } from '../../components/admin/SaveIndicator';
 import { MEDIA_BUCKETS } from '../../lib/supabase/storage';
 import { computeStoreReadiness } from '../../lib/admin/readiness';
+import { logBusinessAudit } from '../../lib/auth/security';
 
 export const StoreAdminPage: React.FC = () => {
   const { storeInfo, updateStoreInfo, products, categories, homepageCms, homepageSlides } = useStore();
@@ -152,6 +153,12 @@ export const StoreAdminPage: React.FC = () => {
         adminEmail: adminEmail || undefined,
         copyright: copyright || undefined,
         footerText: footerText || undefined,
+      });
+
+      void logBusinessAudit('store_updated', 'store_settings', null, {
+        businessName: name,
+        shortName: shortName || undefined,
+        adminEmail: adminEmail || undefined,
       });
 
       setSavedSuccess(true);

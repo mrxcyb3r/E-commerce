@@ -34,6 +34,7 @@ const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPa
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { AdminRoute } from './components/admin/AdminRoute';
+import { Cap } from './components/admin/RequireCapability';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { ToastProvider } from './components/common/ToastProvider';
 const DashboardPage = lazyNamed(() => import('./pages/admin/DashboardPage'), 'DashboardPage');
@@ -189,42 +190,42 @@ export default function App() {
                       </Suspense>
                     }
                   >
-                    <Route index element={<DashboardPage />} />
-                    <Route path="products" element={<ProductsListPage />} />
-                    <Route path="products/new" element={<ProductEditPage />} />
-                    <Route path="products/bulk-create" element={<BulkCreatePage />} />
-                    <Route path="products/import" element={<ProductImportPage />} />
-                    <Route path="products/performance" element={<ProductPerformancePage />} />
-                    <Route path="products/:id" element={<ProductEditPage />} />
-                    <Route path="categories" element={<CategoriesPage />} />
-                    <Route path="inventory" element={<InventoryPage />} />
-                    <Route path="operations" element={<OperationsHealthPage />} />
-                    <Route path="feed" element={<FeedAdminPage />} />
-                    <Route path="feed/analytics" element={<FeedAnalyticsAdminPage />} />
-                    <Route path="feed/likes" element={<FeedLikesAdminPage />} />
-                    <Route path="feed/performance" element={<FeedPerformanceAdminPage />} />
-                    <Route path="feed/products" element={<FeedProductPerformancePage />} />
-                    <Route path="prompts" element={<PromptsAdminPage />} />
-                    <Route path="homepage" element={<HomepageCmsPage />} />
-                    <Route path="testimonials" element={<TestimonialsAdminPage />} />
-                    <Route path="faq" element={<FaqAdminPage />} />
-                    <Route path="store" element={<StoreAdminPage />} />
-                    <Route path="onboarding" element={<OnboardingPage />} />
-                    <Route path="about" element={<AboutAdminPage />} />
-                    <Route path="contact" element={<ContactAdminPage />} />
-                    <Route path="settings" element={<SettingsAdminPage />} />
-                    <Route path="analytics" element={<AnalyticsAdminPage />} />
-                    <Route path="analytics/interest" element={<CustomerInterestPage />} />
-                    <Route path="orders" element={<OrdersListPage />} />
-                    <Route path="orders/:id" element={<OrderDetailPage />} />
-                    <Route path="in-store-sale" element={<InStoreSaleAdminPage />} />
-                    <Route path="buy-sessions" element={<BuySessionsPage />} />
-                    <Route path="campaigns" element={<CampaignsPage />} />
-                    <Route path="activity" element={<ActivityPage />} />
-                    <Route path="comments" element={<CommentsAdminPage />} />
-                    <Route path="users" element={<AdminsPage />} />
-                    <Route path="security" element={<SecurityPage />} />
-                    <Route path="audit" element={<AuditLogPage />} />
+                    <Route index element={<Cap capability="dashboard"><DashboardPage /></Cap>} />
+                    <Route path="products" element={<Cap capability="products"><ProductsListPage /></Cap>} />
+                    <Route path="products/new" element={<Cap capability="products"><ProductEditPage /></Cap>} />
+                    <Route path="products/bulk-create" element={<Cap capability="products"><BulkCreatePage /></Cap>} />
+                    <Route path="products/import" element={<Cap capability="products"><ProductImportPage /></Cap>} />
+                    <Route path="products/performance" element={<Cap capability="products"><ProductPerformancePage /></Cap>} />
+                    <Route path="products/:id" element={<Cap capability="products"><ProductEditPage /></Cap>} />
+                    <Route path="categories" element={<Cap capability="categories"><CategoriesPage /></Cap>} />
+                    <Route path="inventory" element={<Cap capability="inventory"><InventoryPage /></Cap>} />
+                    <Route path="operations" element={<Cap capability="inventory"><OperationsHealthPage /></Cap>} />
+                    <Route path="feed" element={<Cap capability="feed"><FeedAdminPage /></Cap>} />
+                    <Route path="feed/analytics" element={<Cap capability="feed"><FeedAnalyticsAdminPage /></Cap>} />
+                    <Route path="feed/likes" element={<Cap capability="feed"><FeedLikesAdminPage /></Cap>} />
+                    <Route path="feed/performance" element={<Cap capability="feed"><FeedPerformanceAdminPage /></Cap>} />
+                    <Route path="feed/products" element={<Cap capability="feed"><FeedProductPerformancePage /></Cap>} />
+                    <Route path="prompts" element={<Cap capability="prompts"><PromptsAdminPage /></Cap>} />
+                    <Route path="homepage" element={<Cap capability="homepage"><HomepageCmsPage /></Cap>} />
+                    <Route path="testimonials" element={<Cap capability="store"><TestimonialsAdminPage /></Cap>} />
+                    <Route path="faq" element={<Cap capability="store"><FaqAdminPage /></Cap>} />
+                    <Route path="store" element={<Cap capability="store"><StoreAdminPage /></Cap>} />
+                    <Route path="onboarding" element={<Cap capability="store"><OnboardingPage /></Cap>} />
+                    <Route path="about" element={<Cap capability="store"><AboutAdminPage /></Cap>} />
+                    <Route path="contact" element={<Cap capability="store"><ContactAdminPage /></Cap>} />
+                    <Route path="settings" element={<Cap capability="settings"><SettingsAdminPage /></Cap>} />
+                    <Route path="analytics" element={<Cap capability="analytics"><AnalyticsAdminPage /></Cap>} />
+                    <Route path="analytics/interest" element={<Cap capability="analytics"><CustomerInterestPage /></Cap>} />
+                    <Route path="orders" element={<Cap capability="orders"><OrdersListPage /></Cap>} />
+                    <Route path="orders/:id" element={<Cap capability="orders"><OrderDetailPage /></Cap>} />
+                    <Route path="in-store-sale" element={<Cap capability="orders"><InStoreSaleAdminPage /></Cap>} />
+                    <Route path="buy-sessions" element={<Cap capability="buySessions"><BuySessionsPage /></Cap>} />
+                    <Route path="campaigns" element={<Cap capability="campaigns"><CampaignsPage /></Cap>} />
+                    <Route path="activity" element={<Cap capability="activity"><ActivityPage /></Cap>} />
+                    <Route path="comments" element={<Cap capability="feed"><CommentsAdminPage /></Cap>} />
+                    <Route path="users" element={<Cap capability="users"><AdminsPage /></Cap>} />
+                    <Route path="security" element={<Cap capability="settings"><SecurityPage /></Cap>} />
+                    <Route path="audit" element={<Cap capability="settings"><AuditLogPage /></Cap>} />
                   </Route>
                 </Routes>
                 </BrowserRouter>

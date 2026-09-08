@@ -43,6 +43,9 @@ export interface AuthResult {
 
 export interface AuthContextType {
   isAuthenticated: boolean;
+  /** True once the DB identity check has finished on load — gates AdminRoute
+   *  so a cold-load can never flash the login page while the session resolves. */
+  sessionChecked: boolean;
   user: AdminUser | null;
   adminUsername: string;
   role: StaffRole | null;
@@ -60,6 +63,9 @@ export interface AuthContextType {
   updateCredentials: (newUsername: string, newPassword: string) => void;
   changeCredentials: (currentPassword: string, newUsername?: string, newPassword?: string) => Promise<boolean>;
   refreshProfile: () => Promise<void>;
+  /** Force a real token refresh (resets sessionExpiresAt) when the session
+   *  is about to expire. No-op when there is no active session. */
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -356,11 +362,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await loadSession();
   }, [loadSession]);
 
+  const refreshSession = useCallback(async () => {
+    try {
+      const { data } = await supabase.auth.refreshSession();
+      if (data.session) {
+        setSessionExpiresAt(data.session.expires_at ?? null);
+      }
+    } catch (e) {
+      console.warn('refreshSession failed:', e);
+    }
+    await loadSession();
+  }, [loadSession]);
+
   const adminUsername = user?.username || 'admin';
 
   const value = useMemo<AuthContextType>(
     () => ({
       isAuthenticated: sessionChecked && !!user && !user.isSuspended,
+      sessionChecked,
       user,
       adminUsername,
       role: user?.role ?? null,
@@ -376,8 +395,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updateCredentials,
       changeCredentials,
       refreshProfile,
+      refreshSession,
     }),
-    [sessionChecked, user, adminUsername, blocked, sessionWarning, sessionExpiresAt, login, loginOtp, verifyOtp, resendOtp, loginGoogle, logout, updateCredentials, changeCredentials, refreshProfile],
+    [sessionChecked, user, adminUsername, blocked, sessionWarning, sessionExpiresAt, login, loginOtp, verifyOtp, resendOtp, loginGoogle, logout, updateCredentials, changeCredentials, refreshProfile, refreshSession],
   );
 
   // Expose the shared auth channel so other modules can trigger cross-tab sync.

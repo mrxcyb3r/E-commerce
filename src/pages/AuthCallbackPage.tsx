@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { logAuthEvent } from '../lib/auth/security';
-import { postChannel } from '../lib/auth/session';
+import { postChannel, getPendingAuthRedirect } from '../lib/auth/session';
 
 /**
  * Landing page for OAuth (Google) redirects. supabase-js exchanges the PKCE
  * code automatically on load; this component waits for the session, then the
  * AuthContext resolves the DB identity via rpc_my_profile() before navigating.
+ * The destination comes from sessionStorage so the user lands back on the
+ * deep link they were trying to open (stashed by LoginPage before OAuth).
  */
 export const AuthCallbackPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ export const AuthCallbackPage: React.FC = () => {
       if (data.session?.user) {
         void logAuthEvent('oauth_login', { success: true }, data.session.user.email ?? undefined);
         postChannel({ type: 'login' });
-        navigate('/admin', { replace: true });
+        navigate(getPendingAuthRedirect(), { replace: true });
       } else {
         navigate('/login?denied=1', { replace: true });
       }
@@ -45,7 +47,7 @@ export const AuthCallbackPage: React.FC = () => {
 
   // isAuthenticated is flipped by AuthContext's onAuthStateChange listener.
   useEffect(() => {
-    if (isAuthenticated) navigate('/admin', { replace: true });
+    if (isAuthenticated) navigate(getPendingAuthRedirect(), { replace: true });
   }, [isAuthenticated, navigate]);
 
   return (

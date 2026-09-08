@@ -7,6 +7,7 @@ import { CommandPalette } from './CommandPalette';
 import { NotificationCenter } from './NotificationCenter';
 import { TableSkeleton } from './ui/LoadingSkeleton';
 import { useAdminShortcuts, ADMIN_SHORTCUT_OPEN_NOTIFICATIONS } from '../../hooks/useAdminShortcuts';
+import { SessionWarningBanner } from './SessionWarningBanner';
 
 export const AdminLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,6 +33,7 @@ export const AdminLayout: React.FC = () => {
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onOpenNotifications={() => setNotificationsOpen(true)}
         />
+        <SessionWarningBanner />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto min-w-0 overflow-x-clip">
           <Suspense fallback={<TableSkeleton columns={5} rows={6} />}>
             <AdminPageTransition>

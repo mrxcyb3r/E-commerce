@@ -44,3 +44,34 @@ export function secondsToExpiry(expiresAtUnix: number | null | undefined, nowMs 
   if (!expiresAtUnix || !Number.isFinite(expiresAtUnix)) return 0;
   return Math.max(0, Math.round((expiresAtUnix * 1000 - nowMs) / 1000));
 }
+
+const REDIRECT_KEY = 'auth_pending_redirect';
+
+/**
+ * Stash the post-login destination before a redirect-based flow (Google
+ * OAuth, magic link) wipes in-memory router state. Falls back to /admin.
+ */
+export function setPendingAuthRedirect(path: string): void {
+  try {
+    sessionStorage.setItem(REDIRECT_KEY, path);
+  } catch {
+    /* noop */
+  }
+}
+
+/**
+ * Read + clear the stashed destination. Only same-origin app-relative paths
+ * are honored so a tampered storage value can never redirect elsewhere.
+ */
+export function getPendingAuthRedirect(fallback = '/admin'): string {
+  try {
+    const v = sessionStorage.getItem(REDIRECT_KEY);
+    sessionStorage.removeItem(REDIRECT_KEY);
+    if (!v) return fallback;
+    const url = new URL(v, window.location.origin);
+    if (url.origin !== window.location.origin) return fallback;
+    return url.pathname + url.search + url.hash || fallback;
+  } catch {
+    return fallback;
+  }
+}

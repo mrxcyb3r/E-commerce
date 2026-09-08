@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { logBusinessAudit } from '../../lib/auth/security';
 import {
   Eye,
   Users,
@@ -924,7 +925,11 @@ const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
   const download = (period: 'daily' | 'weekly' | 'monthly', label: string) => {
     const csv = data.buildReportCsv(period);
     downloadFile(`analytics-${period}-report.csv`, csv);
-    void label;
+    void logBusinessAudit('analytics_exported', 'analytics', null, { report: label });
+  };
+  const downloadProducts = () => {
+    downloadFile('analytics-products.csv', data.buildProductCsv());
+    void logBusinessAudit('analytics_exported', 'analytics', null, { report: 'products' });
   };
   return (
     <SectionCard title="Hisobotlar" icon={BarChart3} accent="text-emerald-500" subtitle="Har bir tugma o'z davrini yuklaydi (kunlik = oxirgi 1 kun, haftalik = 7 kun, oylik = 30 kun)">
@@ -944,7 +949,7 @@ const ReportsSection: React.FC<{ data: AnalyticsData }> = ({ data }) => {
       </div>
       <button
         type="button"
-        onClick={() => downloadFile('analytics-products.csv', data.buildProductCsv())}
+        onClick={() => downloadProducts()}
         className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-foreground text-background text-xs font-black hover:opacity-90 transition-opacity"
       >
         <Download className="w-4 h-4" />

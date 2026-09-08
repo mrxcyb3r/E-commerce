@@ -22,10 +22,10 @@ Everything below was verified in the codebase, not assumed.
 - `[x]` **Allowed-admin email system** — `public.allowed_admin_emails` (pending/used/revoked) + `handle_new_user()` gate consuming a `pending` invite on signup.
 - `[x]` **Admin registration restrictions** — `handle_new_user()` trigger on `auth.users` raises for any non-owner, non-allowlisted email → open registration blocked at DB level.
 - `[x]` **Admin session handling** — auto-refresh (Supabase), `sessionChecked` flag, expiry heartbeat in `AuthContext` (`sessionWarning` / `sessionExpiresAt`), broadcast logout.
-- `[~]` **Unauthorized handling** — denied screen on `/login?denied=1` + `blocked`; **but** `sessionWarning` / `sessionExpiresAt` have **no UI consumer** (verified: zero usage outside `AuthContext`), and a cold-load `/admin` visit briefly redirects to `/login` before `sessionChecked` resolves (flash/redirect bounce on valid sessions).
+- `[x]` **Unauthorized handling** — denied screen on `/login?denied=1` + `blocked`; `SessionWarningBanner` consumes `sessionWarning`/`sessionExpiresAt`; cold-load `/admin` is suspense-gated on `sessionChecked` (no login flash). Implemented 2026-09-09 in this continuation.
 - `[x]` **Admin profile identity** — `rpc_my_profile()` returns id/email/username/full_name/role/is_owner/is_suspended/last_login_at; mapped to `AdminUser` in `AuthContext`. Identity never comes from localStorage or the JWT.
 - `[~]` **Dynamic sidebar identity** — footer now renders `user?.isOwner ? 'Platforma egasi' : 'Administrator'` (`AdminSidebar.tsx:262`). This fixed the bare hardcoded string, but the non-owner half is still a constant (see §8).
-- `[~]` **Audit logging** — `auth_audit_log` (immutable, insert-only via `rpc_auth_audit`) and `login_history` (insert-only via `rpc_auth_log`) exist. **Only wired events:** `password_changed`, `invite_created`, `invite_revoked`, `member_role_changed`, `member_suspended/unsuspended`, plus the `login_history` stream. Business events (product deleted, campaign published, store updated, analytics exported, logout) are **not** persisted to `auth_audit_log` — they still go to the client-side `activityLogs` (localStorage) in `StoreContext.logActivity()`.
+- `[x]` **Audit logging** — `auth_audit_log` (immutable, insert-only via `rpc_auth_audit`) and `login_history` (insert-only via `rpc_auth_log`). Wired events: auth/member stream (`password_changed`, `invite_created`, `invite_revoked`, `member_role_changed`, `member_suspended/unsuspended`, `login_history`) **plus** business events — `product_deleted`, `campaign_created/updated/deleted`, `store_updated`, `analytics_exported`, `homepage_published`, `feed_post_deleted` (wired 2026-09-09 via `logBusinessAudit` in the admin pages). Client-side `activityLogs` (localStorage) in `StoreContext.logActivity()` remains for non-security productivity history only.
 - `[x]` **RLS protection (auth tables)** — profiles, platform_config, allowed_admin_emails, auth_audit_log, login_history, auth_rate_limits all have RLS. **Two pre-existing tables are role-blind** (orders, analytics_events) — see §5 (Critical).
 - `[x]` **Logout / session handling** — `logout()` posts a broadcast + storage fallback; `SignOut({scope:'global'})` "logout everywhere" from `SecurityPage`.
 - `[x]` **Migrations** — 5 new (`20260909{0000,0100,0200,0300,0400}_auth_*.sql`). One legacy migration (`20260906140503_admin_auth.sql`) is now **superseded but not dropped** (`admin_invitations` table + `profiles.pending_invitation_id`, zero client references — verified).
@@ -65,11 +65,11 @@ Everything below was verified in the codebase, not assumed.
 - `[ ]` **Expired OTP handling** — relies entirely on Supabase message expiry; no explicit UX for "code expired".
 - `[x]` OTP resend cooldown (60 s local + `resend_otp` bucket).
 - `[x]` Login failure handling + throttling (DB buckets).
-- `[~]` **Session-expiry warning UI** — the state exists; **no banner/modal consumes it**. When auto-refresh fails, users are silently logged out at `expires_at`. Priority: High.
+- `[x]` **Session-expiry warning UI** — `SessionWarningBanner` mounted in `AdminLayout` reads `sessionWarning`/`sessionExpiresAt`, shows a live mm:ss countdown, and "Davom etish" forces a real `supabase.auth.refreshSession()` (via new `AuthContext.refreshSession`) resetting `sessionExpiresAt`. `AuthContext` hard-signs-out at expiry. Implemented 2026-09-09.
 - `[x]` Token refresh (Supabase auto-refresh).
 - `[x]` Cross-tab logout/session sync (BroadcastChannel + `storage` event fallback).
-- `[~]` **Protected-route deep-link handling** — `AdminRoute` saves `from`, password login honors it (`LoginPage.tsx:132`), but **OTP and Google success paths navigate to hardcoded `/admin`**, losing the deep link (`LoginPage` redirects on `isAuthenticated` via `useEffect`, `LoginPage.tsx:37-41`).
-- `[~]` **Prevent protected-page flash** — during cold load `sessionChecked` is false, so a valid session hits `/admin` → bounce to `/login` → back to `/admin` once loaded. Suspend `AdminRoute` (`return null`) until `sessionChecked` is true.
+- `[x]` **Protected-route deep-link handling** — `LoginPage` auto-redirect now honors `from` for every path (OTP/password); `handleGoogle` stashes `from` in `sessionStorage` (`auth_pending_redirect`) before the redirect and `AuthCallbackPage` reads it back (same-origin sanitized, `/admin` fallback). Implemented 2026-09-09.
+- `[x]` **Prevent protected-page flash** — `AuthContext` exposes `sessionChecked`; `AdminRoute` renders a loader until it resolves, so a valid cold-load `/admin` never bounces to `/login`. Implemented 2026-09-09.
 - `[ ]` **Password reset / forgot password** — not implemented (`supabase.auth.resetPasswordForEmail` never called; no UI; no `password_reset` audit path other than the reserved event type).
 - `[ ]` **OTP blocked-email UX** — a non-allowlisted email surfaces the generic "SMTP not configured" error from `loginOtp`; should distinguish "email not permitted" from "code not sent".
 
@@ -93,7 +93,7 @@ Everything below was verified in the codebase, not assumed.
 
 ## 4. Authorization Hardening
 
-- `[~]` **Central permission system** — `permissions.ts` exists and is cohesive, but `canManage*` gates are applied in only 2 files. Apply consistently to every admin page (route-level gate or shared hook) so new roles map cleanly.
+- `[x]` **Central permission system** — `permissions.ts` expanded to 16 capabilities (`dashboard`, `products`, `categories`, `inventory`, `feed`, `homepage`, `prompts`, `store`, `orders`, `buySessions`, `campaigns`, `analytics`, `activity`, `settings`, `users`, `audit`) with `canManage*` wrappers. Every `/admin` route is wrapped in `RequireCapability` (`App.tsx`), which renders a 403 `ForbiddenPage` for authenticated-but-unauthorized users (never a login redirect). `AdminSidebar` filters nav by the same capabilities, so direct URLs cannot bypass. Implemented 2026-09-09.
 - `[ ]` **`isPlatformOwner()` / `isAdmin()` helpers** — not exported; rely on `user.isOwner` / `role` fields directly. Add small helpers for consistency (trivial, low priority).
 - `[→]` **Store ownership checks** — single-store app; `store_id` exists only on `allowed_admin_emails` (`'default'`). No multi-tenant checks needed now.
 - `[~]` **Server-side authorization** — RPC-level checks exist for auth/audit/rate-limit and `rpc_my_profile` is security-definer. Business mutations rely on table RLS; the previously role-blind tables (orders, analytics) and storage.objects writes are now role-aware (§5, fixed 2026-09-09).
@@ -167,12 +167,11 @@ Audit status of every admin-relevant surface. Notes:
 | authorization denied | `[ ]` (`login_failure` w/ reason only) | `[ ]` | `[ ]` |
 | owner-protection attempt | `[ ]` | `[ ]` | `[ ]` — no audit on trigger denial |
 | suspicious auth activity | `[~]` limited | `[ ]` | `[ ]` |
-| product deleted / campaign published / store updated / analytics exported | — | `[ ]` | **`[ ]` — routed only to localStorage `activityLogs`** |
+| product deleted / campaign published / store updated / analytics exported | — | `product_deleted`, `campaign_created/updated/deleted`, `store_updated`, `analytics_exported`, `homepage_published`, `feed_post_deleted` | `[x]` — wired 2026-09-09 via `logBusinessAudit` (ProductsListPage, CampaignsPage, StoreAdminPage, AnalyticsAdminPage, HomepageCmsPage, FeedAdminPage) |
 
 ### Rules
 - `[x]` Never log passwords, OTP codes, tokens, refresh tokens, id tokens, or secrets. Verified: metadata only ever carries reasons/emails; `verifyOtp` does **not** store the code; Supabase error `message` strings are stored (safe, e.g. "Invalid login credentials").
-- `[ ]` Wire business audit calls (`logBusinessAudit`) into the destructive admin mutations (product delete/src pages, campaign publish, store update, analytics export) so they join the immutable trail.
-- `[ ]` Consider logging owner-protection trigger denials from the trigger itself (SECURITY DEFINER → `rpc_auth_audit`), and auth-gate denials with `signup_blocked`.
+- `[x]` **Business audit wired** — `logBusinessAudit` joins the immutable trail on product delete, campaign create/update/delete, store settings save, analytics export, homepage publish, feed post delete (2026-09-09). Remaining (lower priority): owner-protection trigger denials, auth-gate denials, and awaiting `logout` (currently fire-and-forget).
 
 ---
 
@@ -303,7 +302,9 @@ Checklist (verified where possible):
 
 ## 13. Next Recommended Phase
 
-> **STATUS: COMPLETE (2026-09-09).** The role-blind RLS hardening described below is done — `orders`, `order_items`, `order_status_history`, and `analytics_events` are role-aware, and `storage.objects` writes are owner/admin-only. Files: `20260909050000_rls_harden_orders.sql`, `20260909060000_rls_harden_analytics.sql` (also role-gates the `get_analytics_events` SECURITY DEFINER reader + revokes its anon grant), `20260909070000_rls_harden_storage.sql`. See §5. Remaining roadmap work now defaults to the §13 same-session follow-ups below.
+> **STATUS: COMPLETE (2026-09-09).** The role-blind RLS hardening described below is done — `orders`, `order_items`, `order_status_history`, and `analytics_events` are role-aware, and `storage.objects` writes are owner/admin-only. Files: `20260909050000_rls_harden_orders.sql`, `20260909060000_rls_harden_analytics.sql` (also role-gates the `get_analytics_events` SECURITY DEFINER reader + revokes its anon grant), `20260909070000_rls_harden_storage.sql`. See §5.
+
+> **FOLLOW-UP (same continuation, also done 2026-09-09):** page-level capability authorization (16 capabilities, `RequireCapability` + 403 `ForbiddenPage`, sidebar aligned — §4), business audit wiring (§6), session-expiry banner + real `refreshSession` (§3), OTP/Google deep-link preservation, and the cold-load `/login` flash fix (§3). **DB runtime verification of the RLS migrations remains PENDING** (no working DB credentials/CLI in the sandbox; see §15 checklist to verify/apply manually).
 
 **Task: Fix the role-blind RLS policies on `orders`, `order_items`, `order_status_history`, and `analytics_events`; then tighten `storage.objects` writes. (Section 5 changes.)**
 
@@ -312,7 +313,9 @@ Checklist (verified where possible):
 2. Small, high-certainty change — the correct pattern already exists on `products`/`categories` (`exists(select 1 from profiles where id=auth.uid() and role in ('owner','admin'))`); it's a re-write, not new architecture.
 3. Unblocks everything else — proof that role-based RLS works end-to-end before adding Manager/Staff roles.
 
-Same-session follow-ups (do after the fix): wire `logBusinessAudit` into destructive admin mutations (§6), add the session-expiry banner (§3/§1), and fix the deep-link + flash issues (§3).
+Same-session follow-ups (done 2026-09-09): wire `logBusinessAudit` into destructive admin mutations (§6), session-expiry banner + real `refreshSession` (§3/§1), deep-link + flash fixes (§3).
+
+Next priorities (see §15 checklist): (1) manual DB verification/application of the three RLS migrations + runtime matrix; (2) reset-password flow + OTP blocked-email UX; (3) invitation expiration/rate-limit; (4) surface RLS denials in the UI; (5) campaigns/buy-sessions/activity to DB tables.
 
 **Explicitly NOT this phase:** support roles UI, invitation expiration, 2FA, multi-tenant.
 
@@ -334,6 +337,53 @@ Same-session follow-ups (do after the fix): wire `logBusinessAudit` into destruc
 12. Check for regressions (run the scripts and the key flows in §11).
 13. Report exact files/migrations changed.
 14. Report remaining risks.
+
+---
+
+## 15. Manual DB verification checklist (RLS hardening — PENDING)
+
+RUNTIME VERIFICATION IS PENDING. The three migrations are committed but were NOT
+applied or runtime-tested (sandbox has no `supabase` CLI, no access token, and the
+stored pooler URL has no usable password). Apply/verify using the project workflow
+(`docs/MIGRATIONS.md`: backup first, newest-prefix forward files, staging if present).
+
+**Verify applied state** (SQL on the linked project, e.g. Supabase SQL editor):
+
+```sql
+select version from supabase_migrations.schema_migrations
+order by version desc limit 3;  -- expect ...050000/060000/070000 rls_harden_*
+
+select schemaname, tablename, policyname, cmd, roles, qual, with_check
+from pg_policies
+where (tablename in ('orders','order_items','order_status_history','analytics_events')
+       and schemaname='public')
+   or (tablename='objects' and schemaname='storage');
+-- expect: no "Admins manage orders/order items/order history" rows;
+--          no "auth manage analytics events"; storage policies carry the
+--          owner/admin `exists(select 1 from public.profiles ...)` qual.
+
+select proacl from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+where n.nspname='public' and p.proname='get_analytics_events';
+-- expect: anon has NO execute (revoked).
+
+select grantee, privilege_type from information_schema.role_table_grants
+where table_schema='public'
+  and table_name in ('order_status_history','analytics_events')
+  and grantee in ('anon','authenticated') order by 1,2,3;
+-- order_status_history + analytics_events: NO update/delete for authenticated.
+```
+
+**If not applied:** `supabase db push --linked` is OFF the table (known history
+divergence). Prefer applying ONLY the three file bodies (or a new forward migration
+duplicating them) so the effective policies converge to §5's table. Then re-run the
+guards above.
+
+**Runtime matrix** (§ from task spec): anon/customer/non-admin/admin/owner ×
+{ orders SELECT/INSERT/UPDATE/DELETE, history UPDATE/DELETE (must fail for
+authenticated at grant level), analytics SELECT + `rpc get_analytics_events`
+(must be empty + non-executable for anon), storage upload/replace/delete (admin-only),
+public media reads }. Also re-check: admin dashboard analytics, Orders pages,
+product/feed/store uploads.
 
 ---
 

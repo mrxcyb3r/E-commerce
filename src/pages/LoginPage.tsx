@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { useI18n } from '../i18n/I18nContext';
 import { AUTH_CONFIG } from '../lib/auth/config';
+import { setPendingAuthRedirect } from '../lib/auth/session';
 
 type Step = 'email' | 'otp' | 'password';
 
@@ -36,9 +37,11 @@ export const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/admin', { replace: true });
+      // Preserve the deep link for every auth path (OTP/password included);
+      // redirect-based flows stash `from` in sessionStorage before leaving.
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, from]);
 
   useEffect(() => {
     if (step === 'otp' && !demoFallback) {
@@ -138,6 +141,8 @@ export const LoginPage: React.FC = () => {
   const handleGoogle = async () => {
     setErrorMessage(null);
     setIsLoading(true);
+    // Redirect-based flow: persist the deep link before we leave the page.
+    setPendingAuthRedirect(from);
     const result = await loginGoogle();
     setIsLoading(false);
     if (!result.success && result.error) setErrorMessage(result.error);

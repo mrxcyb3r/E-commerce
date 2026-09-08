@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { logBusinessAudit } from '../../lib/auth/security';
 import {
   Plus,
   Search,
@@ -280,6 +281,9 @@ export const ProductsListPage: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (productToDelete) {
       deleteProduct(productToDelete.id);
+      void logBusinessAudit('product_deleted', 'products', productToDelete.id, {
+        name: productToDelete.name,
+      });
       setProductToDelete(null);
     }
   };

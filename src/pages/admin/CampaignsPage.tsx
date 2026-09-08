@@ -14,6 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { ConfirmDialog } from '../../components/admin/ConfirmDialog';
+import { logBusinessAudit } from '../../lib/auth/security';
 import {
   listCampaigns,
   saveCampaign,
@@ -128,6 +129,10 @@ export const CampaignsPage: React.FC = () => {
           createdAt: Date.now(),
         };
     saveCampaign(record);
+    void logBusinessAudit(isNew ? 'campaign_created' : 'campaign_updated', 'campaigns', record.id, {
+      name: record.name,
+      type: record.type,
+    });
     track(isNew ? 'campaign_created' : 'campaign_created', {
       metadata: { campaignId: record.id, name: record.name, type: record.type },
     });
@@ -140,6 +145,9 @@ export const CampaignsPage: React.FC = () => {
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteCampaign(deleteTarget.id);
+    void logBusinessAudit('campaign_deleted', 'campaigns', deleteTarget.id, {
+      name: deleteTarget.name,
+    });
     logActivity('delete', 'campaign', `Aktsiya o‘chirildi: "${deleteTarget.name}"`);
     setDeleteTarget(null);
     refresh();

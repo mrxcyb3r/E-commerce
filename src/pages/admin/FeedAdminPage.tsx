@@ -19,6 +19,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useVideoFeed } from '../../context/VideoContext';
+import { logBusinessAudit } from '../../lib/auth/security';
 import { useStore } from '../../context/StoreContext';
 import { VideoItem } from '../../types/video';
 import { track } from '../../lib/analytics/client';
@@ -112,6 +113,9 @@ export const FeedAdminPage: React.FC = () => {
       const owned = [videoToDelete.videoUrl, videoToDelete.posterUrl].map((url) => { if (!url) return null; const match = url.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/); return match ? { bucket: match[1], path: decodeURIComponent(match[2].split('?')[0]) } : null; }).filter((item): item is { bucket: string; path: string } => item !== null);
       for (const item of owned) { void deleteMediaObjects(item.bucket, [item.path]); }
       await deleteVideo(videoToDelete.id);
+      void logBusinessAudit('feed_post_deleted', 'feed', videoToDelete.id, {
+        title: videoToDelete.title,
+      });
       setVideoToDelete(null);
     }
   };
