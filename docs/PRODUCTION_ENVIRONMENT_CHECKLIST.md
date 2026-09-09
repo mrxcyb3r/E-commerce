@@ -45,10 +45,13 @@ bundle only ever ships the two publishable `VITE_` variables.
 
 ## Before launch (developer manual actions)
 
+Follow the ordered runbook: `docs/PRODUCTION_VERIFICATION_RUNBOOK.md`
+(migration order, E2E matrix, owner-protection proof, rollback plan).
+
 1. Apply migrations — see `docs/MIGRATIONS.md` + `docs/ADMIN_AUTH_ROADMAP.md` §15
    (three `20260909…_rls_harden_*`, `20260910000000_auth_audit_allowlist`,
    `20260910010000_auth_invite_expiration`).
 2. Set SMTP in Supabase Auth so OTP + password-reset emails deliver.
 3. (Optional) Configure Google OAuth.
-4. Run the runtime matrix (roadmap §15) in a real browser, including OAuth and
-   reset-password email round trips.
+4. Run the runtime matrix (roadmap §15 / runbook §1) in a real browser, including
+   OAuth and reset-password email round trips.

@@ -231,7 +231,7 @@ export default function App() {
                     <Route path="comments" element={<Cap capability="feed"><CommentsAdminPage /></Cap>} />
                     <Route path="users" element={<Cap capability="users"><AdminsPage /></Cap>} />
                     <Route path="security" element={<Cap capability="settings"><SecurityPage /></Cap>} />
-                    <Route path="audit" element={<Cap capability="settings"><AuditLogPage /></Cap>} />
+                    <Route path="audit" element={<Cap capability="audit"><AuditLogPage /></Cap>} />
                   </Route>
                 </Routes>
                 </BrowserRouter>

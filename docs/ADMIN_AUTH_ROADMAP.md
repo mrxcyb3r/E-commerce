@@ -316,6 +316,7 @@ Checklist (verified where possible):
 > - Crash containment: root `ErrorBoundary` in `main.tsx` + keyed admin boundary in `AdminRoute`.
 > - Environment/secret audit: no secrets in repo/history; `.env.example` is placeholder-only (owner email is a config value, not a credential); ImgBB unused; YouTube embed-only (no key). Added `docs/PRODUCTION_ENVIRONMENT_CHECKLIST.md`. **Verified gap fixed (2026-09-10):** `VITE_SITE_URL` (used by `scripts/generate-seo.mjs` inside `npm run build` for `robots.txt`/`sitemap.xml`) was undocumented → added to `.env.example` + environment checklist; without it the build falls back to an `https://example.com` placeholder.
 > - **Remaining (unavailable here):** DB application/verification of the 5 pending migrations (§15); live browser runtime matrix incl. OTP/Google/reset round-trips.
+> - **Last-pass fixes (2026-09-10):** `/admin/audit` route + sidebar now gated by the `audit` capability (was `settings` — same role set, model now self-consistent); OTP login/resend/verify now map the DB signup-gate rejection to safe invite, expired, or already-accepted copy (non-enumerating). Added the operator runbook `docs/PRODUCTION_VERIFICATION_RUNBOOK.md` (E2E matrix, audit-event mapping, owner-protection proof, migration order + rollback plan).
 
 **Task: Fix the role-blind RLS policies on `orders`, `order_items`, `order_status_history`, and `analytics_events`; then tighten `storage.objects` writes. (Section 5 changes.)**
 

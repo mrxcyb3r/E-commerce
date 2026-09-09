@@ -142,7 +142,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
       items: [
         { label: 'Xodimlar va takliflar', path: '/admin/users', icon: Users, requires: 'users' },
         { label: 'Hisob xavfsizligi', path: '/admin/security', icon: ShieldCheck, requires: 'settings' },
-        { label: 'Audit jurnali', path: '/admin/audit', icon: ScrollText, requires: 'settings' },
+        { label: 'Audit jurnali', path: '/admin/audit', icon: ScrollText, requires: 'audit' },
       ],
     },
   ];

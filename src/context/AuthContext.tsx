@@ -92,6 +92,18 @@ const toAdminUser = (p: {
   lastLoginAt: p.last_login_at,
 });
 
+/** Matches the DB signup-gate exception raised by handle_new_user(). When a
+ *  blocked/expired/used invite (or an unapproved email) hits the OTP signup
+ *  path, GoTrue surfaces this message; map it to safe, non-enumerating copy
+ *  that still explains the invite lifecycle states. */
+const INVITE_GATE_MARKER = 'ruxsatisiz kirish bloklandi';
+const INVITE_GATE_COPY =
+  "Email tasdiqlanmagan: taklif mavjud emas, muddati o'tgan yoki allaqachon qabul qilingan bo'lishi mumkin. Platforma egasi bilan bog'laning.";
+const isInviteGate = (message?: string) => message?.includes(INVITE_GATE_MARKER);
+
+const desensitize = (error: { message?: string } | null) =>
+  isInviteGate(error?.message) ? INVITE_GATE_COPY : undefined;
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { storeInfo } = useStore();
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -261,8 +273,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       options: { shouldCreateUser: true },
     });
     if (error) {
-      void logAuthEvent('otp_request', { reason: error.message }, clean);
-      return { success: false, error: "Kod yuborilmadi. Email tasdiqlanmagan bo‘lishi yoki xat yuborish sozlanmagan bo‘lishi mumkin — parol bilan kirishni sinab ko‘ring." };
+      const gate = desensitize(error);
+      void logAuthEvent('otp_request', { reason: 'gate' }, clean);
+      return { success: false, error: gate ?? "Kod yuborilmadi. Email tasdiqlanmagan bo‘lishi yoki xat yuborish sozlanmagan bo‘lishi mumkin — parol bilan kirishni sinab ko‘ring." };
     }
     void logAuthEvent('otp_request', {}, clean);
     return { success: true };
@@ -273,8 +286,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const clean = email.trim().toLowerCase();
       const { error } = await supabase.auth.verifyOtp({ email: clean, token: code.trim(), type: 'email' });
       if (error) {
-        void logAuthEvent('otp_verify', { success: false, reason: error.message }, clean);
-        return { success: false, error: "Kod noto'g'ri yoki eskirgan." };
+        const gate = desensitize(error);
+        void logAuthEvent('otp_verify', { success: false, reason: 'invalid' }, clean);
+        return { success: false, error: gate ?? "Kod noto'g'ri yoki eskirgan." };
       }
       void logAuthEvent('otp_verify', { success: true }, clean);
       await loadSession();
@@ -299,7 +313,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         options: { shouldCreateUser: true },
       });
       if (error) {
-        return { success: false, error: "Kod yuborilmadi. Bir daqiqadan so'ng qayta urinib ko'ring." };
+        const gate = desensitize(error);
+        void logAuthEvent('otp_resend', { reason: 'gate' }, clean);
+        return { success: false, error: gate ?? "Kod yuborilmadi. Bir daqiqadan so'ng qayta urinib ko'ring." };
       }
       void logAuthEvent('otp_resend', {}, clean);
       return { success: true };
