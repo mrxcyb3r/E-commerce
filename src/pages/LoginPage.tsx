@@ -412,6 +412,7 @@ export const LoginPage: React.FC = () => {
               <div className="flex items-center justify-between text-[11px] font-semibold">
                 <button type="button" onClick={() => setStep('email')} className="text-zinc-400 hover:text-white transition-colors">{t('pages', 'login.back')}</button>
                 <button type="button" onClick={() => setStep('email')} className="text-amber-400 hover:text-amber-300 transition-colors">{t('pages', 'login.useOtp')}</button>
+                <Link to={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`} className="text-zinc-400 hover:text-amber-300 transition-colors">Parolni unutdingizmi?</Link>
               </div>
             </form>
           )}

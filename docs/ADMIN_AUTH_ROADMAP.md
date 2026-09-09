@@ -70,17 +70,17 @@ Everything below was verified in the codebase, not assumed.
 - `[x]` Cross-tab logout/session sync (BroadcastChannel + `storage` event fallback).
 - `[x]` **Protected-route deep-link handling** — `LoginPage` auto-redirect now honors `from` for every path (OTP/password); `handleGoogle` stashes `from` in `sessionStorage` (`auth_pending_redirect`) before the redirect and `AuthCallbackPage` reads it back (same-origin sanitized, `/admin` fallback). Implemented 2026-09-09.
 - `[x]` **Prevent protected-page flash** — `AuthContext` exposes `sessionChecked`; `AdminRoute` renders a loader until it resolves, so a valid cold-load `/admin` never bounces to `/login`. Implemented 2026-09-09.
-- `[ ]` **Password reset / forgot password** — not implemented (`supabase.auth.resetPasswordForEmail` never called; no UI; no `password_reset` audit path other than the reserved event type).
-- `[ ]` **OTP blocked-email UX** — a non-allowlisted email surfaces the generic "SMTP not configured" error from `loginOtp`; should distinguish "email not permitted" from "code not sent".
+- `[x]` **Password reset / forgot password** — `forgotPassword()` (rate-limited `reset` bucket, `password_reset` audit) + `/forgot-password` + `/reset-password` pages; PKCE recovery redirect; invalid/expired-link, success and error states; no password in URL/logs. Implemented 2026-09-10. Requires SMTP configured for email delivery.
+- `[x]` **OTP blocked-email UX** — `loginOtp` failure now explains "email unapproved OR email sending unconfigured" without leaking which ("Kod yuborilmadi. Email tasdiqlanmagan bo‘lishi yoki xat yuborish sozlanmagan bo‘lishi mumkin…"). No user-enumeration. Implemented 2026-09-10.
 
 ### Admin onboarding
 - `[x]` Owner-only invite/allowlist management (`AdminsPage`, policy `owner manage allowed admin emails`).
 - `[x]` Allowed-email lifecycle: pending → used / revoked.
-- `[ ]` **Invitation expiration** — no `expires_at` column; pending invites never expire.
-- `[ ]` **Re-invite after used/revoked** — `unique(email)` blocks a second invite row for a used account; no continuous "resend invite" path.
+- `[x]` **Invitation expiration** — `expires_at` column added; signup-gate trigger rejects expired pending invites at the DB (`20260910010000_auth_invite_expiration.sql`); AdminsPage shows the expiry state. Implemented 2026-09-10 (migration pending DB apply).
+- `[x]` **Re-invite after used/revoked** — owner "Qayta taklif" button resets status→pending + resets `expires_at` (still `unique(email)`; used accounts keep their row). Implemented 2026-09-10.
 - `[~]` Google email matching — the DB gate matches the provider email to the allowlist (works), but untested end-to-end.
 - `[x]` Email OTP / password login for approved accounts (post-gate).
-- `[ ]` **Invitation abuse prevention** — invite creation itself is not rate-limited (only RLS owner-gated). Add an `invite_create` bucket ×2/server-side cap.
+- `[x]` **Invitation abuse prevention** — new-invite creation rate-limited via client cooldown (`invite:new`, 30s) on top of the owner-only RLS + DB `unique(email)`; a stricter server-side bucket is still possible (§-future). Partially implemented 2026-09-10.
 
 ### Account security
 - `[ ]` **Admin profile page** — no dedicated page showing: current authenticated email, actual role, store association, last login, auth method (OTP/password/Google). `SecurityPage` shows the email-security stream and session device, but no "my account" profile.
@@ -160,7 +160,7 @@ Audit status of every admin-relevant surface. Notes:
 | Google login | `[x]` (`oauth_login`) | — | `[~]` success path in callback, failure path in `loginGoogle` |
 | password login | `[x]` (`login_success`) | — | `[x]` |
 | password changed | ID not fired | `[x]` (`password_changed`) | `[~]` audit only, no login_history row |
-| password reset | reserved `[ ]` (no flow) | — | `[ ]` |
+| password reset | `[x]` (`password_reset`) | — | `[x]` — wired 2026-09-10:: `forgotPassword` logs request/failure/success |
 | logout | `[x]` | — | `[~]` fire-and-forget (`void`), not awaited |
 | session revoked (logout everywhere) | `[x]` | — | `[x]` |
 | admin invited / approved / revoked | — | `invite_created` / `invite_revoked` (used/approved implicitly) | `[x]` |
@@ -172,6 +172,7 @@ Audit status of every admin-relevant surface. Notes:
 ### Rules
 - `[x]` Never log passwords, OTP codes, tokens, refresh tokens, id tokens, or secrets. Verified: metadata only ever carries reasons/emails; `verifyOtp` does **not** store the code; Supabase error `message` strings are stored (safe, e.g. "Invalid login credentials").
 - `[x]` **Business audit wired** — `logBusinessAudit` joins the immutable trail on product delete, campaign create/update/delete, store settings save, analytics export, homepage publish, feed post delete (2026-09-09). Remaining (lower priority): owner-protection trigger denials, auth-gate denials, and awaiting `logout` (currently fire-and-forget).
+- `[x]` **Audit RPC hardened against forgery/log-pollution** — `20260910000000_auth_audit_allowlist.sql` (2026-09-10): `rpc_auth_audit` now (a) rejects callers whose profile role is not owner/admin/manager, (b) requires owner for the `users` entity (member-management events), and (c) enforces a strict action allowlist (`password_changed`, invites, member role/suspend, campaign create/update/delete, `store_updated`, `product_deleted`, `analytics_exported`, `feed_post_deleted`, `homepage_published`). Anonymous cannot call it; rows remain insert-only (no UPDATE/DELETE policies, grants revoked); actor is always `auth.uid()`. Client `logBusinessAudit` treats rejection as non-fatal. *Migration pending DB apply.*
 
 ---
 
@@ -306,6 +307,16 @@ Checklist (verified where possible):
 
 > **FOLLOW-UP (same continuation, also done 2026-09-09):** page-level capability authorization (16 capabilities, `RequireCapability` + 403 `ForbiddenPage`, sidebar aligned — §4), business audit wiring (§6), session-expiry banner + real `refreshSession` (§3), OTP/Google deep-link preservation, and the cold-load `/login` flash fix (§3). **DB runtime verification of the RLS migrations remains PENDING** (no working DB credentials/CLI in the sandbox; see §15 checklist to verify/apply manually).
 
+> **FINAL PASS (2026-09-10, "production completion + crash elimination"):**
+> - **P0 fixed — `useStore must be used within a StoreProvider`.** Root cause: `SaveToBuyProvider` (which calls `useStore()`) was mounted in `src/main.tsx` ABOVE `StoreProvider` (which lives in `App.tsx`). Every consumer of `SaveToBuy` crashed the whole tree on load. Fixed architecturally: moved `SaveToBuyProvider` inside `StoreProvider` in `App.tsx`, removed from `main.tsx`. Verified: only provider with an inverted dependency; provider tree now I18n→Toast→Theme→Store→SaveToBuy→Auth→Favorites→Video→BuySession→Router.
+> - Password reset flow: `forgotPassword()` (rate-limited, logged as `password_reset`) + `/forgot-password` + `/reset-password` pages; recovery link uses Supabase PKCE redirect; expired/invalid link + success + error states.
+> - Blocked-email OTP UX: loginOtp error now describes "unapproved email / SMTP unconfigured" without enumerating which.
+> - Invitation expiration + renewal (`20260910010000_auth_invite_expiration.sql`): `expires_at` column, signup gate rejects expired pending invites at the DB, AdminsPage shows expiry + owner "qayta taklif".
+> - Audit log hardening (`20260910000000_auth_audit_allowlist.sql`): `rpc_auth_audit` is now staff-only (owner/admin/manager), owner-only for `users` entity, and enforces a strict action allowlist (forgery/log-pollution closed).
+> - Crash containment: root `ErrorBoundary` in `main.tsx` + keyed admin boundary in `AdminRoute`.
+> - Environment/secret audit: no secrets in repo/history; `.env.example` is placeholder-only (owner email is a config value, not a credential); ImgBB unused; YouTube embed-only (no key). Added `docs/PRODUCTION_ENVIRONMENT_CHECKLIST.md`.
+> - **Remaining (unavailable here):** DB application/verification of the 5 pending migrations (§15); live browser runtime matrix incl. OTP/Google/reset round-trips.
+
 **Task: Fix the role-blind RLS policies on `orders`, `order_items`, `order_status_history`, and `analytics_events`; then tighten `storage.objects` writes. (Section 5 changes.)**
 
 *Why this and not a bigger feature:*
@@ -315,9 +326,9 @@ Checklist (verified where possible):
 
 Same-session follow-ups (done 2026-09-09): wire `logBusinessAudit` into destructive admin mutations (§6), session-expiry banner + real `refreshSession` (§3/§1), deep-link + flash fixes (§3).
 
-Next priorities (see §15 checklist): (1) manual DB verification/application of the three RLS migrations + runtime matrix; (2) reset-password flow + OTP blocked-email UX; (3) invitation expiration/rate-limit; (4) surface RLS denials in the UI; (5) campaigns/buy-sessions/activity to DB tables.
+Next priorities (see §15 checklist): (1) manual DB verification/application of the five pending migrations + runtime matrix; (2) surface RLS denials in the UI; (3) campaigns/buy-sessions/activity to DB tables; (4) cover other contexts with crash-boundaries if any recur.
 
-**Explicitly NOT this phase:** support roles UI, invitation expiration, 2FA, multi-tenant.
+**Explicitly NOT this phase:** support roles UI, 2FA, multi-tenant.
 
 ---
 
@@ -340,18 +351,31 @@ Next priorities (see §15 checklist): (1) manual DB verification/application of 
 
 ---
 
-## 15. Manual DB verification checklist (RLS hardening — PENDING)
+## 15. Manual DB verification checklist (RLS hardening + audit + invites — PENDING)
 
-RUNTIME VERIFICATION IS PENDING. The three migrations are committed but were NOT
-applied or runtime-tested (sandbox has no `supabase` CLI, no access token, and the
-stored pooler URL has no usable password). Apply/verify using the project workflow
-(`docs/MIGRATIONS.md`: backup first, newest-prefix forward files, staging if present).
+RUNTIME VERIFICATION IS PENDING. The migrations below are committed but were NOT
+applied or runtime-tested in this sandbox (no `supabase` CLI, no access token, and
+the stored pooler URL has no usable password). Apply/verify using the project
+workflow (`docs/MIGRATIONS.md`: backup first, newest-prefix forward files,
+staging if present).
+
+**Pending to apply (newest first):**
+1. `20260909050000_rls_harden_orders.sql`
+2. `20260909060000_rls_harden_analytics.sql`
+3. `20260909070000_rls_harden_storage.sql`
+4. `20260910000000_auth_audit_allowlist.sql` — rpc_auth_audit: staff-only caller
+   gate (owner/admin/manager), owner-only for `users` entity, strict action
+   allowlist. Do NOT apply before the audit worker previously granted to
+   `authenticated` is confirmed (verify no other callers of rpc_auth_audit
+   outside the app's `logBusinessAudit`).
+5. `20260910010000_auth_invite_expiration.sql` — `expires_at` column + signup-gate
+   trigger now rejects expired pending invites.
 
 **Verify applied state** (SQL on the linked project, e.g. Supabase SQL editor):
 
 ```sql
 select version from supabase_migrations.schema_migrations
-order by version desc limit 3;  -- expect ...050000/060000/070000 rls_harden_*
+order by version desc limit 5;  -- expect the five files above among the newest
 
 select schemaname, tablename, policyname, cmd, roles, qual, with_check
 from pg_policies
@@ -371,10 +395,14 @@ where table_schema='public'
   and table_name in ('order_status_history','analytics_events')
   and grantee in ('anon','authenticated') order by 1,2,3;
 -- order_status_history + analytics_events: NO update/delete for authenticated.
-```
+
+-- Audit allowlist (20260910000000): a customer RPC call must raise, an admin
+-- product_deleted call must insert. Verify from the UI after applying:
+--   * login as a non-staff customer -> logBusinessAudit must NON-FATALLY warn
+--   * member_role_changed by an admin (not owner) must warn (users entity)
 
 **If not applied:** `supabase db push --linked` is OFF the table (known history
-divergence). Prefer applying ONLY the three file bodies (or a new forward migration
+divergence). Prefer applying ONLY the file bodies (or a new forward migration
 duplicating them) so the effective policies converge to §5's table. Then re-run the
 guards above.
 

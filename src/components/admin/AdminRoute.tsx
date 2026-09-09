@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 const FullscreenLoader: React.FC = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
@@ -10,6 +11,16 @@ const FullscreenLoader: React.FC = () => (
     </div>
   </div>
 );
+
+/**
+ * Keyed by path so a recoverable error on one admin page clears when the user
+ * navigates to another instead of leaving the whole admin area stuck in a
+ * (possibly already-resolved) error state.
+ */
+const AdminBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
+};
 
 export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, blocked, sessionChecked } = useAuth();
@@ -29,7 +40,7 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <>{children}</>;
+  return <AdminBoundary>{children}</AdminBoundary>;
 };
 
 export default AdminRoute;

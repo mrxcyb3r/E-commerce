@@ -22,6 +22,7 @@ import { canManageUsers } from '../../lib/admin/permissions';
 import { logBusinessAudit } from '../../lib/auth/security';
 import { relativeTime } from '../../lib/admin/relativeTime';
 import { AUTH_CONFIG } from '../../lib/auth/config';
+import { localCooldownMs } from '../../lib/auth/security';
 
 interface Member {
   id: string;
@@ -40,6 +41,7 @@ interface Invite {
   status: 'pending' | 'used' | 'revoked';
   created_at: string;
   used_at: string | null;
+  expires_at: string | null;
 }
 
 const ROLE_META: Record<StaffRole, { label: string; cls: string }> = {
@@ -67,7 +69,7 @@ export const AdminsPage: React.FC = () => {
 
   const load = useCallback(async () => {
     const m = await supabase.from('profiles').select('id,email,username,role,full_name,is_suspended,last_login_at,created_at').order('created_at', { ascending: true });
-    const i = await supabase.from('allowed_admin_emails').select('id,email,status,created_at,used_at').order('created_at', { ascending: false });
+    const i = await supabase.from('allowed_admin_emails').select('id,email,status,created_at,used_at,expires_at').order('created_at', { ascending: false });
     if (!m.error) setMembers((m.data ?? []) as unknown as Member[]);
     if (!i.error) setInvites((i.data ?? []) as unknown as Invite[]);
   }, []);
@@ -95,6 +97,11 @@ export const AdminsPage: React.FC = () => {
       setError('Owner email taklif qilinmaydi — u doim to‘liq huquqqa ega.');
       return;
     }
+    const cooldown = localCooldownMs('invite:new', 30_000);
+    if (cooldown > 0) {
+      setError(`Yangi taklif yuborish orasida kutish kerak (${Math.ceil(cooldown / 1000)}s).`);
+      return;
+    }
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -103,6 +110,7 @@ export const AdminsPage: React.FC = () => {
       store_id: 'default',
       status: 'pending',
       created_by: user?.id ?? null,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     });
     setBusy(false);
     if (err) {
@@ -119,6 +127,17 @@ export const AdminsPage: React.FC = () => {
     if (!canManage) return;
     await supabase.from('allowed_admin_emails').update({ status: 'revoked' }).eq('id', invite.id);
     void logBusinessAudit('invite_revoked', 'users', invite.id, { email: invite.email });
+    void load();
+  };
+
+  /** Renew an expired (or revoked) invite by resetting status + extending expiry. */
+  const handleReinvite = async (invite: Invite) => {
+    if (!canManage || invite.status === 'used') return;
+    await supabase
+      .from('allowed_admin_emails')
+      .update({ status: 'pending', expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() })
+      .eq('id', invite.id);
+    void logBusinessAudit('invite_created', 'users', invite.id, { email: invite.email, reinvite: true });
     void load();
   };
 
@@ -303,27 +322,47 @@ export const AdminsPage: React.FC = () => {
           <p className="py-8 text-center text-xs text-muted-foreground">Takliflar yo‘q.</p>
         ) : (
           <ul className="divide-y divide-border/60">
-            {invites.map((inv) => (
+            {invites.map((inv) => {
+              const expired = inv.status === 'pending' && !!inv.expires_at && new Date(inv.expires_at).getTime() < Date.now();
+              return (
               <li key={inv.id} className="flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold text-foreground truncate">{inv.email}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {inv.status === 'pending' && <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> Kutilmoqda · {relativeTime(inv.created_at)}</span>}
+                    {expired && (
+                      <span className="inline-flex items-center gap-1 text-red-600 dark:text-red-400"><Clock className="w-3 h-3" /> Muddati o‘tgan · {relativeTime(inv.expires_at!)}</span>
+                    )}
+                    {!expired && inv.status === 'pending' && <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> Kutilmoqda · {relativeTime(inv.created_at)}</span>}
                     {inv.status === 'used' && <span className="inline-flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Ro‘yxatdan o‘tdi {inv.used_at ? relativeTime(inv.used_at) : ''}</span>}
                     {inv.status === 'revoked' && <span className="inline-flex items-center gap-1"><ShieldX className="w-3 h-3" /> Bekor qilingan</span>}
                   </p>
                 </div>
-                {inv.status === 'pending' && canManage && (
-                  <button
-                    type="button"
-                    onClick={() => handleRevoke(inv)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-[11px] font-bold text-muted-foreground hover:text-red-600 hover:border-red-500/40 transition-colors shrink-0"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" /> Bekor qilish
-                  </button>
+                {canManage && inv.status !== 'used' && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {expired && (
+                      <button
+                        type="button"
+                        onClick={() => handleReinvite(inv)}
+                        title="Taklifni yangilash"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/40 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" /> Qayta taklif
+                      </button>
+                    )}
+                    {inv.status === 'pending' && !expired && (
+                      <button
+                        type="button"
+                        onClick={() => handleRevoke(inv)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-[11px] font-bold text-muted-foreground hover:text-red-600 hover:border-red-500/40 transition-colors shrink-0"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" /> Bekor qilish
+                      </button>
+                    )}
+                  </div>
                 )}
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </div>

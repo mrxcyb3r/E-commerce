@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { VideoProvider } from './context/VideoContext';
 import { StoreProvider } from './context/StoreContext';
+import { SaveToBuyProvider } from './context/SaveToBuyContext';
 import { AuthProvider } from './context/AuthContext';
 import { BuySessionProvider } from './context/BuySessionContext';
 import { Navbar } from './components/common/Navbar';
@@ -33,6 +34,8 @@ const NotFoundPage = lazyNamed(() => import('./pages/NotFoundPage'), 'NotFoundPa
 // Admin pages
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { AdminRoute } from './components/admin/AdminRoute';
 import { Cap } from './components/admin/RequireCapability';
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -143,7 +146,8 @@ export default function App() {
   return (
     <ThemeProvider>
       <StoreProvider>
-        <AuthProvider>
+        <SaveToBuyProvider>
+          <AuthProvider>
           <FavoritesProvider>
             <VideoProvider>
               <BuySessionProvider>
@@ -176,6 +180,8 @@ export default function App() {
                   {/* Admin Login */}
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/login/callback" element={<AuthCallbackPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                   {/* Protected Admin CMS Area */}
                   <Route
@@ -233,6 +239,7 @@ export default function App() {
             </VideoProvider>
           </FavoritesProvider>
         </AuthProvider>
+        </SaveToBuyProvider>
       </StoreProvider>
     </ThemeProvider>
   );

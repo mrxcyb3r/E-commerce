@@ -58,6 +58,7 @@ export interface AuthContextType {
   loginOtp: (email: string) => Promise<AuthResult>;
   verifyOtp: (email: string, code: string) => Promise<AuthResult>;
   resendOtp: (email: string) => Promise<AuthResult>;
+  forgotPassword: (email: string) => Promise<AuthResult>;
   loginGoogle: () => Promise<AuthResult>;
   logout: () => void;
   updateCredentials: (newUsername: string, newPassword: string) => void;
@@ -261,7 +262,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
     if (error) {
       void logAuthEvent('otp_request', { reason: error.message }, clean);
-      return { success: false, error: "Kod yuborilmadi. SMTP sozlanmagan bo'lsa, parol bilan kiring." };
+      return { success: false, error: "Kod yuborilmadi. Email tasdiqlanmagan bo‘lishi yoki xat yuborish sozlanmagan bo‘lishi mumkin — parol bilan kirishni sinab ko‘ring." };
     }
     void logAuthEvent('otp_request', {}, clean);
     return { success: true };
@@ -324,6 +325,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       void logAuthEvent('oauth_login', { success: false, reason: error.message });
       return { success: false, error: 'Google bilan kirishda xatolik yuz berdi.' };
     }
+    return { success: true };
+  }, []);
+
+  const forgotPassword = useCallback(async (email: string): Promise<AuthResult> => {
+    const clean = email.trim().toLowerCase();
+    if (!clean.includes('@')) return { success: false, error: "Email manzilini to'liq kiriting." };
+
+    const bucket = rateBucket('reset', clean);
+    const gate = await authTryAttempt(bucket, 300, 3);
+    if (!gate.ok) {
+      void logAuthEvent('password_reset', { reason: 'rate_limited' }, clean);
+      return { success: false, error: 'Ko‘p so‘rov — birozdan so‘ng qayta urinib ko‘ring.', retryAfter: gate.retryAfter };
+    }
+    await authRecordAttempt(bucket);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(clean, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      void logAuthEvent('password_reset', { reason: error.message }, clean);
+      return { success: false, error: "Tiklash havolasi yuborilmadi. Elektron pochta yuborish sozlanmagan bo‘lishi mumkin — admin bilan bog‘laning." };
+    }
+    void logAuthEvent('password_reset', {}, clean);
     return { success: true };
   }, []);
 
@@ -390,6 +414,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       loginOtp,
       verifyOtp,
       resendOtp,
+      forgotPassword,
       loginGoogle,
       logout,
       updateCredentials,
@@ -397,7 +422,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       refreshProfile,
       refreshSession,
     }),
-    [sessionChecked, user, adminUsername, blocked, sessionWarning, sessionExpiresAt, login, loginOtp, verifyOtp, resendOtp, loginGoogle, logout, updateCredentials, changeCredentials, refreshProfile, refreshSession],
+    [sessionChecked, user, adminUsername, blocked, sessionWarning, sessionExpiresAt, login, loginOtp, verifyOtp, resendOtp, forgotPassword, loginGoogle, logout, updateCredentials, changeCredentials, refreshProfile, refreshSession],
   );
 
   // Expose the shared auth channel so other modules can trigger cross-tab sync.
