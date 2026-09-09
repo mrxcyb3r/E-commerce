@@ -314,7 +314,7 @@ Checklist (verified where possible):
 > - Invitation expiration + renewal (`20260910010000_auth_invite_expiration.sql`): `expires_at` column, signup gate rejects expired pending invites at the DB, AdminsPage shows expiry + owner "qayta taklif".
 > - Audit log hardening (`20260910000000_auth_audit_allowlist.sql`): `rpc_auth_audit` is now staff-only (owner/admin/manager), owner-only for `users` entity, and enforces a strict action allowlist (forgery/log-pollution closed).
 > - Crash containment: root `ErrorBoundary` in `main.tsx` + keyed admin boundary in `AdminRoute`.
-> - Environment/secret audit: no secrets in repo/history; `.env.example` is placeholder-only (owner email is a config value, not a credential); ImgBB unused; YouTube embed-only (no key). Added `docs/PRODUCTION_ENVIRONMENT_CHECKLIST.md`.
+> - Environment/secret audit: no secrets in repo/history; `.env.example` is placeholder-only (owner email is a config value, not a credential); ImgBB unused; YouTube embed-only (no key). Added `docs/PRODUCTION_ENVIRONMENT_CHECKLIST.md`. **Verified gap fixed (2026-09-10):** `VITE_SITE_URL` (used by `scripts/generate-seo.mjs` inside `npm run build` for `robots.txt`/`sitemap.xml`) was undocumented → added to `.env.example` + environment checklist; without it the build falls back to an `https://example.com` placeholder.
 > - **Remaining (unavailable here):** DB application/verification of the 5 pending migrations (§15); live browser runtime matrix incl. OTP/Google/reset round-trips.
 
 **Task: Fix the role-blind RLS policies on `orders`, `order_items`, `order_status_history`, and `analytics_events`; then tighten `storage.objects` writes. (Section 5 changes.)**

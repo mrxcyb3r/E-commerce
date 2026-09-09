@@ -8,6 +8,7 @@ No real secrets live in this repo or in `.env.example`.
 | Variable | Used in | Browser-safe | Local dev | Netlify prod | Notes |
 |---|---|---|---|---|---|
 | `VITE_SUPABASE_URL` | `src/lib/supabase/client.ts` | yes (publishable) | required | required | `https://<project-ref>.supabase.co` |
+| `VITE_SITE_URL` | `scripts/generate-seo.mjs` (robots.txt + sitemap.xml, runs inside `npm run build`) | yes (build-time) | recommended | recommended (Netlify auto-sets `URL`, but be explicit) | without it the build falls back to an `https://example.com` placeholder; keep it in sync with the deploy domain |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | `src/lib/supabase/client.ts`, `src/lib/supabase/storage.ts` (upload `apikey` header) | yes (publishable) | required | required | `sb_publishable_…` from Dashboard → Settings → API |
 | `VITE_PLATFORM_OWNER_EMAIL` | `src/lib/auth/config.ts` (UX mirror only; DB is the gate) | yes | optional (has default) | recommended | MUST equal `platform_config.owner_email` seed in migrations/`20260909…` |
 | `VITE_AUTH_GOOGLE_ENABLED` | `src/lib/auth/config.ts` (show Google button) | yes | optional | `true` only if Google provider configured | remember to set the supabase Redirect URL (`/login/callback`) in the Google/Supabase consoles |
@@ -35,7 +36,9 @@ bundle only ever ships the two publishable `VITE_` variables.
 
 ## Deploy steps (Netlify)
 
-1. Set the four `VITE_*` vars (above) in Site settings → Environment variables.
+1. Set the five `VITE_*` vars (above) in Site settings → Environment variables
+   (including `VITE_SITE_URL`; if omitted, Netlify still injects `URL`, which the
+   SEO generator reads as a fallback).
 2. Do **not** define `SUPABASE_SECRET_KEY` as `VITE_*`.
 3. Build command `npm run build`; publish `dist`.
 4. Supabase Auth redirect URLs must include the live domain.
